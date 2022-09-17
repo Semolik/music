@@ -6,18 +6,20 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Главная',
       component: HomeView
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    }
+      path: '/:pathMatch(.*)*',
+      name: 'Страница не найдена',
+      alias: '/404',
+      component: () => import('../components/AppError.vue')
+    },
   ]
-})
-
+});
+router.beforeEach((to, from, next) => {
+  document.title = to.name;
+  window.scrollTo(0, 0)
+  next();
+});
 export default router

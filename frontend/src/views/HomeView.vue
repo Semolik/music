@@ -1,9 +1,14 @@
-<script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+<template>
+  <BaseContainer class="home-container">
+    sds
+  </BaseContainer>
+</template>
+
+<script>
+import BaseContainer from '../components/BaseContainer.vue';
+
 </script>
 
-<template>
-  <main>
-    <TheWelcome />
-  </main>
-</template>
+<style lang="scss">
+@use '../assets/styles/breakpoints';
+</style>
