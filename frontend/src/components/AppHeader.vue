@@ -77,14 +77,18 @@ export default {
 @use '@/assets/styles/helpers';
 
 header {
-    margin: 10px 0px;
     @include helpers.flex-center;
     width: 100%;
     height: var(--header-height);
     padding: 1rem;
     gap: 10px;
     z-index: 10;
-    border-radius: 20px;
+
+    @include breakpoints.xl {
+        margin: 10px 0px;
+        border-radius: 20px;
+    }
+
     transition: border-color .2s;
 
     @include themes.dark {
@@ -115,7 +119,7 @@ header {
             .icon {
                 width: 100%;
                 height: 100%;
-                padding: 8px;
+                
 
                 svg {
                     color: black;
@@ -125,7 +129,9 @@ header {
             }
 
             &.login {
+                
                 background-color: var(--login-icon-color);
+
                 &:hover {
                     background-color: var(--login-icon-color-hover);
                 }
@@ -186,9 +192,13 @@ header {
             .icons {
                 position: absolute;
                 top: 0;
+                left: 0;
                 width: 100%;
                 height: 100%;
                 transition: .2s top;
+                .icon {
+                    padding: 8px;
+                }
             }
         }
     }

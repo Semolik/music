@@ -10,6 +10,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/login',
+      name: 'Авторизация',
+      component: () => import('../views/LoginView.vue')
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'Страница не найдена',
       alias: '/404',

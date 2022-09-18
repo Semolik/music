@@ -25,8 +25,16 @@
   --vt-c-text-dark-3: rgba(206, 206, 206, 0.64);
   --vt-c-white-60: rgb(60, 60, 60);
   --vt-c-white-68: rgb(68, 68, 68);
+  --vt-c-white-76: rgb(76, 76, 76);
+  --vt-c-white-84: rgb(84, 84, 84);
+  --vt-c-white-92: rgb(92, 92, 92);
+  --vt-c-white-100: rgb(100, 100, 100);
   --vt-c-white-190: rgb(190, 190, 190);
   --vt-c-white-170: rgb(170, 170, 170);
+  --vt-c-white-150: rgb(150, 150, 150);
+  --vt-c-white-130: rgb(130, 130, 130);
+  --vt-c-white-110: rgb(110, 110, 110);
+  --vt-c-white-90: rgb(90, 90, 90);
 
 
 
@@ -37,6 +45,10 @@
   --light-theme-mute-2: var(--vt-c-white-mute-2);
   --light-theme-mute-3: var(--vt-c-white-190);
   --light-theme-mute-4: var(--vt-c-white-170);
+  --light-theme-mute-5: var(--vt-c-white-150);
+  --light-theme-mute-6: var(--vt-c-white-130);
+  --light-theme-mute-7: var(--vt-c-white-110);
+  --light-theme-mute-8: var(--vt-c-white-90);
 
   // --dark-theme-background: var(--vt-c-black);
   @include color.defineColorRGB(--dark-theme-background, #181818);
@@ -46,6 +58,10 @@
   --dark-theme-mute-2: var(--vt-c-black-mute-2);
   --dark-theme-mute-3: var(--vt-c-white-60);
   --dark-theme-mute-4: var(--vt-c-white-68);
+  --dark-theme-mute-5: var(--vt-c-white-76);
+  --dark-theme-mute-6: var(--vt-c-white-84);
+  --dark-theme-mute-7: var(--vt-c-white-92);
+  --dark-theme-mute-8: var(--vt-c-white-100);
   --accent: #2e7cc3;
   --accent-2: #3a59c5;
   --purple-1: hsl(261, 50%, 50%);
@@ -95,6 +111,10 @@
   --color-background-mute-2: var(--light-theme-mute-2);
   --color-background-mute-3: var(--light-theme-mute-3);
   --color-background-mute-4: var(--light-theme-mute-4);
+  --color-background-mute-5: var(--light-theme-mute-5);
+  --color-background-mute-6: var(--light-theme-mute-6);
+  --color-background-mute-7: var(--light-theme-mute-7);
+  --color-background-mute-8: var(--light-theme-mute-8);
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
   --color-heading: var(--vt-c-text-light-1);
@@ -123,6 +143,10 @@
   --color-background-mute-2: var(--dark-theme-mute-2);
   --color-background-mute-3: var(--dark-theme-mute-3);
   --color-background-mute-4: var(--dark-theme-mute-4);
+  --color-background-mute-5: var(--dark-theme-mute-5);
+  --color-background-mute-6: var(--dark-theme-mute-6);
+  --color-background-mute-7: var(--dark-theme-mute-7);
+  --color-background-mute-8: var(--dark-theme-mute-8);
   --color-border: var(--vt-c-divider-dark-2);
   --color-border-hover: var(--vt-c-divider-dark-1);
   --color-header-text: var(--vt-c-text-dark-2);
@@ -169,7 +193,7 @@ body {
 
 #app {
   height: 100%;
-  width: min(1300px, 100%);
+  width: min(1200px, 100%);
   margin: 0 auto;
   display: flex;
   overflow-x: hidden;
