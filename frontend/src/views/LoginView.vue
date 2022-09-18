@@ -31,15 +31,27 @@
                 </div>
             </div>
         </div>
-        <div :class="['button', {active: isButtonActive}]">
+        <div :class="['button', {active: isButtonActive}]" @click="buttonHandler">
             <span v-if="loginActive">Войти</span>
             <span v-else>Зарегистрироваться</span>
         </div>
     </FormContainer>
 </template>
 <script>
+import { storeToRefs } from 'pinia';
 import FormContainer from '../components/FormContainer.vue';
+import { useAuthStore } from '../stores/auth';
 export default {
+    setup() {
+        const { token, loading, message } = storeToRefs(useAuthStore());
+        const { loginRequest } = useAuthStore();
+        return {
+            loginRequest,
+            token,
+            loading,
+            message
+        }
+    },
     components: { FormContainer },
     data() {
         return {
@@ -56,6 +68,13 @@ export default {
             name: '',
             nameMessage: '',
             nameFocus: false,
+        }
+    },
+    methods: {
+        buttonHandler() {
+            if (this.loginActive) {
+                this.loginRequest(this.login, this.password)
+            }
         }
     },
     computed: {
@@ -84,8 +103,9 @@ export default {
         },
         passwordIsValid() {
             if (!this.password) return
-            if (this.loginActive){
+            if (this.loginActive) {
                 this.passwordMessage = '';
+                return true
             }
             let value = this.password;
             var messageBase = 'Пароль должен содержать ';

@@ -13,7 +13,6 @@ export default {
   },
   data() {
     return {
-
       loading: false,
       windowWidth: window.innerWidth,
       blur_content: false,

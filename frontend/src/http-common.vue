@@ -2,6 +2,6 @@
 import axios from "axios";
 
 export const HTTP = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:3000/',
 });
 </script>
