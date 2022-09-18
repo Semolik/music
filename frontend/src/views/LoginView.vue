@@ -26,6 +26,7 @@
                 <div class="input-container">
                     <input type="password" v-model="password" @blur="e => e.target.classList.remove('focus')"
                         @focus="e => e.target.classList.add('focus')">
+                    <span :class="['tooltiptext', {active: password}]">{{passwordMessage}}</span>
                 </div>
             </div>
         </div>
@@ -45,21 +46,58 @@ export default {
             login: '',
             loginMessage: '',
             password: '',
+            passwordMessage: '',
             name: ''
         }
     },
     computed: {
         loginIsValid() {
             if (!this.login) return
-            if (this.login.length < 5) {
-                this.loginMessage = 'Логин должен быть более 5 символов';
+            let value = this.login;
+            if (value.length < 3) {
+                this.loginMessage = 'Логин должен быть более 3 символов';
+                return
+            }
+            if (value.length > 20) {
+                this.loginMessage = 'Логин должен быть менее 20 символов';
                 return
             }
             this.loginMessage = '';
             return true
         },
+        passwordIsValid() {
+            if (!this.password) return
+            if (this.loginActive) return true
+            let value = this.password;
+            var messageBase = 'Пароль должен содержать ';
+            if (this.password.length < 8) {
+                this.passwordMessage = messageBase + ' более 8 символов';
+                return
+            }
+            if (!/\W/.test(value)) {
+                this.passwordMessage = messageBase + 'ПРОПИСНЫЕ английские Абуквы';
+                return
+            }
+            if (!/\w/.test(value)) {
+                this.passwordMessage = messageBase + 'строчные английские буквы';
+                return
+            }
+            if (!/[0-9]/.test(value)) {
+                this.passwordMessage = messageBase + 'цифры';
+                return
+            }
+            if (!/[#?!@$%^&*-]/.test(value)) {
+                this.passwordMessage = messageBase + 'специальные символы (#?!@$%^&*-)';
+                return
+            }
+            this.passwordMessage = '';
+            return true
+        },
+        fieldsIsEmpty() {
+            return this.login.length === 0 || this.password.length === 0
+        },
         isButtonActive() {
-            return this.loginIsValid
+            return this.loginIsValid & this.passwordIsValid
         }
     }
 }
@@ -79,7 +117,7 @@ export default {
 .selector {
     gap: 5px;
     @include helpers.flex-center;
-    
+
 
     .item {
         text-align: center;
@@ -148,7 +186,7 @@ export default {
             display: inline-block;
 
             input {
-                background-color: var(--color-background-mute-4);
+                background-color: var(--color-background-mute-3);
                 border: none;
                 padding: 2px 10px;
                 height: 35px;

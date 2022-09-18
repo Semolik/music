@@ -115,6 +115,7 @@ header {
             height: 40px;
             width: 40px;
             border-radius: 50%;
+            padding: 8px;
 
             .icon {
                 width: 100%;
