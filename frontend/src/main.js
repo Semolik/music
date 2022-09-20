@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { useThemeStore } from './stores/theme'
+import { useAuthStore } from './stores/auth'
 import { SetupCalendar } from 'v-calendar';
 
 import App from './App.vue'
@@ -18,9 +19,8 @@ app.use(SetupCalendar, {})
 
 app.mount('#app')
 
-
-
-// Setup plugin for defaults or `$screens` (optional)
-
+const { getMe } = useAuthStore();
 const { initTheme } = useThemeStore();
+
+getMe()
 initTheme();

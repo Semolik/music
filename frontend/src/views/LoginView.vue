@@ -45,11 +45,11 @@ import FormContainer from '../components/FormContainer.vue';
 import { useAuthStore } from '../stores/auth';
 export default {
     setup() {
-        const { token, loading, message } = storeToRefs(useAuthStore());
+        const { logined, loading, message } = storeToRefs(useAuthStore());
         const { loginRequest, clearMessage } = useAuthStore();
         return {
             loginRequest,
-            token,
+            logined,
             loading,
             message,
             clearMessage

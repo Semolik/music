@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia';
-import { useStorage } from '@vueuse/core';
 import { HTTP } from '../http-common.vue';
 import { handleError } from 'vue';
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
-    token: useStorage('token', ''),
     message: '',
     loading: false,
+    logined: false,
   }),
   actions: {
-    clearMessage(){
+    clearMessage() {
       this.message = '';
     },
     loginRequest(username, password) {
@@ -18,19 +17,29 @@ export const useAuthStore = defineStore({
       this.clearMessage();
       HTTP.post('login', { username: username, password: password })
         .then((response) => {
-          const { access_token, detail } = response.data;
-          if (access_token) {
-            this.token = access_token;
-          } else {
-            this.message = detail;
-          }
+          this.logined = true;
         })
         .catch((error) => {
-          if (error?.response?.status===401){
+          if (error?.response?.status === 401) {
             this.message = error.response.data.detail;
-          }else {
+          } else {
             this.message = handleError(error)
           }
+          this.logined = false;
+        }).finally(() => {
+          this.loading = false;
+        });
+    },
+    getMe() {
+      this.loading = true;
+      this.clearMessage();
+      HTTP.get('me')
+        .then((response) => {
+          const { detail } = response.data;
+          this.logined = true;
+        })
+        .catch((error) => {
+          this.logined = false;
         }).finally(() => {
           this.loading = false;
         });
