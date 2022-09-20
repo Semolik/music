@@ -55,18 +55,12 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 @app.post('/login')
 def login(user: User, Authorize: AuthJWT = Depends()):
-    """
-    With authjwt_cookie_csrf_protect set to True, set_access_cookies() and
-    set_refresh_cookies() will now also set the non-httponly CSRF cookies
-    """
     if user.username != "test" or user.password != "test":
-        raise HTTPException(status_code=401, detail="Bad username or password")
+        raise HTTPException(status_code=401, detail="неправильное имя пользователя или пароль")
 
-    # Create the tokens and passing to set_access_cookies or set_refresh_cookies
     access_token = Authorize.create_access_token(subject=user.username)
     refresh_token = Authorize.create_refresh_token(subject=user.username)
 
-    # Set the JWT and CSRF double submit cookies in the response
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
     return {"msg": "Successfully login"}
@@ -78,20 +72,14 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
-    # Set the JWT and CSRF double submit cookies in the response
+
     Authorize.set_access_cookies(new_access_token)
     return {"msg": "The token has been refresh"}
 
 
 @app.delete('/logout')
 def logout(Authorize: AuthJWT = Depends()):
-    """
-    Because the JWT are stored in an httponly cookie now, we cannot
-    log the user out by simply deleting the cookie in the frontend.
-    We need the backend to send us a response to delete the cookies.
-    """
     Authorize.jwt_required()
-
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}
 

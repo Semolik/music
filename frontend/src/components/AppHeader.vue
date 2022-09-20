@@ -12,9 +12,10 @@
                     </div>
                 </div>
             </div>
-            <router-link class="button login" to="/login">
+            <router-link class="button login" :to="!logined ? 'login': 'lk'">
                 <div class="icon">
-                    <FontAwesomeIcon icon="fa-right-from-bracket" />
+                    <FontAwesomeIcon icon="fa-user" v-if="logined" />
+                    <FontAwesomeIcon icon="fa-right-from-bracket" v-else />
                 </div>
             </router-link>
         </div>
@@ -22,21 +23,24 @@
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSun, faMoon, faBars, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faSun, faMoon, faBars, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useThemeStore } from '../stores/theme';
+import { useAuthStore } from '../stores/auth';
 import { storeToRefs } from 'pinia';
 
-library.add([faSun, faMoon, faBars, faRightFromBracket]);
+library.add([faSun, faMoon, faBars, faRightFromBracket, faUser]);
 
 export default {
     setup() {
+        const { logined } = storeToRefs(useAuthStore());
         const themeStore = useThemeStore();
         const { themeName } = storeToRefs(themeStore);
         const { toggleTheme } = themeStore;
         return {
             themeName,
             toggleTheme,
+            logined
         }
     },
     components: {
@@ -120,7 +124,7 @@ header {
             .icon {
                 width: 100%;
                 height: 100%;
-                
+
 
                 svg {
                     color: black;
@@ -130,7 +134,7 @@ header {
             }
 
             &.login {
-                
+
                 background-color: var(--login-icon-color);
 
                 &:hover {
@@ -197,6 +201,7 @@ header {
                 width: 100%;
                 height: 100%;
                 transition: .2s top;
+
                 .icon {
                     padding: 8px;
                 }

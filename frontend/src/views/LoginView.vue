@@ -1,6 +1,7 @@
 <template>
     <FormContainer :formWidth="350" class="login-form">
         <div class="message" v-if="message">
+            <FontAwesomeIcon icon="fa-triangle-exclamation"/>
             <div class="text">{{message}}</div>
         </div>
         <div class="selector">
@@ -43,6 +44,11 @@
 import { storeToRefs } from 'pinia';
 import FormContainer from '../components/FormContainer.vue';
 import { useAuthStore } from '../stores/auth';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(faTriangleExclamation);
+
 export default {
     setup() {
         const { logined, loading, message } = storeToRefs(useAuthStore());
@@ -55,7 +61,7 @@ export default {
             clearMessage
         }
     },
-    components: { FormContainer },
+    components: { FormContainer, FontAwesomeIcon },
     data() {
         return {
             loginActive: true,
@@ -191,8 +197,11 @@ export default {
         bottom: calc(100% + 10px);
         background-color: var(--red-0-hover);
         @include helpers.flex-center;
-
-        .text {}
+        padding: 10px;
+        flex-wrap: wrap;
+        .text {
+            text-align: center;
+        }
     }
 
     .selector {
