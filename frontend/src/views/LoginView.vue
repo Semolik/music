@@ -1,5 +1,8 @@
 <template>
-    <FormContainer :formWidth="350">
+    <FormContainer :formWidth="350" class="login-form">
+        <div class="message" v-if="message">
+            <div class="text">{{message}}</div>
+        </div>
         <div class="selector">
             <div :class="['item', {active: loginActive}]" @click="loginActive = true">Вход</div>
             <div :class="['item', {active: !loginActive}]" @click="loginActive = false">Регистрация</div>
@@ -20,7 +23,6 @@
                         @focus="loginFocus = true">
                     <span :class="['tooltiptext', {active: login}, {show: loginFocus}]">{{loginMessage}}</span>
                 </div>
-
             </div>
             <div class="field">
                 <div class="label">Пароль</div>
@@ -44,12 +46,13 @@ import { useAuthStore } from '../stores/auth';
 export default {
     setup() {
         const { token, loading, message } = storeToRefs(useAuthStore());
-        const { loginRequest } = useAuthStore();
+        const { loginRequest, clearMessage } = useAuthStore();
         return {
             loginRequest,
             token,
             loading,
-            message
+            message,
+            clearMessage
         }
     },
     components: { FormContainer },
@@ -72,10 +75,18 @@ export default {
     },
     methods: {
         buttonHandler() {
-            if (this.loginActive) {
+            if (this.isButtonActive) {
                 this.loginRequest(this.login, this.password)
             }
-        }
+        },
+    },
+    watch: {
+        login() {
+            this.clearMessage();
+        },
+        password() {
+            this.clearMessage();
+        },
     },
     computed: {
         loginIsValid() {
@@ -160,149 +171,165 @@ export default {
 @use '@/assets/styles/themes';
 @use '@/assets/styles/breakpoints';
 
-.selector,
-.fields-area,
-.button {
-    background-color: var(--color-background-mute-2);
-    padding: 5px;
-    border-radius: 20px;
-    user-select: none;
-}
+.login-form {
+    position: relative;
 
-.selector {
-    gap: 5px;
-    @include helpers.flex-center;
-
-    .item {
-        text-align: center;
-        flex-grow: 1;
-        border-radius: 15px;
+    .message,
+    .selector,
+    .fields-area,
+    .button {
+        background-color: var(--color-background-mute-2);
         padding: 5px;
-        cursor: pointer;
-        border: 1px solid transparent;
+        border-radius: 20px;
+        user-select: none;
+    }
 
-        &:not(.active):hover {
-            @include themes.light {
-                border-color: var(--color-background-mute-4);
+    .message {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        bottom: calc(100% + 10px);
+        background-color: var(--red-0-hover);
+        @include helpers.flex-center;
+
+        .text {}
+    }
+
+    .selector {
+        gap: 5px;
+        @include helpers.flex-center;
+
+        .item {
+            text-align: center;
+            flex-grow: 1;
+            border-radius: 15px;
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+
+            &:not(.active):hover {
+                @include themes.light {
+                    border-color: var(--color-background-mute-4);
+                }
+
+                @include themes.dark {
+                    background-color: var(--color-background-mute-3);
+                }
             }
 
-            @include themes.dark {
-                background-color: var(--color-background-mute-3);
-            }
-        }
+            &.active {
+                cursor: auto;
 
-        &.active {
-            cursor: auto;
+                @include themes.light {
+                    background-color: var(--color-background-mute-3);
+                }
 
-            @include themes.light {
-                background-color: var(--color-background-mute-3);
-            }
-
-            @include themes.dark {
-                background-color: var(--color-background-mute-4);
+                @include themes.dark {
+                    background-color: var(--color-background-mute-4);
+                }
             }
         }
     }
-}
 
-.fields-area {
-    display: flex;
-    flex-direction: column;
-
-    .field {
+    .fields-area {
         display: flex;
         flex-direction: column;
-        padding: 5px 2px;
-        gap: 5px;
 
-        .label {
-            margin-left: 5px;
-            font-size: calc(1em - 2px);
-            color: var(--color-header-text);
-        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            padding: 5px 2px;
+            gap: 5px;
 
-        .input-container {
-            position: relative;
-            display: inline-block;
-
-            input {
-                background-color: var(--color-background-mute-3);
-                padding: 2px 10px;
-                height: 35px;
-                color: var(--color-text);
-                font-size: 1.02em;
-                outline: none;
-                width: 100%;
-                border-radius: 10px;
-                border: 1px solid transparent;
-
-                &.wrong {
-                    border-color: var(--red-0);
-
-                    @include themes.light {
-                        border-color: red;
-                    }
-                }
+            .label {
+                margin-left: 5px;
+                font-size: calc(1em - 2px);
+                color: var(--color-header-text);
             }
 
-            .tooltiptext {
-                visibility: hidden;
-                width: 200px;
-                background-color: black;
-                color: #fff;
-                text-align: center;
-                padding: 5px;
-                border-radius: 6px;
-                position: absolute;
-                z-index: 1;
+            .input-container {
+                position: relative;
+                display: inline-block;
 
-                &.show.active:not(:empty) {
-                    visibility: visible;
+                input {
+                    background-color: var(--color-background-mute-3);
+                    padding: 2px 10px;
+                    height: 35px;
+                    color: var(--color-text);
+                    font-size: 1.02em;
+                    outline: none;
+                    width: 100%;
+                    border-radius: 10px;
+                    border: 1px solid transparent;
+
+                    &.wrong {
+                        border-color: var(--red-0);
+
+                        @include themes.light {
+                            border-color: red;
+                        }
+                    }
                 }
 
-                @include breakpoints.md {
-                    top: -20%;
-                    left: calc(100% + 5px);
-                }
-
-                @include breakpoints.md(true) {
-                    bottom: 110%;
-                    left: 50%;
-                    margin-left: -100px;
-                }
-
-                &::after {
-                    content: " ";
+                .tooltiptext {
+                    visibility: hidden;
+                    width: 200px;
+                    background-color: black;
+                    color: #fff;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius: 6px;
                     position: absolute;
-                    top: 50%;
-                    right: 100%;
+                    z-index: 1;
+
+                    &.show.active:not(:empty) {
+                        visibility: visible;
+                    }
+
+                    @include breakpoints.md {
+                        top: -20%;
+                        left: calc(100% + 5px);
+                    }
 
                     @include breakpoints.md(true) {
-                        top: 100%;
+                        bottom: 110%;
                         left: 50%;
+                        margin-left: -100px;
                     }
 
-                    margin-top: -5px;
-                    border-width: 5px;
-                    border-style: solid;
-                    border-color: transparent black transparent transparent;
+                    &::after {
+                        content: " ";
+                        position: absolute;
+                        top: 50%;
+                        right: 100%;
+
+                        @include breakpoints.md(true) {
+                            top: 100%;
+                            left: 50%;
+                        }
+
+                        margin-top: -5px;
+                        border-width: 5px;
+                        border-style: solid;
+                        border-color: transparent black transparent transparent;
+                    }
                 }
             }
         }
     }
-}
 
-.button {
-    text-align: center;
-    user-select: none;
-    min-height: 31px;
-    color: var(--color-header-text);
+    .button {
+        text-align: center;
+        user-select: none;
+        min-height: 31px;
+        color: var(--color-header-text);
 
-    &.active {
-        color: var(--color-text);
-        cursor: pointer;
-        background-color: var(--color-background-mute-3);
+        &.active {
+            color: var(--color-text);
+            cursor: pointer;
+            background-color: var(--color-background-mute-3);
+        }
+
     }
-
 }
 </style>

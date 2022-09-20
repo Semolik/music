@@ -10,19 +10,13 @@ export const useAuthStore = defineStore({
     loading: false,
   }),
   actions: {
+    clearMessage(){
+      this.message = '';
+    },
     loginRequest(username, password) {
       this.loading = true;
-      this.message = '';
-      var form = new FormData();
-      form.append('username', username);
-      form.append('password', password);
-      let options = {
-        method: "POST",
-        headers: { "content-type": "application/x-www-form-urlencoded" },
-        data: form,
-        url: 'token'
-      };
-      HTTP(options)
+      this.clearMessage();
+      HTTP.post('login', { username: username, password: password })
         .then((response) => {
           const { access_token, detail } = response.data;
           if (access_token) {
@@ -32,7 +26,11 @@ export const useAuthStore = defineStore({
           }
         })
         .catch((error) => {
-          this.message = handleError(error)
+          if (error?.response?.status===401){
+            this.message = error.response.data.detail;
+          }else {
+            this.message = handleError(error)
+          }
         }).finally(() => {
           this.loading = false;
         });
