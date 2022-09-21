@@ -1,8 +1,5 @@
 import typing as t
-
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-
-
 class_registry: t.Dict = {}
 
 
