@@ -1,11 +1,11 @@
 from fastapi import HTTPException, Depends, APIRouter
 from fastapi_jwt_auth import AuthJWT
-from schemas.user import User
+from schemas.user import UserAuth
 router = APIRouter()
 
 
 @router.post('/login')
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: UserAuth, Authorize: AuthJWT = Depends()):
     if user.username != "test" or user.password != "test":
         raise HTTPException(
             status_code=401, detail="неправильное имя пользователя или пароль")
