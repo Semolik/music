@@ -1,4 +1,5 @@
 import logging
+from core.security import get_password_hash
 from schemas.user import UserRegister
 from crud.crud_user import create_user, get_user_by_username
 from db import base  # noqa: F401
@@ -16,6 +17,7 @@ def init_db(db: Session) -> None:  # 1
                 username=FIRST_SUPERUSER,
                 first_name=FIRST_SUPERUSER,
                 is_superuser=True,
+                password='abobus'
             )
             user = create_user(db=db, user=user_in)
         else:

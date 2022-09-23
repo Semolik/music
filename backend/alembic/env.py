@@ -1,3 +1,4 @@
+from models.user import Users
 from core.config import settings
 from db.base import Base
 from logging.config import fileConfig

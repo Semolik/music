@@ -1,8 +1,8 @@
 from passlib.context import CryptContext
 from sqlalchemy.orm.session import Session
 from typing import Optional, MutableMapping, List, Union
-
-from backend.schemas.user import UserInfo
+from models.user import Users
+from schemas.user import UserInfo
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -17,11 +17,11 @@ def get_password_hash(password: str) -> str:
 
 def authenticate(
     *,
-    email: str,
+    username: str,
     password: str,
     db: Session,
 ) -> Optional[UserInfo]:
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(Users).filter(Users.username == username).first()
     if not user:
         return None
     if not verify_password(password, user.hashed_password):  # 1
