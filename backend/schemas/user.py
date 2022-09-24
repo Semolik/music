@@ -6,16 +6,17 @@ class UserAuth(BaseModel):
     password: str
 
 
-class UserRegister(UserAuth):
+class UserBase(BaseModel):
     first_name: str | None = None
-    surname: str | None = None
+    last_name: str | None = None
 
 
-class UserInfo(UserRegister):
+class UserRegister(UserBase, UserAuth):
+    ...
+
+
+class UserInfo(UserBase):
     id: int
     is_superuser: bool
     is_musician: bool
     is_radio_station: bool
-
-    class Config:
-        fields = {'password': {'exclude': True}}

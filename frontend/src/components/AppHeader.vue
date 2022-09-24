@@ -1,8 +1,9 @@
 <template>
-    <header :class="{ active: nav_opened }">
+    <header>
         <router-link to="/" class="text" @click="this.$emit('reset_error')">Музыка</router-link>
         <div class="buttons">
-            <div :class="['themeswitch', 'button', themeName]" @click="toggleTheme">
+            <div :class="['themeswitch', 'button', themeName]" @click="toggleTheme"
+                v-if="logined ? !panelActive : true">
                 <div class="icons">
                     <div class="icon">
                         <FontAwesomeIcon icon="fa-sun" />
@@ -12,12 +13,21 @@
                     </div>
                 </div>
             </div>
-            <router-link class="button login" :to="!logined ? 'login': 'lk'">
+            <router-link @[logined&&`mouseover`]="panelActive = true"
+                :class="['button', 'login', {logined: logined},{normal: !panelActive}]" :to="!logined ? 'login': 'lk'">
                 <div class="icon">
                     <FontAwesomeIcon icon="fa-user" v-if="logined" />
                     <FontAwesomeIcon icon="fa-right-from-bracket" v-else />
                 </div>
             </router-link>
+            <div :class="['account-panel', {active: panelActive}]" v-if="logined"
+                @[logined&&`mouseleave`]="panelActive = false">
+                <div class="line">
+                    <div class="info">
+                        <div class="info-text">Сладкопар Жижедуй</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 </template>
@@ -47,30 +57,10 @@ export default {
         FontAwesomeIcon,
     },
     emits: ['blur_content', 'hide_body_overflow'],
-    methods: {
-        toggleNav() {
-            this.nav_opened = !this.nav_opened;
-            this.$emit('blur_content', this.nav_opened);
-        }
-    },
     data() {
         return {
             themeToggle: false,
-            nav_opened: false,
-            links: [
-                {
-                    'name': 'Образовательный портал',
-                    'url': 'https://portal.edu.asu.ru/my'
-                },
-                {
-                    'name': 'Сайт университета',
-                    'url': 'https://asu.ru'
-                },
-                {
-                    'name': 'Автор',
-                    'url': 'https://vk.com/id612410511'
-                },
-            ],
+            panelActive: false,
         }
     }
 }
@@ -87,6 +77,7 @@ header {
     padding: 1rem;
     gap: 10px;
     z-index: 10;
+    position: relative;
 
     @include breakpoints.xl {
         margin: 10px 0px;
@@ -111,6 +102,48 @@ header {
         text-decoration: none;
     }
 
+    .account-panel {
+        position: absolute;
+        top: 0;
+        z-index: -1;
+        background-color: var(--color-background-mute-2);
+        overflow: hidden;
+        max-width: 0px;
+        right: 0;
+
+        @include breakpoints.xl {
+            border-radius: 20px;
+        }
+
+        @include breakpoints.xl(true) {
+            border-radius: 20px 0px 0px 20px;
+        }
+
+        &:where(.active, :hover) {
+            min-width: 300px;
+            min-height: 100%;
+            // padding: 10px;
+        }
+
+        .line {
+            height: calc(40px + 2rem);
+            margin-right: calc(40px + 2rem); //Ширина кнопки + отступ хедера
+            display: flex;
+
+            .info {
+                background-color: red;
+                flex-grow: 1;
+                padding: 10px;
+                @include helpers.flex-center;
+
+                .info-text {
+                    font-size: 1.2em;
+                }
+            }
+        }
+    }
+
+
     .buttons {
         display: flex;
         gap: 10px;
@@ -120,11 +153,11 @@ header {
             width: 40px;
             border-radius: 50%;
             padding: 8px;
+            overflow: hidden;
 
             .icon {
                 width: 100%;
                 height: 100%;
-
 
                 svg {
                     color: black;
@@ -134,11 +167,23 @@ header {
             }
 
             &.login {
-
                 background-color: var(--login-icon-color);
+                position: relative;
+                transition: border-radius .2s, background-color .2s;
 
                 &:hover {
                     background-color: var(--login-icon-color-hover);
+                }
+
+                &.logined {
+                    &:not(.normal) {
+                        background-color: transparent;
+                        border-radius: 0px;
+
+                        &:hover {
+                            background-color: transparent;
+                        }
+                    }
                 }
             }
         }

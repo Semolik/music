@@ -4,8 +4,17 @@ import AppHeader from './components/AppHeader.vue';
 import { computed } from 'vue';
 import AppError from './components/AppError.vue';
 import handleError from './composables/errors';
+import { useAuthStore } from './stores/auth';
+import { storeToRefs } from 'pinia';
 
 export default {
+  setup() {
+    const { logined } = storeToRefs(useAuthStore());
+
+    return {
+      logined
+    }
+  },
   components: {
     RouterView,
     AppHeader,
@@ -23,6 +32,7 @@ export default {
     return {
       loading: computed(() => this.loading),
       windowWidth: computed(() => this.windowWidth),
+      logined: computed(() => this.logined),
       disableLoading: false,
     }
   },

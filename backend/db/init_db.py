@@ -1,5 +1,4 @@
 import logging
-from core.security import get_password_hash
 from schemas.user import UserRegister
 from crud.crud_user import create_user, get_user_by_username
 from db import base  # noqa: F401

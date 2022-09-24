@@ -1,7 +1,7 @@
 <template>
     <FormContainer :formWidth="350" class="login-form">
         <div class="message" v-if="message">
-            <FontAwesomeIcon icon="fa-triangle-exclamation"/>
+            <FontAwesomeIcon icon="fa-triangle-exclamation" />
             <div class="text">{{message}}</div>
         </div>
         <div class="selector">
@@ -9,14 +9,25 @@
             <div :class="['item', {active: !loginActive}]" @click="loginActive = false">Регистрация</div>
         </div>
         <div class="fields-area">
-            <div class="field" v-if="!loginActive">
-                <div class="label">Отображаемое имя</div>
-                <div class="input-container">
-                    <input type="text" v-model="name" :class="[{wrong: nameMessage}]" @blur="nameFocus = false"
-                        @focus="nameFocus = true">
-                    <span :class="['tooltiptext', {active: name}, {show: nameFocus}]">{{nameMessage}}</span>
+            <template v-if="!loginActive">
+                <div class="field">
+                    <div class="label">Имя</div>
+                    <div class="input-container">
+                        <input type="text" v-model="name" :class="[{wrong: nameMessage}]" @blur="nameFocus = false"
+                            @focus="nameFocus = true">
+                        <span :class="['tooltiptext', {active: name}, {show: nameFocus}]">{{nameMessage}}</span>
+                    </div>
                 </div>
-            </div>
+                <div class="field">
+                    <div class="label">Фамилия</div>
+                    <div class="input-container">
+                        <input type="text" v-model="lastName" :class="[{wrong: lastNameMessage}]"
+                            @blur="lastNameFocus = false" @focus="lastNameFocus = true">
+                        <span
+                            :class="['tooltiptext', {active: lastName}, {show: lastNameFocus}]">{{lastNameMessage}}</span>
+                    </div>
+                </div>
+            </template>
             <div class="field">
                 <div class="label">Логин</div>
                 <div class="input-container">
@@ -52,9 +63,10 @@ library.add(faTriangleExclamation);
 export default {
     setup() {
         const { logined, loading, message } = storeToRefs(useAuthStore());
-        const { loginRequest, clearMessage } = useAuthStore();
+        const { loginRequest, registerRequest, clearMessage } = useAuthStore();
         return {
             loginRequest,
+            registerRequest,
             logined,
             loading,
             message,
@@ -77,12 +89,19 @@ export default {
             name: '',
             nameMessage: '',
             nameFocus: false,
+
+            lastName: '',
+            lastNameMessage: '',
+            lastNameFocus: false,
         }
     },
     methods: {
         buttonHandler() {
-            if (this.isButtonActive) {
+            if (!this.isButtonActive) return;
+            if (this.loginActive) {
                 this.loginRequest(this.login, this.password)
+            } else {
+                this.registerRequest(this.login, this.password, this.name, this.lastName)
             }
         },
     },
@@ -93,6 +112,17 @@ export default {
         password() {
             this.clearMessage();
         },
+        name() {
+            this.clearMessage();
+        },
+        lastName() {
+            this.clearMessage();
+        },
+        logined(value) {
+            if (value === true) {
+                this.$router.push({ path: '/lk' })
+            }
+        }
     },
     computed: {
         loginIsValid() {
@@ -124,34 +154,38 @@ export default {
                 this.passwordMessage = '';
                 return true
             }
-            let value = this.password;
-            var messageBase = 'Пароль должен содержать ';
-            if (!/[A-Z]/.test(value)) {
-                this.passwordMessage = messageBase + 'ПРОПИСНЫЕ английские Абуквы';
-                return
-            }
-            if (!/[a-z]/.test(value)) {
-                this.passwordMessage = messageBase + 'строчные английские буквы';
-                return
-            }
-            if (!/[0-9]/.test(value)) {
-                this.passwordMessage = messageBase + 'цифры';
-                return
-            }
-            if (!/[#?!@$%^&*-]/.test(value)) {
-                this.passwordMessage = messageBase + 'специальные символы (#?!@$%^&*-)';
-                return
-            }
-            if (this.password.length < 8) {
-                this.passwordMessage = messageBase + ' более 8 символов';
-                return
-            }
+            // let value = this.password;
+            // var messageBase = 'Пароль должен содержать ';
+            // if (!/[A-Z]/.test(value)) {
+            //     this.passwordMessage = messageBase + 'ПРОПИСНЫЕ английские Абуквы';
+            //     return
+            // }
+            // if (!/[a-z]/.test(value)) {
+            //     this.passwordMessage = messageBase + 'строчные английские буквы';
+            //     return
+            // }
+            // if (!/[0-9]/.test(value)) {
+            //     this.passwordMessage = messageBase + 'цифры';
+            //     return
+            // }
+            // if (!/[#?!@$%^&*-]/.test(value)) {
+            //     this.passwordMessage = messageBase + 'специальные символы (#?!@$%^&*-)';
+            //     return
+            // }
+            // if (this.password.length < 8) {
+            //     this.passwordMessage = messageBase + ' более 8 символов';
+            //     return
+            // }
             this.passwordMessage = '';
             return true
         },
         nameIsValid() {
             if (!this.name) return
             let value = this.name;
+            if (/[\s]/.test(value)) {
+                this.nameMessage = 'В имени зарещены пробельные символы';
+                return
+            }
             if (value.length < 3) {
                 this.nameMessage = 'Имя должено быть более 3 символов';
                 return
@@ -163,11 +197,25 @@ export default {
             this.nameMessage = '';
             return true
         },
+        lastNameIsValid() {
+            if (!this.lastName) return
+            let value = this.lastName;
+            if (/[\s]/.test(value)) {
+                this.lastNameMessage = 'В фамилии зарещены пробельные символы';
+                return
+            }
+            if (value.length > 25) {
+                this.lastNameMessage = 'Фамилия должена быть менее 25 символов';
+                return
+            }
+            this.lastNameMessage = '';
+            return true
+        },
         fieldsIsEmpty() {
             return this.login.length === 0 || this.password.length === 0 || (this.loginActive ? false : this.nameIsValid)
         },
         isButtonActive() {
-            return (this.loginIsValid & this.passwordIsValid) & (this.loginActive ? true : this.nameIsValid)
+            return (this.loginIsValid & this.passwordIsValid) & (this.loginActive ? true : this.nameIsValid & this.lastNameIsValid)
         }
     }
 }
@@ -199,8 +247,10 @@ export default {
         @include helpers.flex-center;
         padding: 10px;
         flex-wrap: wrap;
+
         .text {
             text-align: center;
+            font-size: 0.95em;
         }
     }
 

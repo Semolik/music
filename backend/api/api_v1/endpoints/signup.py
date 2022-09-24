@@ -24,12 +24,11 @@ def create_user_signup(
     if user:
         raise HTTPException(
             status_code=400,
-            detail="The user with this email already exists in the system",
+            detail="Такой пользователь уже существует",
         )
     user = create_user(db=db, user=user_in)
     access_token = Authorize.create_access_token(subject=user.username)
     refresh_token = Authorize.create_refresh_token(subject=user.username)
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-
     return user.as_dict()
