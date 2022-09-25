@@ -74,6 +74,11 @@ export default {
         }
     },
     components: { FormContainer, FontAwesomeIcon },
+    mounted() {
+        if (this.logined === true) {
+            this.$router.push({ path: '/lk' })
+        }
+    },
     data() {
         return {
             loginActive: true,
