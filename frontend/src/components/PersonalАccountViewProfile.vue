@@ -1,6 +1,6 @@
 <template>
     <div class="profile-container">
-        <div class="user-info-container">
+        <form class="user-info-container" @submit.prevent="formSubmited" ref="form">
             <div :class="['user-pic', {empty: avatarIsEmpty}]">
                 <FontAwesomeIcon icon="fa-user" v-if="avatarIsEmpty" />
                 <div class="edit-area">
@@ -9,18 +9,29 @@
                 </div>
             </div>
             <div class="user-info">
-                <h2>{{fullName}}</h2>
+                <div class="fields">
+                    <FormKit type="text" name="first_name" label="Имя" v-model="firstName" placeholder="Ваше имя" />
+                    <FormKit type="text" name="last_name" label="Фамилия" v-model="lastName"
+                        placeholder="Ваша фамилия" />
+                </div>
+                <div class="buttons">
+                    <div :class="['button', 'save', {active: dataChanged}]" @click="save">
+                        <FontAwesomeIcon icon="fa-floppy-disk" />
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { storeToRefs } from 'pinia';
+import { HTTP } from '../http-common.vue';
 import { useAuthStore } from '../stores/auth';
-library.add(faUser)
+import handleError from '../composables/errors'
+library.add([faUser, faFloppyDisk])
 
 export default {
     setup() {
@@ -29,8 +40,44 @@ export default {
             userData
         }
     },
+    data() {
+        return {
+            firstName: this.userData?.first_name,
+            lastName: this.userData?.last_name,
+            message: '',
+        }
+    },
     components: {
         FontAwesomeIcon,
+    },
+    watch: {
+        userData(value) {
+            this.firstName = value?.first_name;
+            this.lastName = value?.last_name
+        }
+    },
+    methods: {
+        save() {
+            if (this.dataChanged) {
+                const form = this.$refs.form;
+                if (!form) return
+                const data = new FormData(form);
+                const value = Object.fromEntries(data.entries());
+                console.log(value)
+                HTTP.put('me', value)
+                    .then((response) => {
+                        this.userData = response.data;
+                    })
+                    .catch((error) => {
+                        let message = error?.response?.data?.detail;
+                        if (message) {
+                            this.message = message;
+                        } else {
+                            this.message = handleError(error).message
+                        }
+                    });
+            }
+        }
     },
     computed: {
         avatarIsEmpty() {
@@ -40,13 +87,17 @@ export default {
         fullName() {
             if (!this.userData) return
             return [this.userData.first_name, this.userData.last_name].filter(Boolean).join(' ')
+        },
+        dataChanged() {
+            if (!this.userData) return
+            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName
         }
-
     }
 }
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/themes';
 
 .profile-container {
     display: flex;
@@ -54,18 +105,28 @@ export default {
 
     .user-info-container {
         display: grid;
-        grid-template-columns: 250px 1fr;
+        gap: 10px;
+        grid-template-columns: 200px 1fr;
 
         .user-pic {
             aspect-ratio: 1;
             position: relative;
+            border-radius: 7px;
 
             &.empty {
                 @include helpers.flex-center;
-                border-radius: 50%;
-                margin: 15px;
-                border: 2px dashed var(--main-card-border);
+                
                 overflow: hidden;
+                border: 2px dashed transparent;
+
+                @include themes.dark {
+                    border-color: var(--main-card-border);
+                }
+
+                @include themes.light {
+                    border-color: var(--color-text);
+                }
+
 
                 svg {
                     width: 50px;
@@ -118,14 +179,59 @@ export default {
         }
 
         .user-info {
-            padding: 10px;
+            border-radius: 5px;
             display: grid;
             gap: 5px;
+            padding-top: 5px;
 
-            h2 {
-                text-align: center;
+            .fields {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+
+                .formkit-inner:focus-within {
+                    border-color: var(--purple-1);
+                    box-shadow: 0 0 0 1px var(--purple-1);
+                }
+
+                .formkit-input {
+                    color: var(--color-text);
+                }
+            }
+
+            .buttons {
+                // grid-column: 1 / -1;
+                margin-top: auto;
+                display: flex;
+                gap: 5px;
+                justify-content: right;
+
+                .button {
+                    @include helpers.flex-center;
+                    border-radius: 10px;
+                    padding: 5px;
+                    background-color: var(--color-background-mute-4);
+                    width: 40px;
+                    height: 40px;
+
+                    &.save {
+                        @include themes.light {
+                            svg {
+                                color: var(--color-background-mute);
+                            }
+                        }
+
+                        &.active {
+                            background-color: var(--purple-1);
+
+                            cursor: pointer;
+                        }
+                    }
+                }
             }
         }
     }
+
+
 }
 </style>

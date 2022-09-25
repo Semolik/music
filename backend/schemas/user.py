@@ -14,6 +14,8 @@ class UserBase(BaseModel):
 class UserRegister(UserBase, UserAuth):
     ...
 
+class UserModifiable(UserBase):
+    ...
 
 class UserInfo(UserBase):
     id: int

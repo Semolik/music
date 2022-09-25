@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas.user import UserRegister
+from schemas.user import UserModifiable, UserRegister
 from models.user import Users
 from passlib.context import CryptContext
 
@@ -31,3 +31,14 @@ def login(username, password, db):
     if (not pwd_context.verify(password, db_user.hashed_password)):
         return 401
     return db_user
+
+
+def update_user(db: Session, user: Users, new_user_data: UserModifiable):
+    print(new_user_data.dict())
+    for var, value in new_user_data.dict().items():
+        print(var, value)
+        setattr(user, var, value) if value is not None else None
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
