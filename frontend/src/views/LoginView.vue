@@ -145,7 +145,6 @@ export default {
                 return
             }
             this.loginMessage = '';
-
             return true
         },
         passwordIsValid() {

@@ -91,7 +91,6 @@ export default {
 
 .app-content {
   margin-right: calc(-1 * (100vw - 100%));
-  padding-inline: 20px;
   transition: filter .3s;
   width: 100%;
   height: 100%;

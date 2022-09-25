@@ -15,6 +15,17 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
+      path: '/lk',
+      component: () => import('../views/PersonalАccountView.vue'),
+      children: [
+        {
+          path: '',
+          name: 'Личный кабинет',
+          component: () => import('../components/PersonalАccountViewProfile.vue'),
+        },
+      ]
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'Страница не найдена',
       alias: '/404',

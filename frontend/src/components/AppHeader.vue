@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="menu">
-                    <div class="item">Личный кабинет</div>
+                    <router-link to="/lk" class="item">Личный кабинет</router-link>
                     <div class="item" @click="logoutRequest">Выйти из аккаунта</div>
                 </div>
             </div>
@@ -93,7 +93,7 @@ header {
     gap: 10px;
     z-index: 10;
     position: relative;
-
+    margin-bottom: 10px;
     @include breakpoints.xl {
         margin: 10px 0px;
         border-radius: 20px;
@@ -161,11 +161,16 @@ header {
             flex-direction: column;
 
             .item {
-                border-bottom: 1px solid var(--color-background-mute);
+                &:not(:last-child) {
+                    border-bottom: 1px solid var(--color-background-mute);
+                }
+
                 padding: 10px;
                 background-color: var(--color-background-mute-3);
                 text-align: center;
                 cursor: pointer;
+                text-decoration: none;
+                color: var(--color-text);
 
                 &:hover {
                     background-color: var(--color-background-mute-4);
