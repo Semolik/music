@@ -2,9 +2,8 @@
     <div class="lk-container">
         <aside>
             <router-link class="item" to="/lk">Профиль</router-link>
-            <div class="item">Профиль</div>
-            <div class="item">Профиль</div>
-            <div class="item">Профиль</div>
+            <router-link class="item" to="/lk/music">Моя музыка</router-link>
+
         </aside>
         <div class="active-route">
             <router-view></router-view>
@@ -56,7 +55,7 @@
                 transition: opacity .2s;
             }
 
-            &.router-link-active::after {
+            &.router-link-exact-active::after {
                 opacity: 1;
             }
         }

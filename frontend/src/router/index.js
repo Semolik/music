@@ -21,7 +21,12 @@ const router = createRouter({
         {
           path: '',
           name: 'Личный кабинет',
-          component: () => import('../components/PersonalАccountViewProfile.vue'),
+          component: () => import('../components/PersonalАccountProfile.vue'),
+        },
+        {
+          path: 'music',
+          name: 'Моя музыка',
+          component: () => import('../components/PersonalАccountMusic.vue'),
         },
       ]
     },
