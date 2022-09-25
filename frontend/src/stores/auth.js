@@ -8,6 +8,7 @@ export const useAuthStore = defineStore({
     message: '',
     loading: false,
     logined: useStorage('logined', false),
+    userData: null,
   }),
   actions: {
     clearMessage() {
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore({
       HTTP.delete('logout')
         .then((response) => {
           this.logined = false;
+          this.userData = null;
         })
         .catch((error) => {
           this.setMessage(error);
@@ -35,9 +37,11 @@ export const useAuthStore = defineStore({
     },
     loginRequest(username, password) {
       this.loading = true;
+      this.logined = false;
       this.clearMessage();
       HTTP.post('login', { username: username, password: password })
         .then((response) => {
+          this.userData = response.data;
           this.logined = true;
         })
         .catch((error) => {
@@ -49,9 +53,11 @@ export const useAuthStore = defineStore({
     },
     registerRequest(username, password, first_name, last_name) {
       this.loading = true;
+      this.logined = false;
       this.clearMessage();
       HTTP.post('signup', { username: username, password: password, first_name, last_name })
         .then((response) => {
+          this.userData = response.data;
           this.logined = true;
         })
         .catch((error) => {
@@ -66,7 +72,7 @@ export const useAuthStore = defineStore({
       this.clearMessage();
       HTTP.get('me')
         .then((response) => {
-          const { detail } = response.data;
+          this.userData = response.data;
           this.logined = true;
         })
         .catch((error) => {

@@ -20,12 +20,16 @@
                     <FontAwesomeIcon icon="fa-right-from-bracket" v-else />
                 </div>
             </router-link>
-            <div :class="['account-panel', {active: panelActive}]" v-if="logined"
+            <div :class="['account-panel', {active: panelActive}]" v-if="logined && userData"
                 @[logined&&`mouseleave`]="panelActive = false">
                 <div class="line">
                     <div class="info">
-                        <div class="info-text">Сладкопар Жижедуй</div>
+                        <div class="info-text">{{fullName}}</div>
                     </div>
+                </div>
+                <div class="menu">
+                    <div class="item">Личный кабинет</div>
+                    <div class="item" @click="logoutRequest">Выйти из аккаунта</div>
                 </div>
             </div>
         </div>
@@ -43,14 +47,19 @@ library.add([faSun, faMoon, faBars, faRightFromBracket, faUser]);
 
 export default {
     setup() {
-        const { logined } = storeToRefs(useAuthStore());
+        const AuthStore = useAuthStore();
         const themeStore = useThemeStore();
+
+        const { logined, userData } = storeToRefs(AuthStore);
         const { themeName } = storeToRefs(themeStore);
         const { toggleTheme } = themeStore;
+        const { logoutRequest } = AuthStore;
         return {
             themeName,
             toggleTheme,
-            logined
+            logined,
+            userData,
+            logoutRequest
         }
     },
     components: {
@@ -61,6 +70,12 @@ export default {
         return {
             themeToggle: false,
             panelActive: false,
+        }
+    },
+    computed: {
+        fullName() {
+            if (!this.userData) return
+            return [this.userData.first_name, this.userData.last_name].filter(Boolean).join(' ') || this.userData.username
         }
     }
 }
@@ -122,22 +137,38 @@ header {
         &:where(.active, :hover) {
             min-width: 300px;
             min-height: 100%;
-            // padding: 10px;
         }
 
         .line {
+
             height: calc(40px + 2rem);
             margin-right: calc(40px + 2rem); //Ширина кнопки + отступ хедера
             display: flex;
 
             .info {
-                background-color: red;
                 flex-grow: 1;
                 padding: 10px;
                 @include helpers.flex-center;
 
                 .info-text {
                     font-size: 1.2em;
+                }
+            }
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+
+            .item {
+                border-bottom: 1px solid var(--color-background-mute);
+                padding: 10px;
+                background-color: var(--color-background-mute-3);
+                text-align: center;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: var(--color-background-mute-4);
                 }
             }
         }
@@ -178,48 +209,12 @@ header {
                 &.logined {
                     &:not(.normal) {
                         background-color: transparent;
-                        border-radius: 0px;
 
                         &:hover {
                             background-color: transparent;
                         }
                     }
                 }
-            }
-        }
-
-        .nav-toggle {
-            background-color: var(--nav-toggle-color);
-            position: relative;
-
-            &.active {
-                .icon {
-                    &.on {
-                        opacity: 1;
-                        transform: rotate(0deg);
-                    }
-
-                    &.off {
-                        opacity: 0;
-                        transform: rotate(90deg);
-                    }
-                }
-            }
-
-            .icon {
-                &.on {
-                    opacity: 0;
-                    transform: rotate(90deg);
-                }
-
-                &.off {
-                    opacity: 1;
-                    transform: rotate(0deg);
-                }
-
-                transition: opacity .2s,
-                transform .2s;
-                position: absolute;
             }
         }
 
@@ -241,6 +236,7 @@ header {
 
             .icons {
                 position: absolute;
+                cursor: pointer;
                 top: 0;
                 left: 0;
                 width: 100%;

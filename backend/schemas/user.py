@@ -17,6 +17,7 @@ class UserRegister(UserBase, UserAuth):
 
 class UserInfo(UserBase):
     id: int
+    username: str
     is_superuser: bool
     is_musician: bool
     is_radio_station: bool

@@ -19,4 +19,4 @@ def login(user: UserAuth, Authorize: AuthJWT = Depends(), db: Session = Depends(
 
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully login"}
+    return user.as_dict()

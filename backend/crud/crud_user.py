@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from schemas.user import UserRegister
 from models.user import Users
 from passlib.context import CryptContext
 
@@ -13,9 +14,10 @@ def get_user_by_username(db: Session, username: str):
     return db.query(Users).filter(Users.username == username).first()
 
 
-def create_user(db: Session, user: Users):
+def create_user(db: Session, user: UserRegister):
     password_hash = pwd_context.hash(user.password)
-    db_user = Users(username=user.username, hashed_password=password_hash)
+    db_user = Users(username=user.username, hashed_password=password_hash, first_name=user.first_name,
+                    last_name=user.last_name)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
