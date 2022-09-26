@@ -1,0 +1,5 @@
+passlib
+alembic
+sqlalchemy
+fastapi-jwt-auth
+bcrypt
