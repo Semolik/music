@@ -1,4 +1,4 @@
-from models.user import Users
+from models.user import User
 from core.config import settings
 from db.base import Base
 from logging.config import fileConfig
