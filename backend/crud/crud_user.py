@@ -34,6 +34,8 @@ class UserCruds:
         return db_user
 
     def update(self, user: User, new_user_data: UserModifiable) -> User:
+        if user is None:
+            raise Exception('Update user failed: user is None')
         for var, value in new_user_data.dict().items():
             setattr(user, var, value) if value is not None else None
         self.db.add(user)

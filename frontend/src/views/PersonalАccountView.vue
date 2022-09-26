@@ -12,6 +12,9 @@
 </template>
 
 <style lang="scss" scoped>
+@use '@/assets/styles/breakpoints';
+@use '@/assets/styles/helpers';
+
 .lk-container {
     display: grid;
     grid-template-columns: 270px 1fr;
@@ -21,15 +24,26 @@
     border-radius: 20px;
     gap: 10px;
 
+    @include breakpoints.lg(true) {
+        grid-template-columns: 1fr;
+    }
+
     aside {
         background-color: var(--color-background-mute-2);
         border-radius: 10px;
         padding: 5px;
-        display: grid;
-        grid-auto-rows: min-content;
+        display: flex;
+        flex-direction: column;
         gap: 5px;
+        height: min-content;
+
+        @include breakpoints.lg(true) {
+            grid-template-columns: 1fr;
+            flex-direction: row;
+        }
 
         .item {
+            flex-grow: 1;
             position: relative;
             display: flex;
             padding: 10px;
@@ -39,7 +53,20 @@
             border-radius: 5px;
             background-color: var(--color-background-mute-3);
 
-            &:hover {
+            @include breakpoints.lg(true) {
+                @include helpers.flex-center;
+                &.router-link-exact-active {
+                    background-color: var(--purple);
+                }
+            }
+
+            @include breakpoints.lg {
+                &.router-link-exact-active::after {
+                    opacity: 1;
+                }
+            }
+
+            &:not(.router-link-exact-active):hover {
                 background-color: var(--color-background-mute-4);
             }
 
@@ -55,9 +82,6 @@
                 transition: opacity .2s;
             }
 
-            &.router-link-exact-active::after {
-                opacity: 1;
-            }
         }
     }
 

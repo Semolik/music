@@ -84,10 +84,6 @@ export default {
             if (!this.userData) return true
             return !Boolean(this.userData.picture)
         },
-        fullName() {
-            if (!this.userData) return
-            return [this.userData.first_name, this.userData.last_name].filter(Boolean).join(' ')
-        },
         dataChanged() {
             if (!this.userData) return
             return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName
@@ -98,6 +94,7 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/themes';
+@use '@/assets/styles/breakpoints';
 
 .profile-container {
     display: flex;
@@ -108,6 +105,11 @@ export default {
         gap: 10px;
         grid-template-columns: 200px 1fr;
 
+        @include breakpoints.lg(true) {
+            grid-template-columns: 1fr;
+ 
+        }
+
         .user-pic {
             aspect-ratio: 1;
             position: relative;
@@ -115,7 +117,7 @@ export default {
 
             &.empty {
                 @include helpers.flex-center;
-                
+
                 overflow: hidden;
                 border: 2px dashed transparent;
 
@@ -231,7 +233,5 @@ export default {
             }
         }
     }
-
-
 }
 </style>
