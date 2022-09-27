@@ -51,24 +51,20 @@ router.beforeEach((to, from, next) => {
   let flag = sessionStorage.getItem('logined');
   let role = sessionStorage.getItem('user-role');
   if (to.meta.requireAuth == true) {
-    let roles = to.meta.roles;
-    if (roles) {
-      console.log(role)
-      console.log(roles)
-      console.log(roles.indexOf(role))
-      if (!role || roles.indexOf(role) < 0) {
-        next({
-          path: '/login'
-        })
-      } else {
-        return next();
-      }
-    }
-    else {
-      if (!flag || flag === 'false') {
-        next({
-          path: '/login'
-        })
+    if (!flag || flag === 'false') {
+      next({
+        path: '/login'
+      })
+    } else {
+      let roles = to.meta.roles;
+      if (roles) {
+        if (!role || roles.indexOf(role) < 0) {
+          next({
+            path: '/login'
+          })
+        } else {
+          return next();
+        }
       } else {
         return next();
       }
