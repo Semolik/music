@@ -3,6 +3,7 @@ from db.session import SessionLocal
 from schemas.user import UserAuth, UserModifiable, UserRegister
 from models.user import User
 from passlib.context import CryptContext
+from fastapi.encoders import jsonable_encoder
 
 
 class UserCruds:
@@ -18,8 +19,9 @@ class UserCruds:
 
     def create_user(self, user: UserRegister) -> User:
         password_hash = self.pwd_context.hash(user.password)
-        db_user = User(username=user.username, hashed_password=password_hash, first_name=user.first_name,
-                       last_name=user.last_name)
+        user_in_data = jsonable_encoder(user)
+        del user_in_data['password']
+        db_user = User(hashed_password=password_hash, **user_in_data)
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)

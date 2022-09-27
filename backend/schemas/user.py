@@ -11,15 +11,24 @@ class UserBase(BaseModel):
     last_name: str | None = None
 
 
+class UserTypes(BaseModel):
+    is_superuser: bool = False
+    is_musician: bool = False
+    is_radio_station: bool = False
+
+
+class UserWithTypeRegister(UserBase, UserAuth, UserTypes):
+    ...
+
+
 class UserRegister(UserBase, UserAuth):
     ...
+
 
 class UserModifiable(UserBase):
     ...
 
-class UserInfo(UserBase):
+
+class UserInfo(UserTypes, UserBase):
     id: int
     username: str
-    is_superuser: bool
-    is_musician: bool
-    is_radio_station: bool

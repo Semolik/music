@@ -28,8 +28,8 @@
                     </div>
                 </div>
                 <div class="menu">
-                    <router-link to="/lk" class="item">Личный кабинет</router-link>
-                    <div class="item" @click="logoutRequest">Выйти из аккаунта</div>
+                    <router-link to="/lk" @click="clicked" class="item">Личный кабинет</router-link>
+                    <div class="item" @click="clicked(logoutRequest)">Выйти из аккаунта</div>
                 </div>
             </div>
         </div>
@@ -77,6 +77,20 @@ export default {
             if (!this.userData) return
             return [this.userData.first_name, this.userData.last_name].filter(Boolean).join(' ') || this.userData.username
         }
+    },
+    watch: {
+        logined(value) {
+            console.log(value)
+            if (value === false) {
+                this.$router.push({ path: '/login' })
+            }
+        }
+    },
+    methods: {
+        clicked(func) {
+            this.panelActive = false;
+            if (func) func();
+        }
     }
 }
 </script>
@@ -94,6 +108,7 @@ header {
     z-index: 10;
     position: relative;
     margin-bottom: 10px;
+
     @include breakpoints.xl {
         margin: 10px 0px;
         border-radius: 20px;

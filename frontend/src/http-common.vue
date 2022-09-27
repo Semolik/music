@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const HTTP = axios.create({
-  baseURL: 'http://192.168.50.106:3000/api/v1/',
+  baseURL: 'http://localhost:3000/api/v1/',
   withCredentials: true
 });
 HTTP.interceptors.response.use(

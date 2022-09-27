@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { HTTP } from '../http-common.vue';
 import handleError from '../composables/errors'
-import { useStorage } from '@vueuse/core';
+import { useSessionStorage } from '@vueuse/core';
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
     message: '',
     loading: false,
-    logined: useStorage('logined', false),
+    logined: useSessionStorage('logined', false),
     userData: null,
   }),
   actions: {

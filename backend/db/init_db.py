@@ -1,5 +1,5 @@
 import logging
-from schemas.user import UserRegister
+from schemas.user import UserWithTypeRegister
 from crud.crud_user import user_cruds
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ def init_db() -> None:  # 1
     if FIRST_SUPERUSER:
         user = user_cruds.get_user_by_username(FIRST_SUPERUSER)  # 2
         if not user:
-            user_in = UserRegister(
+            user_in = UserWithTypeRegister(
                 username=FIRST_SUPERUSER,
                 first_name=FIRST_SUPERUSER,
                 is_superuser=True,
