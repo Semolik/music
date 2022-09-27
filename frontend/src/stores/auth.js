@@ -2,17 +2,31 @@ import { defineStore } from 'pinia';
 import { HTTP } from '../http-common.vue';
 import handleError from '../composables/errors'
 import { useSessionStorage } from '@vueuse/core';
+import { Role } from '../helpers/roles.js';
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
     message: '',
     loading: false,
     logined: useSessionStorage('logined', false),
+    userRole: useSessionStorage('user-role', null),
     userData: null,
   }),
   actions: {
     clearMessage() {
       this.message = '';
+    },
+    setUserRole() {
+      this.userRole = null;
+      let user = this.userData;
+      Object.values(Role).forEach(role_key => {
+        if (user[role_key] === true) {
+          this.userRole = role_key;
+        }
+      });
+      if (!this.userRole) {
+        this.userRole = Role.User;
+      }
     },
     setMessage(error) {
       let message = error?.response?.data?.detail;
@@ -28,6 +42,7 @@ export const useAuthStore = defineStore({
         .then((response) => {
           this.logined = false;
           this.userData = null;
+          this.userRole = null;
         })
         .catch((error) => {
           this.setMessage(error);
@@ -42,6 +57,7 @@ export const useAuthStore = defineStore({
       HTTP.post('login', { username: username, password: password })
         .then((response) => {
           this.userData = response.data;
+          this.setUserRole();
           this.logined = true;
         })
         .catch((error) => {
@@ -58,6 +74,7 @@ export const useAuthStore = defineStore({
       HTTP.post('signup', { username: username, password: password, first_name, last_name })
         .then((response) => {
           this.userData = response.data;
+          this.setUserRole();
           this.logined = true;
         })
         .catch((error) => {
@@ -73,6 +90,7 @@ export const useAuthStore = defineStore({
       HTTP.get('me')
         .then((response) => {
           this.userData = response.data;
+          this.setUserRole(this.userData);
           this.logined = true;
         })
         .catch((error) => {

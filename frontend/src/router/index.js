@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { Role } from '../helpers/roles.js';
 import HomeView from '../views/HomeView.vue'
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +30,11 @@ const router = createRouter({
           name: 'Моя музыка',
           component: () => import('../components/PersonalАccountMusic.vue'),
         },
+        {
+          path: 'update-status',
+          name: 'Изменение статуса аккаунта',
+          meta: { requireAuth: true, roles: [Role.User] },
+        }
       ]
     },
     {
@@ -42,17 +47,33 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   document.title = to.name;
-  let flag = sessionStorage.getItem('logined')
 
-  if (to.meta.requireAuth == true) {// Маршрут, требующий разрешения на вход
-    if (!flag || flag === 'false') {// Невозможно получить данные для входа
-      next({
-        path: '/login'
-      })
-    } else {// Получите информацию для входа и перейдите к следующему шагу
-      return next();
+  let flag = sessionStorage.getItem('logined');
+  let role = sessionStorage.getItem('user-role');
+  if (to.meta.requireAuth == true) {
+    let roles = to.meta.roles;
+    if (roles) {
+      console.log(role)
+      console.log(roles)
+      console.log(roles.indexOf(role))
+      if (!role || roles.indexOf(role) < 0) {
+        next({
+          path: '/login'
+        })
+      } else {
+        return next();
+      }
     }
-  } else {// Непосредственно перейти к следующему шагу без разрешения на вход
+    else {
+      if (!flag || flag === 'false') {
+        next({
+          path: '/login'
+        })
+      } else {
+        return next();
+      }
+    }
+  } else {
     return next();
   }
 });
