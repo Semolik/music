@@ -8,6 +8,7 @@ class Settings(BaseSettings):
         'http://localhost:4000', 'http://192.168.50.106:4000']
     DATABASE_URI: Optional[str] = "sqlite:///example.db"
     FIRST_SUPERUSER: str = "admin"
+    IMAGES_FOLDER: str = 'assets/images'
 
     class Config:
         case_sensitive = True  # 4

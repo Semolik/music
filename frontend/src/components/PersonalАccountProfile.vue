@@ -5,7 +5,7 @@
                 <FontAwesomeIcon icon="fa-user" v-if="avatarIsEmpty" />
                 <div class="edit-area">
                     <div class="edit-area-text">выбрать файл</div>
-                    <input type="file">
+                    <input type="file" name="userPicture">
                 </div>
             </div>
             <div class="user-info">
@@ -63,8 +63,8 @@ export default {
                 if (!form) return
                 const data = new FormData(form);
                 const value = Object.fromEntries(data.entries());
-                console.log(value)
-                HTTP.put('me', value)
+                // console.log(value)
+                HTTP.put('me', data)
                     .then((response) => {
                         this.userData = response.data;
                     })

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from helpers.forms import form_body
 
 
 class UserAuth(BaseModel):
@@ -26,6 +27,11 @@ class UserRegister(UserBase, UserAuth):
 
 
 class UserModifiable(UserBase):
+    ...
+
+
+@form_body
+class UserModifiableForm(UserBase):
     ...
 
 
