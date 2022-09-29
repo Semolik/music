@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, status, UploadFile, File
 from fastapi_jwt_auth import AuthJWT
 from helpers.images import save_image
 from schemas.user import UserInfo, UserModifiableForm
-from models.error import HTTP_401_UNAUTHORIZED
+from schemas.error import HTTP_401_UNAUTHORIZED
 from crud.crud_user import user_cruds
 router = APIRouter()
 

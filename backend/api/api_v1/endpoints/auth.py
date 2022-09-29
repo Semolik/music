@@ -1,7 +1,7 @@
 from typing import Any
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi_jwt_auth import AuthJWT
-from models.error import HTTP_401_UNAUTHORIZED
+from schemas.error import HTTP_401_UNAUTHORIZED
 from schemas.user import UserAuth, UserInfo
 from crud.crud_user import user_cruds
 from schemas.user import UserRegister
