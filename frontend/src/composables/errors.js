@@ -1,7 +1,7 @@
-export default function (error) {
+export default function (error, errorText) {
     if (error.response) {
         return {
-            message: error.response.data?.message || error.message,
+            message: error.response.data?.detail || (errorText || error.message),
             status: error.response.status,
         }
     } else if (error.request) {

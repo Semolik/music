@@ -19,6 +19,6 @@ def init_db() -> None:  # 1
             user = user_cruds.create_user(user_in)
         else:
             logger.warning(
-                "Skipping creating superuser. User with email "
+                "Skipping creating superuser. User with username "
                 f"{FIRST_SUPERUSER} already exists. "
             )

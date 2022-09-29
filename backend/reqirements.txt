@@ -3,3 +3,5 @@ alembic
 sqlalchemy
 fastapi-jwt-auth
 bcrypt
+pillow
+python-multipart

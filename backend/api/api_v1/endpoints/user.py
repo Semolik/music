@@ -8,13 +8,13 @@ router = APIRouter()
 
 
 @router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
-async def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm), userPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
+def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm), userPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = user_cruds.get_user_by_id(current_user_id)
-    db_image = await save_image(userPicture)
+    db_image = save_image(userPicture)
     db_user_updated = user_cruds.update(
-        user=db_user, new_user_data=UserData, image=db_image)
+        user=db_user, new_user_data=UserData)
     return db_user_updated.as_dict()
 
 

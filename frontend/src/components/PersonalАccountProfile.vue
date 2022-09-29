@@ -30,21 +30,24 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { storeToRefs } from 'pinia';
 import { HTTP } from '../http-common.vue';
 import { useAuthStore } from '../stores/auth';
-import handleError from '../composables/errors'
+import handleError from '../composables/errors';
+import { useToast } from "vue-toastification";
+
 library.add([faUser, faFloppyDisk])
 
 export default {
     setup() {
         const { userData } = storeToRefs(useAuthStore());
+        const toast = useToast();
         return {
-            userData
+            userData,
+            toast
         }
     },
     data() {
         return {
             firstName: this.userData?.first_name,
             lastName: this.userData?.last_name,
-            message: '',
         }
     },
     components: {
@@ -62,19 +65,12 @@ export default {
                 const form = this.$refs.form;
                 if (!form) return
                 const data = new FormData(form);
-                const value = Object.fromEntries(data.entries());
-                // console.log(value)
                 HTTP.put('me', data)
                     .then((response) => {
                         this.userData = response.data;
                     })
                     .catch((error) => {
-                        let message = error?.response?.data?.detail;
-                        if (message) {
-                            this.message = message;
-                        } else {
-                            this.message = handleError(error).message
-                        }
+                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
                     });
             }
         }
@@ -107,7 +103,7 @@ export default {
 
         @include breakpoints.lg(true) {
             grid-template-columns: 1fr;
- 
+
         }
 
         .user-pic {

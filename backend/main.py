@@ -21,31 +21,6 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 
-# @app.post('/refresh')
-# def refresh(Authorize: AuthJWT = Depends()):
-#     Authorize.jwt_refresh_token_required()
-
-#     current_user = Authorize.get_jwt_subject()
-#     new_access_token = Authorize.create_access_token(subject=current_user)
-
-#     Authorize.set_access_cookies(new_access_token)
-#     return {"msg": "The token has been refresh"}
-
-
-# @app.delete('/logout')
-# def logout(Authorize: AuthJWT = Depends()):
-#     Authorize.jwt_required()
-#     Authorize.unset_jwt_cookies()
-#     return {"msg": "Successfully logout"}
-
-
-# @app.get('/me')
-# def protected(Authorize: AuthJWT = Depends()):
-#     Authorize.jwt_required()
-
-#     current_user = Authorize.get_jwt_subject()
-#     return {"user": current_user}
-
 app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 
 app.add_middleware(
