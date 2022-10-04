@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from db.session import SessionLocal
 from schemas.user import UserAuth, UserModifiable, UserRegister
-from models.user import User
+from models.user import File, User
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 

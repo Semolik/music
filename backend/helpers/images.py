@@ -3,13 +3,16 @@ import shutil
 from fastapi import UploadFile, HTTPException, Depends
 from PIL import Image
 import uuid
-from models.user import File, User
+from schemas.file import File
+from db.base import CRUDBase
+# from models.user import File, User
+import models.user as user_models
 from core.config import settings
 from db.session import Session
 from db.db import get_db
 
 
-def save_image(upload_file: UploadFile, user: User, db: Session = Depends(get_db)):
+def save_image(upload_file: UploadFile, user: user_models.User, db: Session = Depends(get_db)):
     if not upload_file.filename:
         return
     buf = io.BytesIO()
@@ -22,8 +25,5 @@ def save_image(upload_file: UploadFile, user: User, db: Session = Depends(get_db
         image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
     except:
         raise HTTPException(status_code=500, detail="поврежденный файл")
-    db_file = File(file_name=fileName, user_id=user.id)
-    db.add(db_file)
-    db.commit()
-    db.refresh(db_file)
-    return db_file
+    file_obj = File(file_name=fileName, user_id=user.id)
+    return CRUDBase(user_models.File).create(obj_in=file_obj)

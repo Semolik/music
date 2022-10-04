@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from db.session import SessionLocal
 
 from db.base_class import Base
 
@@ -21,19 +22,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # 1
         * `schema`: A Pydantic model (schema) class
         """
         self.model = model
+        self.db: Session = SessionLocal()
 
-    def get(self, db: Session, id: Any) -> Optional[ModelType]:
-        return db.query(self.model).filter(self.model.id == id).first()  # 3
+    def get(self, id: Any) -> Optional[ModelType]:
+        # 3
+        return self.db.query(self.model).filter(self.model.id == id).first()
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self,  *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()  # 4
+        return self.db.query(self.model).offset(skip).limit(limit).all()  # 4
 
-    def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
+    def create(self,  *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)  # type: ignore
-        db.add(db_obj)
-        db.commit()  # 5
-        db.refresh(db_obj)
+        self.db.add(db_obj)
+        self.db.commit()  # 5
+        self.db.refresh(db_obj)
         return db_obj
