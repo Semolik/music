@@ -70,7 +70,13 @@ export default {
                         this.userData = response.data;
                     })
                     .catch((error) => {
-                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
+                        if (error?.response?.status === 422) {
+                            this.$router.push({ path: '/login' })
+                            this.toast.error('Необходимо войти в аккаунт')
+                        }else {
+
+                            this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
+                        }
                     });
             }
         }

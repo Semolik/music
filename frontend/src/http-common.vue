@@ -25,10 +25,9 @@ HTTP.interceptors.response.use(
             });
         });
       })
-      .catch((error) => {
+      .catch((error_2) => {
         console.log('Выход из аккаунта')
-        // поставить выход из аккаунта
-        return Promise.reject(error);
+        return Promise.reject(error_2);
       });
   });
 export { HTTP };

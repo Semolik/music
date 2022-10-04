@@ -1,8 +1,9 @@
 export default function (error, errorText) {
     if (error.response) {
+        let status = error.response.status;
         return {
             message: error.response.data?.detail || (errorText || error.message),
-            status: error.response.status,
+            status: status,
         }
     } else if (error.request) {
         return {

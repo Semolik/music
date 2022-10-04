@@ -12,7 +12,7 @@ def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm),
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = user_cruds.get_user_by_id(current_user_id)
-    db_image = save_image(userPicture)
+    db_image = save_image(upload_file=userPicture, user=db_user)
     db_user_updated = user_cruds.update(
         user=db_user, new_user_data=UserData)
     return db_user_updated.as_dict()
