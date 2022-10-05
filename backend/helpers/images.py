@@ -21,7 +21,7 @@ def save_image(upload_file: UploadFile, user: user_models.User, db: Session = De
     try:
         image = Image.open(buf)
         image.thumbnail((600, 600))
-        fileName = '.'.join([str(uuid.uuid4()), 'png'])
+        fileName = str(uuid.uuid4()) + settings.IMAGES_EXTENTION
         image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
     except:
         raise HTTPException(status_code=500, detail="поврежденный файл")

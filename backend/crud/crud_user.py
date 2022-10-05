@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from crud.crud_file import FileCruds
 from db.session import SessionLocal
 from schemas.user import UserAuth, UserModifiable, UserRegister
 from models.user import File, User
@@ -42,6 +43,8 @@ class UserCruds:
             setattr(user, var, value) if value is not None else None
         if userPic:
             local_object_pic = self.db.merge(userPic)
+            if (user.picture):
+                FileCruds(self.db).delete_file(user.picture)
             user.picture = local_object_pic
         self.db.add(user)
         self.db.commit()

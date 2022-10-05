@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DATABASE_URI: Optional[str] = "sqlite:///example.db"
     FIRST_SUPERUSER: str = "admin"
     IMAGES_FOLDER: str = 'assets/images'
+    IMAGES_EXTENTION: str = '.png'
 
     class Config:
         case_sensitive = True  # 4
