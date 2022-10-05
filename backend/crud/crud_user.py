@@ -35,11 +35,14 @@ class UserCruds:
             return None
         return db_user
 
-    def update(self, user: User, new_user_data: UserModifiable) -> User:
+    def update(self, user: User, new_user_data: UserModifiable, userPic: File) -> User:
         if user is None:
             raise Exception('Update user failed: user is None')
         for var, value in new_user_data.dict().items():
             setattr(user, var, value) if value is not None else None
+        if userPic:
+            local_object_pic = self.db.merge(userPic)
+            user.picture = local_object_pic
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)

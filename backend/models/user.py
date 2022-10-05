@@ -1,5 +1,5 @@
 from db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean,ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 
@@ -15,6 +15,8 @@ class User(Base):
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
     files = relationship("File")
+    picture = relationship("File", uselist=False)
+
 
 class File(Base):
     __tablename__ = 'files'

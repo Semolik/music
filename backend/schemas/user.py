@@ -38,3 +38,4 @@ class UserModifiableForm(UserBase):
 class UserInfo(UserTypes, UserBase):
     id: int
     username: str
+    # picture: str
