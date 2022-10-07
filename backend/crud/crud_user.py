@@ -43,7 +43,8 @@ class UserCruds:
             setattr(user, var, value) if value is not None else None
         if userPic:
             local_object_pic = self.db.merge(userPic)
-            if (user.picture):
+            print(user.picture)
+            if user.picture:
                 FileCruds(self.db).delete_file(user.picture)
             user.picture = local_object_pic
         self.db.add(user)

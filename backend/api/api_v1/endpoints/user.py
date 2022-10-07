@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, status, UploadFile, File
+from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from helpers.images import save_image
 from schemas.user import UserInfo, UserModifiableForm
@@ -13,6 +13,9 @@ def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm),
     user_cruds = UserCruds()
     current_user_id = Authorize.get_jwt_subject()
     db_user = user_cruds.get_user_by_id(current_user_id)
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="неправильное имя пользователя или пароль")
     db_image = save_image(upload_file=userPicture, user=db_user)
     db_user_updated = user_cruds.update(
         user=db_user, new_user_data=UserData, userPic=db_image)
@@ -24,4 +27,7 @@ def get_user_info(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     user = UserCruds().get_user_by_id(current_user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="неправильное имя пользователя или пароль")
     return user.as_dict()
