@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import FileResponse
 from core.config import settings
 
-router = APIRouter(prefix='/uploads')
+router = APIRouter(prefix=settings.UPLOADS_ROUTE)
 
 
 @router.get('/images/{fileName}', response_class=FileResponse)

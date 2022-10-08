@@ -27,3 +27,10 @@ def save_image(upload_file: UploadFile, user: user_models.User, db: Session = De
         raise HTTPException(status_code=500, detail="поврежденный файл")
     file_obj = File(file_name=fileName, user_id=user.id)
     return CRUDBase(user_models.File).create(obj_in=file_obj)
+
+
+def set_picture(user_data: dict, picture: File):
+    if picture:
+        user_data['picture'] = ''.join(
+            [settings.SERVER_LINK, settings.API_V1_STR,  settings.UPLOADS_ROUTE, '/images/', picture.file_name])
+    return user_data

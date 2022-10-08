@@ -28,6 +28,12 @@ export const useAuthStore = defineStore({
         this.userRole = Role.User;
       }
     },
+    setUserData(data) {
+      if (data) {
+        this.userData = data;
+        this.setUserRole();
+      }
+    },
     setMessage(error) {
       let message = error?.response?.data?.detail;
       if (message) {
@@ -36,13 +42,16 @@ export const useAuthStore = defineStore({
         this.message = handleError(error).message
       }
     },
+    logout() {
+      this.logined = false;
+      this.userData = null;
+      this.userRole = null;
+    },
     logoutRequest() {
       this.clearMessage();
       HTTP.delete('logout')
         .then((response) => {
-          this.logined = false;
-          this.userData = null;
-          this.userRole = null;
+          this.logout();
         })
         .catch((error) => {
           this.setMessage(error);
@@ -90,7 +99,7 @@ export const useAuthStore = defineStore({
       HTTP.get('me')
         .then((response) => {
           this.userData = response.data;
-          this.setUserRole(this.userData);
+          this.setUserRole();
           this.logined = true;
         })
         .catch((error) => {
