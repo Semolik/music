@@ -20,9 +20,8 @@ class FileCruds:
             path = settings.IMAGES_FOLDER+file.file_name
             if Path(path).exists():
                 os.remove(path)
-            self.db.query(File).filter(File.id == file.id).delete()
             # session = self.db.object_session(file)
-            # self.db.delete(file)
+            self.db.delete(file)
             self.db.commit()
         else:
             raise Exception('Удаление не картинки еще не написано')

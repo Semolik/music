@@ -1,6 +1,6 @@
 from db.base_class import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 
 class User(Base):
@@ -15,7 +15,8 @@ class User(Base):
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
     files = relationship("File")
-    picture = relationship("File", uselist=False)
+    # picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL', use_alter=True))
+    picture = relationship("File", back_populates='user', uselist=False)
 
 
 class File(Base):
@@ -24,3 +25,4 @@ class File(Base):
     id = Column(Integer, primary_key=True, index=True)
     file_name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="files", foreign_keys=[user_id])
