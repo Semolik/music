@@ -3,6 +3,7 @@ from fastapi_jwt_auth import AuthJWT
 from helpers.images import save_image
 from schemas.user import UserInfo, UserModifiableForm
 from schemas.error import HTTP_401_UNAUTHORIZED
+from models.user import File as FileModel
 from crud.crud_user import UserCruds
 router = APIRouter()
 
@@ -30,4 +31,8 @@ def get_user_info(Authorize: AuthJWT = Depends()):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="неправильное имя пользователя или пароль")
-    return user.as_dict()
+    user_data = user.as_dict()
+    picture: FileModel = user.picture
+    if picture:
+        user_data['picture'] = picture.file_name
+    return user_data

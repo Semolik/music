@@ -15,7 +15,6 @@ class User(Base):
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
     files = relationship("File")
-    # picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL', use_alter=True))
     picture = relationship("File", back_populates='user', uselist=False)
 
 

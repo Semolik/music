@@ -15,12 +15,10 @@ class FileCruds:
         self.db = db
 
     def delete_file(self, file: File) -> None:
-        print(file)
         if Path(file.file_name).suffix == settings.IMAGES_EXTENTION:
-            path = settings.IMAGES_FOLDER+file.file_name
+            path = '/'.join([settings.IMAGES_FOLDER,file.file_name])
             if Path(path).exists():
                 os.remove(path)
-            # session = self.db.object_session(file)
             self.db.delete(file)
             self.db.commit()
         else:
