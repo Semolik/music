@@ -2,16 +2,41 @@
     <div class="selector">
         <div class="text">Изменить тип аккаунта на</div>
         <div class="items">
-            <div class="item active">Радиостанцию</div>
-            <div class="item">Музыканта</div>
+            <div :class="['item',{active: radioStation_selected}]" @click="selectRadioStation">
+                Радиостанцию
+            </div>
+            <div :class="['item',{active: musician_selected}]" @click="selectMusician">
+                Музыканта
+            </div>
         </div>
     </div>
+    <div class="request-form">
+        <FormKit type="textarea" name="first_name" label="Доказательство" placeholder="Ваше имя" />
+    </div>
 </template>
-<script setup>
+<script>
 import { isRadioStation, isMusician } from '../composables/roleChecker';
+export default {
+    data() {
+        return {
+            radioStation_selected: isRadioStation.value,
+            musician_selected: isMusician.value,
+        }
+    },
+    methods: {
+        selectRadioStation() {
+            this.radioStation_selected = true;
+            this.musician_selected = false;
+        },
+        selectMusician() {
+            this.musician_selected = true;
+            this.radioStation_selected = false;
+        }
+    }
+}
 
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/assets/styles/helpers';
 
 .selector {
@@ -33,14 +58,25 @@ import { isRadioStation, isMusician } from '../composables/roleChecker';
         border-radius: 5px;
 
         .item {
+            cursor: pointer;
             text-align: center;
             flex-grow: 1;
             padding: 5px;
             border-radius: 15px;
             background-color: var(--color-background-mute-3);
 
+            &:not(.active):hover {
+                background-color: var(--color-background-mute-4);
+            }
+
             &.active {
+                cursor: auto;
                 background-color: var(--purple);
+            }
+
+            &.disabled {
+                cursor: not-allowed;
+                background-color: var(--red-0);
             }
         }
     }
