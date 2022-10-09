@@ -53,8 +53,8 @@
 </template>
 <script>
 import { storeToRefs } from 'pinia';
-import FormContainer from '../components/FormContainer.vue';
 import { useAuthStore } from '../stores/auth';
+import FormContainer from '../components/FormContainer.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';

@@ -20,7 +20,9 @@ def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm),
     db_image = save_image(upload_file=userPicture, user=db_user)
     db_user_updated = user_cruds.update(
         user=db_user, new_user_data=UserData, userPic=db_image)
-    return db_user_updated.as_dict()
+    user_data = db_user_updated.as_dict()
+    user_data = set_picture(user_data, db_user_updated.picture)
+    return user_data
 
 
 @router.get('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)

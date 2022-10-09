@@ -7,10 +7,10 @@
                 <div class="edit-area">
                     <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
                     <div class="edit-area-text">выбрать файл</div>
-                    <input type="file" name="userPicture">
+                    <input type="file" name="userPicture" ref="fileupload" @change="previewFiles">
                 </div>
             </div>
-            <div class="button remove-picture">
+            <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
             <div class="user-info">
@@ -27,7 +27,6 @@
                     </div>
                 </Teleport>
             </div>
-
         </form>
     </div>
 </template>
@@ -45,7 +44,7 @@ library.add([faUser, faFloppyDisk, faTrash, faImage])
 
 export default {
     setup() {
-        const { userData, } = storeToRefs(useAuthStore());
+        const { userData } = storeToRefs(useAuthStore());
         const { setUserData, logout } = useAuthStore();
         const toast = useToast();
         return {
@@ -60,6 +59,9 @@ export default {
             firstName: this.userData?.first_name,
             lastName: this.userData?.last_name,
             mounted: false,
+            remove_picture: false,
+            original_image: null,
+            file_changed: false,
         }
     },
     mounted() {
@@ -71,17 +73,40 @@ export default {
     watch: {
         userData(value) {
             this.firstName = value?.first_name;
-            this.lastName = value?.last_name
+            this.lastName = value?.last_name;
+            this.original_image = value?.picture;
         }
     },
     methods: {
+        previewFiles(event) {
+            let file = event.target.files;
+            if (!(file && file[0])) return;
+            if (this.remove_picture) {
+                this.remove_picture = false;
+            }
+            let reader = new FileReader;
+            reader.onload = e => {
+                this.userData.picture = e.target.result
+            }
+            reader.readAsDataURL(file[0]);
+            this.file_changed = true;
+        },
+        detelePicture() {
+            this.$refs.fileupload.value = null;
+            this.userData.picture = null;
+            this.remove_picture = true;
+            this.file_changed = true;
+        },
         save() {
             if (this.dataChanged) {
                 const form = this.$refs.form;
                 if (!form) return
-                const data = new FormData(form);
+                let data = new FormData(form);
+                data.append('remove_picture', this.remove_picture);
                 HTTP.put('me', data)
                     .then((response) => {
+                        this.remove_picture = false;
+                        this.file_changed = false;
                         this.setUserData(response.data);
                     })
                     .catch((error) => {
@@ -101,9 +126,14 @@ export default {
             if (!this.userData) return true
             return !Boolean(this.userData.picture)
         },
+        fileChanged() {
+            if (!this.file_changed) return
+            let file = this.$refs.fileupload.files;
+            return file !== this.userData.picture;
+        },
         dataChanged() {
             if (!this.userData) return
-            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName
+            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.fileChanged
         }
     }
 }
@@ -124,7 +154,6 @@ export default {
 
         @include breakpoints.lg(true) {
             grid-template-columns: 1fr;
-
         }
 
         .user-pic {
@@ -216,6 +245,7 @@ export default {
         .button {
             cursor: pointer;
             padding: 10px;
+            // height: min-content;
             background-color: var(--color-background-mute-4);
             border-radius: 10px;
             transition: .2s scale, .2s background-color;

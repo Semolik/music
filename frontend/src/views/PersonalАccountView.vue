@@ -3,14 +3,31 @@
         <aside>
             <router-link class="item" to="/lk">Профиль</router-link>
             <router-link class="item" to="/lk/music">Моя музыка</router-link>
-
+            <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
         </aside>
         <div class="active-route">
             <router-view></router-view>
         </div>
     </div>
 </template>
-
+<script>
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../stores/auth';
+import { Role } from '../helpers/roles.js';
+export default {
+    setup() {
+        const { userRole } = storeToRefs(useAuthStore());
+        return {
+            userRole
+        }
+    },
+    computed: {
+        isAdmin() {
+            return this.userRole === Role.Admin;
+        }
+    }
+}
+</script>
 <style lang="scss" scoped>
 @use '@/assets/styles/breakpoints';
 @use '@/assets/styles/helpers';
@@ -55,6 +72,7 @@
 
             @include breakpoints.lg(true) {
                 @include helpers.flex-center;
+
                 &.router-link-exact-active {
                     background-color: var(--purple);
                 }

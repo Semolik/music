@@ -33,6 +33,7 @@ class UserModifiable(UserBase):
 @form_body
 class UserModifiableForm(UserBase):
     ...
+    remove_picture: bool = False
 
 
 class UserInfo(UserTypes, UserBase):
