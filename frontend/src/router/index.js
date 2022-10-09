@@ -34,6 +34,7 @@ const router = createRouter({
           path: 'update-status',
           name: 'Изменение статуса аккаунта',
           meta: { requireAuth: true, roles: [Role.User] },
+          component: () => import('../components/PersonalАccountChangeStatatus.vue'),
         }
       ]
     },
