@@ -11,17 +11,18 @@
         </div>
     </div>
     <div class="request-form">
-        <FormKit type="textarea" name="first_name" label="Доказательство" placeholder="Ваше имя" />
+        <FormKitTextArea :name="" label="Предоставьте информацию о себе"></FormKitTextArea>
     </div>
 </template>
 <script>
 import { isRadioStation, isMusician } from '../composables/roleChecker';
+import FormKitTextArea from './FormKitTextArea.vue';
 export default {
     data() {
         return {
             radioStation_selected: isRadioStation.value,
             musician_selected: isMusician.value,
-        }
+        };
     },
     methods: {
         selectRadioStation() {
@@ -32,7 +33,8 @@ export default {
             this.musician_selected = true;
             this.radioStation_selected = false;
         }
-    }
+    },
+    components: { FormKitTextArea }
 }
 
 </script>
@@ -54,7 +56,7 @@ export default {
         display: flex;
         gap: 5px;
         width: 100%;
-        padding: 5px;
+        padding: 5px 0px;
         border-radius: 5px;
 
         .item {
@@ -80,5 +82,11 @@ export default {
             }
         }
     }
+}
+
+.request-form {
+    display: flex;
+
+
 }
 </style>
