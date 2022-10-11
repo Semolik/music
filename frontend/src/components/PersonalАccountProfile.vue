@@ -5,9 +5,11 @@
                 <FontAwesomeIcon icon="fa-user" v-if="avatarIsEmpty" />
                 <img :src="userData.picture" v-else>
                 <div class="edit-area">
-                    <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
-                    <div class="edit-area-text">выбрать файл</div>
-                    <input type="file" name="userPicture" ref="fileupload" @change="previewFiles">
+                    <div class="edit-area-container">
+                        <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
+                        <div class="edit-area-text">выбрать файл</div>
+                        <input type="file" name="userPicture" ref="fileupload" @change="previewFiles">
+                    </div>
                 </div>
             </div>
             <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
@@ -190,7 +192,6 @@ export default {
 
                 .edit-area {
                     .edit-area-text {
-
                         margin-top: 90px;
                     }
                 }
@@ -211,16 +212,28 @@ export default {
                 opacity: 0;
                 isolation: isolate;
 
-                svg {
-                    width: 30px;
-                    height: 30px;
-                    margin-bottom: 10px;
+                .edit-area-container {
                     z-index: 2;
-                }
+                    @include helpers.flex-center;
+                    flex-direction: column;
+                    background-color: var(--color-background-mute-3);
+                    padding: 5px;
+                    border-radius: 10px;
+                    aspect-ratio: 1;
 
-                .edit-area-text {
+                    svg {
+                        width: 30px;
+                        height: 30px;
+                        margin-bottom: 10px;
+                        z-index: 2;
+                    }
 
-                    z-index: 2;
+                    .edit-area-text {
+
+                        z-index: 2;
+                    }
+
+
                 }
 
                 input {
