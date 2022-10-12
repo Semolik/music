@@ -6,6 +6,7 @@ import { plugin, defaultConfig } from '@formkit/vue'
 import App from './App.vue'
 import router from './router'
 import Toast from "vue-toastification";
+import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 
 import './assets/styles/base.scss'
 import '@formkit/themes/genesis'
@@ -16,8 +17,9 @@ app.config.unwrapInjectedRef = true
 
 
 app.use(createPinia())
-app.use(router)
-app.use(plugin, defaultConfig)
+app.use(router);
+app.use(autoAnimatePlugin);
+app.use(plugin, defaultConfig);
 app.use(Toast);
 
 app.mount('#app')

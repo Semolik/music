@@ -15,7 +15,7 @@ class User(Base):
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
     files = relationship("File")
-    picture = relationship("File", uselist=False)
+    picture = relationship("File", uselist=False, overlaps="files")
 
 
 class File(Base):
@@ -24,4 +24,5 @@ class File(Base):
     id = Column(Integer, primary_key=True, index=True)
     file_name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
-    user = relationship("User", back_populates="files", foreign_keys=[user_id])
+    user = relationship("User", back_populates="files",
+                        foreign_keys=[user_id], overlaps="picture")

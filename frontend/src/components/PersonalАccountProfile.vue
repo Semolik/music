@@ -8,7 +8,7 @@
                     <div class="edit-area-container">
                         <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
                         <div class="edit-area-text">выбрать файл</div>
-                        <input type="file" name="userPicture" ref="fileupload" @change="previewFiles">
+                        <input type="file" name="userPicture" ref="fileupload" accept="image/*" @change="previewFiles">
                     </div>
                 </div>
             </div>
@@ -188,6 +188,7 @@ export default {
                 svg {
                     width: 50px;
                     height: 50px;
+                    z-index: 2;
                 }
 
                 .edit-area {
