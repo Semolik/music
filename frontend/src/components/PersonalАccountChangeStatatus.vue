@@ -25,7 +25,7 @@
             <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
                 <FontAwesomeIcon icon="fa-xmark" />
             </div>
-            <!-- {{images}} -->
+
             <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
                 <img :src="images[index].base64" alt="" v-if="images[index].base64">
                 <div class="name">{{file.name}}</div>
@@ -47,8 +47,12 @@ library.add(faPaperclip, faXmark);
 export default {
     setup() {
         const toast = useToast();
+        const memoizeBase64Image = useMemoize(useBase64, {
+            getKey: (file, headers) => file.name,
+        });
         return {
-            toast
+            toast,
+            memoizeBase64Image
         }
     },
     components: {
@@ -61,10 +65,8 @@ export default {
             messageText: '',
             files: [],
             images: [],
-            memoizeBase64Image: null,
         };
     },
-
     methods: {
         selectRadioStation() {
             this.radioStation_selected = true;
@@ -86,6 +88,8 @@ export default {
         changeFiles(event) {
             this.files = event?.target?.files || [];
             this.generatePreview();
+            var fileBuffer = new DataTransfer();
+            event.target.files = fileBuffer.files;
         },
         removeFiles() {
             this.files = [];
@@ -97,8 +101,7 @@ export default {
             let files = [...this.files];
             this.images = new Array(null).fill(files.length);
             files.forEach(async (file, index) => {
-                const memoizeBase64Image = useMemoize(useBase64);
-                let result_base64 = memoizeBase64Image(file);
+                let result_base64 = this.memoizeBase64Image(file);
                 this.images[index] = result_base64;
             });
         }
