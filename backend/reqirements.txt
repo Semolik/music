@@ -1,6 +1,6 @@
 passlib
 alembic
-sqlalchemy
+sqlalchemy==1.4.41
 fastapi-jwt-auth
 bcrypt
 pillow

@@ -8,7 +8,8 @@
                     <div class="edit-area-container">
                         <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
                         <div class="edit-area-text">выбрать файл</div>
-                        <input type="file" name="userPicture" ref="fileupload" accept="image/*" @change="previewFiles">
+                        <input :title="filesTitle" type="file" name="userPicture" ref="fileupload" accept="image/*"
+                            @change="previewFiles">
                     </div>
                 </div>
             </div>

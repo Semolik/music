@@ -20,12 +20,16 @@
         <div class="line" v-auto-animate>
             <div :class="['button','files', {active: isFilesSelected}]">
                 <FontAwesomeIcon icon="fa-paperclip" />
-                <input type="file" @change="changeFiles" multiple>
+                <input type="file" :title="filesTitle" @change="changeFiles" multiple>
             </div>
             <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
                 <FontAwesomeIcon icon="fa-xmark" />
             </div>
-            <div v-for="file in files" class="file" @click="removeFile(file)">{{file.name}}</div>
+            <!-- {{images}} -->
+            <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
+                <img :src="images[index].base64" alt="" v-if="images[index].base64">
+                <div class="name">{{file.name}}</div>
+            </div>
         </div>
         <div :class="['button', {active: buttonActive}]" @click="sendMessageToAdmins">Отправить сообщение</div>
     </div>
@@ -36,6 +40,8 @@ import { useToast } from "vue-toastification";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPaperclip, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { useMemoize } from '@vueuse/core';
+import { useBase64 } from '@vueuse/core';
 library.add(faPaperclip, faXmark);
 
 export default {
@@ -53,9 +59,12 @@ export default {
             radioStation_selected: isRadioStation.value,
             musician_selected: isMusician.value,
             messageText: '',
-            files: []
+            files: [],
+            images: [],
+            memoizeBase64Image: null,
         };
     },
+
     methods: {
         selectRadioStation() {
             this.radioStation_selected = true;
@@ -76,12 +85,22 @@ export default {
         },
         changeFiles(event) {
             this.files = event?.target?.files || [];
+            this.generatePreview();
         },
         removeFiles() {
             this.files = [];
         },
         removeFile(target) {
             this.files = [...this.files].filter(file => file !== target);
+        },
+        generatePreview() {
+            let files = [...this.files];
+            this.images = new Array(null).fill(files.length);
+            files.forEach(async (file, index) => {
+                const memoizeBase64Image = useMemoize(useBase64);
+                let result_base64 = memoizeBase64Image(file);
+                this.images[index] = result_base64;
+            });
         }
     },
     computed: {
@@ -93,7 +112,10 @@ export default {
         },
         isFilesSelected() {
             return this.files.length > 0;
-        }
+        },
+        filesTitle() {
+            return this.isFilesSelected ? [...this.files].map(file => file.name).join('\n') : 'Файл не выбран'
+        },
     }
 }
 
@@ -184,6 +206,7 @@ export default {
             aspect-ratio: 1;
             @include helpers.flex-center;
             width: min-content;
+            height: min-content;
             cursor: pointer;
 
             &.files {
@@ -193,20 +216,37 @@ export default {
                     position: absolute;
                     inset: 0;
                     opacity: 0;
+                    cursor: pointer;
                 }
             }
 
             &.remove {
                 background-color: var(--red-0);
+
+                &:hover {
+                    background-color: var(--red-0);
+                }
             }
         }
 
         .file {
             background-color: var(--color-background-mute-3);
             border-radius: 15px;
-            padding: 10px;
+            padding: 5px;
             cursor: pointer;
             white-space: nowrap;
+            text-align: center;
+
+            img {
+                object-fit: cover;
+                width: 100%;
+                height: 100px;
+                border-radius: 10px;
+            }
+
+            &:hover {
+                background-color: var(--red-0);
+            }
         }
     }
 
