@@ -38,7 +38,7 @@ export default {
     background-color: var(--color-background-mute);
     padding: 10px;
     width: 100%;
-    border-radius: 20px;
+    border-radius: 30px;
     gap: 10px;
 
     @include breakpoints.lg(true) {
@@ -47,7 +47,7 @@ export default {
 
     aside {
         background-color: var(--color-background-mute-2);
-        border-radius: 10px;
+        border-radius: 20px;
         padding: 5px;
         display: flex;
         flex-direction: column;
@@ -67,7 +67,7 @@ export default {
             text-decoration: none;
             overflow: hidden;
             color: var(--color-text);
-            border-radius: 5px;
+            border-radius: 15px;
             background-color: var(--color-background-mute-3);
 
             @include breakpoints.lg(true) {
@@ -105,7 +105,7 @@ export default {
 
     .active-route {
         background-color: var(--color-background-mute-2);
-        border-radius: 10px;
+        border-radius: 20px;
         padding: 10px;
     }
 }
