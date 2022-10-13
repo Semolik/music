@@ -40,3 +40,8 @@ class UserInfo(UserTypes, UserBase):
     id: int
     username: str
     picture: str | None = None
+
+
+@form_body
+class UpdateUserRoleRequest(BaseModel):
+    message: str

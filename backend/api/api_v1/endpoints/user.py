@@ -1,7 +1,8 @@
+from typing import List
 from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from helpers.images import save_image, set_picture
-from schemas.user import UserInfo, UserModifiableForm
+from schemas.user import UpdateUserRoleRequest, UserInfo, UserModifiableForm
 from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
 from crud.crud_user import UserCruds
@@ -36,3 +37,10 @@ def get_user_info(Authorize: AuthJWT = Depends()):
     user_data = user.as_dict()
     user_data = set_picture(user_data, user.picture)
     return user_data
+
+
+@router.post('/role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = File(...)):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    return ''

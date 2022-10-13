@@ -1,5 +1,5 @@
 from db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY
 from sqlalchemy.orm import relationship, backref
 
 
@@ -26,3 +26,12 @@ class File(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="files",
                         foreign_keys=[user_id], overlaps="picture")
+    type = Column(String)
+
+
+class ChangeRoleRequest(Base):
+    __tablename__ = 'change_role_requests'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    message = Column(String)
+    files = Column(ARRAY(Integer))

@@ -25,9 +25,8 @@ def save_image(upload_file: UploadFile, user: User, db: Session = Depends(get_db
         image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
     except:
         raise HTTPException(status_code=500, detail="поврежденный файл")
-    # file_obj = File(file_name=fileName, user_id=user.id)
-    # return CRUDBase(user_models.File).create(obj_in=file_obj)
-    return File(file_name=fileName, user_id=user.id)
+
+    return File(file_name=fileName, user_id=user.id, type='image')
 
 
 def set_picture(user_data: dict, picture: File):

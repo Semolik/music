@@ -10,7 +10,9 @@ class Settings(BaseSettings):
     # DATABASE_URI: Optional[str] = "sqlite:///example.db"
     DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/postgres"
     FIRST_SUPERUSER: str = "admin"
-    IMAGES_FOLDER: str = 'assets/images'
+    ASSETS_FOLDER: str = 'assets/'
+    IMAGES_FOLDER: str = ASSETS_FOLDER+'images'
+    OTHER_FILES_FOLDER: str = ASSETS_FOLDER+'other'
     IMAGES_EXTENTION: str = '.png'
     UPLOADS_ROUTE: str = '/uploads'
 

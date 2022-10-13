@@ -15,7 +15,7 @@
             В сообщении будут передано имя которое указано у ваc в настройках аккаунта
         </div>
         <div class="request-form">
-            <textarea v-model="messageText" id="" cols="30" rows="10"></textarea>
+            <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
         </div>
         <div class="line" v-auto-animate>
             <div :class="['button','files', {active: isFilesSelected}]">
@@ -25,7 +25,6 @@
             <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
                 <FontAwesomeIcon icon="fa-xmark" />
             </div>
-
             <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
                 <img :src="images[index].base64" alt="" v-if="images[index].base64">
                 <div class="name">{{file.name}}</div>
@@ -42,6 +41,9 @@ import { faPaperclip, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useMemoize } from '@vueuse/core';
 import { useBase64 } from '@vueuse/core';
+import handleError from '../composables/errors';
+import { HTTP } from '../http-common.vue'
+
 library.add(faPaperclip, faXmark);
 
 export default {
@@ -83,10 +85,13 @@ export default {
                     return
                 }
                 this.toast.error('Сообщение не может быть пустым')
+            } else {
+                this.sendForm();
             }
         },
         changeFiles(event) {
-            this.files = event?.target?.files || [];
+            let files = event?.target?.files;
+            this.files = files ? [...files] : [];
             this.generatePreview();
             var fileBuffer = new DataTransfer();
             event.target.files = fileBuffer.files;
@@ -104,7 +109,28 @@ export default {
                 let result_base64 = this.memoizeBase64Image(file);
                 this.images[index] = result_base64;
             });
-        }
+        },
+        sendForm() {
+            var formData = new FormData();
+            this.files.forEach(file => {
+                formData.append('files', file);
+            })
+            formData.append('message', this.messageText);
+            HTTP.post('role', formData)
+                .then((response) => {
+                    this.toast('ABOBA')
+                })
+                .catch((error) => {
+                    this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)
+                    // if (error?.response?.status === 422) {
+                    //     this.logout();
+                    //     this.$router.push({ path: '/login' })
+                    //     this.toast.error('Необходимо войти в аккаунт')
+                    // } else {
+                    //     
+                    // }
+                });
+        },
     },
     computed: {
         is_selected() {
@@ -220,6 +246,10 @@ export default {
                     inset: 0;
                     opacity: 0;
                     cursor: pointer;
+
+                    &.hidden {
+                        display: none;
+                    }
                 }
             }
 
@@ -239,7 +269,7 @@ export default {
             cursor: pointer;
             white-space: nowrap;
             // aspect-ratio: 1;
-            
+
             display: flex;
             flex-direction: column;
             max-width: 200px;
@@ -255,6 +285,7 @@ export default {
             &:hover {
                 background-color: var(--red-0);
             }
+
             .name {
                 // overflow-wrap: anywhere;
                 overflow-wrap: anywhere;
