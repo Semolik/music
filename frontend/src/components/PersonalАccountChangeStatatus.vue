@@ -20,7 +20,7 @@
         <div class="line" v-auto-animate>
             <div :class="['button','files', {active: isFilesSelected}]">
                 <FontAwesomeIcon icon="fa-paperclip" />
-                <input type="file" :title="filesTitle" @change="changeFiles" multiple>
+                <input type="file" :title="filesTitle" @change="changeFiles" accept="image/*" multiple>
             </div>
             <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
                 <FontAwesomeIcon icon="fa-xmark" />
@@ -238,17 +238,27 @@ export default {
             padding: 5px;
             cursor: pointer;
             white-space: nowrap;
+            // aspect-ratio: 1;
+            
+            display: flex;
+            flex-direction: column;
+            max-width: 200px;
             text-align: center;
 
             img {
                 object-fit: cover;
                 width: 100%;
-                height: 100px;
+                height: 100%;
                 border-radius: 10px;
             }
 
             &:hover {
                 background-color: var(--red-0);
+            }
+            .name {
+                // overflow-wrap: anywhere;
+                overflow-wrap: anywhere;
+                // width: 100%;
             }
         }
     }
