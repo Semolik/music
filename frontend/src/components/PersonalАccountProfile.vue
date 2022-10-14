@@ -190,7 +190,7 @@ export default {
                 svg {
                     width: 50px;
                     height: 50px;
-                    z-index: 2;
+
                 }
 
                 .edit-area {

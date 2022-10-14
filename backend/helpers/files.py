@@ -34,7 +34,7 @@ def save_file(upload_file: UploadFile, user_id: int) -> File:
     originalFilePath = Path(originalFileName)
     suffix = originalFilePath.suffix
     uuid_filename = str(uuid.uuid4())
-    if suffix in supported_image_extensions:
+    if suffix.lower() in supported_image_extensions:
         buf = io.BytesIO()
         shutil.copyfileobj(upload_file.file, buf)
         buf.seek(0)
