@@ -27,14 +27,14 @@ def init_folders_structure():
         logger.info("Структура папок создана")
 
 
-def save_file(upload_file: UploadFile, user_id: int) -> File:
+def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
     if not upload_file.filename:
         return
     originalFileName = upload_file.filename
     originalFilePath = Path(originalFileName)
     suffix = originalFilePath.suffix
     uuid_filename = str(uuid.uuid4())
-    if suffix.lower() in supported_image_extensions:
+    if suffix.lower() in supported_image_extensions or force_image:
         buf = io.BytesIO()
         shutil.copyfileobj(upload_file.file, buf)
         buf.seek(0)
