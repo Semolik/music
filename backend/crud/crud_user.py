@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
 from schemas.user import UserAuth, UserModifiable, UserRegister
-from models.user import File, User
+from models.user import File, User, ChangeRoleRequest
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 
@@ -47,19 +47,26 @@ class UserCruds:
             raise Exception('Update user failed: user is None')
         data_obj = new_user_data.dict()
         remove_picture = data_obj.pop('remove_picture')
-        print(remove_picture)
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if (userPic and user.picture) or remove_picture:
             FileCruds(self.db).delete_file(user.picture)
         if userPic:
-            # if user.picture:
-            #     FileCruds(self.db).delete_file(user.picture)
+            if user.picture:
+                FileCruds(self.db).delete_file(user.picture)
             user.picture = self.create(userPic)
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
         return user
+
+    def send_change_role_message(self, user_id, message, files_ids):
+        db_change_role_request = ChangeRoleRequest(files_ids=files_ids,
+                                                   message=message, user_id=user_id)
+        return self.create(db_change_role_request)
+
+    def get_user_change_role_messages(self, user_id):
+        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).all()
 
 
 user_cruds = UserCruds()

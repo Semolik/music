@@ -43,6 +43,7 @@ import { useMemoize } from '@vueuse/core';
 import { useBase64 } from '@vueuse/core';
 import handleError from '../composables/errors';
 import { HTTP } from '../http-common.vue'
+import { files } from '@formkit/inputs';
 
 library.add(faPaperclip, faXmark);
 
@@ -110,15 +111,23 @@ export default {
                 this.images[index] = result_base64;
             });
         },
+        clearForm() {
+            this.messageText = '';
+            this.musician_selected = false;
+            this.radioStation_selected = false;
+            this.files = [];
+            this.images = [];
+        },
         sendForm() {
             var formData = new FormData();
             this.files.forEach(file => {
                 formData.append('files', file);
             })
             formData.append('message', this.messageText);
-            HTTP.post('role', formData)
+            HTTP.post('change-role', formData)
                 .then((response) => {
-                    this.toast('ABOBA')
+                    this.clearForm();
+                    this.toast(response.data.detail);
                 })
                 .catch((error) => {
                     this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)

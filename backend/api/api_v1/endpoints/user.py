@@ -1,7 +1,8 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from helpers.images import save_image, set_picture
+from helpers.files import save_file
+from helpers.images import set_picture
 from schemas.user import UpdateUserRoleRequest, UserInfo, UserModifiableForm
 from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
@@ -18,7 +19,7 @@ def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm),
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="неправильное имя пользователя или пароль")
-    db_image = save_image(upload_file=userPicture, user=db_user)
+    db_image = save_file(upload_file=userPicture, user_id=db_user.id)
     db_user_updated = user_cruds.update(
         user=db_user, new_user_data=UserData, userPic=db_image)
     user_data = db_user_updated.as_dict()
@@ -39,8 +40,28 @@ def get_user_info(Authorize: AuthJWT = Depends()):
     return user_data
 
 
-@router.post('/role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = File(...)):
     Authorize.jwt_required()
+    user_cruds = UserCruds()
     current_user_id = Authorize.get_jwt_subject()
-    return ''
+    db_files: List[FileModel] = [
+        user_cruds.create(
+            save_file(
+                upload_file=upload_file,
+                user_id=current_user_id
+            )
+        )
+        for upload_file in files]
+    files_ids = [file.id for file in db_files]
+    user_cruds.send_change_role_message(
+        user_id=current_user_id, message=formData.message, files_ids=files_ids)
+    return {'detail': 'Сообщение отправлено'}
+
+@router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+def get(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    user_cruds = UserCruds()
+    current_user_id = Authorize.get_jwt_subject()
+    
+    return user_cruds.get_user_change_role_messages(user_id=current_user_id)

@@ -1,3 +1,4 @@
+from email.policy import default
 from db.base_class import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY
 from sqlalchemy.orm import relationship, backref
@@ -23,10 +24,11 @@ class File(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     file_name = Column(String)
+    original_file_name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="files",
                         foreign_keys=[user_id], overlaps="picture")
-    type = Column(String)
+    type = Column(String, default='file')
 
 
 class ChangeRoleRequest(Base):
@@ -34,4 +36,4 @@ class ChangeRoleRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     message = Column(String)
-    files = Column(ARRAY(Integer))
+    files_ids = Column(ARRAY(Integer))
