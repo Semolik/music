@@ -50,6 +50,7 @@ export default {
         border-radius: 20px;
         padding: 5px;
         display: flex;
+        flex-wrap: wrap;
         flex-direction: column;
         gap: 5px;
         height: min-content;

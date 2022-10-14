@@ -45,10 +45,10 @@ def save_file(upload_file: UploadFile, user_id: int) -> File:
             image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
         except:
             raise HTTPException(status_code=500, detail="поврежденный файл")
-        return File(file_name=fileName,original_file_name=originalFileName, user_id=user_id, type='image')
+        return File(file_name=fileName, original_file_name=originalFileName, user_id=user_id, type='image')
     else:
         fileName = uuid_filename + suffix
-        with open(os.path.join(settings.OTHER_FILES_FOLDER, fileName), "wb+") as buffer:
+        with open('/'.join([settings.OTHER_FILES_FOLDER, fileName]), "wb+") as buffer:
             shutil.copyfileobj(upload_file.file, buffer)
         upload_file.file.close()
         return File(file_name=fileName, original_file_name=originalFileName, user_id=user_id)

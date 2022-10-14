@@ -1,7 +1,10 @@
 <template>
     <div class="container">
         <div class="selector">
-            <div class="text">Изменить тип аккаунта на</div>
+            <div class="text">
+                <div class="content">Изменить тип аккаунта на</div>
+                <router-link to="/" class="my-requests" v-if="has_requests">мои запросы</router-link>
+            </div>
             <div class="items">
                 <div :class="['item',{active: radioStation_selected}]" @click="selectRadioStation">
                     Радиостанцию
@@ -20,13 +23,19 @@
         <div class="line" v-auto-animate>
             <div :class="['button','files', {active: isFilesSelected}]">
                 <FontAwesomeIcon icon="fa-paperclip" />
-                <input type="file" :title="filesTitle" @change="changeFiles" accept="image/*" multiple>
+                <input type="file" :title="filesTitle" @change="changeFiles" multiple>
             </div>
             <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
                 <FontAwesomeIcon icon="fa-xmark" />
             </div>
             <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
-                <img :src="images[index].base64" alt="" v-if="images[index].base64">
+                <div class="icon">
+                    <template v-if="previews[index]">
+                        <img :src="previews[index].base64" alt="">
+                        <FontAwesomeIcon icon="fa-image" />
+                    </template>
+                    <FontAwesomeIcon icon="fa-file" v-else />
+                </div>
                 <div class="name">{{file.name}}</div>
             </div>
         </div>
@@ -37,7 +46,7 @@
 import { isRadioStation, isMusician } from '../composables/roleChecker';
 import { useToast } from "vue-toastification";
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPaperclip, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faPaperclip, faXmark, faImage, faFile } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useMemoize } from '@vueuse/core';
 import { useBase64 } from '@vueuse/core';
@@ -45,7 +54,7 @@ import handleError from '../composables/errors';
 import { HTTP } from '../http-common.vue'
 import { files } from '@formkit/inputs';
 
-library.add(faPaperclip, faXmark);
+library.add(faPaperclip, faXmark, faImage, faFile);
 
 export default {
     setup() {
@@ -67,8 +76,19 @@ export default {
             musician_selected: isMusician.value,
             messageText: '',
             files: [],
-            images: [],
+            previews: [],
+            has_requests: false,
         };
+    },
+    mounted() {
+        HTTP.get('has-change-role-requests')
+            .then((response) => {
+                this.has_requests = response.data.result;
+            })
+            .catch((error) => {
+                console.log(handleError(error, 'При получении информации о том отпроавлял ли пользватель запросы на смену аккаунта произошла ошибка').message)
+                this.has_requests = false;
+            });
     },
     methods: {
         selectRadioStation() {
@@ -105,10 +125,14 @@ export default {
         },
         generatePreview() {
             let files = [...this.files];
-            this.images = new Array(null).fill(files.length);
+            this.previews = new Array(null).fill(files.length);
             files.forEach(async (file, index) => {
-                let result_base64 = this.memoizeBase64Image(file);
-                this.images[index] = result_base64;
+                if (this.isImage(file)) {
+                    let result_base64 = this.memoizeBase64Image(file);
+                    this.previews[index] = result_base64;
+                } else {
+                    this.previews[index] = false;
+                }
             });
         },
         clearForm() {
@@ -131,15 +155,12 @@ export default {
                 })
                 .catch((error) => {
                     this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)
-                    // if (error?.response?.status === 422) {
-                    //     this.logout();
-                    //     this.$router.push({ path: '/login' })
-                    //     this.toast.error('Необходимо войти в аккаунт')
-                    // } else {
-                    //     
-                    // }
+
                 });
         },
+        isImage(file) {
+            return file?.type.split('/')?.includes('image')
+        }
     },
     computed: {
         is_selected() {
@@ -154,12 +175,14 @@ export default {
         filesTitle() {
             return this.isFilesSelected ? [...this.files].map(file => file.name).join('\n') : 'Файл не выбран'
         },
+
     }
 }
 
 </script>
 <style lang="scss" scoped>
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/breakpoints';
 
 .container {
     display: flex;
@@ -175,10 +198,47 @@ export default {
 
         .text {
             font-size: large;
+            display: flex;
+            width: 100%;
+            position: relative;
+
+            @include breakpoints.md(true) {
+                flex-direction: column-reverse;
+            }
+
+            .content {
+                flex-grow: 1;
+                text-align: center;
+                padding: 5px;
+            }
+
+            .my-requests {
+                @include breakpoints.md {
+                    position: absolute;
+                    width: min-content;
+                    white-space: nowrap;
+                    right: 0;
+                }
+
+                cursor: pointer;
+                text-decoration: none;
+                color: var(--color-text);
+                text-align: center;
+                background-color: var(--color-background-mute-3);
+                border-radius: 15px;
+                padding: 5px 10px;
+
+                &:hover {
+                    background-color: var(--color-background-mute-4);
+                }
+            }
         }
 
         .items {
             display: flex;
+
+            flex-wrap: wrap;
+
             gap: 5px;
             width: 100%;
             border-radius: 5px;
@@ -187,7 +247,7 @@ export default {
                 cursor: pointer;
                 text-align: center;
                 flex-grow: 1;
-                padding: 5px;
+                padding: 5px 40px;
                 border-radius: 15px;
                 background-color: var(--color-background-mute-3);
 
@@ -276,29 +336,46 @@ export default {
             border-radius: 15px;
             padding: 5px;
             cursor: pointer;
-            white-space: nowrap;
-            // aspect-ratio: 1;
 
+            gap: 5px;
+            flex-grow: 1;
             display: flex;
-            flex-direction: column;
-            max-width: 200px;
             text-align: center;
 
-            img {
-                object-fit: cover;
-                width: 100%;
-                height: 100%;
+            .icon {
+                width: 50px;
+                height: 50px;
+                position: relative;
+                background-color: var(--color-background-mute-4);
                 border-radius: 10px;
+                @include helpers.flex-center;
+
+                svg {
+                    width: 30px;
+                    height: 30px;
+                }
+
+                img {
+                    position: absolute;
+                    inset: 0;
+                    width: 50px;
+                    height: 50px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                }
             }
+
+
 
             &:hover {
                 background-color: var(--red-0);
             }
 
             .name {
-                // overflow-wrap: anywhere;
+                @include helpers.flex-center;
                 overflow-wrap: anywhere;
-                // width: 100%;
+                white-space: break-spaces;
+                text-align: center;
             }
         }
     }

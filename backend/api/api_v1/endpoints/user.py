@@ -58,10 +58,17 @@ def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUse
         user_id=current_user_id, message=formData.message, files_ids=files_ids)
     return {'detail': 'Сообщение отправлено'}
 
+
 @router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
-def get(Authorize: AuthJWT = Depends()):
+def get_change_requests(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    user_cruds = UserCruds()
     current_user_id = Authorize.get_jwt_subject()
-    
-    return user_cruds.get_user_change_role_messages(user_id=current_user_id)
+    return UserCruds().get_user_change_role_messages(user_id=current_user_id)
+
+
+@router.get('/has-change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+def user_has_change_requests(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    result = UserCruds().is_has_change_role_messages(user_id=current_user_id)
+    return {'result': result}

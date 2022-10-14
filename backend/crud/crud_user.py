@@ -68,5 +68,8 @@ class UserCruds:
     def get_user_change_role_messages(self, user_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).all()
 
+    def is_has_change_role_messages(self, user_id):
+        return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
+
 
 user_cruds = UserCruds()
