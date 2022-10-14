@@ -1,4 +1,6 @@
+from typing import List
 from sqlalchemy.orm import Session
+from helpers.files import add_url
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
 from schemas.user import UserAuth, UserModifiable, UserRegister
@@ -66,7 +68,21 @@ class UserCruds:
         return self.create(db_change_role_request)
 
     def get_user_change_role_messages(self, user_id):
-        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).all()
+        records: List[ChangeRoleRequest] = self.db.query(ChangeRoleRequest).filter(
+            ChangeRoleRequest.user_id == user_id).all()
+        result = list()
+        for record in records:
+            files = list()
+            for file_id in record.files_ids:
+                db_file = self.db.query(File).filter(
+                    File.id == file_id).first()
+                if db_file:
+                    files.append(add_url(db_file))
+            record = jsonable_encoder(record)
+            record['files'] = files
+            del record['files_ids']
+            result.append(record)
+        return result
 
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())

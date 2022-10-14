@@ -164,6 +164,7 @@ export default {
             position: relative;
             overflow: hidden;
             border-radius: 7px;
+            transition: 2s filter, 2s opacity;
 
             img {
                 object-fit: cover;
@@ -203,6 +204,10 @@ export default {
                 .edit-area {
                     opacity: 1;
                 }
+
+                img {
+                    filter: blur(3px);
+                }
             }
 
             .edit-area {
@@ -216,11 +221,13 @@ export default {
 
                 .edit-area-container {
                     z-index: 2;
+                    position: absolute;
+                    inset: 0;
                     @include helpers.flex-center;
                     flex-direction: column;
-                    background-color: var(--color-background-mute-3);
+                    background-color: rgba($color: #000000, $alpha: 0.2);
                     padding: 5px;
-                    border-radius: 10px;
+                    // border-radius: 10px;
                     aspect-ratio: 1;
 
                     svg {

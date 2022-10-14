@@ -35,6 +35,13 @@ const router = createRouter({
           name: 'Изменение статуса аккаунта',
           meta: { requireAuth: true, roles: [Role.User] },
           component: () => import('../components/PersonalАccountChangeStatatus.vue'),
+          children: [
+            {
+              path: 'history',
+              name: 'История запросов',
+              component: () => import('../components/PersonalАccountChangeStatatusHistory.vue'),
+            }
+          ]
         }
       ]
     },

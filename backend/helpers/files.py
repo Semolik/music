@@ -1,9 +1,9 @@
 import io
 from PIL import Image
-import os
 import logging
 import shutil
 import uuid
+from fastapi.encoders import jsonable_encoder
 from models.user import File
 from fastapi import UploadFile, HTTPException
 from core.config import settings
@@ -52,3 +52,9 @@ def save_file(upload_file: UploadFile, user_id: int) -> File:
             shutil.copyfileobj(upload_file.file, buffer)
         upload_file.file.close()
         return File(file_name=fileName, original_file_name=originalFileName, user_id=user_id)
+
+
+def add_url(file: File) -> dict:
+    file_obj = jsonable_encoder(file)
+    file_obj['url'] = '/'.join([settings.UPLOADS_ROUTE, file.file_name])
+    return file_obj

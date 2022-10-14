@@ -10,7 +10,7 @@ class FileCruds:
         self.db = db
 
     def delete_file(self, file: File) -> None:
-        if Path(file.file_name).suffix == settings.IMAGES_EXTENTION:
+        if file.type == 'image':
             path = '/'.join([settings.IMAGES_FOLDER, file.file_name])
             if Path(path).exists():
                 os.remove(path)

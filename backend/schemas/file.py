@@ -5,3 +5,4 @@ class File(BaseModel):
     file_name: str
     user_id: int
     type: str
+    url: str

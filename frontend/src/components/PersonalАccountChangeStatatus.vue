@@ -2,10 +2,25 @@
     <div class="container">
         <div class="selector">
             <div class="text">
-                <div class="content">Изменить тип аккаунта на</div>
-                <router-link to="/" class="my-requests" v-if="has_requests">мои запросы</router-link>
+                <div class="content">
+                    <template v-if="!is_history_route">
+                        Изменить тип аккаунта на
+                    </template>
+                    <template v-else>
+                        История запросов
+                    </template>
+                </div>
+                <router-link :to="'/lk/update-status'+ (is_history_route ? '' : '/history')" class="my-requests"
+                    v-if="has_requests">
+                    <template v-if="is_history_route">
+                        отправить запрос
+                    </template>
+                    <template v-else>
+                        мои запросы
+                    </template>
+                </router-link>
             </div>
-            <div class="items">
+            <div class="items" v-if="!is_history_route">
                 <div :class="['item',{active: radioStation_selected}]" @click="selectRadioStation">
                     Радиостанцию
                 </div>
@@ -14,32 +29,35 @@
                 </div>
             </div>
         </div>
-        <div class="info">
-            В сообщении будут передано имя которое указано у ваc в настройках аккаунта
-        </div>
-        <div class="request-form">
-            <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
-        </div>
-        <div class="line" v-auto-animate>
-            <div :class="['button','files', {active: isFilesSelected}]">
-                <FontAwesomeIcon icon="fa-paperclip" />
-                <input type="file" :title="filesTitle" @change="changeFiles" multiple>
+        <router-view v-if="is_history_route" />
+        <template v-else>
+            <div class="info">
+                В сообщении будут передано имя которое указано у ваc в настройках аккаунта
             </div>
-            <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
-                <FontAwesomeIcon icon="fa-xmark" />
+            <div class="request-form">
+                <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
             </div>
-            <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
-                <div class="icon">
-                    <template v-if="previews[index]">
-                        <img :src="previews[index].base64" alt="">
-                        <FontAwesomeIcon icon="fa-image" />
-                    </template>
-                    <FontAwesomeIcon icon="fa-file" v-else />
+            <div class="line" v-auto-animate>
+                <div :class="['button','files', {active: isFilesSelected}]">
+                    <FontAwesomeIcon icon="fa-paperclip" />
+                    <input type="file" :title="filesTitle" @change="changeFiles" multiple>
                 </div>
-                <div class="name">{{file.name}}</div>
+                <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
+                    <FontAwesomeIcon icon="fa-xmark" />
+                </div>
+                <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
+                    <div class="icon">
+                        <template v-if="previews[index]">
+                            <img :src="previews[index].base64" alt="">
+                            <FontAwesomeIcon icon="fa-image" />
+                        </template>
+                        <FontAwesomeIcon icon="fa-file" v-else />
+                    </div>
+                    <div class="name">{{file.name}}</div>
+                </div>
             </div>
-        </div>
-        <div :class="['button', {active: buttonActive}]" @click="sendMessageToAdmins">Отправить сообщение</div>
+            <div :class="['button', {active: buttonActive}]" @click="sendMessageToAdmins">Отправить сообщение</div>
+        </template>
     </div>
 </template>
 <script>
@@ -78,15 +96,17 @@ export default {
             files: [],
             previews: [],
             has_requests: false,
+            is_history_route: false,
         };
     },
     mounted() {
+        this.is_history_route = (this.$route.fullPath === "/lk/update-status/history");
         HTTP.get('has-change-role-requests')
             .then((response) => {
                 this.has_requests = response.data.result;
             })
             .catch((error) => {
-                console.log(handleError(error, 'При получении информации о том отпроавлял ли пользватель запросы на смену аккаунта произошла ошибка').message)
+                console.log(handleError(error, 'При получении информации о том отправлял ли пользватель запросы на смену аккаунта произошла ошибка').message)
                 this.has_requests = false;
             });
     },
@@ -152,6 +172,7 @@ export default {
                 .then((response) => {
                     this.clearForm();
                     this.toast(response.data.detail);
+                    this.has_requests = true;
                 })
                 .catch((error) => {
                     this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)

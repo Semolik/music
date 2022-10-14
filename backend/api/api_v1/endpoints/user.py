@@ -8,12 +8,13 @@ from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
 from crud.crud_user import UserCruds
 router = APIRouter()
+user_cruds = UserCruds()
 
 
 @router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
 def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm), userPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    user_cruds = UserCruds()
+    # user_cruds = UserCruds()
     current_user_id = Authorize.get_jwt_subject()
     db_user = user_cruds.get_user_by_id(current_user_id)
     if not db_user:
@@ -31,7 +32,7 @@ def update_user_data(UserData: UserModifiableForm = Depends(UserModifiableForm),
 def get_user_info(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    user = UserCruds().get_user_by_id(current_user_id)
+    user = user_cruds.get_user_by_id(current_user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="неправильное имя пользователя или пароль")
@@ -43,7 +44,6 @@ def get_user_info(Authorize: AuthJWT = Depends()):
 @router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = File(...)):
     Authorize.jwt_required()
-    user_cruds = UserCruds()
     current_user_id = Authorize.get_jwt_subject()
     db_files: List[FileModel] = [
         user_cruds.create(
@@ -63,12 +63,12 @@ def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUse
 def get_change_requests(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    return UserCruds().get_user_change_role_messages(user_id=current_user_id)
+    return user_cruds.get_user_change_role_messages(user_id=current_user_id)
 
 
 @router.get('/has-change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def user_has_change_requests(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    result = UserCruds().is_has_change_role_messages(user_id=current_user_id)
+    result = user_cruds.is_has_change_role_messages(user_id=current_user_id)
     return {'result': result}
