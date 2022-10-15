@@ -42,7 +42,13 @@ const router = createRouter({
               component: () => import('../components/PersonalAccountChangeStatusHistory.vue'),
             }
           ]
-        }
+        },
+        {
+          path: 'update-status-requests',
+          name: 'Изменение статуса аккаунта',
+          meta: { requireAuth: true, roles: [Role.Admin] },
+          component: () => import('../components/PersonalАccountChangeStatatusRequests.vue'),
+        },
       ]
     },
     {

@@ -4,6 +4,7 @@
             <router-link class="item" to="/lk">Профиль</router-link>
             <router-link class="item" to="/lk/music">Моя музыка</router-link>
             <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
+            <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
         </aside>
         <div class="active-route">
             <router-view></router-view>
