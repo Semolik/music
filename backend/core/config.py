@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     OTHER_FILES_FOLDER: str = ASSETS_FOLDER+'other'
     IMAGES_EXTENTION: str = '.png'
     UPLOADS_ROUTE: str = '/uploads'
+    DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
 
     class Config:
         case_sensitive = True  # 4

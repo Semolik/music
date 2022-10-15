@@ -39,7 +39,7 @@ const router = createRouter({
             {
               path: 'history',
               name: 'История запросов',
-              component: () => import('../components/PersonalАccountChangeStatatusHistory.vue'),
+              component: () => import('../components/PersonalAccountChangeStatusHistory.vue'),
             }
           ]
         }

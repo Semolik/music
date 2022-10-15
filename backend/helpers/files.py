@@ -27,7 +27,7 @@ def init_folders_structure():
         logger.info("Структура папок создана")
 
 
-def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
+def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_image=False) -> File:
     if not upload_file.filename:
         return
     originalFileName = upload_file.filename
@@ -40,7 +40,8 @@ def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
         buf.seek(0)
         try:
             image = Image.open(buf)
-            image.thumbnail((600, 600))
+            if resize_image:
+                image.thumbnail((600, 600))
             fileName = uuid_filename + settings.IMAGES_EXTENTION
             image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
         except:

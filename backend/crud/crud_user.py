@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
+from core.config import settings
 from helpers.files import add_url
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
@@ -68,8 +70,11 @@ class UserCruds:
         return self.create(db_change_role_request)
 
     def get_user_change_role_messages(self, user_id):
-        records: List[ChangeRoleRequest] = self.db.query(ChangeRoleRequest).filter(
-            ChangeRoleRequest.user_id == user_id).all()
+        records: List[ChangeRoleRequest] =\
+            self.db.query(ChangeRoleRequest)\
+            .order_by(ChangeRoleRequest.id.desc())\
+            .filter(ChangeRoleRequest.user_id == user_id)\
+            .all()
         result = list()
         for record in records:
             files = list()
@@ -78,14 +83,21 @@ class UserCruds:
                     File.id == file_id).first()
                 if db_file:
                     files.append(add_url(db_file))
+
+            time_created: datetime = record.time_created
+            time_created_str = time_created.strftime(settings.DATETIME_FORMAT)
+
             record = jsonable_encoder(record)
             record['files'] = files
             del record['files_ids']
+            record['time_created'] = time_created_str
+
             result.append(record)
         return result
 
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
+
 
 
 user_cruds = UserCruds()

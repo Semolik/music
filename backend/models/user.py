@@ -1,6 +1,6 @@
-from email.policy import default
+from sqlalchemy.sql import func
 from db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime
 from sqlalchemy.orm import relationship, backref
 
 
@@ -38,3 +38,12 @@ class ChangeRoleRequest(Base):
     message = Column(String)
     files_ids = Column(ARRAY(Integer))
     status = Column(String, default='in-progress')
+    time_created = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class AnswerChangeRoleRequest(Base):
+    __tablename__ = 'answers_change_role_requests'
+    id = Column(Integer, primary_key=True, index=True)
+    time_created = Column(DateTime(timezone=True), server_default=func.now())
+    message = Column(String)
+    request_id = Column(Integer, ForeignKey("change_role_requests.id"))
