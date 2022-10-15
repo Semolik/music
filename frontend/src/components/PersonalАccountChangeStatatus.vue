@@ -37,7 +37,7 @@
             <div class="request-form">
                 <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
             </div>
-            <div class="line" v-auto-animate>
+            <div class="line" >
                 <div :class="['button','files', {active: isFilesSelected}]">
                     <FontAwesomeIcon icon="fa-paperclip" />
                     <input type="file" :title="filesTitle" @change="changeFiles" multiple>

@@ -27,7 +27,7 @@ def init_folders_structure():
         logger.info("Структура папок создана")
 
 
-def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_image=False) -> File:
+def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
     if not upload_file.filename:
         return
     originalFileName = upload_file.filename
@@ -40,13 +40,14 @@ def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_i
         buf.seek(0)
         try:
             image = Image.open(buf)
-            if resize_image:
-                image.thumbnail((600, 600))
+            image.thumbnail((400, 400))
             fileName = uuid_filename + settings.IMAGES_EXTENTION
             image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
+            newFileName = originalFilePath.with_suffix(
+                settings.IMAGES_EXTENTION).name
         except:
             raise HTTPException(status_code=500, detail="поврежденный файл")
-        return File(file_name=fileName, original_file_name=originalFileName, user_id=user_id, type='image')
+        return File(file_name=fileName, original_file_name=newFileName, user_id=user_id, type='image')
     else:
         fileName = uuid_filename + suffix
         with open('/'.join([settings.OTHER_FILES_FOLDER, fileName]), "wb+") as buffer:

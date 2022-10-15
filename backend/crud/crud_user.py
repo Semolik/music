@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
+from helpers.images import set_picture
 from core.config import settings
 from helpers.files import add_url
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
-from schemas.user import UserAuth, UserModifiable, UserRegister
+from schemas.user import ChangeRoleRequestInfo, UserAuth, UserModifiable, UserRegister
 from models.user import File, User, ChangeRoleRequest
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
@@ -75,6 +76,17 @@ class UserCruds:
             .order_by(ChangeRoleRequest.id.desc())\
             .filter(ChangeRoleRequest.user_id == user_id)\
             .all()
+        return self.post_processing_change_role_messages(records)
+
+    def get_all_change_role_messages(self, page: int = 1, page_size: int = 10):
+        end = page * page_size
+        records: List[ChangeRoleRequest] =\
+            self.db.query(ChangeRoleRequest)\
+            .order_by(ChangeRoleRequest.id.desc())\
+            .slice(end-page_size, end)
+        return self.post_processing_change_role_messages(records, add_user=True)
+
+    def post_processing_change_role_messages(self, records: List[ChangeRoleRequest], add_user=False):
         result = list()
         for record in records:
             files = list()
@@ -83,21 +95,28 @@ class UserCruds:
                     File.id == file_id).first()
                 if db_file:
                     files.append(add_url(db_file))
-
             time_created: datetime = record.time_created
             time_created_str = time_created.strftime(settings.DATETIME_FORMAT)
-
-            record = jsonable_encoder(record)
-            record['files'] = files
-            del record['files_ids']
-            record['time_created'] = time_created_str
-
-            result.append(record)
+            record_obj = jsonable_encoder(record)
+            if add_user:
+                user = record.user
+                user_obj = jsonable_encoder(user)
+                user_obj_with_pic = set_picture(user_obj, user.picture)
+                record_obj['user'] = user_obj_with_pic
+            record_obj['files'] = files
+            record_obj['time_created'] = time_created_str
+            result.append(record_obj)
         return result
+
 
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
 
+    def is_admin(self, user_id):
+        db_user = self.get_user_by_id(user_id=user_id)
+        if not db_user:
+            raise Exception('Пользователь не найден')
+        return db_user.is_superuser
 
 
 user_cruds = UserCruds()

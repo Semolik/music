@@ -11,14 +11,13 @@ class FileCruds:
         self.db = db
 
     def delete_file(self, file: File) -> None:
-        if file.type == 'image':
-            path = '/'.join([settings.IMAGES_FOLDER, file.file_name])
-            if Path(path).exists():
-                os.remove(path)
-            self.db.delete(file)
-            self.db.commit()
-        else:
-            raise Exception('Удаление не картинки еще не написано')
+        # ':
+        path = '/'.join([settings.IMAGES_FOLDER if file.type ==
+                        'image' else settings.OTHER_FILES_FOLDER, file.file_name])
+        if Path(path).exists():
+            os.remove(path)
+        self.db.delete(file)
+        self.db.commit()
 
     def get_file_by_name(self, file_name: str):
         return self.db.query(File).filter(File.file_name == file_name).first()

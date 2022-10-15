@@ -25,7 +25,7 @@ class File(Base):
     id = Column(Integer, primary_key=True, index=True)
     file_name = Column(String)
     original_file_name = Column(String)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="files",
                         foreign_keys=[user_id], overlaps="picture")
     type = Column(String, default='file')
@@ -35,6 +35,7 @@ class ChangeRoleRequest(Base):
     __tablename__ = 'change_role_requests'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", foreign_keys=[user_id])
     message = Column(String)
     files_ids = Column(ARRAY(Integer))
     status = Column(String, default='in-progress')

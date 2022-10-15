@@ -55,3 +55,7 @@ class ChangeRoleRequestInfo(BaseModel):
     message: str
     status: Literal['in-progress', 'successfully', 'rejected']
     time_created: str
+
+
+class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
+    user: UserInfo
