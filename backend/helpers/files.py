@@ -56,5 +56,17 @@ def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
 
 def add_url(file: File) -> dict:
     file_obj = jsonable_encoder(file)
-    file_obj['url'] = '/'.join([settings.UPLOADS_ROUTE, file.file_name])
+    chapters = [
+        ''.join(
+            [
+                settings.SERVER_LINK,
+                settings.API_V1_STR,
+                settings.UPLOADS_ROUTE
+            ]
+        )
+    ]
+    if file.type == 'image':
+        chapters.append('images')
+    chapters.append(file.file_name)
+    file_obj['url'] = '/'.join(chapters)
     return file_obj

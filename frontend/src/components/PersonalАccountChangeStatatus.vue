@@ -10,7 +10,7 @@
                         История запросов
                     </template>
                 </div>
-                <router-link :to="'/lk/update-status'+ (is_history_route ? '' : '/history')" class="my-requests"
+                <router-link :to="is_history_route ? base_route_path : history_route_path" class="my-requests"
                     v-if="has_requests">
                     <template v-if="is_history_route">
                         отправить запрос
@@ -97,13 +97,15 @@ export default {
             previews: [],
             has_requests: false,
             is_history_route: false,
+            base_route_path: '/lk/update-status',
+            history_route_path: '/lk/update-status/history',
         };
     },
     mounted() {
-        this.is_history_route = (this.$route.fullPath === "/lk/update-status/history");
+        this.is_history_route = (this.$route.fullPath === this.history_route_path);
         HTTP.get('has-change-role-requests')
             .then((response) => {
-                this.has_requests = response.data.result;
+                this.has_requests = response.data;
             })
             .catch((error) => {
                 console.log(handleError(error, 'При получении информации о том отправлял ли пользватель запросы на смену аккаунта произошла ошибка').message)
@@ -164,9 +166,11 @@ export default {
         },
         sendForm() {
             var formData = new FormData();
-            this.files.forEach(file => {
-                formData.append('files', file);
-            })
+            if (this.files.length > 0) {
+                this.files.forEach(file => {
+                    formData.append('files', file);
+                })
+            }
             formData.append('message', this.messageText);
             HTTP.post('change-role', formData)
                 .then((response) => {
@@ -241,6 +245,7 @@ export default {
                     right: 0;
                 }
 
+                font-size: initial;
                 cursor: pointer;
                 text-decoration: none;
                 color: var(--color-text);

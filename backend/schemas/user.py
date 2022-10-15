@@ -1,4 +1,6 @@
+from typing import List, Literal
 from pydantic import BaseModel
+from schemas.file import File
 from helpers.forms import form_body
 
 
@@ -45,3 +47,13 @@ class UserInfo(UserTypes, UserBase):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str
+
+
+class ChangeRoleRequestInfo(BaseModel):
+    files: List[File]
+    message: str
+    status: Literal['in-progress', 'successfully', 'rejected']
+
+
+class ChangeRoleRequestsListInfo(BaseModel):
+    result: List[ChangeRoleRequestInfo]

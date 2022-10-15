@@ -3,7 +3,7 @@ from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from helpers.files import save_file
 from helpers.images import set_picture
-from schemas.user import UpdateUserRoleRequest, UserInfo, UserModifiableForm
+from schemas.user import UpdateUserRoleRequest, UserInfo, UserModifiableForm, ChangeRoleRequestInfo
 from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
 from crud.crud_user import UserCruds
@@ -43,7 +43,7 @@ def get_user_info(Authorize: AuthJWT = Depends()):
 
 
 @router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
-def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = File(...)):
+def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = []):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_files: List[FileModel] = [
@@ -60,7 +60,7 @@ def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUse
     return {'detail': 'Сообщение отправлено'}
 
 
-@router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
 def get_change_requests(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
@@ -72,4 +72,4 @@ def user_has_change_requests(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     result = user_cruds.is_has_change_role_messages(user_id=current_user_id)
-    return {'result': result}
+    return result

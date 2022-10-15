@@ -37,3 +37,4 @@ class ChangeRoleRequest(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     message = Column(String)
     files_ids = Column(ARRAY(Integer))
+    status = Column(String, default='in-progress')
