@@ -2,6 +2,14 @@
     <div class="request">
         <div :class="['line', {adminMode: adminMode}]">
             <div class="date">{{request.time_created}}</div>
+            <div class="block status custom" v-if="custom_status">
+                <span class="txt">принудительная установка статуса </span>
+                <span class="role custom">{{customStatusText}}</span>
+            </div>
+            <div class="block status" v-else>
+                <span class="txt">запрошенный статус </span>
+                <span class="role">{{status}}</span>
+            </div>
             <div :class="['status', request.status]" v-if="!hideStatus"></div>
             <template v-if="adminMode">
                 <div class="block full-name" v-if="fullName" @click="modalOpened = true">
@@ -47,7 +55,27 @@
         <template v-if="openTextArea">
             <textarea name="message" v-model="answerMessageText" id="" cols="30" rows="10"></textarea>
             <div class="buttons">
-                <div class="button">
+                <div class="custom-status">
+                    <!-- <div class="label">другой статус</div> -->
+                    <div :class="['button', {red: custom_status===Role.User}]" @click="setCustomStatus(Role.User)">
+                        пользватель
+                    </div>
+                    <div :class="['button', {red: custom_status===Role.Musician}]"
+                        @click="setCustomStatus(Role.Musician)">
+                        музыкант
+                    </div>
+                    <div :class="['button', {red: custom_status===Role.RadioStation}]"
+                        @click="setCustomStatus(Role.RadioStation)">
+                        радиостанция
+                    </div>
+                </div>
+                <div :class="['button', {green: accept===true}]" @click="accept = true">
+                    одобрить
+                </div>
+                <div :class="['button', {red: accept===false}]" @click="accept = false">
+                    отклонить
+                </div>
+                <div class="button" @click="sendAnswer">
                     отправить
                 </div>
             </div>
@@ -56,7 +84,9 @@
 </template>
 <script>
 import FileBlock from "./FileBlock.vue";
-
+import { useToast } from "vue-toastification";
+import { HTTP } from "../http-common.vue";
+import { Role } from '../helpers/roles';
 
 export default {
     props: {
@@ -64,18 +94,69 @@ export default {
         adminMode: Boolean,
         hideStatus: Boolean,
     },
-
+    components: { FileBlock },
+    setup() {
+        const toast = useToast();
+        return {
+            toast,
+            Role
+        }
+    },
     data() {
         return {
             modalOpened: false,
             openTextArea: false,
             answerMessageText: '',
+            // status: '',
+            accept: null,
+            custom_status: null,
         }
     },
-    components: { FileBlock },
+    methods: {
+        sendAnswer() {
+            if (this.accept === null) {
+                this.toast.error('Выберите одобрить или отклонить заявку')
+                return;
+            }
+            if (this.accept === false && !this.answerMessageText) {
+                this.toast.error('Сообщение путое')
+                return;
+            }
+            let request = this.request;
+            if (!request) {
+                this.toast.error('Объект запроса отсутвует')
+            }
+            let request_data = { request_id: request.id, message: this.answerMessageText, accept: this.accept, };
+            if (this.custom_status) {
+                request_data.status = this.custom_status;
+            }
+            // HTTP.post('change-role-answer',data)
+
+        },
+        setCustomStatus(status) {
+            if (status === this.custom_status) {
+                this.custom_status = null;
+            } else {
+                this.custom_status = status;
+            }
+        },
+    },
     computed: {
         isFilesEmpty() {
             return !this.request.files || this.request.files.length === 0
+        },
+        status() {
+            let account_status = this.request?.account_status;
+            if (!account_status) return
+            if (account_status === Role.Musician) {
+                return 'музыкант'
+            }
+            if (account_status === Role.RadioStation) {
+                return 'радиостанция'
+            }
+            if (account_status === Role.User) {
+                return 'пользователь'
+            }
         },
         fullName() {
             let user = this.request?.user;
@@ -93,6 +174,21 @@ export default {
             let user = this.request?.user;
             if (!user || !user.last_name) return
             return user.last_name
+        },
+        customStatusText() {
+            if (!this.custom_status) return
+            if (this.custom_status === Role.User) {
+                return 'пользователь';
+            }
+            if (this.custom_status === Role.Musician) {
+                return 'музыкант';
+            }
+            if (this.custom_status === Role.RadioStation) {
+                return 'радиостанция';
+            }
+            if (this.custom_status === Role.Admin) {
+                return 'администратор';
+            }
         },
         accountStatus() {
             let user = this.request?.user;
@@ -146,6 +242,35 @@ export default {
             @include breakpoints.md(true) {
                 padding: 3px 40px;
                 flex-grow: 1;
+            }
+
+            @include helpers.flex-center;
+        }
+
+        .block.status {
+            overflow: hidden;
+            padding-right: 3px;
+            @include helpers.flex-center;
+            gap: 10px;
+
+            &.custom {
+                background-color: var(--red-0);
+            }
+
+            .txt {
+                flex-grow: 1;
+                text-align: center;
+                margin-right: auto;
+            }
+
+            .role {
+                background-color: var(--red-0);
+                padding: 2px 10px;
+                border-radius: 7px;
+
+                &.custom {
+                    background-color: var(--purple);
+                }
             }
         }
 
@@ -284,6 +409,35 @@ export default {
         display: flex;
         gap: 5px;
         justify-content: right;
+        flex-wrap: wrap;
+        // @include helpers.flex-center;
+        align-items: center;
+
+        @include breakpoints.md(true) {
+            .button {
+                flex-grow: 1;
+            }
+        }
+
+        .custom-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+
+            @include breakpoints.md(true) {
+                width: 100%;
+                margin-bottom: 10px;
+
+            }
+
+            @include breakpoints.md {
+                margin-right: auto;
+            }
+
+            border: 2px dashed var(--color-background-mute-6);
+            padding: 5px;
+            border-radius: 15px;
+        }
 
         .button {
             user-select: none;
@@ -291,9 +445,19 @@ export default {
             background-color: var(--color-background-mute-5);
             padding: 5px 10px;
             border-radius: 10px;
+            height: min-content;
+            @include helpers.flex-center;
 
-            &:hover {
+            &:not(:where(.red, .green)):hover {
                 background-color: var(--color-background-mute-6);
+            }
+
+            &.red {
+                background-color: var(--red-0);
+            }
+
+            &.green {
+                background-color: var(--green-128);
             }
         }
     }

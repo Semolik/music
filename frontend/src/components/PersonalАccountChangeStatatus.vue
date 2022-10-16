@@ -21,11 +21,17 @@
                 </router-link>
             </div>
             <div class="items" v-if="!is_history_route">
-                <div :class="['item',{active: radioStation_selected}]" @click="selectRadioStation">
+                <div :class="['item',{active: active_role === Role.RadioStation},{disabled: userRole === Role.RadioStation}]"
+                    @click="this.active_role = Role.RadioStation">
                     Радиостанцию
                 </div>
-                <div :class="['item',{active: musician_selected}]" @click="selectMusician">
+                <div :class="['item',{active: active_role === Role.Musician}, {disabled: userRole === Role.Musician}]"
+                    @click="this.active_role = Role.Musician">
                     Музыканта
+                </div>
+                <div :class="['item',{active: active_role === Role.User}, {disabled: userRole === Role.User}]"
+                    @click="this.active_role = Role.User">
+                    Пользователя
                 </div>
             </div>
         </div>
@@ -37,7 +43,7 @@
             <div class="request-form">
                 <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
             </div>
-            <div class="line" >
+            <div class="line">
                 <div :class="['button','files', {active: isFilesSelected}]">
                     <FontAwesomeIcon icon="fa-paperclip" />
                     <input type="file" :title="filesTitle" @change="changeFiles" multiple>
@@ -71,18 +77,23 @@ import { useBase64 } from '@vueuse/core';
 import handleError from '../composables/errors';
 import { HTTP } from '../http-common.vue'
 import { files } from '@formkit/inputs';
-
+import { Role } from '../helpers/roles.js';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../stores/auth';
 library.add(faPaperclip, faXmark, faImage, faFile);
 
 export default {
     setup() {
         const toast = useToast();
+        const { userRole } = storeToRefs(useAuthStore());
         const memoizeBase64Image = useMemoize(useBase64, {
             getKey: (file, headers) => file.name,
         });
         return {
             toast,
-            memoizeBase64Image
+            memoizeBase64Image,
+            Role,
+            userRole
         }
     },
     components: {
@@ -90,8 +101,6 @@ export default {
     },
     data() {
         return {
-            radioStation_selected: isRadioStation.value,
-            musician_selected: isMusician.value,
             messageText: '',
             files: [],
             previews: [],
@@ -99,6 +108,7 @@ export default {
             is_history_route: false,
             base_route_path: '/lk/update-status',
             history_route_path: '/lk/update-status/history',
+            active_role: this.userRole,
         };
     },
     mounted() {
@@ -113,18 +123,14 @@ export default {
             });
     },
     methods: {
-        selectRadioStation() {
-            this.radioStation_selected = true;
-            this.musician_selected = false;
-        },
-        selectMusician() {
-            this.musician_selected = true;
-            this.radioStation_selected = false;
-        },
         sendMessageToAdmins() {
             if (!this.buttonActive) {
                 if (!this.is_selected) {
                     this.toast.error('Выберите тип аккаунта')
+                    return
+                }
+                if (this.active_role === this.userRole) {
+                    this.toast.error('Измените тип акканта на отличный от вашего')
                     return
                 }
                 this.toast.error('Сообщение не может быть пустым')
@@ -172,6 +178,7 @@ export default {
                 })
             }
             formData.append('message', this.messageText);
+            formData.append('account_status', this.active_role);
             HTTP.post('change-role', formData)
                 .then((response) => {
                     this.clearForm();
@@ -189,10 +196,10 @@ export default {
     },
     computed: {
         is_selected() {
-            return this.musician_selected || this.radioStation_selected
+            return Boolean(this.active_role)
         },
         buttonActive() {
-            return this.is_selected && this.messageText
+            return this.is_selected && this.active_role !== this.userRole && this.messageText
         },
         isFilesSelected() {
             return this.files.length > 0;
@@ -277,7 +284,7 @@ export default {
                 border-radius: 15px;
                 background-color: var(--color-background-mute-3);
 
-                &:not(.active):hover {
+                &:not(:where(.active, .disabled)):hover {
                     background-color: var(--color-background-mute-4);
                 }
 
@@ -288,7 +295,25 @@ export default {
 
                 &.disabled {
                     cursor: not-allowed;
-                    background-color: var(--red-0);
+                    position: relative;
+                    isolation: isolate;
+                    background-color: transparent;
+                    overflow: hidden;
+
+                    &.active {
+                        &::after {
+                            opacity: 1;
+                        }
+                    }
+
+                    &::after {
+                        z-index: -1;
+                        content: '';
+                        background-color: var(--red-0);
+                        opacity: 0.5;
+                        position: absolute;
+                        inset: 0;
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 from sqlalchemy.sql import func
 from db.base_class import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -39,7 +39,9 @@ class ChangeRoleRequest(Base):
     message = Column(String)
     files_ids = Column(ARRAY(Integer))
     status = Column(String, default='in-progress')
+    account_status = Column(String, nullable=False)
     time_created = Column(DateTime(timezone=True), server_default=func.now())
+    answer = relationship("AnswerChangeRoleRequest", uselist=False)
 
 
 class AnswerChangeRoleRequest(Base):
@@ -48,3 +50,4 @@ class AnswerChangeRoleRequest(Base):
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     message = Column(String)
     request_id = Column(Integer, ForeignKey("change_role_requests.id"))
+    accept = Column(Boolean)

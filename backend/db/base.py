@@ -14,7 +14,7 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # 1
-    def __init__(self, model: Type[ModelType]):  # 2
+    def __init__(self, model: Type[ModelType], db):  # 2
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
         **Parameters**
@@ -22,7 +22,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # 1
         * `schema`: A Pydantic model (schema) class
         """
         self.model = model
-        self.db: Session = SessionLocal()
+        self.db = db
 
     def get(self, id: Any) -> Optional[ModelType]:
         # 3

@@ -1,6 +1,6 @@
-import datetime
-from typing import List, Literal
+from typing import List
 from pydantic import BaseModel
+from core.config import settings
 from schemas.file import File
 from helpers.forms import form_body
 
@@ -48,14 +48,18 @@ class UserInfo(UserTypes, UserBase):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str
+    account_status: str
 
 
 class ChangeRoleRequestInfo(BaseModel):
     files: List[File]
     message: str
-    status: Literal['in-progress', 'successfully', 'rejected']
+    status: settings.ALLOWED_STATUSES
     time_created: str
+    account_status: str
+
 
 
 class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
+    id: int
     user: UserInfo
