@@ -69,10 +69,11 @@
                         радиостанция
                     </div>
                 </div>
-                <div :class="['button', {green: accept===true}]" @click="accept = true">
+                <div :class="['button', {green: request_status==='successfully'}]"
+                    @click="request_status = 'successfully'">
                     одобрить
                 </div>
-                <div :class="['button', {red: accept===false}]" @click="accept = false">
+                <div :class="['button', {red: request_status === 'rejected'}]" @click="request_status = 'rejected'">
                     отклонить
                 </div>
                 <div class="button" @click="sendAnswer">
@@ -87,6 +88,7 @@ import FileBlock from "./FileBlock.vue";
 import { useToast } from "vue-toastification";
 import { HTTP } from "../http-common.vue";
 import { Role } from '../helpers/roles';
+import handleError from '../composables/errors'
 
 export default {
     props: {
@@ -108,17 +110,17 @@ export default {
             openTextArea: false,
             answerMessageText: '',
             // status: '',
-            accept: null,
+            request_status: null,
             custom_status: null,
         }
     },
     methods: {
         sendAnswer() {
-            if (this.accept === null) {
+            if (this.request_status === null) {
                 this.toast.error('Выберите одобрить или отклонить заявку')
                 return;
             }
-            if (this.accept === false && !this.answerMessageText) {
+            if (this.request_status === 'rejected' && !this.answerMessageText) {
                 this.toast.error('Сообщение путое')
                 return;
             }
@@ -126,11 +128,21 @@ export default {
             if (!request) {
                 this.toast.error('Объект запроса отсутвует')
             }
-            let request_data = { request_id: request.id, message: this.answerMessageText, accept: this.accept, };
+            let request_data = { request_id: request.id, message: this.answerMessageText, request_status: this.request_status };
             if (this.custom_status) {
                 request_data.status = this.custom_status;
             }
-            // HTTP.post('change-role-answer',data)
+            HTTP.post('change-role-answer', request_data)
+                .then((response) => {
+                    // this.clearForm();
+                    // this.toast(response.data.detail);
+                    // this.has_requests = true;
+                    this.toast(`Заявка успешно ${this.request_status === 'rejected' ? 'отклонена' : 'одобрена'}`);
+                })
+                .catch((error) => {
+                    this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)
+
+                });
 
         },
         setCustomStatus(status) {

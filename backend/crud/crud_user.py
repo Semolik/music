@@ -126,22 +126,26 @@ class UserCruds:
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
 
-    def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, accept: bool, account_status: str = None):
+    def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: settings.ALLOWED_STATUSES, account_status: str = None):
         if request.answer:
             self.db.delete(request.answer)
             self.db.commit()
         db_answer = AnswerChangeRoleRequest(
             message=message,
-            request_id=request.id,
-            accept=accept
+            request_id=request.id
         )
         db_answer = self.create(db_answer)
-        set_status_result = set_status(
-            self.db, request.user, account_status if account_status else request.account_status)
+        if account_status:
+            set_status_result = set_status(
+                self.db, request.user, account_status)
+        elif request_status == 'successfully':
+            set_status_result = set_status(
+                self.db, request.user, request.account_status)
         if not set_status_result:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail="Попытка установить неподдерживаемый статус аккаунта")
         request.answer = db_answer
+        request.status = request_status
         answer_obj = jsonable_encoder(db_answer)
         answer_obj['time_created'] = db_answer.time_created.strftime(
             settings.DATETIME_FORMAT)

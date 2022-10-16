@@ -33,7 +33,7 @@ const router = createRouter({
         {
           path: 'update-status',
           name: 'Изменение статуса аккаунта',
-          meta: { requireAuth: true, roles: [Role.User] },
+          meta: { requireAuth: true, roles: [Role.User, Role.Musician, Role.RadioStation] },
           component: () => import('../components/PersonalАccountChangeStatatus.vue'),
           children: [
             {

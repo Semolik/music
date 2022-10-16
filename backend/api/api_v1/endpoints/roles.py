@@ -3,7 +3,7 @@ from fastapi import Depends, APIRouter, status, UploadFile, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from core.config import settings
 from helpers.files import save_file
-from schemas.user import UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
+from schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
 from crud.crud_user import UserCruds
@@ -54,16 +54,16 @@ def get_all_change_role_requests(page: int, Authorize: AuthJWT = Depends()):
 
 
 @router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
-def send_update_role_request(request_id: int, accept: bool, message: str = None, status: str = None, Authorize: AuthJWT = Depends()):
+def send_update_role_request(data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not user_cruds.is_admin(user_id=current_user_id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Недостаточно прав")
-    db_request = user_cruds.get_change_role_message(request_id=request_id)
+    db_request = user_cruds.get_change_role_message(request_id=data.request_id)
     if not db_request:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Запрос на смену типа аккаута по данному id не найден")
     answer_obj = user_cruds.send_change_role_message_answer(
-        request=db_request, message=message, accept=accept, account_status=status)
+        request=db_request, message=data.message, request_status=data.request_status, account_status=data.status)
     return answer_obj

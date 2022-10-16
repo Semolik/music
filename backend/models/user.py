@@ -50,4 +50,3 @@ class AnswerChangeRoleRequest(Base):
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     message = Column(String)
     request_id = Column(Integer, ForeignKey("change_role_requests.id"))
-    accept = Column(Boolean)
