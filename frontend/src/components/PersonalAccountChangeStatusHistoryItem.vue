@@ -10,7 +10,7 @@
                 <span class="txt">запрошенный статус </span>
                 <span class="role">{{status}}</span>
             </div>
-            <div :class="['status', request.status]" v-if="!hideStatus"></div>
+            <div :class="['status', result_request_status]" v-if="!hideStatus || showStatus"></div>
             <template v-if="adminMode">
                 <div class="block full-name" v-if="fullName" @click="modalOpened = true">
                     {{fullName}}
@@ -43,6 +43,11 @@
             </template>
         </div>
         <div class="message">{{request.message}}</div>
+        <div class="answer-message" v-if="answerMessageTextResult">
+            <div class="text">
+                {{answerMessageTextResult}}
+            </div>
+        </div>
         <div class="files" v-if="!isFilesEmpty">
             <FileBlock :file="file" v-for="file in request.files" />
         </div>
@@ -56,7 +61,6 @@
             <textarea name="message" v-model="answerMessageText" id="" cols="30" rows="10"></textarea>
             <div class="buttons">
                 <div class="custom-status">
-                    <!-- <div class="label">другой статус</div> -->
                     <div :class="['button', {red: custom_status===Role.User}]" @click="setCustomStatus(Role.User)">
                         пользватель
                     </div>
@@ -108,10 +112,12 @@ export default {
         return {
             modalOpened: false,
             openTextArea: false,
-            answerMessageText: '',
-            // status: '',
-            request_status: null,
+            answerMessageTextResult: this.request?.answer?.message || '',
+            answerMessageText: this.request?.answer?.message || '',
+            result_request_status: this.request.status,
+            request_status: this.request.status || null,
             custom_status: null,
+            showStatus: false,
         }
     },
     methods: {
@@ -134,14 +140,14 @@ export default {
             }
             HTTP.post('change-role-answer', request_data)
                 .then((response) => {
-                    // this.clearForm();
-                    // this.toast(response.data.detail);
-                    // this.has_requests = true;
                     this.toast(`Заявка успешно ${this.request_status === 'rejected' ? 'отклонена' : 'одобрена'}`);
+                    this.result_request_status = this.request_status;
+                    this.showStatus = true;
+                    this.openTextArea = false;
+                    this.answerMessageTextResult = this.answerMessageText;
                 })
                 .catch((error) => {
-                    this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)
-
+                    this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message);
                 });
 
         },
@@ -259,31 +265,36 @@ export default {
             @include helpers.flex-center;
         }
 
-        .block.status {
-            overflow: hidden;
-            padding-right: 3px;
-            @include helpers.flex-center;
-            gap: 10px;
+        .block {
 
-            &.custom {
-                background-color: var(--red-0);
-            }
-
-            .txt {
-                flex-grow: 1;
-                text-align: center;
-                margin-right: auto;
-            }
-
-            .role {
-                background-color: var(--red-0);
-                padding: 2px 10px;
-                border-radius: 7px;
+            &.status {
+                overflow: hidden;
+                padding-right: 3px;
+                @include helpers.flex-center;
+                gap: 10px;
 
                 &.custom {
-                    background-color: var(--purple);
+                    background-color: var(--red-0);
+                }
+
+                .txt {
+                    flex-grow: 1;
+                    text-align: center;
+                    margin-right: auto;
+                }
+
+                .role {
+                    background-color: var(--red-0);
+                    padding: 2px 10px;
+                    border-radius: 7px;
+
+                    &.custom {
+                        background-color: var(--purple);
+                    }
                 }
             }
+
+
         }
 
         .full-name {
@@ -296,7 +307,7 @@ export default {
         }
 
         .user-modal-container {
-            position: absolute;
+            position: fixed;
             inset: 0;
             z-index: 99;
             backdrop-filter: blur(10px);
@@ -396,6 +407,25 @@ export default {
         overflow-wrap: anywhere;
     }
 
+    .answer-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: var(--color-background-mute-5);
+        padding: 6px;
+        border-radius: 15px;
+        border: 2px dashed var(--color-text);
+        gap: 5px;
+
+        .text {
+            overflow-wrap: anywhere;
+            border-radius: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--color-background-mute-3);
+        }
+    }
+
     .files {
         display: flex;
         flex-wrap: wrap;
@@ -408,10 +438,11 @@ export default {
         border: none;
         outline: 1px solid var(--color-background-mute-6);
         background-color: transparent;
-        border-radius: 15px;
+        border-radius: 5px;
         padding: 10px;
         color: var(--color-text);
         font-size: 1.1em;
+
 
         &:focus {
             outline: 1px solid var(--purple-1);

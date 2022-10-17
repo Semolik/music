@@ -13,35 +13,42 @@
                 <div class="field">
                     <div class="label">Имя</div>
                     <div class="input-container">
-                        <input type="text" v-model="name" :class="[{wrong: nameMessage}]" @blur="nameFocus = false"
-                            @focus="nameFocus = true">
-                        <span :class="['tooltiptext', {active: name}, {show: nameFocus}]">{{nameMessage}}</span>
+                        <input type="text" v-model="name" :class="[{wrong: nameMessage.length !==0}]"
+                            @blur="nameFocus = false" @focus="nameFocus = true">
+                        <span :class="['tooltiptext', {active: name}, {show: nameFocus}]">
+                            <div class="item" v-for="message in nameMessage">{{message}}</div>
+                        </span>
                     </div>
                 </div>
                 <div class="field">
                     <div class="label">Фамилия</div>
                     <div class="input-container">
-                        <input type="text" v-model="lastName" :class="[{wrong: lastNameMessage}]"
+                        <input type="text" v-model="lastName" :class="[{wrong: lastNameMessage.length !==0}]"
                             @blur="lastNameFocus = false" @focus="lastNameFocus = true">
-                        <span
-                            :class="['tooltiptext', {active: lastName}, {show: lastNameFocus}]">{{lastNameMessage}}</span>
+                        <span :class="['tooltiptext', {active: lastName}, {show: lastNameFocus}]">
+                            <div class="item" v-for="message in lastNameMessage">{{message}}</div>
+                        </span>
                     </div>
                 </div>
             </template>
             <div class="field">
                 <div class="label">Логин</div>
                 <div class="input-container">
-                    <input type="text" :class="[{wrong: loginMessage}]" v-model="login" @blur="loginFocus = false"
-                        @focus="loginFocus = true">
-                    <span :class="['tooltiptext', {active: login}, {show: loginFocus}]">{{loginMessage}}</span>
+                    <input type="text" :class="[{wrong: loginMessage.length !==0}]" v-model="login"
+                        @blur="loginFocus = false" @focus="loginFocus = true">
+                    <span :class="['tooltiptext', {active: login}, {show: loginFocus}]">
+                        <div class="item" v-for="message in loginMessage">{{message}}</div>
+                    </span>
                 </div>
             </div>
             <div class="field">
                 <div class="label">Пароль</div>
                 <div class="input-container">
-                    <input type="password" :class="[{wrong: passwordMessage}]" v-model="password"
+                    <input type="password" :class="[{wrong: passwordMessage.length !==0}]" v-model="password"
                         @blur="passwordFocus = false" @focus="passwordFocus = true">
-                    <span :class="['tooltiptext', {active: password}, {show: passwordFocus}]">{{passwordMessage}}</span>
+                    <span :class="['tooltiptext', {active: password}, {show: passwordFocus}]">
+                        <div class="item" v-for="message in passwordMessage">{{message}}</div>
+                    </span>
                 </div>
             </div>
         </div>
@@ -84,19 +91,19 @@ export default {
             loginActive: true,
 
             login: '',
-            loginMessage: '',
+            loginMessage: [],
             loginFocus: false,
 
             password: '',
-            passwordMessage: '',
+            passwordMessage: [],
             passwordFocus: false,
 
             name: '',
-            nameMessage: '',
+            nameMessage: [],
             nameFocus: false,
 
             lastName: '',
-            lastNameMessage: '',
+            lastNameMessage: [],
             lastNameFocus: false,
         }
     },
@@ -133,24 +140,22 @@ export default {
         loginIsValid() {
             if (!this.login) return
             if (this.loginActive) {
-                this.loginMessage = '';
+                this.loginMessage = [];
                 return true
             }
+            var messages = [];
             let value = this.login;
             if (/[\s]/.test(value)) {
-                this.loginMessage = 'В логине зарещены пробельные символы';
-                return
+                messages.push('В логине зарещены пробельные символы');
             }
             if (value.length < 5) {
-                this.loginMessage = 'Логин должен быть более 5 символов';
-                return
+                messages.push('Логин должен быть более 5 символов');
             }
             if (value.length > 20) {
-                this.loginMessage = 'Логин должен быть менее 20 символов';
-                return
+                messages.push('Логин должен быть менее 20 символов');
             }
-            this.loginMessage = '';
-            return true
+            this.loginMessage = messages;
+            return messages.length === 0
         },
         passwordIsValid() {
             if (!this.password) return
@@ -158,62 +163,52 @@ export default {
                 this.passwordMessage = '';
                 return true
             }
-            // let value = this.password;
-            // var messageBase = 'Пароль должен содержать ';
-            // if (!/[A-Z]/.test(value)) {
-            //     this.passwordMessage = messageBase + 'ПРОПИСНЫЕ английские Абуквы';
-            //     return
-            // }
-            // if (!/[a-z]/.test(value)) {
-            //     this.passwordMessage = messageBase + 'строчные английские буквы';
-            //     return
-            // }
-            // if (!/[0-9]/.test(value)) {
-            //     this.passwordMessage = messageBase + 'цифры';
-            //     return
-            // }
-            // if (!/[#?!@$%^&*-]/.test(value)) {
-            //     this.passwordMessage = messageBase + 'специальные символы (#?!@$%^&*-)';
-            //     return
-            // }
-            // if (this.password.length < 8) {
-            //     this.passwordMessage = messageBase + ' более 8 символов';
-            //     return
-            // }
-            this.passwordMessage = '';
-            return true
+            var messages = [];
+            let value = this.password;
+            var messageBase = 'Пароль должен содержать ';
+            if (!/[A-Z]/.test(value)) {
+                messages.push(messageBase + 'ПРОПИСНЫЕ английские Абуквы');
+            }
+            if (!/[a-z]/.test(value)) {
+                messages.push(messageBase + 'строчные английские буквы');
+            }
+            if (!/[0-9]/.test(value)) {
+                messages.push(messageBase + 'цифры');
+            }
+            if (!/[#?!@$%^&*-]/.test(value)) {
+                messages.push(messageBase + 'специальные символы (#?!@$%^&*-)');
+            }
+            if (this.password.length < 8) {
+                messages.push(messageBase + ' более 8 символов');
+            }
+            this.passwordMessage = messages;
+            return messages.length === 0
         },
         nameIsValid() {
             if (!this.name) return
             let value = this.name;
+            var messages = [];
             if (/[\s]/.test(value)) {
-                this.nameMessage = 'В имени зарещены пробельные символы';
-                return
-            }
-            if (value.length < 3) {
-                this.nameMessage = 'Имя должено быть более 3 символов';
-                return
+                messages.push('В имени зарещены пробельные символы');
             }
             if (value.length > 15) {
-                this.nameMessage = 'Имя должено быть менее 15 символов';
-                return
+                messages.push('Имя должено быть менее 15 символов');
             }
-            this.nameMessage = '';
-            return true
+            this.nameMessage = messages;
+            return messages.length === 0
         },
         lastNameIsValid() {
             if (!this.lastName) return
             let value = this.lastName;
+            var messages = [];
             if (/[\s]/.test(value)) {
-                this.lastNameMessage = 'В фамилии зарещены пробельные символы';
-                return
+                messages.push('В фамилии зарещены пробельные символы');
             }
             if (value.length > 25) {
-                this.lastNameMessage = 'Фамилия должена быть менее 25 символов';
-                return
+                messages.push('Фамилия должена быть менее 25 символов');
             }
-            this.lastNameMessage = '';
-            return true
+            this.lastNameMessage = messages;
+            return messages.length === 0
         },
         fieldsIsEmpty() {
             return this.login.length === 0 || this.password.length === 0 || (this.loginActive ? false : this.nameIsValid)
@@ -228,6 +223,10 @@ export default {
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/themes';
 @use '@/assets/styles/breakpoints';
+
+#app:has(.login-form) {
+    height: 100%;
+}
 
 .login-form {
     position: relative;
@@ -344,6 +343,13 @@ export default {
                     border-radius: 6px;
                     position: absolute;
                     z-index: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+
+                    .item {
+                        border-radius: 3px;
+                    }
 
                     &.show.active:not(:empty) {
                         visibility: visible;

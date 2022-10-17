@@ -17,14 +17,16 @@
             </div>
             <div class="user-info">
                 <div class="fields">
-                    <FormKit type="text" name="first_name" label="Имя" v-model="firstName" placeholder="Ваше имя" />
-                    <FormKit type="text" name="last_name" label="Фамилия" v-model="lastName"
-                        placeholder="Ваша фамилия" />
-                        добавить проверку на длину текста
+                    <FormField name="first_name" label="Имя" placeholder="Ваше имя" v-model="firstName">
+                        <span :class="['count',{wrong: firstNameLenght < 0}]">{{firstNameLenght}}</span>
+                    </FormField>
+                    <FormField name="last_name" label="Фамилия" placeholder="Ваша фамилия" v-model="lastName">
+                        <span :class="['count',{wrong: lastNameLenght < 0}]">{{lastNameLenght}}</span>
+                    </FormField>
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
                     <div class="buttons">
-                        <div :class="['button', 'save', {active: dataChanged}]" @click="save">
+                        <div :class="['button', 'save', {active: dataChanged}, {wrong: fieldsWrong}]" @click="save">
                             <FontAwesomeIcon icon="fa-floppy-disk" />
                         </div>
                     </div>
@@ -42,6 +44,8 @@ import { HTTP } from '../http-common.vue';
 import { useAuthStore } from '../stores/auth';
 import handleError from '../composables/errors';
 import { useToast } from "vue-toastification";
+import FormField from './FormField.vue';
+import AnimateInteger from './AnimateInteger.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
@@ -72,6 +76,8 @@ export default {
     },
     components: {
         FontAwesomeIcon,
+        FormField,
+        AnimateInteger
     },
     watch: {
         userData(value) {
@@ -136,7 +142,19 @@ export default {
         },
         dataChanged() {
             if (!this.userData) return
+            if (this.fieldsWrong) return
             return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.fileChanged
+        },
+        fieldsWrong() {
+            return this.lastNameLenght < 0 || this.firstNameLenght < 0
+        },
+        lastNameLenght() {
+            if (!this.lastName) return
+            return 25 - this.lastName?.length
+        },
+        firstNameLenght() {
+            if (!this.firstName) return
+            return 15 - this.firstName?.length
         },
     }
 }
@@ -313,9 +331,12 @@ export default {
                         }
                     }
 
+                    &.wrong {
+                        background-color: var(--red-0);
+                    }
+
                     &.active {
                         background-color: var(--purple-1);
-
                         cursor: pointer;
                     }
                 }
@@ -333,17 +354,31 @@ export default {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
 
-                .formkit-inner:focus-within {
-                    border-color: var(--purple-1);
-                    box-shadow: 0 0 0 1px var(--purple-1);
+                .formkit-inner {
+                    .count {
+                        opacity: 0;
+                        padding: 0px 8px;
+
+                        &.wrong {
+                            opacity: 1;
+                            color: red;
+                        }
+                    }
+
+                    &:focus-within {
+                        .count {
+                            opacity: 1;
+                        }
+
+                        border-color: var(--purple-1);
+                        box-shadow: 0 0 0 1px var(--purple-1);
+                    }
                 }
 
                 .formkit-input {
                     color: var(--color-text);
                 }
             }
-
-
         }
     }
 }

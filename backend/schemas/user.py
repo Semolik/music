@@ -51,11 +51,14 @@ class UpdateUserRoleRequest(BaseModel):
     account_status: str
 
 
-class UpdateRoleRequestAnswer(BaseModel):
+class RoleRequestAnswer(BaseModel):
     request_id: int
     message: str | None = None
-    request_status: settings.ALLOWED_STATUSES
     status: str | None = None
+
+
+class UpdateRoleRequestAnswer(RoleRequestAnswer):
+    request_status: settings.ALLOWED_STATUSES
 
 
 class ChangeRoleRequestInfo(BaseModel):
@@ -64,6 +67,7 @@ class ChangeRoleRequestInfo(BaseModel):
     status: settings.ALLOWED_STATUSES
     time_created: str
     account_status: str
+    answer: RoleRequestAnswer | None = None
 
 
 class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):

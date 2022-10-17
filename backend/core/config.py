@@ -19,11 +19,13 @@ class Settings(BaseSettings):
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
     ALLOWED_STATUSES = Literal['in-progress',
                                'successfully', 'rejected']
+    ALLOWED_STATUSES_FILTER = Literal[ALLOWED_STATUSES, 'all']
     ALLOWED_STATUSES_LIST: Tuple[str, ...] = get_args(ALLOWED_STATUSES)
     USER_ACCOUNT_STATUSES = Literal['is_radio_station',
                                     'is_musician', 'is_user']
     USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
         USER_ACCOUNT_STATUSES)
+    ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
 
     class Config:
         case_sensitive = True  # 4

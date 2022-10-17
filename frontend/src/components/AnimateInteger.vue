@@ -1,7 +1,7 @@
 <!-- https://gist.github.com/millerrafi/65fc1193d98ae9fcef257ab558bc3f2c -->
 
 <template>
-    <span>{{ formatted }}</span>
+    <span class="animate-integer">{{ formatted }}</span>
 </template>
 
 <script>

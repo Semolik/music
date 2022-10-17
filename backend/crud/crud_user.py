@@ -12,6 +12,7 @@ from models.user import AnswerChangeRoleRequest, File, User, ChangeRoleRequest
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
+from sqlalchemy import select
 
 
 class UserCruds:
@@ -84,13 +85,13 @@ class UserCruds:
             .all()
         return self.post_processing_change_role_messages(records)
 
-    def get_all_change_role_messages(self, page: int = 1, page_size: int = 10):
+    def get_all_change_role_messages(self, page: int = 1, filter: str = 'all', page_size: int = 10) -> List[ChangeRoleRequest]:
         end = page * page_size
-        records: List[ChangeRoleRequest] =\
-            self.db.query(ChangeRoleRequest)\
-            .order_by(ChangeRoleRequest.id.desc())\
-            .slice(end-page_size, end)
-        return self.post_processing_change_role_messages(records, add_user=True)
+        query = self.db.query(ChangeRoleRequest).order_by(
+            ChangeRoleRequest.id.desc())
+        if filter != 'all':
+            query = query.where(ChangeRoleRequest.status == filter)
+        return self.post_processing_change_role_messages(query.slice(end-page_size, end), add_user=True)
 
     def post_processing_change_role_messages(self, records: List[ChangeRoleRequest], add_user=False):
         result = list()
@@ -104,6 +105,7 @@ class UserCruds:
             time_created: datetime = record.time_created
             time_created_str = time_created.strftime(settings.DATETIME_FORMAT)
             record_obj = jsonable_encoder(record)
+            record_obj['answer'] = jsonable_encoder(record.answer)
             if add_user:
                 user = record.user
                 user_obj = jsonable_encoder(user)
@@ -116,6 +118,12 @@ class UserCruds:
 
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
+
+    def is_user_have_active_change_role_messages(self, user_id: int, count: int) -> bool:
+        result = self.db.query(ChangeRoleRequest)\
+            .filter(ChangeRoleRequest.user_id == user_id, ChangeRoleRequest.status == 'in-progress')\
+            .limit(count).all()
+        return len(result) == count
 
     def is_admin(self, user_id):
         db_user = self.get_user_by_id(user_id=user_id)
@@ -135,6 +143,7 @@ class UserCruds:
             request_id=request.id
         )
         db_answer = self.create(db_answer)
+        set_status_result = True
         if account_status:
             set_status_result = set_status(
                 self.db, request.user, account_status)
@@ -146,6 +155,8 @@ class UserCruds:
                                 detail="Попытка установить неподдерживаемый статус аккаунта")
         request.answer = db_answer
         request.status = request_status
+        print(request_status)
+        self.db.commit()
         answer_obj = jsonable_encoder(db_answer)
         answer_obj['time_created'] = db_answer.time_created.strftime(
             settings.DATETIME_FORMAT)

@@ -328,6 +328,7 @@ export default {
 
     .request-form {
         display: flex;
+        
 
         textarea {
             width: 100%;
@@ -335,7 +336,7 @@ export default {
             border: none;
             outline: 1px solid var(--color-background-mute-6);
             background-color: transparent;
-            border-radius: 15px;
+            border-radius: 5px;
             padding: 10px;
             color: var(--color-text);
             font-size: 1.1em;

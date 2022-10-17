@@ -18,9 +18,13 @@
                 <div class="bg rejected"></div>
             </div>
         </div>
-        <div class="requests">
-            <status-history-item :adminMode="true" :hideStatus="current!==all" :request="request"
+        <div class="requests" v-if="!requestsEmpty">
+            <status-history-item :adminMode="true" :ырщц="current!==all" :request="request"
                 v-for="request in this.requests" />
+        </div>
+        <div class="empty" v-else>тут пусто</div>
+        <div class="buttons" v-if="show_button && !loading">
+            <div class="button" @click="getNextPage">Загрузить еще</div>
         </div>
     </div>
 </template>
@@ -38,14 +42,27 @@ export default {
             page: 1,
             requests: [],
             loading: false,
+            show_button: true,
         }
     },
     components: { StatusHistoryItem },
+    watch: {
+        current(value) {
+            // this.loading = true;
+            this.requests = [];
+            this.page = 1;
+            this.show_button = true;
+            this.getPage();
+        }
+    },
     methods: {
         getPage() {
             this.loading = true;
-            HTTP.get('change-role-requests', { params: { page: this.page } })
+            HTTP.get('change-role-requests', { params: { page: this.page, filter: this.current } })
                 .then((response) => {
+                    if (response.data.length === 0) {
+                        this.show_button = false;
+                    }
                     this.requests = [...this.requests, ...response.data]
                 })
                 .catch((error) => {
@@ -60,10 +77,18 @@ export default {
     },
     mounted() {
         this.getPage();
+    },
+    computed: {
+        requestsEmpty() {
+            if (this.loading) return
+            return this.requests.length === 0
+        }
     }
 }
 </script>
 <style lang="scss" scoped>
+@use '@/assets/styles/helpers';
+
 .container {
     display: flex;
     flex-direction: column;
@@ -129,6 +154,26 @@ export default {
         display: flex;
         flex-direction: column;
         gap: 5px;
+    }
+
+    .empty {
+        @include helpers.flex-center;
+        border: 2px dashed var(--color-text);
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        .button {
+            background-color: var(--color-background-mute-4);
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
     }
 }
 </style>

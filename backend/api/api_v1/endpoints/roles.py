@@ -15,6 +15,9 @@ user_cruds = UserCruds()
 def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest), files: List[UploadFile] = []):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
+    if user_cruds.is_user_have_active_change_role_messages(user_id=current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта")
     db_files: List[FileModel] = [
         user_cruds.create(
             save_file(
@@ -44,13 +47,13 @@ def user_has_change_requests(Authorize: AuthJWT = Depends()):
 
 
 @router.get('/change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
-def get_all_change_role_requests(page: int, Authorize: AuthJWT = Depends()):
+def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FILTER, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not user_cruds.is_admin(user_id=current_user_id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Недостаточно прав")
-    return user_cruds.get_all_change_role_messages(page=page)
+    return user_cruds.get_all_change_role_messages(page=page, filter=filter)
 
 
 @router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
