@@ -13,7 +13,7 @@ from typing import Any
 from db.base import Base
 from db.db import get_db
 from api.api_v1.api import api_v1_router
-
+from sqlalchemy_utils import database_exists, create_database
 
 
 def start_application():
@@ -22,8 +22,10 @@ def start_application():
     return app
 
 engine = create_engine(
-    settings.TEST_DATABASE_URI
+    settings.DATABASE_URI
 )
+# if not database_exists(engine.url):
+#     create_database(engine.url)
 # Use connect_args parameter only with sqlite
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

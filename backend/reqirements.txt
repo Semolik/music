@@ -6,6 +6,8 @@ bcrypt
 pillow
 python-multipart
 werkzeug
+psycopg2
+sqlalchemy-utils
 
 pytest
 requests
