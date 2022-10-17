@@ -9,6 +9,7 @@ class Settings(BaseSettings):
         'http://localhost:4000', 'http://192.168.50.106:4000']
     # DATABASE_URI: Optional[str] = "sqlite:///example.db"
     DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/postgres"
+    TEST_DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/postgres_test"
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
     IMAGES_FOLDER: str = ASSETS_FOLDER+'images'

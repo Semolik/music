@@ -6,3 +6,6 @@ bcrypt
 pillow
 python-multipart
 werkzeug
+
+pytest
+requests
