@@ -10,8 +10,11 @@ engine = create_engine(  # 2
     # required for sqlite
     # connect_args={"check_same_thread": False},  # 3
 )
+
 if not database_exists(engine.url):
     create_database(engine.url)
+
+# Base.metadata.create_all(engine)
 
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)  # 4

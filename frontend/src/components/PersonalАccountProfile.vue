@@ -20,6 +20,7 @@
                     <FormKit type="text" name="first_name" label="Имя" v-model="firstName" placeholder="Ваше имя" />
                     <FormKit type="text" name="last_name" label="Фамилия" v-model="lastName"
                         placeholder="Ваша фамилия" />
+                        добавить проверку на длину текста
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
                     <div class="buttons">

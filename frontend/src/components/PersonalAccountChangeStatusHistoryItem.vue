@@ -393,6 +393,7 @@ export default {
         background-color: var(--color-background-mute-4);
         padding: 10px;
         border-radius: 10px;
+        overflow-wrap: anywhere;
     }
 
     .files {

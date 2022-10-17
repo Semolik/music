@@ -14,7 +14,7 @@
                 </div>
             </div>
             <router-link @[logined&&`mouseover`]="panelActive = true"
-                :class="['button', 'login', {logined: logined},{normal: !panelActive}]" :to="!logined ? 'login': 'lk'">
+                :class="['button', 'login', {logined: logined},{normal: !panelActive}]" :to="!logined ? '/login': '/lk'">
                 <div class="icon">
                     <FontAwesomeIcon icon="fa-user" v-if="logined" />
                     <FontAwesomeIcon icon="fa-right-from-bracket" v-else />
