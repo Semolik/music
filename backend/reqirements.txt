@@ -1,7 +1,7 @@
 passlib
 alembic
 sqlalchemy==1.4.41
-fastapi-jwt-auth
+fastapi-jwt-auth[asymmetric]
 bcrypt
 pillow
 python-multipart

@@ -24,6 +24,16 @@
                         <span :class="['count',{wrong: lastNameLenght < 0}]">{{lastNameLenght}}</span>
                     </FormField>
                 </div>
+                <div class="user-information" v-if="userData">
+                    <div class="block">username: {{userData.username}}</div>
+                    <div class="block custom">тип аккаунта:
+                        <div class="statuses">
+                            <span :class="{active:  userRole === Role.Musician}">музыкант</span>
+                            <span :class="{active:  userRole === Role.User}">пользователь</span>
+                            <span :class="{active:  userRole === Role.RadioStation}">радиостанция</span>
+                        </div>
+                    </div>
+                </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
                     <div class="buttons">
                         <div :class="['button', 'save', {active: dataChanged}, {wrong: fieldsWrong}]" @click="save">
@@ -46,19 +56,22 @@ import handleError from '../composables/errors';
 import { useToast } from "vue-toastification";
 import FormField from './FormField.vue';
 import AnimateInteger from './AnimateInteger.vue';
+import { Role } from '../helpers/roles.js';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
 export default {
     setup() {
-        const { userData } = storeToRefs(useAuthStore());
+        const { userData, userRole } = storeToRefs(useAuthStore());
         const { setUserData, logout } = useAuthStore();
         const toast = useToast();
         return {
             userData,
             toast,
             setUserData,
-            logout
+            logout,
+            Role,
+            userRole
         }
     },
     data() {
@@ -174,6 +187,10 @@ export default {
         grid-template-columns: 200px 1fr;
 
         @include breakpoints.lg(true) {
+            grid-template-columns: 160px 1fr;
+        }
+
+        @include breakpoints.sm(true) {
             grid-template-columns: 1fr;
         }
 
@@ -260,7 +277,6 @@ export default {
                         z-index: 2;
                     }
 
-
                 }
 
                 input {
@@ -285,7 +301,6 @@ export default {
         .button {
             cursor: pointer;
             padding: 10px;
-            // height: min-content;
             background-color: var(--color-background-mute-4);
             border-radius: 10px;
             transition: .2s scale, .2s background-color;
@@ -324,6 +339,10 @@ export default {
                 width: 40px;
                 height: 40px;
 
+                @include breakpoints.xl(true) {
+                    width: 100%;
+                }
+
                 &.save {
                     @include themes.light {
                         svg {
@@ -346,6 +365,7 @@ export default {
         .user-info {
             border-radius: 5px;
             display: grid;
+            grid-auto-rows: min-content;
             gap: 5px;
             padding-top: 5px;
 
@@ -354,29 +374,76 @@ export default {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
 
-                .formkit-inner {
-                    .count {
-                        opacity: 0;
-                        padding: 0px 8px;
-
-                        &.wrong {
-                            opacity: 1;
-                            color: red;
-                        }
-                    }
-
-                    &:focus-within {
-                        .count {
-                            opacity: 1;
-                        }
-
-                        border-color: var(--purple-1);
-                        box-shadow: 0 0 0 1px var(--purple-1);
-                    }
+                @include breakpoints.lg(true) {
+                    grid-template-columns: 2fr;
                 }
 
-                .formkit-input {
-                    color: var(--color-text);
+                .formkit-wrapper {
+                    max-width: none;
+
+                    .formkit-inner {
+                        .count {
+                            opacity: 0;
+                            padding: 0px 8px;
+
+                            &.wrong {
+                                opacity: 1;
+                                color: red;
+                            }
+                        }
+
+                        &:focus-within {
+                            .count {
+                                opacity: 1;
+                            }
+
+                            border-color: var(--purple-1);
+                            box-shadow: 0 0 0 1px var(--purple-1);
+                        }
+                    }
+
+
+
+                    .formkit-input {
+                        color: var(--color-text);
+                    }
+                }
+            }
+
+            .user-information {
+                display: flex;
+                gap: 5px;
+
+                .block {
+                    background-color: var(--color-background-mute-4);
+                    padding: 5px 15px;
+                    border-radius: 15px;
+                    @include helpers.flex-center;
+                    gap: 10px;
+                    flex-grow: 1;
+
+                    &.custom {
+                        padding-right: 5px;
+                    }
+
+                    .statuses {
+                        display: flex;
+                        gap: 5px;
+                        flex-grow: 1;
+
+                        span {
+                            background-color: var(--color-background-mute-6);
+                            border-radius: 10px;
+                            padding: 2px 10px;
+                            flex-grow: 1;
+                            text-align: center;
+
+                            &.active {
+                                background-color: var(--purple);
+
+                            }
+                        }
+                    }
                 }
             }
         }
