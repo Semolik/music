@@ -5,7 +5,10 @@
             <router-link class="item" to="/lk/music">Моя музыка</router-link>
             <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
             <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
+            <router-link class="item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
         </aside>
+
+
         <div class="active-route">
             <router-view></router-view>
         </div>
@@ -14,17 +17,11 @@
 <script>
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../stores/auth';
-import { Role } from '../helpers/roles.js';
 export default {
     setup() {
-        const { userRole } = storeToRefs(useAuthStore());
+        const { isAdmin, isMusician } = storeToRefs(useAuthStore());
         return {
-            userRole
-        }
-    },
-    computed: {
-        isAdmin() {
-            return this.userRole === Role.Admin;
+            isAdmin, isMusician
         }
     }
 }

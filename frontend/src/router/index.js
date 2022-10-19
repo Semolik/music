@@ -31,6 +31,11 @@ const router = createRouter({
           component: () => import('../components/PersonalАccountMusic.vue'),
         },
         {
+          path: 'my-music',
+          name: 'Кабинет музыканта',
+          component: () => import('../components/PersonalАccountMusicianCabinet.vue'),
+        },
+        {
           path: 'update-status',
           name: 'Изменение статуса аккаунта',
           meta: { requireAuth: true, roles: [Role.User, Role.Musician, Role.RadioStation] },

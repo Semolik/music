@@ -377,37 +377,6 @@ export default {
                 @include breakpoints.lg(true) {
                     grid-template-columns: 2fr;
                 }
-
-                .formkit-wrapper {
-                    max-width: none;
-
-                    .formkit-inner {
-                        .count {
-                            opacity: 0;
-                            padding: 0px 8px;
-
-                            &.wrong {
-                                opacity: 1;
-                                color: red;
-                            }
-                        }
-
-                        &:focus-within {
-                            .count {
-                                opacity: 1;
-                            }
-
-                            border-color: var(--purple-1);
-                            box-shadow: 0 0 0 1px var(--purple-1);
-                        }
-                    }
-
-
-
-                    .formkit-input {
-                        color: var(--color-text);
-                    }
-                }
             }
 
             .user-information {

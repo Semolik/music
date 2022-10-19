@@ -10,10 +10,11 @@ from fastapi import FastAPI
 import pytest
 from typing import Generator
 from typing import Any
+from models.user import User, File
 from models.user import Base
 from db.db import get_db
 from api.api_v1.api import api_v1_router
-# from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy_utils import database_exists, create_database
 
 
 def start_application():
@@ -24,8 +25,8 @@ def start_application():
 engine = create_engine(
     settings.TEST_DATABASE_URI #DATABASE_URI
 )
-# if not database_exists(engine.url):
-#     create_database(engine.url)
+if not database_exists(engine.url):
+    create_database(engine.url)
 
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -35,10 +36,10 @@ def app() -> Generator[FastAPI, Any, None]:
     """
     Create a fresh database on each test case.
     """
-    Base.metadata.create_all(engine)  # Create the tables.
+    Base.metadata.create_all(bind=engine)  # Create the tables.
     _app = start_application()
     yield _app
-    Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="function")

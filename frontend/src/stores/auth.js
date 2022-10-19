@@ -3,6 +3,7 @@ import { HTTP } from '../http-common.vue';
 import handleError from '../composables/errors'
 import { useSessionStorage } from '@vueuse/core';
 import { Role } from '../helpers/roles.js';
+
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
@@ -11,6 +12,10 @@ export const useAuthStore = defineStore({
     logined: useSessionStorage('logined', false),
     userRole: useSessionStorage('user-role', null),
     userData: null,
+    isAdmin: false,
+    isUser: false,
+    isMusician: false,
+    isRadioStation: false,
   }),
   actions: {
     clearMessage() {
@@ -19,11 +24,31 @@ export const useAuthStore = defineStore({
     setUserRole() {
       this.userRole = null;
       let user = this.userData;
+
+      this.isAdmin = false;
+      this.isUser = false;
+      this.isRadioStation = false;
+      this.isMusician = false;
+
       Object.values(Role).forEach(role_key => {
         if (user[role_key] === true) {
           this.userRole = role_key;
         }
       });
+      switch (this.userRole) {
+        case Role.Admin:
+          this.isAdmin = true;
+          break;
+        case Role.User:
+          this.isUser = true;
+          break;
+        case Role.Musician:
+          this.isMusician = true;
+          break;
+        case Role.RadioStation:
+          this.isRadioStation = true;
+          break;
+      }
       if (!this.userRole) {
         this.userRole = Role.User;
       }

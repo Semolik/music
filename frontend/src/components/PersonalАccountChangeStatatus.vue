@@ -62,12 +62,13 @@
                     <div class="name">{{file.name}}</div>
                 </div>
             </div>
-            <div :class="['button', {active: buttonActive}]" @click="sendMessageToAdmins">Отправить сообщение</div>
+            <div :class="['button', {active: buttonActive}, {preloader: 0 < uploadPercentage < 100}]"
+                :style="{'--i': uploadPercentage}" @click="sendMessageToAdmins">Отправить
+                сообщение</div>
         </template>
     </div>
 </template>
 <script>
-import { isRadioStation, isMusician } from '../composables/roleChecker';
 import { useToast } from "vue-toastification";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPaperclip, faXmark, faImage, faFile } from '@fortawesome/free-solid-svg-icons';
@@ -109,6 +110,7 @@ export default {
             base_route_path: '/lk/update-status',
             history_route_path: '/lk/update-status/history',
             active_role: this.userRole,
+            uploadPercentage: 0,
         };
     },
     mounted() {
@@ -179,11 +181,20 @@ export default {
             }
             formData.append('message', this.messageText);
             formData.append('account_status', this.active_role);
-            HTTP.post('change-role', formData)
+            this.uploadPercentage = 0;
+            HTTP.post('change-role', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: function (progressEvent) {
+                    this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+                }.bind(this)
+            })
                 .then((response) => {
                     this.clearForm();
                     this.toast(response.data.detail);
                     this.has_requests = true;
+                    this.uploadPercentage = 0;
                 })
                 .catch((error) => {
                     this.toast.error(handleError(error, 'При отправке сообщения произошла ошибка').message)
@@ -328,7 +339,7 @@ export default {
 
     .request-form {
         display: flex;
-        
+
 
         textarea {
             width: 100%;
@@ -439,6 +450,23 @@ export default {
         border-radius: 15px;
         padding: 10px;
         text-align: center;
+
+        &.preloader {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+
+            &::after {
+                z-index: -1;
+                position: absolute;
+                content: '';
+                left: 0;
+                top: 0;
+                height: 100%;
+                background-color: var(--red-0);
+                width: calc(1% * var(--i));
+            }
+        }
 
         &:not(.active):hover {
             background-color: var(--color-background-mute-4);
