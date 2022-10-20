@@ -10,8 +10,9 @@
     <div class="songs">
         <UploadSong v-if="activeSelection==='single'" />
         <template v-else>
+            <FormField :borderRadius="10" label="Название альбома" />
             <UploadSong />
-            <div class="add-button-container">
+            <div class="add-buttons-container">
                 <div class="add-button">
                     <FontAwesomeIcon icon="fa-plus" />
                 </div>
@@ -24,19 +25,21 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import UploadSong from '../components/PersonalАccountMusicianCabinetUploadSong.vue'
+import FormField from './FormField.vue';
 
 library.add(faPlus);
 export default {
-    components: [UploadSong, FontAwesomeIcon],
     data() {
         return {
-            activeSelection: 'single',
-        }
-    }
+            activeSelection: "single",
+        };
+    },
+    components: { FormField, UploadSong, FontAwesomeIcon }
 }
 </script>
 <style lang="scss" scoped>
 @use '@/assets/styles/components';
+@use '@/assets/styles/helpers';
 
 .buttons {
     display: grid;
@@ -45,6 +48,25 @@ export default {
 
     .button {
         @include components.button;
+    }
+
+}
+
+.songs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .add-buttons-container {
+        display: flex;
+        justify-content: right;
+
+        .add-button {
+            @include components.button;
+            @include helpers.flex-center;
+            height: 45px;
+            width: 45px;
+        }
     }
 }
 </style>

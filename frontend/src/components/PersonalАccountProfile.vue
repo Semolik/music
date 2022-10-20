@@ -1,26 +1,18 @@
 <template>
     <div class="profile-container">
         <form class="user-info-container" @submit.prevent="formSubmited" ref="form" id="user-info-container">
-            <div :class="['user-pic', {empty: avatarIsEmpty}]">
-                <FontAwesomeIcon icon="fa-user" v-if="avatarIsEmpty" />
-                <img :src="userData.picture" v-else>
-                <div class="edit-area">
-                    <div class="edit-area-container">
-                        <FontAwesomeIcon icon="fa-image" v-if="!avatarIsEmpty" />
-                        <div class="edit-area-text">выбрать файл</div>
-                        <input type="file" name="userPicture" ref="fileupload" accept="image/*" @change="previewFiles">
-                    </div>
-                </div>
-            </div>
+            <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPicture" ref="selectPic" />
             <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
             <div class="user-info">
                 <div class="fields">
-                    <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя" v-model="firstName">
+                    <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя"
+                        v-model="firstName">
                         <span :class="['count',{wrong: firstNameLenght < 0}]">{{firstNameLenght}}</span>
                     </FormField>
-                    <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия" v-model="lastName">
+                    <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия"
+                        v-model="lastName">
                         <span :class="['count',{wrong: lastNameLenght < 0}]">{{lastNameLenght}}</span>
                     </FormField>
                 </div>
@@ -57,6 +49,7 @@ import { useToast } from "vue-toastification";
 import FormField from './FormField.vue';
 import AnimateInteger from './AnimateInteger.vue';
 import { Role } from '../helpers/roles.js';
+import SelectImage from './SelectImage.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
@@ -82,6 +75,8 @@ export default {
             remove_picture: false,
             original_image: null,
             file_changed: false,
+            fileChanged: false,
+            picture: this.userData?.picture,
         }
     },
     mounted() {
@@ -90,7 +85,8 @@ export default {
     components: {
         FontAwesomeIcon,
         FormField,
-        AnimateInteger
+        AnimateInteger,
+        SelectImage
     },
     watch: {
         userData(value) {
@@ -100,24 +96,18 @@ export default {
         }
     },
     methods: {
-        previewFiles(event) {
-            let file = event.target.files;
-            if (!(file && file[0])) return;
-            if (this.remove_picture) {
-                this.remove_picture = false;
-            }
-            let reader = new FileReader;
-            reader.onload = e => {
-                this.userData.picture = e.target.result
-            }
-            reader.readAsDataURL(file[0]);
-            this.file_changed = true;
-        },
+
         detelePicture() {
-            this.$refs.fileupload.value = null;
-            this.userData.picture = null;
+
+            this.$refs.selectPic.detelePicture();
             this.remove_picture = true;
             this.file_changed = true;
+        },
+        updatePic(target) {
+            this.file_changed = true;
+            if (!this.file_changed) return
+            let file = target.files;
+            this.fileChanged = file !== this.userData.picture;
         },
         save() {
             if (this.dataChanged) {
@@ -148,15 +138,13 @@ export default {
             if (!this.userData) return true
             return !Boolean(this.userData.picture)
         },
-        fileChanged() {
-            if (!this.file_changed) return
-            let file = this.$refs.fileupload.files;
-            return file !== this.userData.picture;
-        },
+        //         fileChanged() {
+        // fileChanged
+        //         },
         dataChanged() {
             if (!this.userData) return
             if (this.fieldsWrong) return
-            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.fileChanged
+            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.file_changed
         },
         fieldsWrong() {
             return this.lastNameLenght < 0 || this.firstNameLenght < 0
