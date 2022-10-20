@@ -17,10 +17,10 @@
             </div>
             <div class="user-info">
                 <div class="fields">
-                    <FormField name="first_name" label="Имя" placeholder="Ваше имя" v-model="firstName">
+                    <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя" v-model="firstName">
                         <span :class="['count',{wrong: firstNameLenght < 0}]">{{firstNameLenght}}</span>
                     </FormField>
-                    <FormField name="last_name" label="Фамилия" placeholder="Ваша фамилия" v-model="lastName">
+                    <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия" v-model="lastName">
                         <span :class="['count',{wrong: lastNameLenght < 0}]">{{lastNameLenght}}</span>
                     </FormField>
                 </div>
@@ -209,7 +209,6 @@ export default {
 
             &.empty {
                 @include helpers.flex-center;
-
                 overflow: hidden;
                 border: 2px dashed transparent;
 
@@ -365,7 +364,7 @@ export default {
         .user-info {
             border-radius: 5px;
             display: grid;
-            grid-auto-rows: min-content;
+            grid-template-rows: min-content min-content;
             gap: 5px;
             padding-top: 5px;
 

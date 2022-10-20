@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     SERVER_LINK: str = 'http://localhost:3000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         'http://localhost:4000', 'http://192.168.50.106:4000']
-    # DATABASE_URI: Optional[str] = "sqlite:///example.db"
     DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/altai_music"
     TEST_DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/postgres_test"
     FIRST_SUPERUSER: str = "admin"

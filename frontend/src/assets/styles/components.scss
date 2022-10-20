@@ -1,0 +1,33 @@
+@use '@/assets/styles/helpers';
+
+@mixin button {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background-mute-3);
+    padding: 10px;
+    gap: 5px;
+    border-radius: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-text);
+
+    &:not(.active):hover {
+        background-color: var(--color-background-mute-4);
+    }
+
+    &.active {
+        background-color: var(--purple);
+    }
+
+    .icon {
+        @include helpers.flex-center;
+
+        svg {
+            height: 25px;
+        }
+    }
+
+    .text {
+        text-align: center;
+    }
+}

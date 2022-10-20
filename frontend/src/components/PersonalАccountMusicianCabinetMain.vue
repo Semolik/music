@@ -17,6 +17,7 @@
 </template>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/components';
 
 .buttons {
     display: grid;
@@ -24,31 +25,7 @@
     gap: 10px;
 
     .button {
-        display: flex;
-        flex-direction: column;
-        background-color: var(--color-background-mute-3);
-        padding: 10px;
-        gap: 5px;
-        border-radius: 15px;
-        cursor: pointer;
-        text-decoration: none;
-        color: var(--color-text);
-
-        &:hover {
-            background-color: var(--color-background-mute-4);
-        }
-
-        .icon {
-            @include helpers.flex-center;
-
-            svg {
-                height: 25px;
-            }
-        }
-
-        .text {
-            text-align: center;
-        }
+        @include components.button;
     }
 }
 </style>
