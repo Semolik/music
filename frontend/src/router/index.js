@@ -32,8 +32,20 @@ const router = createRouter({
         },
         {
           path: 'my-music',
-          name: 'Кабинет музыканта',
           component: () => import('../components/PersonalАccountMusicianCabinet.vue'),
+          children: [
+            {
+              path: '',
+              name: 'Кабинет музыканта',
+              component: () => import('../components/PersonalАccountMusicianCabinetMain.vue'),
+            },
+            {
+              path: 'upload',
+              name: 'Загрузить',
+              component: () => import('../components/PersonalАccountMusicianCabinetUpload.vue'),
+            },
+
+          ]
         },
         {
           path: 'update-status',

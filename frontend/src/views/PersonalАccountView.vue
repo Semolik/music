@@ -7,8 +7,6 @@
             <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
             <router-link class="item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
         </aside>
-
-
         <div class="active-route">
             <router-view></router-view>
         </div>
