@@ -105,6 +105,9 @@
   --color-36-dark: hsl(36, 50%, 40%);
   --white-0-5: rgba(255, 255, 255, 0.5);
   --white-0-6: rgba(255, 255, 255, 0.6);
+
+  --fields-border-color-dark: #94929c;
+
 }
 
 [data-theme="light"] {
@@ -137,6 +140,8 @@
   --color-36: var(--color-36-light);
   --login-icon-color: var(--color-background-mute-3);
   --login-icon-color-hover: var(--color-background-mute-4);
+
+  --fields-border-color: var(--light-theme-mute-6);
 }
 
 [data-theme="dark"] {
@@ -168,6 +173,7 @@
   --color-36: var(--color-36-dark);
   --login-icon-color: var(--white-0-5);
   --login-icon-color-hover: var(--white-0-6);
+  --fields-border-color: var(--fields-border-color-dark);
 }
 
 *,

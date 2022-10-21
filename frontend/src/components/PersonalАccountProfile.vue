@@ -138,9 +138,6 @@ export default {
             if (!this.userData) return true
             return !Boolean(this.userData.picture)
         },
-        //         fileChanged() {
-        // fileChanged
-        //         },
         dataChanged() {
             if (!this.userData) return
             if (this.fieldsWrong) return
@@ -369,6 +366,7 @@ export default {
             .user-information {
                 display: flex;
                 gap: 5px;
+                flex-wrap: wrap;
 
                 .block {
                     background-color: var(--color-background-mute-4);
@@ -380,10 +378,12 @@ export default {
 
                     &.custom {
                         padding-right: 5px;
+                        text-align: center;
                     }
 
                     .statuses {
                         display: flex;
+                        flex-wrap: wrap;
                         gap: 5px;
                         flex-grow: 1;
 

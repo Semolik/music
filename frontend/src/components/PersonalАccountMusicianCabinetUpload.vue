@@ -8,7 +8,7 @@
         </div>
     </div>
     <div class="songs">
-        <UploadSong v-if="activeSelection==='single'" />
+        <UploadSong v-if="activeSelection==='single'" isSingle/>
         <template v-else>
             <FormField :borderRadius="10" label="Название альбома" />
             <UploadSong />

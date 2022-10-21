@@ -2,42 +2,53 @@
     <div class="formkit-outer" data-family="text" data-type="text">
         <div class="formkit-wrapper">
             <label class="formkit-label" :for="id" v-if="label">{{label}}</label>
-            <div class="formkit-inner" :style="{'--inner-radius': borderRadius+'px'}">
-                <input @input="changeValue" :placeholder="placeholder" class="formkit-input" type="text" :name="name"
-                    :id="id" v-model="modelValue">
-                <slot></slot>
+            <div class="formkit-inner-container">
+                <div class="formkit-inner" :style="{'--inner-radius': borderRadius+'px'}">
+                    <input @input="changeValue" :placeholder="placeholder" class="formkit-input" type="text"
+                        :name="name" :id="id" v-model="modelValue">
+                    <slot></slot>
+                </div>
+                <slot name="side"></slot>
             </div>
         </div>
     </div>
 </template>
 <style lang="scss">
 .formkit-wrapper {
+    flex-grow: 1;
     max-width: none;
 
-    .formkit-inner {
-        border-radius: var(--inner-radius);
-        .count {
-            opacity: 0;
-            padding: 0px 8px;
+    .formkit-inner-container {
+        display: flex;
+        gap: 5px;
 
-            &.wrong {
-                opacity: 1;
-                color: red;
-            }
-        }
+        .formkit-inner {
+            flex-grow: 1;
+            border-radius: var(--inner-radius);
+            box-shadow: 0 0 0 1px var(--fields-border-color);
 
-        &:focus-within {
             .count {
-                opacity: 1;
+                opacity: 0;
+                padding: 0px 8px;
+
+                &.wrong {
+                    opacity: 1;
+                    color: red;
+                }
             }
 
-            border-color: var(--purple-1);
-            box-shadow: 0 0 0 1px var(--purple-1);
-        }
-    }
+            &:focus-within {
+                .count {
+                    opacity: 1;
+                }
 
-    .formkit-input {
-        color: var(--color-text);
+                box-shadow: 0 0 0 1px var(--purple-1);
+            }
+        }
+
+        .formkit-input {
+            color: var(--color-text);
+        }
     }
 }
 </style>
