@@ -2,7 +2,7 @@
     <header>
         <router-link to="/" class="text" @click="this.$emit('reset_error')">Музыка</router-link>
         <div class="buttons">
-            <div :class="['themeswitch', 'button', themeName]" @click="toggleTheme"
+            <!-- <div :class="['themeswitch', 'button', themeName]" @click="toggleTheme"
                 v-if="logined ? !panelActive : true">
                 <div class="icons">
                     <div class="icon">
@@ -12,7 +12,7 @@
                         <FontAwesomeIcon icon="fa-moon" />
                     </div>
                 </div>
-            </div>
+            </div> -->
             <router-link @[logined&&`mouseover`]="panelActive = true"
                 :class="['button', 'login', {logined: logined},{normal: !panelActive}]"
                 :to="!logined ? '/login': '/lk'">

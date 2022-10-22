@@ -110,41 +110,41 @@
 
 }
 
-[data-theme="light"] {
-  --color-background: var(--light-theme-background);
-  --color-background-rgb: var(--light-theme-background-rgb);
-  --color-background-soft: var(--light-theme-soft);
-  --color-background-mute: var(--light-theme-mute);
-  --color-background-mute-2: var(--light-theme-mute-2);
-  --color-background-mute-3: var(--light-theme-mute-3);
-  --color-background-mute-4: var(--light-theme-mute-4);
-  --color-background-mute-5: var(--light-theme-mute-5);
-  --color-background-mute-6: var(--light-theme-mute-6);
-  --color-background-mute-7: var(--light-theme-mute-7);
-  --color-background-mute-8: var(--light-theme-mute-8);
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-black);
-  --color-text-rev: var(--vt-c-white);
-  --color-header-text: var(--color-text);
-  --nav-toggle-color: var(--light-theme-nav-toggle-color);
-  --green-128: var(--green-128-light);
-  --green-128-hover: var(--green-128-light-hover);
-  --green-128-hover-active: var(--green-128-light-hover-active);
-  --red-0: var(--red-0-light);
-  --red-0-hover: var(--red-0-light-hover);
-  --purple: var(--nav-toggle-color);
-  --color-216: var(--color-216-light);
-  --color-54: var(--color-54-light);
-  --color-36: var(--color-36-light);
-  --login-icon-color: var(--color-background-mute-3);
-  --login-icon-color-hover: var(--color-background-mute-4);
+// [data-theme="light"] {
+//   --color-background: var(--light-theme-background);
+//   --color-background-rgb: var(--light-theme-background-rgb);
+//   --color-background-soft: var(--light-theme-soft);
+//   --color-background-mute: var(--light-theme-mute);
+//   --color-background-mute-2: var(--light-theme-mute-2);
+//   --color-background-mute-3: var(--light-theme-mute-3);
+//   --color-background-mute-4: var(--light-theme-mute-4);
+//   --color-background-mute-5: var(--light-theme-mute-5);
+//   --color-background-mute-6: var(--light-theme-mute-6);
+//   --color-background-mute-7: var(--light-theme-mute-7);
+//   --color-background-mute-8: var(--light-theme-mute-8);
+//   --color-border: var(--vt-c-divider-light-2);
+//   --color-border-hover: var(--vt-c-divider-light-1);
+//   --color-heading: var(--vt-c-text-light-1);
+//   --color-text: var(--vt-c-black);
+//   --color-text-rev: var(--vt-c-white);
+//   --color-header-text: var(--color-text);
+//   --nav-toggle-color: var(--light-theme-nav-toggle-color);
+//   --green-128: var(--green-128-light);
+//   --green-128-hover: var(--green-128-light-hover);
+//   --green-128-hover-active: var(--green-128-light-hover-active);
+//   --red-0: var(--red-0-light);
+//   --red-0-hover: var(--red-0-light-hover);
+//   --purple: var(--nav-toggle-color);
+//   --color-216: var(--color-216-light);
+//   --color-54: var(--color-54-light);
+//   --color-36: var(--color-36-light);
+//   --login-icon-color: var(--color-background-mute-3);
+//   --login-icon-color-hover: var(--color-background-mute-4);
 
-  --fields-border-color: var(--light-theme-mute-6);
-}
+//   --fields-border-color: var(--light-theme-mute-6);
+// }
 
-[data-theme="dark"] {
+html {
   --color-background-rgb: var(--dark-theme-background-rgb);
   --color-background: var(--dark-theme-background);
   --color-background-soft: var(--dark-theme-soft);

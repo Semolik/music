@@ -8,16 +8,15 @@
         </div>
     </div>
     <div class="songs">
-        <UploadSong v-if="activeSelection==='single'" isSingle/>
-        <template v-else>
-            <FormField :borderRadius="10" label="Название альбома" />
-            <UploadSong />
-            <div class="add-buttons-container">
-                <div class="add-button">
-                    <FontAwesomeIcon icon="fa-plus" />
-                </div>
+        <FormField :borderRadius="10" label="Название альбома" v-if="!singleMode" off-margin/>
+        <UploadSong :track="track" @update="trackUpdate($event,index)" :is-single="singleMode"
+            v-for="(track, index) in tracks" />
+        <div class="add-buttons-container" v-if="!singleMode">
+            <div class="add-button" @click="addTrack">
+                <FontAwesomeIcon icon="fa-plus" />
             </div>
-        </template>
+        </div>
+
     </div>
 </template>
 <script>
@@ -32,9 +31,30 @@ export default {
     data() {
         return {
             activeSelection: "single",
+            tracks: [{}],
         };
     },
-    components: { FormField, UploadSong, FontAwesomeIcon }
+    watch: {
+        singleMode(value) {
+            if (value && this.tracks.length > 1) {
+                this.tracks = [this.tracks[0]];
+            }
+        }
+    },
+    methods: {
+        trackUpdate(event, index) {
+            console.log(event, index)
+        },
+        addTrack() {
+            this.tracks.push(this.trackTemplate);
+        }
+    },
+    components: { FormField, UploadSong, FontAwesomeIcon },
+    computed: {
+        singleMode() {
+            return this.activeSelection === 'single'
+        }
+    }
 }
 </script>
 <style lang="scss" scoped>

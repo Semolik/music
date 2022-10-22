@@ -1,5 +1,5 @@
 <template>
-    <div class="formkit-outer" data-family="text" data-type="text">
+    <div :class="['formkit-outer', {'off-margin': offMargin}]" data-family="text" data-type="text">
         <div class="formkit-wrapper">
             <label class="formkit-label" :for="id" v-if="label">{{label}}</label>
             <div class="formkit-inner-container">
@@ -14,40 +14,46 @@
     </div>
 </template>
 <style lang="scss">
-.formkit-wrapper {
-    flex-grow: 1;
-    max-width: none;
+.formkit-outer {
+    &.off-margin {
+        margin: 0;
+    }
 
-    .formkit-inner-container {
-        display: flex;
-        gap: 5px;
+    .formkit-wrapper {
+        flex-grow: 1;
+        max-width: none;
 
-        .formkit-inner {
-            flex-grow: 1;
-            border-radius: var(--inner-radius);
-            box-shadow: 0 0 0 1px var(--fields-border-color);
+        .formkit-inner-container {
+            display: flex;
+            gap: 5px;
 
-            .count {
-                opacity: 0;
-                padding: 0px 8px;
+            .formkit-inner {
+                flex-grow: 1;
+                border-radius: var(--inner-radius);
+                box-shadow: 0 0 0 1px var(--fields-border-color);
 
-                &.wrong {
-                    opacity: 1;
-                    color: red;
-                }
-            }
-
-            &:focus-within {
                 .count {
-                    opacity: 1;
+                    opacity: 0;
+                    padding: 0px 8px;
+
+                    &.wrong {
+                        opacity: 1;
+                        color: red;
+                    }
                 }
 
-                box-shadow: 0 0 0 1px var(--purple-1);
-            }
-        }
+                &:focus-within {
+                    .count {
+                        opacity: 1;
+                    }
 
-        .formkit-input {
-            color: var(--color-text);
+                    box-shadow: 0 0 0 1px var(--purple-1);
+                }
+            }
+
+            .formkit-input {
+                color: var(--color-text);
+            }
         }
     }
 }
@@ -61,6 +67,7 @@ export default {
         placeholder: String,
         modelValue: String,
         borderRadius: Number,
+        offMargin: Boolean,
     },
     emits: ['update:modelValue'],
     methods: {
