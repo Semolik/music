@@ -8,7 +8,7 @@
             <div class="fields-container">
                 <FormField :borderRadius="borderRadius" label="Альбом" v-if="isSingle">
                     <template v-slot:side>
-                        <div class="button">
+                        <div :class="['button',{active: followingName}]" @click="followingName = !followingName">
                             <FontAwesomeIcon icon='fa-paperclip' />
                         </div>
                     </template>
@@ -40,6 +40,7 @@ export default {
             borderRadius: 5,
             nameLimit: 30,
             featLimit: 50,
+            followingName: false,
         };
     },
     components: { SelectImage, FormField, FontAwesomeIcon },
@@ -86,9 +87,14 @@ export default {
             .button {
                 box-shadow: 0 0 0 1px var(--fields-border-color);
                 border-radius: 5px;
-                // aspect-ratio: 1;
                 padding: 0px 10px;
                 @include helpers.flex-center;
+                cursor: pointer;
+
+                &.active {
+                    background-color: var(--purple-1);
+                }
+
                 svg {
                     width: 18px;
                     height: 18px;
