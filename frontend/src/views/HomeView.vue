@@ -1,12 +1,9 @@
 <template>
   <div class="home-container">
     <aside>
-      <div class="item" @click="$event.target.classList.toggle('active')" >
+      <div class="item" >
         <div class="button-content">
           <div class="text">наушники</div>
-          <div class="icon">
-            <FontAwesomeIcon icon="fa-caret-down" />
-          </div>
         </div>
         <div class="list">
           <div class="item">dfsfsdfs</div>
@@ -17,13 +14,13 @@
 </template>
 
 <script>
-import BaseContainer from '../components/BaseContainer.vue';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faCaretDown);
+// import BaseContainer from '../components/BaseContainer.vue';
+// import { library } from '@fortawesome/fontawesome-svg-core';
+// import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+// library.add(faCaretDown);
 export default {
-  components: { BaseContainer, FontAwesomeIcon }
+  components: {  }
 }
 </script>
 
@@ -69,6 +66,7 @@ export default {
 
       &.active {
         background-color: var(--color-background-mute-3);
+
         .list {
           display: flex;
         }
