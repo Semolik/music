@@ -25,7 +25,7 @@
 
         .formkit-inner-container {
             display: flex;
-            gap: 5px;
+            gap: 10px;
 
             .formkit-inner {
                 flex-grow: 1;

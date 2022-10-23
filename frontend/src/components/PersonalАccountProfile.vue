@@ -58,13 +58,16 @@ export default {
         const { userData, userRole } = storeToRefs(useAuthStore());
         const { setUserData, logout } = useAuthStore();
         const toast = useToast();
+        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } = import.meta.env;
         return {
             userData,
             toast,
             setUserData,
             logout,
             Role,
-            userRole
+            userRole,
+            VITE_MAX_FIRSTNAME_LENGTH,
+            VITE_MAX_LASTNAME_LENGTH,
         }
     },
     data() {
@@ -148,11 +151,11 @@ export default {
         },
         lastNameLenght() {
             if (!this.lastName) return
-            return 25 - this.lastName?.length
+            return this.VITE_MAX_LASTNAME_LENGTH - this.lastName?.length
         },
         firstNameLenght() {
             if (!this.firstName) return
-            return 15 - this.firstName?.length
+            return this.VITE_MAX_FIRSTNAME_LENGTH - this.firstName?.length
         },
     }
 }

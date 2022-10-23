@@ -1,12 +1,12 @@
 <template>
     <div class="upload-song-container">
-        <FormField :borderRadius="borderRadius" label="Название" v-model="data.name">
+        <FormField :borderRadius="borderRadius" label="Название" v-model="data.name" off-margin>
             <span :class="['count',{wrong: upToNameLimit < 0}]" v-if="nameLenght">{{upToNameLimit}}</span>
         </FormField>
         <div class="block">
             <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
             <div class="fields-container">
-                <FormField v-model="data.album" :borderRadius="borderRadius" label="Альбом" v-if="isSingle">
+                <FormField v-model="data.album" :borderRadius="borderRadius" label="Альбом" v-if="isSingle" off-margin>
                     <span :class="['count',{wrong: upToAlbumLimit < 0}]" v-if="albumLenght">{{upToAlbumLimit}}</span>
                     <template v-slot:side>
                         <div :class="['button',{active: followingName}]" @click="clickFollowingButton">
@@ -14,7 +14,7 @@
                         </div>
                     </template>
                 </FormField>
-                <FormField :borderRadius="borderRadius" label="Создан совместно с" v-model="data.feat">
+                <FormField :borderRadius="borderRadius" label="Создан совместно с" v-model="data.feat" off-margin>
                     <span :class="['count',{wrong: upToFeatLimit < 0}]" v-if="featLenght">{{upToFeatLimit}}</span>
                 </FormField>
             </div>
@@ -104,6 +104,7 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/breakpoints';
 
 .upload-song-container {
 
@@ -111,15 +112,22 @@ export default {
     border-radius: 10px;
     border: 1px solid var(--color-background-mute-6);
     padding: 10px;
+    display: grid;
+    gap: 10px;
 
     .block {
         display: grid;
         grid-template-columns: 150px 1fr;
         gap: 10px;
 
+        @include breakpoints.rwd(450,true) {
+            grid-template-columns: 1fr;
+        }
+
         .fields-container {
             display: flex;
             flex-direction: column;
+            gap: 10px;
 
             .button {
                 box-shadow: 0 0 0 1px var(--fields-border-color);

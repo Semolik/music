@@ -71,13 +71,17 @@ export default {
     setup() {
         const { logined, loading, message } = storeToRefs(useAuthStore());
         const { loginRequest, registerRequest, clearMessage } = useAuthStore();
+        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MIN_PASSWORD_LENGTH, VITE_MAX_LASTNAME_LENGTH} = import.meta.env;
         return {
             loginRequest,
             registerRequest,
             logined,
             loading,
             message,
-            clearMessage
+            clearMessage,
+            VITE_MAX_FIRSTNAME_LENGTH,
+            VITE_MIN_PASSWORD_LENGTH,
+            VITE_MAX_LASTNAME_LENGTH
         }
     },
     components: { FormContainer, FontAwesomeIcon },
@@ -151,8 +155,8 @@ export default {
             if (value.length < 5) {
                 messages.push('Логин должен быть более 5 символов');
             }
-            if (value.length > 20) {
-                messages.push('Логин должен быть менее 20 символов');
+            if (value.length >= 20) {
+                messages.push('Логин должен быть не более 20 символов');
             }
             this.loginMessage = messages;
             return messages.length === 0
@@ -191,8 +195,8 @@ export default {
             if (/[\s]/.test(value)) {
                 messages.push('В имени зарещены пробельные символы');
             }
-            if (value.length > 15) {
-                messages.push('Имя должено быть менее 15 символов');
+            if (value.length > this.VITE_MAX_FIRSTNAME_LENGTH) {
+                messages.push(`Имя должено быть менее ${this.VITE_MAX_FIRSTNAME_LENGTH} символов`);
             }
             this.nameMessage = messages;
             return messages.length === 0
@@ -204,14 +208,11 @@ export default {
             if (/[\s]/.test(value)) {
                 messages.push('В фамилии зарещены пробельные символы');
             }
-            if (value.length > 25) {
-                messages.push('Фамилия должена быть менее 25 символов');
+            if (value.length > this.VITE_MAX_LASTNAME_LENGTH) {
+                messages.push(`Фамилия должена быть менее ${this.VITE_MAX_LASTNAME_LENGTH} символов`);
             }
             this.lastNameMessage = messages;
             return messages.length === 0
-        },
-        fieldsIsEmpty() {
-            return this.login.length === 0 || this.password.length === 0 || (this.loginActive ? false : this.nameIsValid)
         },
         isButtonActive() {
             return (this.loginIsValid & this.passwordIsValid) & (this.loginActive ? true : this.nameIsValid & this.lastNameIsValid)

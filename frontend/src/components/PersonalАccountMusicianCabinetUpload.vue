@@ -16,7 +16,6 @@
                 <FontAwesomeIcon icon="fa-plus" />
             </div>
         </div>
-
     </div>
 </template>
 <script>
@@ -60,6 +59,7 @@ export default {
 <style lang="scss" scoped>
 @use '@/assets/styles/components';
 @use '@/assets/styles/helpers';
+
 
 .buttons {
     display: grid;
