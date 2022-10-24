@@ -1,11 +1,11 @@
 <template>
-    <div :class="['formkit-outer', {'off-margin': offMargin}]" data-family="text" data-type="text">
+    <div :class="['formkit-outer', { 'off-margin': offMargin }]" data-family="text" data-type="text">
         <div class="formkit-wrapper">
-            <label class="formkit-label" :for="id" v-if="label">{{label}}</label>
+            <label class="formkit-label" :for="id" v-if="label">{{ label }}</label>
             <div class="formkit-inner-container">
-                <div class="formkit-inner" :style="{'--inner-radius': borderRadius+'px'}">
-                    <input @input="changeValue" :placeholder="placeholder" class="formkit-input" type="text"
-                        :name="name" :id="id" v-model="modelValue">
+                <div :class="['formkit-inner', { error: notValid }]" :style="{ '--inner-radius': borderRadius + 'px' }">
+                    <input :placeholder="placeholder" class="formkit-input" type="text" :name="name" :id="id"
+                        v-model="modelValue">
                     <slot></slot>
                 </div>
                 <slot name="side"></slot>
@@ -49,6 +49,10 @@
 
                     box-shadow: 0 0 0 1px var(--purple-1);
                 }
+
+                &.error {
+                    box-shadow: 0 0 0 1px red;
+                }
             }
 
             .formkit-input {
@@ -68,11 +72,37 @@ export default {
         modelValue: String,
         borderRadius: Number,
         offMargin: Boolean,
+        notEmpty: Boolean,
     },
-    emits: ['update:modelValue'],
+    inject: ['runValidation'],
+    data() {
+        return {
+            notValid: false,
+        }
+    },
+    emits: ['update:modelValue', 'empty'],
+    watch: {
+        modelValue(value) {
+            this.changeValue(value);
+        },
+        runValidation(value) {
+            if (value) {
+                this.verify(this.modelValue);
+            }
+        }
+    },
     methods: {
-        changeValue(value) {
-            this.$emit('update:modelValue', value.target.value)
+        changeValue(text) {
+            // let text = value.target.value;
+            this.$emit('update:modelValue', text);
+            this.verify(text);
+
+        },
+        verify(text) {
+            if (this.notEmpty) {
+                this.notValid = !Boolean(text)
+                this.$emit('empty', !this.notValid);
+            }
         }
     }
 }

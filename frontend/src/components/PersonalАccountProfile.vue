@@ -9,26 +9,26 @@
                 <div class="fields">
                     <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя"
                         v-model="firstName">
-                        <span :class="['count',{wrong: firstNameLenght < 0}]">{{firstNameLenght}}</span>
+                        <span :class="['count', { wrong: firstNameLenght < 0 }]">{{ firstNameLenght }}</span>
                     </FormField>
                     <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия"
                         v-model="lastName">
-                        <span :class="['count',{wrong: lastNameLenght < 0}]">{{lastNameLenght}}</span>
+                        <span :class="['count', { wrong: lastNameLenght < 0 }]">{{ lastNameLenght }}</span>
                     </FormField>
                 </div>
                 <div class="user-information" v-if="userData">
-                    <div class="block">username: {{userData.username}}</div>
+                    <div class="block">username: {{ userData.username }}</div>
                     <div class="block custom">тип аккаунта:
                         <div class="statuses">
-                            <span :class="{active:  userRole === Role.Musician}">музыкант</span>
-                            <span :class="{active:  userRole === Role.User}">пользователь</span>
-                            <span :class="{active:  userRole === Role.RadioStation}">радиостанция</span>
+                            <span :class="{ active: userRole === Role.Musician }">музыкант</span>
+                            <span :class="{ active: userRole === Role.User }">пользователь</span>
+                            <span :class="{ active: userRole === Role.RadioStation }">радиостанция</span>
                         </div>
                     </div>
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
                     <div class="buttons">
-                        <div :class="['button', 'save', {active: dataChanged}, {wrong: fieldsWrong}]" @click="save">
+                        <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
                             <FontAwesomeIcon icon="fa-floppy-disk" />
                         </div>
                     </div>
@@ -162,7 +162,6 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
-@use '@/assets/styles/themes';
 @use '@/assets/styles/breakpoints';
 
 .profile-container {
@@ -199,14 +198,7 @@ export default {
                 @include helpers.flex-center;
                 overflow: hidden;
                 border: 2px dashed transparent;
-
-                @include themes.dark {
-                    border-color: var(--main-card-border);
-                }
-
-                @include themes.light {
-                    border-color: var(--color-text);
-                }
+                border-color: var(--main-card-border);
 
 
                 svg {
@@ -331,11 +323,6 @@ export default {
                 }
 
                 &.save {
-                    @include themes.light {
-                        svg {
-                            color: var(--color-background-mute);
-                        }
-                    }
 
                     &.wrong {
                         background-color: var(--red-0);

@@ -2,30 +2,19 @@
     <header>
         <router-link to="/" class="text" @click="this.$emit('reset_error')">Музыка</router-link>
         <div class="buttons">
-            <!-- <div :class="['themeswitch', 'button', themeName]" @click="toggleTheme"
-                v-if="logined ? !panelActive : true">
-                <div class="icons">
-                    <div class="icon">
-                        <FontAwesomeIcon icon="fa-sun" />
-                    </div>
-                    <div class="icon">
-                        <FontAwesomeIcon icon="fa-moon" />
-                    </div>
-                </div>
-            </div> -->
             <router-link @[logined&&`mouseover`]="panelActive = true"
-                :class="['button', 'login', {logined: logined},{normal: !panelActive}]"
-                :to="!logined ? '/login': '/lk'">
+                :class="['button', 'login', { logined: logined }, { normal: !panelActive }]"
+                :to="!logined ? '/login' : '/lk'">
                 <div class="icon">
                     <FontAwesomeIcon icon="fa-user" v-if="logined" />
                     <FontAwesomeIcon icon="fa-right-from-bracket" v-else />
                 </div>
             </router-link>
-            <div :class="['account-panel', {active: panelActive}]" v-if="logined && userData"
+            <div :class="['account-panel', { active: panelActive }]" v-if="logined && userData"
                 @[logined&&`mouseleave`]="panelActive = false">
                 <div class="line">
                     <div class="info">
-                        <div class="info-text">{{fullName}}</div>
+                        <div class="info-text">{{ fullName }}</div>
                     </div>
                 </div>
                 <div class="menu">
@@ -97,7 +86,6 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/breakpoints';
-@use '@/assets/styles/themes';
 @use '@/assets/styles/helpers';
 
 header {
@@ -116,14 +104,7 @@ header {
     }
 
     transition: border-color .2s;
-
-    @include themes.dark {
-        background-color: var(--color-background-soft);
-    }
-
-    @include themes.light {
-        background-color: var(--color-background-mute);
-    }
+    background-color: var(--color-background-soft);
 
     .text {
         font-size: x-large;

@@ -1,12 +1,14 @@
 <template>
     <div class="upload-song-container">
-        <FormField :borderRadius="borderRadius" label="Название" v-model="data.name" off-margin>
+        <FormField @empty="nameIsValid = $event" :borderRadius="borderRadius" label="Название" v-model="data.name"
+            off-margin notEmpty>
             <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
         </FormField>
         <div class="block">
             <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
-            <div class="fields-container">
-                <FormField v-model="data.album" :borderRadius="borderRadius" label="Альбом" v-if="isSingle" off-margin>
+            <div class="fields-container" :id="`fields-${id}`">
+                <FormField @empty="albumIsValid = $event" v-model="data.album" :borderRadius="borderRadius"
+                    label="Альбом" off-margin notEmpty v-if="isSingle">
                     <span :class="['count', { wrong: upToAlbumLimit < 0 }]" v-if="albumLenght">{{ upToAlbumLimit
                     }}</span>
                     <template v-slot:side>
@@ -15,11 +17,17 @@
                         </div>
                     </template>
                 </FormField>
-                <FormField :borderRadius="borderRadius" label="Создан совместно с" v-model="data.feat" off-margin>
+                <FormField @empty="featIsValid = $event" :borderRadius="borderRadius" label="Создан совместно с"
+                    v-model="data.feat" off-margin notEmpty>
                     <span :class="['count', { wrong: upToFeatLimit < 0 }]" v-if="featLenght">{{ upToFeatLimit }}</span>
                 </FormField>
             </div>
         </div>
+        <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
+            <div :class="['music-selector', { setMinHeight: isSingle }]">
+                <div class="text">выбрать файл</div>
+            </div>
+        </Teleport>
     </div>
 </template>
 <script>
@@ -33,6 +41,7 @@ library.add(faPaperclip);
 export default {
     props: {
         isSingle: Boolean,
+        id: Number,
     },
     setup() {
         const {
@@ -46,6 +55,9 @@ export default {
             VITE_MAX_ALBUM_NAME_LENGTH,
         }
     },
+    mounted() {
+        this.mounted = true;
+    },
     data() {
         return {
             data: {
@@ -54,7 +66,12 @@ export default {
                 feat: '',
                 album: '',
                 file: null,
+                isValid: false,
             },
+            mounted: false,
+            nameIsValid: false,
+            featIsValid: false,
+            albumIsValid: false,
             borderRadius: 5,
             nameLimit: this.VITE_MAX_TRACK_NAME_LENGTH,
             albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
@@ -71,11 +88,14 @@ export default {
             },
             deep: true,
         },
-        'data.name'(newVal, OldVal) {
+        'data.name'() {
             if (this.followingName) {
                 this.setting_following_album_name = true;
                 this.setFollowingAlbumName();
             }
+        },
+        trackIsValid(value) {
+            this.data.isValid = value;
         }
     },
     methods: {
@@ -84,14 +104,15 @@ export default {
         },
         setFollowingAlbumName() {
             this.setting_following_album_name = true;
-            this.data.album = this.data.name + ' - сингл';
+            let name = this.data.name;
+            this.data.album = name ? name + ' - сингл' : '';
         },
         clickFollowingButton() {
             this.followingName = !this.followingName;
             if (this.followingName && this.name) {
                 this.setFollowingAlbumName();
             }
-        }
+        },
     },
     computed: {
         nameLenght() {
@@ -111,6 +132,13 @@ export default {
         },
         upToAlbumLimit() {
             return this.albumLimit - this.albumLenght
+        },
+        trackIsValid() {
+            var result = this.nameIsValid && this.featIsValid;
+            if (this.isSingle) {
+                result = result && this.albumIsValid;
+            }
+            return result;
         }
     }
 }
@@ -130,7 +158,7 @@ export default {
 
     .block {
         display: grid;
-        grid-template-columns: 150px 1fr;
+        grid-template-columns: 140px 1fr;
         gap: 10px;
 
         @include breakpoints.rwd(450, true) {
@@ -159,6 +187,18 @@ export default {
                     height: 18px;
                 }
             }
+        }
+    }
+
+    .music-selector {
+        padding: 10px;
+        border: 2px dashed var(--color-text);
+        border-radius: 10px;
+        height: 100%;
+        @include helpers.flex-center;
+
+        &.setMinHeight {
+            min-height: 80px;
         }
     }
 }

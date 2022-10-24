@@ -230,7 +230,6 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
-@use '@/assets/styles/themes';
 @use '@/assets/styles/breakpoints';
 
 #app:has(.login-form) {
@@ -279,25 +278,12 @@ export default {
             border: 1px solid transparent;
 
             &:not(.active):hover {
-                @include themes.light {
-                    border-color: var(--color-background-mute-4);
-                }
-
-                @include themes.dark {
-                    background-color: var(--color-background-mute-3);
-                }
+                background-color: var(--color-background-mute-3);
             }
 
             &.active {
                 cursor: auto;
-
-                @include themes.light {
-                    background-color: var(--color-background-mute-3);
-                }
-
-                @include themes.dark {
-                    background-color: var(--color-background-mute-4);
-                }
+                background-color: var(--color-background-mute-4);
             }
         }
     }
@@ -335,10 +321,6 @@ export default {
 
                     &.wrong {
                         border-color: var(--red-0);
-
-                        @include themes.light {
-                            border-color: red;
-                        }
                     }
                 }
 
@@ -351,7 +333,7 @@ export default {
                     padding: 5px;
                     border-radius: 6px;
                     position: absolute;
-                    
+
                     z-index: 1;
                     display: flex;
                     flex-direction: column;

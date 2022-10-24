@@ -1,5 +1,5 @@
 <template>
-    <div :class="['select-image', {empty: !picture}]">
+    <div :class="['select-image', { empty: !picture }]">
         <FontAwesomeIcon icon="fa-image" v-if="!picture" />
         <img :src="picture" v-else>
         <div class="edit-area">
@@ -51,7 +51,7 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
-@use '@/assets/styles/themes';
+
 
 .select-image {
     aspect-ratio: 1;
@@ -71,13 +71,7 @@ export default {
         overflow: hidden;
         border: 2px dashed transparent;
 
-        @include themes.dark {
-            border-color: var(--main-card-border);
-        }
-
-        @include themes.light {
-            border-color: var(--color-text);
-        }
+        border-color: var(--color-text);
 
 
         svg {

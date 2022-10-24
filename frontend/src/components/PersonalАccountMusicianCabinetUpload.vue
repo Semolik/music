@@ -1,19 +1,24 @@
 <template>
     <div class="buttons">
-        <div :class="['button', {active: activeSelection==='single'}]" @click="activeSelection='single'">
+        <div :class="['button', { active: activeSelection === 'single' }]" @click="activeSelection = 'single'">
             <div class="text">Сингл</div>
         </div>
-        <div :class="['button', {active: activeSelection==='album'}]" @click="activeSelection='album'">
+        <div :class="['button', { active: activeSelection === 'album' }]" @click="activeSelection = 'album'">
             <div class="text">Альбом</div>
         </div>
     </div>
     <div class="songs">
-        <FormField :borderRadius="10" label="Название альбома" v-if="!singleMode" off-margin/>
-        <UploadSong :track="track" @update="trackUpdate($event,index)" :is-single="singleMode"
-            v-for="(track, index) in tracks" />
-        <div class="add-buttons-container" v-if="!singleMode">
-            <div class="add-button" @click="addTrack">
+        <FormField :borderRadius="10" label="Название альбома" v-if="!singleMode" off-margin notEmpty/>
+        <UploadSong :track="track" @update="trackUpdate($event, index)" is-single v-if="singleMode" />
+        <template v-else>
+            <UploadSong :id="index" :track="track" @update="trackUpdate($event, index)" v-for="(track, index) in tracks" />
+        </template>
+        <div class="buttons-container">
+            <div class="button-block" @click="addTrack" v-if="!singleMode">
                 <FontAwesomeIcon icon="fa-plus" />
+            </div>
+            <div :class="['button-block', { active: buttonActive }]" @click="save">
+                <FontAwesomeIcon icon="fa-floppy-disk" />
             </div>
         </div>
     </div>
@@ -21,37 +26,68 @@
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { computed } from '@vue/reactivity';
 import UploadSong from '../components/PersonalАccountMusicianCabinetUploadSong.vue'
 import FormField from './FormField.vue';
 
-library.add(faPlus);
+library.add(faPlus, faFloppyDisk);
 export default {
     data() {
         return {
             activeSelection: "single",
             tracks: [{}],
+            track: {},
+            runValidation: false,
         };
+    },
+    provide() {
+        return {
+            runValidation: computed(() => this.runValidation)
+        }
     },
     watch: {
         singleMode(value) {
-            if (value && this.tracks.length > 1) {
-                this.tracks = [this.tracks[0]];
-            }
-        }
+            this.tracks = [{}];
+            this.track = {};
+        },
+
     },
     methods: {
+        toggleRunValidation() {
+            this.runValidation = false;
+            this.runValidation = true;
+            setTimeout(() => {
+                this.runValidation = false;
+            }, 300)
+        },
         trackUpdate(event, index) {
-            console.log(event, index)
+            if (this.singleMode) {
+                this.track = event;
+            } else {
+                this.tracks[index] = event;
+            }
         },
         addTrack() {
             this.tracks.push(this.trackTemplate);
+        },
+        save() {
+            this.toggleRunValidation();
         }
     },
     components: { FormField, UploadSong, FontAwesomeIcon },
     computed: {
         singleMode() {
             return this.activeSelection === 'single'
+        },
+        buttonActive() {
+            if (this.singleMode) {
+                return this.track.isValid
+            }
+            else {
+                return this.tracks.filter(el => el?.isValid).length == this.tracks.length
+            }
         }
     }
 }
@@ -77,15 +113,25 @@ export default {
     flex-direction: column;
     gap: 10px;
 
-    .add-buttons-container {
+    .buttons-container {
         display: flex;
         justify-content: right;
+        gap: 5px;
 
-        .add-button {
+        .button-block {
             @include components.button;
             @include helpers.flex-center;
             height: 45px;
             width: 45px;
+
+            &.active {
+                background-color: var(--purple-1);
+            }
+
+            svg {
+                width: 20px;
+                height: 20px;
+            }
         }
     }
 }
