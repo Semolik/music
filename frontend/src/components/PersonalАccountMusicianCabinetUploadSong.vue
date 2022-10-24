@@ -26,6 +26,7 @@
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
             <div :class="['music-selector', { setMinHeight: isSingle }]">
                 <div class="text">выбрать файл</div>
+                <input type="file" name="track-file">
             </div>
         </Teleport>
     </div>
@@ -196,9 +197,19 @@ export default {
         border-radius: 10px;
         height: 100%;
         @include helpers.flex-center;
+        position: relative;
+        &:hover {
+            background-color: var(--color-background-mute);
+        }
 
         &.setMinHeight {
             min-height: 80px;
+        }
+
+        input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
         }
     }
 }
