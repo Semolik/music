@@ -1,21 +1,22 @@
 <template>
     <div class="upload-song-container">
         <FormField :borderRadius="borderRadius" label="Название" v-model="data.name" off-margin>
-            <span :class="['count',{wrong: upToNameLimit < 0}]" v-if="nameLenght">{{upToNameLimit}}</span>
+            <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
         </FormField>
         <div class="block">
             <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
             <div class="fields-container">
                 <FormField v-model="data.album" :borderRadius="borderRadius" label="Альбом" v-if="isSingle" off-margin>
-                    <span :class="['count',{wrong: upToAlbumLimit < 0}]" v-if="albumLenght">{{upToAlbumLimit}}</span>
+                    <span :class="['count', { wrong: upToAlbumLimit < 0 }]" v-if="albumLenght">{{ upToAlbumLimit
+                    }}</span>
                     <template v-slot:side>
-                        <div :class="['button',{active: followingName}]" @click="clickFollowingButton">
+                        <div :class="['button', { active: followingName }]" @click="clickFollowingButton">
                             <FontAwesomeIcon icon='fa-paperclip' />
                         </div>
                     </template>
                 </FormField>
                 <FormField :borderRadius="borderRadius" label="Создан совместно с" v-model="data.feat" off-margin>
-                    <span :class="['count',{wrong: upToFeatLimit < 0}]" v-if="featLenght">{{upToFeatLimit}}</span>
+                    <span :class="['count', { wrong: upToFeatLimit < 0 }]" v-if="featLenght">{{ upToFeatLimit }}</span>
                 </FormField>
             </div>
         </div>
@@ -33,6 +34,18 @@ export default {
     props: {
         isSingle: Boolean,
     },
+    setup() {
+        const {
+            VITE_MAX_TRACK_NAME_LENGTH,
+            VITE_MAX_TRACK_FEAT_LENGTH,
+            VITE_MAX_ALBUM_NAME_LENGTH,
+        } = import.meta.env;
+        return {
+            VITE_MAX_TRACK_NAME_LENGTH,
+            VITE_MAX_TRACK_FEAT_LENGTH,
+            VITE_MAX_ALBUM_NAME_LENGTH,
+        }
+    },
     data() {
         return {
             data: {
@@ -43,9 +56,9 @@ export default {
                 file: null,
             },
             borderRadius: 5,
-            nameLimit: 30,
-            albumLimit: 45,
-            featLimit: 50,
+            nameLimit: this.VITE_MAX_TRACK_NAME_LENGTH,
+            albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
+            featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
             setting_following_album_name: false,
         };
@@ -120,7 +133,7 @@ export default {
         grid-template-columns: 150px 1fr;
         gap: 10px;
 
-        @include breakpoints.rwd(450,true) {
+        @include breakpoints.rwd(450, true) {
             grid-template-columns: 1fr;
         }
 

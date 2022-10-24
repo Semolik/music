@@ -2,31 +2,31 @@
     <FormContainer :formWidth="350" class="login-form">
         <div class="message" v-if="message">
             <FontAwesomeIcon icon="fa-triangle-exclamation" />
-            <div class="text">{{message}}</div>
+            <div class="text">{{ message }}</div>
         </div>
         <div class="selector">
-            <div :class="['item', {active: loginActive}]" @click="loginActive = true">Вход</div>
-            <div :class="['item', {active: !loginActive}]" @click="loginActive = false">Регистрация</div>
+            <div :class="['item', { active: loginActive }]" @click="loginActive = true">Вход</div>
+            <div :class="['item', { active: !loginActive }]" @click="loginActive = false">Регистрация</div>
         </div>
         <div class="fields-area">
             <template v-if="!loginActive">
                 <div class="field">
                     <div class="label">Имя</div>
                     <div class="input-container">
-                        <input type="text" v-model="name" :class="[{wrong: nameMessage.length !==0}]"
+                        <input type="text" v-model="name" :class="[{ wrong: nameMessage.length !== 0 }]"
                             @blur="nameFocus = false" @focus="nameFocus = true">
-                        <span :class="['tooltiptext', {active: name}, {show: nameFocus}]">
-                            <div class="item" v-for="message in nameMessage">{{message}}</div>
+                        <span :class="['tooltiptext', { active: name }, { show: nameFocus }]">
+                            <div class="item" v-for="message in nameMessage">{{ message }}</div>
                         </span>
                     </div>
                 </div>
                 <div class="field">
                     <div class="label">Фамилия</div>
                     <div class="input-container">
-                        <input type="text" v-model="lastName" :class="[{wrong: lastNameMessage.length !==0}]"
+                        <input type="text" v-model="lastName" :class="[{ wrong: lastNameMessage.length !== 0 }]"
                             @blur="lastNameFocus = false" @focus="lastNameFocus = true">
-                        <span :class="['tooltiptext', {active: lastName}, {show: lastNameFocus}]">
-                            <div class="item" v-for="message in lastNameMessage">{{message}}</div>
+                        <span :class="['tooltiptext', { active: lastName }, { show: lastNameFocus }]">
+                            <div class="item" v-for="message in lastNameMessage">{{ message }}</div>
                         </span>
                     </div>
                 </div>
@@ -34,25 +34,25 @@
             <div class="field">
                 <div class="label">Логин</div>
                 <div class="input-container">
-                    <input type="text" :class="[{wrong: loginMessage.length !==0}]" v-model="login"
+                    <input type="text" :class="[{ wrong: loginMessage.length !== 0 }]" v-model="login"
                         @blur="loginFocus = false" @focus="loginFocus = true">
-                    <span :class="['tooltiptext', {active: login}, {show: loginFocus}]">
-                        <div class="item" v-for="message in loginMessage">{{message}}</div>
+                    <span :class="['tooltiptext', { active: login }, { show: loginFocus }]">
+                        <div class="item" v-for="message in loginMessage">{{ message }}</div>
                     </span>
                 </div>
             </div>
             <div class="field">
                 <div class="label">Пароль</div>
                 <div class="input-container">
-                    <input type="password" :class="[{wrong: passwordMessage.length !==0}]" v-model="password"
+                    <input type="password" :class="[{ wrong: passwordMessage.length !== 0 }]" v-model="password"
                         @blur="passwordFocus = false" @focus="passwordFocus = true">
-                    <span :class="['tooltiptext', {active: password}, {show: passwordFocus}]">
-                        <div class="item" v-for="message in passwordMessage">{{message}}</div>
+                    <span :class="['tooltiptext', { active: password }, { show: passwordFocus }]">
+                        <div class="item" v-for="message in passwordMessage">{{ message }}</div>
                     </span>
                 </div>
             </div>
         </div>
-        <div :class="['button', {active: isButtonActive}]" @click="buttonHandler">
+        <div :class="['button', { active: isButtonActive }]" @click="buttonHandler">
             <span v-if="loginActive">Войти</span>
             <span v-else>Зарегистрироваться</span>
         </div>
@@ -71,7 +71,13 @@ export default {
     setup() {
         const { logined, loading, message } = storeToRefs(useAuthStore());
         const { loginRequest, registerRequest, clearMessage } = useAuthStore();
-        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MIN_PASSWORD_LENGTH, VITE_MAX_LASTNAME_LENGTH} = import.meta.env;
+        const {
+            VITE_MAX_FIRSTNAME_LENGTH,
+            VITE_MIN_PASSWORD_LENGTH,
+            VITE_MAX_LASTNAME_LENGTH,
+            VITE_MIN_LOGIN_LENGTH,
+            VITE_MAX_LOGIN_LENGTH
+        } = import.meta.env;
         return {
             loginRequest,
             registerRequest,
@@ -81,7 +87,9 @@ export default {
             clearMessage,
             VITE_MAX_FIRSTNAME_LENGTH,
             VITE_MIN_PASSWORD_LENGTH,
-            VITE_MAX_LASTNAME_LENGTH
+            VITE_MAX_LASTNAME_LENGTH,
+            VITE_MAX_LOGIN_LENGTH,
+            VITE_MIN_LOGIN_LENGTH
         }
     },
     components: { FormContainer, FontAwesomeIcon },
@@ -152,11 +160,11 @@ export default {
             if (/[\s]/.test(value)) {
                 messages.push('В логине зарещены пробельные символы');
             }
-            if (value.length < 5) {
-                messages.push('Логин должен быть более 5 символов');
+            if (value.length < this.VITE_MIN_LOGIN_LENGTH) {
+                messages.push(`Логин должен быть более ${this.VITE_MIN_LOGIN_LENGTH} символов`);
             }
-            if (value.length >= 20) {
-                messages.push('Логин должен быть не более 20 символов');
+            if (value.length >= this.VITE_MAX_LOGIN_LENGTH) {
+                messages.push(`Логин должен быть не более ${this.VITE_MAX_LOGIN_LENGTH} символов`);
             }
             this.loginMessage = messages;
             return messages.length === 0
@@ -171,7 +179,7 @@ export default {
             let value = this.password;
             var messageBase = 'Пароль должен содержать ';
             if (!/[A-Z]/.test(value)) {
-                messages.push(messageBase + 'ПРОПИСНЫЕ английские Абуквы');
+                messages.push(messageBase + 'ПРОПИСНЫЕ английские буквы');
             }
             if (!/[a-z]/.test(value)) {
                 messages.push(messageBase + 'строчные английские буквы');
@@ -182,8 +190,8 @@ export default {
             if (!/[#?!@$%^&*-]/.test(value)) {
                 messages.push(messageBase + 'специальные символы (#?!@$%^&*-)');
             }
-            if (this.password.length < 8) {
-                messages.push(messageBase + ' более 8 символов');
+            if (this.password.length < this.VITE_MIN_PASSWORD_LENGTH) {
+                messages.push(`Пароль должен иметь длину от ${this.VITE_MIN_PASSWORD_LENGTH} символов`);
             }
             this.passwordMessage = messages;
             return messages.length === 0
@@ -343,6 +351,7 @@ export default {
                     padding: 5px;
                     border-radius: 6px;
                     position: absolute;
+                    
                     z-index: 1;
                     display: flex;
                     flex-direction: column;
@@ -357,7 +366,7 @@ export default {
                     }
 
                     @include breakpoints.md {
-                        top: -20%;
+                        bottom: 0;
                         left: calc(100% + 5px);
                     }
 
@@ -367,22 +376,22 @@ export default {
                         margin-left: -100px;
                     }
 
-                    &::after {
-                        content: " ";
-                        position: absolute;
-                        top: 50%;
-                        right: 100%;
+                    // &::after {
+                    //     content: " ";
+                    //     position: absolute;
+                    //     top: 50%;
+                    //     right: 100%;
 
-                        @include breakpoints.md(true) {
-                            top: 100%;
-                            left: 50%;
-                        }
+                    //     @include breakpoints.md(true) {
+                    //         top: 100%;
+                    //         left: 50%;
+                    //     }
 
-                        margin-top: -5px;
-                        border-width: 5px;
-                        border-style: solid;
-                        border-color: transparent black transparent transparent;
-                    }
+                    //     margin-top: -5px;
+                    //     border-width: 5px;
+                    //     border-style: solid;
+                    //     border-color: transparent black transparent transparent;
+                    // }
                 }
             }
         }

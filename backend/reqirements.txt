@@ -8,6 +8,8 @@ python-multipart
 werkzeug
 psycopg2
 sqlalchemy-utils
+python-dotenv
+uvicorn
 
 pytest
 requests
