@@ -5,7 +5,7 @@
             <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
         </FormField>
         <div class="block">
-            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
+            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" notEmpty/>
             <div class="fields-container" :id="`fields-${id}`">
                 <FormField @empty="albumIsValid = $event" v-model="data.album" :borderRadius="borderRadius"
                     label="Альбом" off-margin notEmpty v-if="isSingle">
@@ -18,7 +18,7 @@
                     </template>
                 </FormField>
                 <FormField @empty="featIsValid = $event" :borderRadius="borderRadius" label="Создан совместно с"
-                    v-model="data.feat" off-margin notEmpty>
+                    v-model="data.feat" off-margin>
                     <span :class="['count', { wrong: upToFeatLimit < 0 }]" v-if="featLenght">{{ upToFeatLimit }}</span>
                 </FormField>
             </div>

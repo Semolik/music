@@ -39,12 +39,15 @@ export default {
     methods: {
         previewFiles(event) {
             let file = event.target.files;
-            if (!(file && file[0])) return;
+            if (!(file && file[0])) {
+                this.detelePicture();
+                return;
+            }
             var fileName = file[0].name;
             var idxDot = fileName.lastIndexOf(".") + 1;
             var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
-            let extentions = this.acceptedFormats.split(',').map(el=> el.replace('.', ''));
-            if (!extentions.includes(extFile)){
+            let extentions = this.acceptedFormats.split(', ').map(el => el.replace('.', ''));
+            if (!extentions.includes(extFile)) {
                 this.toast(`Поддерживаемые форматы ${this.acceptedFormats}`);
                 this.toast.error('Формат изображения не поддерживанется');
                 this.detelePicture()
