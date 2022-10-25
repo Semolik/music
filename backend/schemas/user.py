@@ -73,3 +73,16 @@ class ChangeRoleRequestInfo(BaseModel):
 class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
     id: int
     user: UserInfo
+
+
+class PublicProfileLinks(BaseModel):
+    youtube: str | None = None
+    telegram: str | None = None
+    vk: str | None = None
+
+
+class PublicProfile(BaseModel):
+    id: int
+    name: str
+    description: str
+    links: PublicProfileLinks

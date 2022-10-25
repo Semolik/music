@@ -1,7 +1,8 @@
 <template>
     <div class="lk-container">
         <aside>
-            <router-link class="item" to="/lk">Профиль</router-link>
+            <router-link class="item" to="/lk">{{ lkButtonText }}</router-link>
+            <router-link class="item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
             <router-link class="item" to="/lk/music">Моя музыка</router-link>
             <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
             <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
@@ -17,9 +18,20 @@ import { storeToRefs } from 'pinia';
 import { useAuthStore } from '../stores/auth';
 export default {
     setup() {
-        const { isAdmin, isMusician } = storeToRefs(useAuthStore());
+        const { isAdmin, isMusician, isUser, isRadioStation } = storeToRefs(useAuthStore());
         return {
-            isAdmin, isMusician
+            isAdmin, isMusician, isUser, isRadioStation
+        }
+    },
+    computed: {
+        lkButtonText() {
+            if (this.isCustomProfileActive) {
+                return 'Личный профиль'
+            }
+            return 'Профиль'
+        },
+        isCustomProfileActive() {
+            return this.isMusician || this.isRadioStation
         }
     }
 }

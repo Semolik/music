@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
-import { useRoute } from 'vue-router';
+import router from './router'
+
 const HTTP = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true
@@ -26,7 +27,7 @@ HTTP.interceptors.response.use(
         });
       })
       .catch((error_2) => {
-        // window.location.href = '/login';
+        router.push('/login')
         return Promise.reject(error_2);
       });
   });

@@ -131,6 +131,12 @@ class UserCruds:
             raise Exception('Пользователь не найден')
         return db_user.is_superuser
 
+    def is_musician(self, user_id):
+        db_user = self.get_user_by_id(user_id=user_id)
+        if not db_user:
+            raise Exception('Пользователь не найден')
+        return db_user.is_musician
+
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
 
