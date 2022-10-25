@@ -25,8 +25,8 @@
         </div>
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
             <div :class="['music-selector', { setMinHeight: isSingle }]">
-                <div class="text">выбрать файл</div>
-                <input type="file" name="track-file">
+                <div class="text">выбрать аудиофайл</div>
+                <input type="file" accept="audio/*" name="track-file">
             </div>
         </Teleport>
     </div>
@@ -37,6 +37,7 @@ import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import SelectImage from './SelectImage.vue';
 import FormField from './FormField.vue';
+import { useToast } from "vue-toastification";
 library.add(faPaperclip);
 
 export default {
@@ -45,6 +46,7 @@ export default {
         id: Number,
     },
     setup() {
+        const toast = useToast();
         const {
             VITE_MAX_TRACK_NAME_LENGTH,
             VITE_MAX_TRACK_FEAT_LENGTH,
@@ -54,6 +56,7 @@ export default {
             VITE_MAX_TRACK_NAME_LENGTH,
             VITE_MAX_TRACK_FEAT_LENGTH,
             VITE_MAX_ALBUM_NAME_LENGTH,
+            
         }
     },
     mounted() {
@@ -79,6 +82,7 @@ export default {
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
             setting_following_album_name: false,
+            
         };
     },
     components: { SelectImage, FormField, FontAwesomeIcon },

@@ -1,19 +1,19 @@
 <template>
     <div class="request">
-        <div :class="['line', {adminMode: adminMode}]">
-            <div class="date">{{request.time_created}}</div>
+        <div :class="['line', { adminMode: adminMode }]">
+            <div class="date">{{ request.time_created }}</div>
             <div class="block status custom" v-if="custom_status">
                 <span class="txt">принудительная установка статуса </span>
-                <span class="role custom">{{customStatusText}}</span>
+                <span class="role custom">{{ customStatusText }}</span>
             </div>
             <div class="block status" v-else>
                 <span class="txt">запрошенный статус </span>
-                <span class="role">{{status}}</span>
+                <span class="role">{{ status }}</span>
             </div>
             <div :class="['status', result_request_status]" v-if="!hideStatus || showStatus"></div>
             <template v-if="adminMode">
                 <div class="block full-name" v-if="fullName" @click="modalOpened = true">
-                    {{fullName}}
+                    {{ fullName }}
                 </div>
                 <div class="user-modal-container" v-if="modalOpened">
                     <div class="user-modal-wrapper" @click.self="modalOpened = false">
@@ -21,19 +21,19 @@
                             <img :src="request.user.picture" alt="" v-if="request.user.picture">
                             <div class="blocks">
                                 <div class="block">
-                                    id: {{request.user.id}}
+                                    id: {{ request.user.id }}
                                 </div>
                                 <div class="block" v-if="firstName">
-                                    имя: {{firstName}}
+                                    имя: {{ firstName }}
                                 </div>
                                 <div class="block" v-if="lastName">
-                                    фамилия: {{lastName}}
+                                    фамилия: {{ lastName }}
                                 </div>
                                 <div class="block">
-                                    юзернейм: {{request.user.username}}
+                                    юзернейм: {{ request.user.username }}
                                 </div>
                                 <div class="block" v-if="accountStatus">
-                                    статус: {{accountStatus}}
+                                    статус: {{ accountStatus }}
                                 </div>
                             </div>
                             <div class="button" @click="modalOpened = false">закрыть</div>
@@ -42,10 +42,10 @@
                 </div>
             </template>
         </div>
-        <div class="message">{{request.message}}</div>
+        <div class="message">{{ request.message }}</div>
         <div class="answer-message" v-if="answerMessageTextResult">
             <div class="text">
-                {{answerMessageTextResult}}
+                {{ answerMessageTextResult }}
             </div>
         </div>
         <div class="files" v-if="!isFilesEmpty">
@@ -61,23 +61,23 @@
             <textarea name="message" v-model="answerMessageText" id="" cols="30" rows="10"></textarea>
             <div class="buttons">
                 <div class="custom-status">
-                    <div :class="['button', {red: custom_status===Role.User}]" @click="setCustomStatus(Role.User)">
+                    <div :class="['button', { red: custom_status === Role.User }]" @click="setCustomStatus(Role.User)">
                         пользватель
                     </div>
-                    <div :class="['button', {red: custom_status===Role.Musician}]"
+                    <div :class="['button', { red: custom_status === Role.Musician }]"
                         @click="setCustomStatus(Role.Musician)">
                         музыкант
                     </div>
-                    <div :class="['button', {red: custom_status===Role.RadioStation}]"
+                    <div :class="['button', { red: custom_status === Role.RadioStation }]"
                         @click="setCustomStatus(Role.RadioStation)">
                         радиостанция
                     </div>
                 </div>
-                <div :class="['button', {green: request_status==='successfully'}]"
+                <div :class="['button', { green: request_status === 'successfully' }]"
                     @click="request_status = 'successfully'">
                     одобрить
                 </div>
-                <div :class="['button', {red: request_status === 'rejected'}]" @click="request_status = 'rejected'">
+                <div :class="['button', { red: request_status === 'rejected' }]" @click="request_status = 'rejected'">
                     отклонить
                 </div>
                 <div class="button" @click="sendAnswer">
@@ -228,7 +228,7 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/breakpoints';
 @use '@/assets/styles/helpers';
-@use '@/assets/styles/themes';
+
 
 .request {
     background-color: var(--color-background-mute-3);
@@ -339,10 +339,6 @@ export default {
                     flex-direction: column;
                     border-radius: 20px;
                     gap: 5px;
-
-                    @include themes.light {
-                        box-shadow: var(--main-card-shadow);
-                    }
 
                     img {
                         object-fit: cover;

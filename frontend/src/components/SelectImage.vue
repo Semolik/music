@@ -6,7 +6,7 @@
             <div class="edit-area-container">
                 <FontAwesomeIcon icon="fa-image" v-if="picture" />
                 <div class="edit-area-text">выбрать файл</div>
-                <input type="file" :name="name" ref="fileupload" accept="image/*" @change="previewFiles">
+                <input type="file" :name="name" ref="fileupload" :accept="acceptedFormats" @change="previewFiles">
             </div>
         </div>
     </div>
@@ -16,7 +16,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faImage);
+import { useToast } from "vue-toastification";
 export default {
+    setup() {
+        const toast = useToast();
+        return {
+            toast
+        }
+    },
     props: {
         pictureUrl: String,
         name: String,
@@ -26,14 +33,22 @@ export default {
     data() {
         return {
             picture: this.pictureUrl,
+            acceptedFormats: '.jpg, .jpeg, .png'
         }
     },
     methods: {
         previewFiles(event) {
             let file = event.target.files;
             if (!(file && file[0])) return;
-            if (this.remove_picture) {
-                this.remove_picture = false;
+            var fileName = file[0].name;
+            var idxDot = fileName.lastIndexOf(".") + 1;
+            var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+            let extentions = this.acceptedFormats.split(',').map(el=> el.replace('.', ''));
+            if (!extentions.includes(extFile)){
+                this.toast(`Поддерживаемые форматы ${this.acceptedFormats}`);
+                this.toast.error('Формат изображения не поддерживанется');
+                this.detelePicture()
+                return
             }
             let reader = new FileReader;
             reader.onload = e => {
