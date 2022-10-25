@@ -1,6 +1,6 @@
 <script>
 import axios from "axios";
-
+import { useRoute } from 'vue-router';
 const HTTP = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true
@@ -26,7 +26,7 @@ HTTP.interceptors.response.use(
         });
       })
       .catch((error_2) => {
-        console.log('Выход из аккаунта')
+        // window.location.href = '/login';
         return Promise.reject(error_2);
       });
   });

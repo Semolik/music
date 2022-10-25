@@ -5,7 +5,8 @@
             <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
         </FormField>
         <div class="block">
-            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" notEmpty/>
+            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic"
+                notEmpty />
             <div class="fields-container" :id="`fields-${id}`">
                 <FormField @empty="albumIsValid = $event" v-model="data.album" :borderRadius="borderRadius"
                     label="Альбом" off-margin notEmpty v-if="isSingle">
@@ -24,9 +25,9 @@
             </div>
         </div>
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
-            <div :class="['music-selector', { setMinHeight: isSingle }]">
-                <div class="text">выбрать аудиофайл</div>
-                <input type="file" accept="audio/*" name="track-file">
+            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }]">
+                <div class="text">{{ fileName || 'выбрать аудиофайл' }}</div>
+                <input type="file" @change="validFile" :ref="refAudioName" :accept="acceptedFormats">
             </div>
         </Teleport>
     </div>
@@ -56,7 +57,7 @@ export default {
             VITE_MAX_TRACK_NAME_LENGTH,
             VITE_MAX_TRACK_FEAT_LENGTH,
             VITE_MAX_ALBUM_NAME_LENGTH,
-            
+            toast
         }
     },
     mounted() {
@@ -71,7 +72,11 @@ export default {
                 album: '',
                 file: null,
                 isValid: false,
+                audioFileTarget: null,
+                pictureTarget: null,
             },
+            refAudioName: `audio-${this.id}`,
+            fileName: null,
             mounted: false,
             nameIsValid: false,
             featIsValid: false,
@@ -82,7 +87,7 @@ export default {
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
             setting_following_album_name: false,
-            
+            acceptedFormats: '.mp3, .ogg'
         };
     },
     components: { SelectImage, FormField, FontAwesomeIcon },
@@ -105,7 +110,7 @@ export default {
     },
     methods: {
         pictureUpdated(file) {
-            this.data.file = file;
+            this.data.pictureTarget = file;
         },
         setFollowingAlbumName() {
             this.setting_following_album_name = true;
@@ -118,6 +123,30 @@ export default {
                 this.setFollowingAlbumName();
             }
         },
+        resetInputAudio() {
+            this.$refs[this.refAudioName].value = null;
+            this.fileName = null;
+            this.audioFileTarget = null;
+        },
+        validFile(event) {
+            let file = event.target.files;
+            if (!(file && file[0])) {
+                this.resetInputAudio();
+                return;
+            }
+            var fileName = file[0].name;
+            var idxDot = fileName.lastIndexOf(".") + 1;
+            var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+            let extentions = this.acceptedFormats.split(', ').map(el => el.replace('.', ''));
+            if (!extentions.includes(extFile)) {
+                this.toast(`Поддерживаемые форматы ${this.acceptedFormats}`);
+                this.toast.error('Данный формат аудио не поддерживанется');
+                this.resetInputAudio();
+                return
+            }
+            this.fileName = fileName;
+            this.audioFileTarget = file[0];
+        }
     },
     computed: {
         nameLenght() {
@@ -202,6 +231,11 @@ export default {
         height: 100%;
         @include helpers.flex-center;
         position: relative;
+
+        &.active {
+            border-color: var(--green);
+        }
+
         &:hover {
             background-color: var(--color-background-mute);
         }
@@ -211,6 +245,7 @@ export default {
         }
 
         input {
+            cursor: pointer;
             position: absolute;
             inset: 0;
             opacity: 0;
