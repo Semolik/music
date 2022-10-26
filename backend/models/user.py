@@ -60,6 +60,7 @@ class PublicProfileLinks(Base):
     vk = Column(
         String(int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
     )
+    picture = relationship("File", uselist=False, overlaps="files")
 
 
 class File(Base):

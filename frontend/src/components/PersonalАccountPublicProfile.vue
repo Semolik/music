@@ -6,26 +6,11 @@
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
             <div class="user-info">
-                <div class="fields">
-                    <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя"
-                        v-model="firstName">
-                        <span :class="['count', { wrong: firstNameLenght < 0 }]">{{ firstNameLenght }}</span>
-                    </FormField>
-                    <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия"
-                        v-model="lastName">
-                        <span :class="['count', { wrong: lastNameLenght < 0 }]">{{ lastNameLenght }}</span>
-                    </FormField>
-                </div>
-                <div class="user-information" v-if="userData">
-                    <div class="block">username: {{ userData.username }}</div>
-                    <div class="block custom">тип аккаунта:
-                        <div class="statuses">
-                            <span :class="{ active: userRole === Role.Musician }">музыкант</span>
-                            <span :class="{ active: userRole === Role.User }">пользователь</span>
-                            <span :class="{ active: userRole === Role.RadioStation }">радиостанция</span>
-                        </div>
-                    </div>
-                </div>
+                <FormField :borderRadius="10" name="name" label="Отображаемое имя" placeholder="Ваше имя" v-model="name"
+                    offMargin>
+                    <span :class="['count', { wrong: nameLenght < 0 }]">{{ nameLenght }}</span>
+                </FormField>
+                <FormTextArea :borderRadius="10" :placeholder="placeholder" v-model="description" :rows="6" />
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
                     <div class="buttons">
                         <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
@@ -50,6 +35,7 @@ import FormField from './FormField.vue';
 import AnimateInteger from './AnimateInteger.vue';
 import { Role } from '../helpers/roles.js';
 import SelectImage from './SelectImage.vue';
+import FormTextArea from './FormTextArea.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
@@ -58,7 +44,7 @@ export default {
         const { userData, userRole } = storeToRefs(useAuthStore());
         const { setUserData, logout } = useAuthStore();
         const toast = useToast();
-        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } = import.meta.env;
+        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH } = import.meta.env;
         return {
             userData,
             toast,
@@ -66,14 +52,13 @@ export default {
             logout,
             Role,
             userRole,
-            VITE_MAX_FIRSTNAME_LENGTH,
-            VITE_MAX_LASTNAME_LENGTH,
+            VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH
         }
     },
     data() {
         return {
-            firstName: this.userData?.first_name,
-            lastName: this.userData?.last_name,
+            name: this.userData?.name,
+            description: this.userData?.description,
             mounted: false,
             remove_picture: false,
             original_image: null,
@@ -89,7 +74,8 @@ export default {
         FontAwesomeIcon,
         FormField,
         AnimateInteger,
-        SelectImage
+        SelectImage,
+        FormTextArea
     },
     watch: {
         userData(value) {
@@ -142,23 +128,20 @@ export default {
         dataChanged() {
             if (!this.userData) return
             if (this.fieldsWrong) return
-            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.file_changed
+            return this.userData.name !== this.name || this.userData.description !== this.description || this.file_changed
         },
         fieldsWrong() {
-            return this.lastNameLenght < 0 || this.firstNameLenght < 0
+            return this.nameLenght < 0
         },
-        lastNameLenght() {
-            if (!this.lastName) return
-            return this.VITE_MAX_LASTNAME_LENGTH - this.lastName?.length
-        },
-        firstNameLenght() {
-            if (!this.firstName) return
-            return this.VITE_MAX_FIRSTNAME_LENGTH - this.firstName?.length
+
+        nameLenght() {
+            if (!this.name) return
+            return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - this.name?.length
         },
     }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/breakpoints';
 
@@ -338,7 +321,7 @@ export default {
             border-radius: 5px;
             display: grid;
             grid-template-rows: min-content min-content;
-            gap: 5px;
+            gap: 10px;
             padding-top: 5px;
 
             .fields {
