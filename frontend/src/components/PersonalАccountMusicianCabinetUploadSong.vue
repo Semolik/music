@@ -86,7 +86,6 @@ export default {
             albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
-            setting_following_album_name: false,
             acceptedFormats: '.mp3, .ogg'
         };
     },
@@ -100,7 +99,6 @@ export default {
         },
         'data.name'() {
             if (this.followingName) {
-                this.setting_following_album_name = true;
                 this.setFollowingAlbumName();
             }
         },
@@ -113,7 +111,6 @@ export default {
             this.data.pictureTarget = file;
         },
         setFollowingAlbumName() {
-            this.setting_following_album_name = true;
             let name = this.data.name;
             this.data.album = name ? name + ' - сингл' : '';
         },

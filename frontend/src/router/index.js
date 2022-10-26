@@ -26,6 +26,11 @@ const router = createRouter({
           component: () => import('../components/PersonalАccountProfile.vue'),
         },
         {
+          path: 'public',
+          name: 'Публичный профиль',
+          component: () => import('../components/PersonalАccountPublicProfile.vue'),
+        },
+        {
           path: 'music',
           name: 'Моя музыка',
           component: () => import('../components/PersonalАccountMusic.vue'),

@@ -29,6 +29,39 @@ class User(Base):
     picture = relationship("File", uselist=False, overlaps="files")
 
 
+class PublicProfile(Base):
+    __tablename__ = 'public_profiles'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(
+        String(
+            int(env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH'))
+        ), nullable=False)
+    description = Column(
+        String(
+            int(env_config.get('VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH'))
+        ), nullable=True)
+    links = relationship("PublicProfileLinks",
+                         back_populates="public_profile", uselist=False)
+
+
+class PublicProfileLinks(Base):
+    __tablename__ = 'public_profiles_links'
+
+    id = Column(Integer, primary_key=True, index=True)
+    public_profile_id = Column(Integer, ForeignKey("public_profiles.id"))
+    public_profile = relationship("PublicProfile", back_populates="links")
+    telegram = Column(
+        String(int(env_config.get('VITE_MAX_TELEGRAM_USERNAME_LENGTH')))
+    )
+    youtube = Column(
+        String(int(env_config.get('VITE_MAX_YOUTUBE_ID_LENGTH')))
+    )
+    vk = Column(
+        String(int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
+    )
+
+
 class File(Base):
     __tablename__ = 'files'
 

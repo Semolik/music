@@ -1,4 +1,4 @@
-from models.user import User, File
+from models.user import *
 # from models.file import 
 from core.config import settings
 from db.base import Base
