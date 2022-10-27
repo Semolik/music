@@ -1,6 +1,15 @@
 <template>
-    <textarea :name="name" v-model="modelValue" id="" :placeholder="placeholder" :cols="cols" :rows="rows"
-        :style="{ '--radius': borderRadius+'px' }"></textarea>
+    <div class="formkit-outer" :style="{margin: 0+'px'}" data-family="text" data-type="text" data-v-7f4a9599="">
+        <div class="formkit-wrapper">
+            <label class="formkit-label" v-if="label">{{label}}</label>
+            <div class="formkit-inner-container">
+                <div class="formkit-inner" style="--inner-radius:10px;">
+                    <textarea :name="name" v-model="modelValue" id="" :placeholder="placeholder" :cols="cols"
+                        :rows="rows" :style="{ '--radius': borderRadius + 'px' }"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 export default {
@@ -11,6 +20,7 @@ export default {
         cols: Number,
         borderRadius: Number,
         placeholder: String,
+        label: String,
     },
     emits: ['update:modelValue'],
     methods: {

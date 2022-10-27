@@ -1,6 +1,6 @@
 <template>
     <div class="profile-container">
-        <form class="user-info-container" @submit.prevent="formSubmited" ref="form" id="user-info-container">
+        <form class="user-info-container" @submit.prevent="formSubmited" ref="form">
             <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPicture" ref="selectPic" />
             <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
                 <FontAwesomeIcon icon="fa-trash" />
@@ -10,21 +10,22 @@
                     offMargin>
                     <span :class="['count', { wrong: nameLenght < 0 }]">{{ nameLenght }}</span>
                 </FormField>
-                <FormTextArea :borderRadius="10" :placeholder="placeholder" v-model="description" :rows="6" />
-                <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
-                    <div class="buttons">
-                        <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
-                            <FontAwesomeIcon icon="fa-floppy-disk" />
-                        </div>
-                    </div>
-                </Teleport>
+                <FormTextArea :borderRadius="10" label="Описание профиля" placeholder="Напишите о себе"
+                    v-model="description" :rows="5" />
+            </div>
+            <div class="buttons">
+                <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
+                    <FontAwesomeIcon icon="fa-floppy-disk" />
+                </div>
             </div>
         </form>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
+
+
+import { faUser, faFloppyDisk, faTrash, faImage, } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { storeToRefs } from 'pinia';
 import { HTTP } from '../http-common.vue';
@@ -152,7 +153,7 @@ export default {
     .user-info-container {
         display: grid;
         gap: 10px;
-        grid-template-columns: 200px 1fr;
+        grid-template-columns: 210px 1fr;
 
         @include breakpoints.lg(true) {
             grid-template-columns: 160px 1fr;
@@ -284,11 +285,11 @@ export default {
         }
 
         .buttons {
-            // grid-column: 1 / -1;
             margin-top: auto;
             display: flex;
             gap: 5px;
             justify-content: right;
+            grid-column: 1 / -1;
 
             .button {
                 cursor: auto;

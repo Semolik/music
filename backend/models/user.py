@@ -25,8 +25,9 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
-    files = relationship("File")
-    picture = relationship("File", uselist=False, overlaps="files")
+    picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
+    picture = relationship("File", foreign_keys=[picture_id])
+
 
 
 class PublicProfile(Base):
@@ -60,7 +61,8 @@ class PublicProfileLinks(Base):
     vk = Column(
         String(int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
     )
-    picture = relationship("File", uselist=False, overlaps="files")
+    picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
+    picture = relationship("File", foreign_keys=[picture_id])
 
 
 class File(Base):
@@ -70,8 +72,7 @@ class File(Base):
     file_name = Column(String)
     original_file_name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User", back_populates="files",
-                        foreign_keys=[user_id], overlaps="picture")
+    user = relationship("User", foreign_keys=[user_id])
     type = Column(String, default='file')
 
 
