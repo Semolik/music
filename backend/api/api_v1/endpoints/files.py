@@ -7,7 +7,7 @@ from db.session import SessionLocal
 from crud.crud_file import FileCruds
 from core.config import settings
 
-router = APIRouter(prefix=settings.UPLOADS_ROUTE)
+router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 
 
 @router.get('/images/{fileName}', response_class=FileResponse)

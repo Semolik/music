@@ -3,7 +3,9 @@
         <div class="formkit-wrapper">
             <label class="formkit-label" :for="id" v-if="label">{{ label }}</label>
             <div class="formkit-inner-container">
-                <div :class="['formkit-inner', { error: notValid }]" :style="{ '--inner-radius': borderRadius + 'px' }">
+                <div :class="['formkit-inner', { error: notValid }, { setColor: !offChangeColor }]"
+                    :style="{ '--inner-radius': borderRadius + 'px' }">
+                    <slot name="right"></slot>
                     <input :placeholder="placeholder" class="formkit-input" type="text" :name="name" :id="id"
                         v-model="modelValue">
                     <slot></slot>
@@ -14,6 +16,8 @@
     </div>
 </template>
 <style lang="scss">
+@use '@/assets/styles/helpers';
+
 .formkit-outer {
     &.off-margin {
         margin: 0;
@@ -28,9 +32,18 @@
             gap: 10px;
 
             .formkit-inner {
+                --accent-color: var(--fields-border-color);
                 flex-grow: 1;
                 border-radius: var(--inner-radius);
-                box-shadow: 0 0 0 1px var(--fields-border-color);
+                box-shadow: 0 0 0 1px var(--accent-color);
+                overflow: hidden;
+
+                .icon {
+                    @include helpers.flex-center;
+                    height: 100%;
+                    aspect-ratio: 1;
+                    background-color: var(--accent-color);
+                }
 
                 .count {
                     opacity: 0;
@@ -47,7 +60,12 @@
                         opacity: 1;
                     }
 
-                    box-shadow: 0 0 0 1px var(--purple-1);
+                    &.setColor {
+                        --accent-color: var(--purple-1);
+                    }
+
+                    box-shadow: 0 0 0 1px var(--accent-color);
+
                 }
 
                 &.error {
@@ -73,6 +91,7 @@ export default {
         borderRadius: Number,
         offMargin: Boolean,
         notEmpty: Boolean,
+        offChangeColor: Boolean,
     },
     inject: ['runValidation'],
     data() {

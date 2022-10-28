@@ -11,6 +11,7 @@ engine = create_engine(  # 2
 
 if not database_exists(engine.url):
     create_database(engine.url)
+    Base.metadata.create_all(engine)
 
 # Base.metadata.create_all(engine)
 

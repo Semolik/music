@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from user import PublicProfile
+from schemas.user import PublicProfile
 
 
 class UploadTrack(BaseModel):

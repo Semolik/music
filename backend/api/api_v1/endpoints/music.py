@@ -5,7 +5,7 @@ from helpers.files import save_file
 
 from schemas.error import HTTP_401_UNAUTHORIZED
 from crud.crud_user import user_cruds
-router = APIRouter()
+router = APIRouter(tags=['Треки'])
 
 
 @router.post('/upload_song', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})

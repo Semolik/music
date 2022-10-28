@@ -5,7 +5,7 @@ from helpers.images import set_picture
 from schemas.user import UserInfo, UserModifiableForm
 from schemas.error import HTTP_401_UNAUTHORIZED
 from crud.crud_user import user_cruds
-router = APIRouter()
+router = APIRouter(tags=['Профили пользователей'])
 
 
 @router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
@@ -36,3 +36,13 @@ def get_user_info(Authorize: AuthJWT = Depends()):
     user_data = user.as_dict()
     user_data = set_picture(user_data, user.picture)
     return user_data
+
+
+@router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+def update_user_public_profile_data(Authorize: AuthJWT = Depends()):
+    ...
+
+
+@router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+def get_user_public_profile_info(Authorize: AuthJWT = Depends()):
+    ...

@@ -7,7 +7,7 @@ from schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeR
 from schemas.error import HTTP_401_UNAUTHORIZED
 from models.user import File as FileModel
 from crud.crud_user import UserCruds
-router = APIRouter()
+router = APIRouter(tags=['Роли'])
 user_cruds = UserCruds()
 
 

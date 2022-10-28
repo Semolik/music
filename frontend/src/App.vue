@@ -34,6 +34,7 @@ export default {
       windowWidth: computed(() => this.windowWidth),
       logined: computed(() => this.logined),
       disableLoading: false,
+      runValidation: false,
     }
   },
   mounted() {

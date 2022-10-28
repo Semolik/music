@@ -8,12 +8,46 @@
             <div class="user-info">
                 <FormField :borderRadius="10" name="name" label="Отображаемое имя" placeholder="Ваше имя" v-model="name"
                     offMargin>
-                    <span :class="['count', { wrong: nameLenght < 0 }]">{{ nameLenght }}</span>
+                    <span :class="['count', { wrong: nameLenghtLimit < 0 }]" v-if="nameLenght">{{ nameLenghtLimit
+                    }}</span>
                 </FormField>
                 <FormTextArea :borderRadius="10" label="Описание профиля" placeholder="Напишите о себе"
                     v-model="description" :rows="5" />
             </div>
             <div class="buttons">
+                <FormField placeholder="id канала" v-model="yt" :borderRadius="10" offMargin class="iconed youtube"
+                    offChangeColor>
+                    <template v-slot:right>
+                        <div class="icon">
+                            <FontAwesomeIcon :icon="['fab', 'youtube']" />
+                        </div>
+                    </template>
+                    <span :class="['count', { wrong: ytLenghtLimit < 0 }]" v-if="yt?.length">
+                        {{ ytLenghtLimit }}
+                    </span>
+                </FormField>
+                <FormField :borderRadius="10" v-model="telegram" offMargin placeholder="username"
+                    class="iconed telegram" offChangeColor>
+                    <template v-slot:right>
+                        <div class="icon">
+                            <FontAwesomeIcon :icon="['fab', 'telegram']" />
+                        </div>
+                    </template>
+                    <span :class="['count', { wrong: telegramLenghtLimit < 0 }]" v-if="telegram?.length">
+                        {{ telegramLenghtLimit }}
+                    </span>
+                </FormField>
+                <FormField v-model="vk" :borderRadius="10" offMargin placeholder="username" class="iconed vk"
+                    offChangeColor>
+                    <template v-slot:right>
+                        <div class="icon">
+                            <FontAwesomeIcon :icon="['fab', 'vk']" />
+                        </div>
+                    </template>
+                    <span :class="['count', { wrong: vkLenghtLimit < 0 }]" v-if="vk?.length">
+                        {{ vkLenghtLimit }}
+                    </span>
+                </FormField>
                 <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
                     <FontAwesomeIcon icon="fa-floppy-disk" />
                 </div>
@@ -23,9 +57,8 @@
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-
-
-import { faUser, faFloppyDisk, faTrash, faImage, } from '@fortawesome/free-solid-svg-icons';
+import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
+import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { storeToRefs } from 'pinia';
 import { HTTP } from '../http-common.vue';
@@ -38,14 +71,14 @@ import { Role } from '../helpers/roles.js';
 import SelectImage from './SelectImage.vue';
 import FormTextArea from './FormTextArea.vue';
 
-library.add([faUser, faFloppyDisk, faTrash, faImage])
+library.add(faUser, faFloppyDisk, faTrash, faImage, faYoutube, faTelegram, faVk);
 
 export default {
     setup() {
         const { userData, userRole } = storeToRefs(useAuthStore());
         const { setUserData, logout } = useAuthStore();
         const toast = useToast();
-        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH } = import.meta.env;
+        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH, VITE_MAX_TELEGRAM_USERNAME_LENGTH, VITE_MAX_VK_USERNAME_LENGTH, VITE_MAX_YOUTUBE_ID_LENGTH } = import.meta.env;
         return {
             userData,
             toast,
@@ -53,7 +86,10 @@ export default {
             logout,
             Role,
             userRole,
-            VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH
+            VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH,
+            VITE_MAX_TELEGRAM_USERNAME_LENGTH,
+            VITE_MAX_VK_USERNAME_LENGTH,
+            VITE_MAX_YOUTUBE_ID_LENGTH
         }
     },
     data() {
@@ -66,6 +102,9 @@ export default {
             file_changed: false,
             fileChanged: false,
             picture: this.userData?.picture,
+            telegram: '',
+            vk: '',
+            yt: '',
         }
     },
     mounted() {
@@ -134,11 +173,26 @@ export default {
         fieldsWrong() {
             return this.nameLenght < 0
         },
-
-        nameLenght() {
-            if (!this.name) return
-            return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - this.name?.length
+        nameLenghtLimit() {
+            let lenght = this.name?.length;
+            if (!lenght) return
+            return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - lenght
         },
+        telegramLenghtLimit() {
+            let lenght = this.telegram?.length;
+            if (!lenght) return
+            return this.VITE_MAX_TELEGRAM_USERNAME_LENGTH - lenght
+        },
+        vkLenghtLimit() {
+            let lenght = this.vk?.length;
+            if (!lenght) return
+            return this.VITE_MAX_VK_USERNAME_LENGTH - lenght
+        },
+        ytLenghtLimit() {
+            let lenght = this.yt?.length;
+            if (!lenght) return
+            return this.VITE_MAX_YOUTUBE_ID_LENGTH - lenght
+        }
     }
 }
 </script>
@@ -287,9 +341,37 @@ export default {
         .buttons {
             margin-top: auto;
             display: flex;
-            gap: 5px;
-            justify-content: right;
+            gap: 10px;
+
+            @include breakpoints.xl(true) {
+                flex-wrap: wrap;
+            }
+
             grid-column: 1 / -1;
+
+            .iconed {
+                &.youtube {
+                    --icon-color: red;
+                }
+
+                &.vk {
+                    --icon-color: #0077FF;
+                }
+
+                &.telegram {
+                    --icon-color: #0088cc;
+                }
+
+                svg {
+                    transition: color .2s;
+                }
+
+                :focus-within {
+                    svg {
+                        color: var(--icon-color);
+                    }
+                }
+            }
 
             .button {
                 cursor: auto;
@@ -297,8 +379,9 @@ export default {
                 border-radius: 10px;
                 padding: 5px;
                 background-color: var(--color-background-mute-4);
-                width: 40px;
-                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+
 
                 @include breakpoints.xl(true) {
                     width: 100%;
@@ -315,6 +398,10 @@ export default {
                         cursor: pointer;
                     }
                 }
+            }
+
+            .formkit-outer {
+                width: 100%;
             }
         }
 
