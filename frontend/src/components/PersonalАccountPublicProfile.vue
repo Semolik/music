@@ -1,7 +1,7 @@
 <template>
     <div class="profile-container">
         <form class="user-info-container" @submit.prevent="formSubmited" ref="form">
-            <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPicture" ref="selectPic" />
+            <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPublicPicture" ref="selectPic" />
             <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
@@ -142,11 +142,10 @@ export default {
                 if (!form) return
                 let data = new FormData(form);
                 data.append('remove_picture', this.remove_picture);
-                HTTP.put('me', data)
+                HTTP.put('/me/public', data)
                     .then((response) => {
                         this.remove_picture = false;
                         this.file_changed = false;
-                        this.setUserData(response.data);
                     })
                     .catch((error) => {
                         if (error?.response?.status === 422) {

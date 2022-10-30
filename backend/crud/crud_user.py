@@ -7,8 +7,9 @@ from core.config import settings
 from helpers.files import add_url
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
-from schemas.user import UserAuth, UserModifiable, UserRegister
-from models.user import AnswerChangeRoleRequest, File, User, ChangeRoleRequest
+from schemas.user import PublicProfileBase, PublicProfileLinks, UserAuth, UserModifiable, UserRegister
+from models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
+from models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
@@ -59,14 +60,54 @@ class UserCruds:
             setattr(user, var, value) if value is not None else None
         if (userPic and user.picture) or remove_picture:
             FileCruds(self.db).delete_file(user.picture)
-        if userPic:
-            if user.picture:
-                FileCruds(self.db).delete_file(user.picture)
+        elif userPic:
+            # if user.picture:
+            #     FileCruds(self.db).delete_file(user.picture)
             user.picture = self.create(userPic)
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
         return user
+
+    def get_public_profile(self, user_id):
+        db_public_profile = self.db.query(PublicProfile).filter(
+            PublicProfile.user_id == user_id).first()
+        if db_public_profile:
+            return db_public_profile
+        db_user = self.get_user_by_id(user_id=user_id)
+        links = PublicProfileLinksModel()
+        new_db_public_profile = PublicProfile(
+            name=' '.join(
+                filter(None, [db_user.first_name, db_user.last_name])) or db_user.username,
+            user_id=user_id,
+            links=links
+        )
+        return self.create(new_db_public_profile)
+
+    def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileBase, new_public_proile_links: PublicProfileLinks, userPublicPicture: File) -> PublicProfile:
+        if public_proile is None:
+            raise Exception(
+                'Update public_proile failed: public_proile is None')
+        data_obj = new_public_proile_data.dict()
+        remove_picture = data_obj.pop('remove_picture')
+        for var, value in data_obj.items():
+            if value is not None:
+                setattr(public_proile, var, value)
+        public_proile_links = public_proile.links
+        for var, value in new_public_proile_links.dict().items():
+            if value is not None:
+                setattr(public_proile_links, var, value)
+
+        if (userPublicPicture and public_proile.picture) or remove_picture:
+            FileCruds(self.db).delete_file(public_proile.picture)
+        elif userPublicPicture:
+            if public_proile.picture:
+                FileCruds(self.db).delete_file(public_proile.picture)
+            public_proile.picture = self.create(userPublicPicture)
+        self.db.add(public_proile)
+        self.db.commit()
+        self.db.refresh(public_proile)
+        return public_proile
 
     def send_change_role_message(self, user_id, message, files_ids, account_status):
         db_change_role_request = ChangeRoleRequest(

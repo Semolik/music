@@ -99,9 +99,7 @@ export default {
         }
     },
     methods: {
-
         detelePicture() {
-
             this.$refs.selectPic.detelePicture();
             this.remove_picture = true;
             this.file_changed = true;

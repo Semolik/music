@@ -35,7 +35,6 @@ class UserModifiable(UserBase):
 
 @form_body
 class UserModifiableForm(UserBase):
-    ...
     remove_picture: bool = False
 
 
@@ -81,8 +80,16 @@ class PublicProfileLinks(BaseModel):
     vk: str | None = None
 
 
-class PublicProfile(BaseModel):
-    id: int
+class PublicProfileBase(BaseModel):
     name: str
     description: str
+    
+
+
+class PublicProfile(PublicProfileBase):
+    id: int
     links: PublicProfileLinks
+
+
+class PublicProfileModifiable(PublicProfileBase):
+    remove_picture: bool = False

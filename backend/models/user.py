@@ -27,7 +27,8 @@ class User(Base):
     is_radio_station = Column(Boolean, default=False)
     picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
     picture = relationship("File", foreign_keys=[picture_id])
-
+    public_profile = relationship(
+        "PublicProfile", back_populates="user", uselist=False)
 
 
 class PublicProfile(Base):
@@ -44,6 +45,11 @@ class PublicProfile(Base):
         ), nullable=True)
     links = relationship("PublicProfileLinks",
                          back_populates="public_profile", uselist=False)
+    picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
+    picture = relationship("File", foreign_keys=[picture_id])
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", foreign_keys=[
+                        user_id], back_populates="public_profile")
 
 
 class PublicProfileLinks(Base):
@@ -61,8 +67,6 @@ class PublicProfileLinks(Base):
     vk = Column(
         String(int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
     )
-    picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
-    picture = relationship("File", foreign_keys=[picture_id])
 
 
 class File(Base):
