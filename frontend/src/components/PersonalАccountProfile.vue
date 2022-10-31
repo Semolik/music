@@ -56,7 +56,7 @@ library.add([faUser, faFloppyDisk, faTrash, faImage])
 export default {
     setup() {
         const { userData, userRole } = storeToRefs(useAuthStore());
-        const { setUserData, logout } = useAuthStore();
+        const { setUserData, logout, getMe } = useAuthStore();
         const toast = useToast();
         const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } = import.meta.env;
         return {
@@ -64,6 +64,7 @@ export default {
             toast,
             setUserData,
             logout,
+            getMe,
             Role,
             userRole,
             VITE_MAX_FIRSTNAME_LENGTH,
@@ -84,6 +85,7 @@ export default {
     },
     mounted() {
         this.mounted = true;
+        this.getMe();
     },
     components: {
         FontAwesomeIcon,
@@ -123,13 +125,7 @@ export default {
                         this.setUserData(response.data);
                     })
                     .catch((error) => {
-                        if (error?.response?.status === 422) {
-                            this.logout();
-                            this.$router.push({ path: '/login' })
-                            this.toast.error('Необходимо войти в аккаунт')
-                        } else {
-                            this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
-                        }
+                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
                     });
             }
         }

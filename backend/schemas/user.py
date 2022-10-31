@@ -82,14 +82,15 @@ class PublicProfileLinks(BaseModel):
 
 class PublicProfileBase(BaseModel):
     name: str
-    description: str
-    
+    description: str | None
 
 
 class PublicProfile(PublicProfileBase):
     id: int
     links: PublicProfileLinks
+    picture: str | None
 
 
-class PublicProfileModifiable(PublicProfileBase):
+@form_body
+class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks):
     remove_picture: bool = False

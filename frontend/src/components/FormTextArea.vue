@@ -1,11 +1,13 @@
 <template>
-    <div class="formkit-outer" :style="{margin: 0+'px'}" data-family="text" data-type="text" data-v-7f4a9599="">
+    <div class="formkit-outer" :style="{ margin: 0 + 'px' }" data-family="text" data-type="text" data-v-7f4a9599="">
         <div class="formkit-wrapper">
-            <label class="formkit-label" v-if="label">{{label}}</label>
+            <label class="formkit-label" v-if="label">{{ label }}</label>
             <div class="formkit-inner-container">
-                <div class="formkit-inner" style="--inner-radius:10px;">
-                    <textarea :name="name" v-model="modelValue" id="" :placeholder="placeholder" :cols="cols"
-                        :rows="rows" :style="{ '--radius': borderRadius + 'px' }"></textarea>
+                <div :class="['formkit-inner', { focused: focused }]" style="--inner-radius:10px;">
+                    <textarea @focus="focused = true" @blur="focused = false" @input="updateValue" :name="name"
+                        v-model="modelValue" id="" :placeholder="placeholder" :cols="cols" :rows="rows"
+                        :style="{ '--radius': borderRadius + 'px' }"></textarea>
+                    <slot class="content"></slot>
                 </div>
             </div>
         </div>
@@ -22,6 +24,11 @@ export default {
         placeholder: String,
         label: String,
     },
+    data() {
+        return {
+            focused: false,
+        }
+    },
     emits: ['update:modelValue'],
     methods: {
         updateValue(event) {
@@ -32,20 +39,33 @@ export default {
 }
 </script>
 <style lang="scss">
-textarea {
-    width: 100%;
-    resize: none;
-    border: none;
-    box-shadow: 0 0 0 1px var(--fields-border-color);
-    outline: none;
-    background-color: transparent;
-    border-radius: var(--radius);
-    padding: 10px;
-    color: var(--color-text);
-    font-size: 1.1em;
+.formkit-inner {
+    overflow: auto;
 
-    &:focus {
-        box-shadow: 0 0 0 1px var(--purple-1);
+    &:has(.content) {
+        textarea {
+            padding-right: 10px;
+        }
+    }
+
+    &.focused {
+        box-shadow: 0 0 0 1px var(--purple-1) !important;
+    }
+
+    textarea {
+        height: 100%;
+        width: 100%;
+        resize: none;
+        border: none;
+        box-shadow: 0 0 0 1px var(--fields-border-color);
+        outline: none;
+        background-color: transparent;
+        border-radius: var(--radius);
+        padding: 10px;
+        color: var(--color-text);
+        font-size: 1.1em;
+
+
     }
 }
 </style>

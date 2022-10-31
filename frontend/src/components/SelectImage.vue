@@ -15,6 +15,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { computed } from '@vue/reactivity';
 library.add(faImage);
 import { useToast } from "vue-toastification";
 export default {
@@ -33,7 +34,13 @@ export default {
     data() {
         return {
             picture: this.pictureUrl,
-            acceptedFormats: '.jpg, .jpeg, .png'
+            acceptedFormats: '.jpg, .jpeg, .png',
+            target: null,
+        }
+    },
+    watch: {
+        pictureUrl(value) {
+            this.picture = value;
         }
     },
     methods: {
@@ -43,6 +50,7 @@ export default {
                 this.detelePicture();
                 return;
             }
+            this.target = file;
             var fileName = file[0].name;
             var idxDot = fileName.lastIndexOf(".") + 1;
             var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
@@ -63,6 +71,7 @@ export default {
         detelePicture() {
             this.$refs.fileupload.value = null;
             this.picture = null;
+            this.target = null;
         },
     }
 }

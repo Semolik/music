@@ -7,12 +7,15 @@
             </div>
             <div class="user-info">
                 <FormField :borderRadius="10" name="name" label="Отображаемое имя" placeholder="Ваше имя" v-model="name"
-                    offMargin>
-                    <span :class="['count', { wrong: nameLenghtLimit < 0 }]" v-if="nameLenght">{{ nameLenghtLimit
-                    }}</span>
+                    offMargin notEmpty>
+                    <span :class="['count', { wrong: nameLenghtLimit < 0 }]" v-if="nameLenghtLimit">
+                        {{ nameLenghtLimit }}
+                    </span>
                 </FormField>
                 <FormTextArea :borderRadius="10" label="Описание профиля" placeholder="Напишите о себе"
-                    v-model="description" :rows="5" />
+                    v-model="description" :rows="5">
+                    <!-- asdas -->
+                </FormTextArea>
             </div>
             <div class="buttons">
                 <FormField placeholder="id канала" v-model="yt" :borderRadius="10" offMargin class="iconed youtube"
@@ -60,14 +63,14 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
 import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { storeToRefs } from 'pinia';
+
 import { HTTP } from '../http-common.vue';
-import { useAuthStore } from '../stores/auth';
+
 import handleError from '../composables/errors';
 import { useToast } from "vue-toastification";
 import FormField from './FormField.vue';
 import AnimateInteger from './AnimateInteger.vue';
-import { Role } from '../helpers/roles.js';
+
 import SelectImage from './SelectImage.vue';
 import FormTextArea from './FormTextArea.vue';
 
@@ -75,17 +78,10 @@ library.add(faUser, faFloppyDisk, faTrash, faImage, faYoutube, faTelegram, faVk)
 
 export default {
     setup() {
-        const { userData, userRole } = storeToRefs(useAuthStore());
-        const { setUserData, logout } = useAuthStore();
         const toast = useToast();
         const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH, VITE_MAX_TELEGRAM_USERNAME_LENGTH, VITE_MAX_VK_USERNAME_LENGTH, VITE_MAX_YOUTUBE_ID_LENGTH } = import.meta.env;
         return {
-            userData,
             toast,
-            setUserData,
-            logout,
-            Role,
-            userRole,
             VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH,
             VITE_MAX_TELEGRAM_USERNAME_LENGTH,
             VITE_MAX_VK_USERNAME_LENGTH,
@@ -94,14 +90,15 @@ export default {
     },
     data() {
         return {
-            name: this.userData?.name,
-            description: this.userData?.description,
+            userData: null,
+            name: '',
+            description: '',
             mounted: false,
             remove_picture: false,
             original_image: null,
             file_changed: false,
             fileChanged: false,
-            picture: this.userData?.picture,
+            picture: null,
             telegram: '',
             vk: '',
             yt: '',
@@ -109,6 +106,14 @@ export default {
     },
     mounted() {
         this.mounted = true;
+        HTTP.get('/me/public')
+            .then(response => {
+
+                this.setData(response.data);
+            })
+            .catch(error => {
+                this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
+            })
     },
     components: {
         FontAwesomeIcon,
@@ -117,18 +122,21 @@ export default {
         SelectImage,
         FormTextArea
     },
-    watch: {
-        userData(value) {
-            this.firstName = value?.first_name;
-            this.lastName = value?.last_name;
-            this.original_image = value?.picture;
-        }
-    },
     methods: {
         detelePicture() {
             this.$refs.selectPic.detelePicture();
             this.remove_picture = true;
             this.file_changed = true;
+        },
+        setData(data) {
+            this.userData = data;
+            const { name, description, links, picture } = data;
+            this.name = name;
+            this.description = description;
+            this.vk = links.vk;
+            this.telegram = links.telegram;
+            this.yt = links.youtube;
+            this.picture = picture;
         },
         updatePic(target) {
             this.file_changed = true;
@@ -138,23 +146,23 @@ export default {
         },
         save() {
             if (this.dataChanged) {
+                const { name, description, telegram, vk, yt, remove_picture } = this;
                 const form = this.$refs.form;
-                if (!form) return
                 let data = new FormData(form);
-                data.append('remove_picture', this.remove_picture);
+                data.append('name', name);
+                data.append('description', description);
+                data.append('telegram', telegram);
+                data.append('vk', vk);
+                data.append('youtube', yt);
+                data.append('remove_picture', remove_picture);
                 HTTP.put('/me/public', data)
                     .then((response) => {
                         this.remove_picture = false;
                         this.file_changed = false;
+                        this.setData(response.data);
                     })
                     .catch((error) => {
-                        if (error?.response?.status === 422) {
-                            this.logout();
-                            this.$router.push({ path: '/login' })
-                            this.toast.error('Необходимо войти в аккаунт')
-                        } else {
-                            this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
-                        }
+                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
                     });
             }
         }
@@ -170,7 +178,19 @@ export default {
             return this.userData.name !== this.name || this.userData.description !== this.description || this.file_changed
         },
         fieldsWrong() {
-            return this.nameLenght < 0
+            return this.nameWrong || this.telegramWrong || this.vkWrong || this.ytWrong
+        },
+        nameWrong() {
+            return this.nameLenghtLimit < 0 || this.name.length === 0
+        },
+        telegramWrong() {
+            return this.telegramLenghtLimit < 0
+        },
+        vkWrong() {
+            return this.vkLenghtLimit < 0
+        },
+        ytWrong() {
+            return this.ytLenghtLimit < 0
         },
         nameLenghtLimit() {
             let lenght = this.name?.length;
@@ -207,10 +227,6 @@ export default {
         display: grid;
         gap: 10px;
         grid-template-columns: 210px 1fr;
-
-        @include breakpoints.lg(true) {
-            grid-template-columns: 160px 1fr;
-        }
 
         @include breakpoints.sm(true) {
             grid-template-columns: 1fr;
@@ -287,7 +303,6 @@ export default {
                     }
 
                     .edit-area-text {
-
                         z-index: 2;
                     }
 
@@ -335,6 +350,10 @@ export default {
         .remove-picture {
             grid-row: 2;
             @include helpers.flex-center;
+
+            @include breakpoints.lg(true) {
+                grid-column: 1 / -1;
+            }
         }
 
         .buttons {

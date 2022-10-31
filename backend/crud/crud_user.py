@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
+
 from helpers.roles import set_status
 from helpers.images import set_picture
 from core.config import settings
 from helpers.files import add_url
 from crud.crud_file import FileCruds
 from db.session import SessionLocal
-from schemas.user import PublicProfileBase, PublicProfileLinks, UserAuth, UserModifiable, UserRegister
+from schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
 from models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
 from models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
@@ -58,11 +59,11 @@ class UserCruds:
         remove_picture = data_obj.pop('remove_picture')
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
-        if (userPic and user.picture) or remove_picture:
+        if remove_picture:
             FileCruds(self.db).delete_file(user.picture)
         elif userPic:
-            # if user.picture:
-            #     FileCruds(self.db).delete_file(user.picture)
+            if user.picture:
+                FileCruds(self.db).delete_file(user.picture)
             user.picture = self.create(userPic)
         self.db.add(user)
         self.db.commit()
@@ -84,7 +85,7 @@ class UserCruds:
         )
         return self.create(new_db_public_profile)
 
-    def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileBase, new_public_proile_links: PublicProfileLinks, userPublicPicture: File) -> PublicProfile:
+    def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileModifiable,  userPublicPicture: File) -> PublicProfile:
         if public_proile is None:
             raise Exception(
                 'Update public_proile failed: public_proile is None')
@@ -94,11 +95,11 @@ class UserCruds:
             if value is not None:
                 setattr(public_proile, var, value)
         public_proile_links = public_proile.links
-        for var, value in new_public_proile_links.dict().items():
+        for var, _ in public_proile_links.as_dict().items():
+            value = data_obj.get(var)
             if value is not None:
                 setattr(public_proile_links, var, value)
-
-        if (userPublicPicture and public_proile.picture) or remove_picture:
+        if remove_picture:
             FileCruds(self.db).delete_file(public_proile.picture)
         elif userPublicPicture:
             if public_proile.picture:
@@ -202,7 +203,6 @@ class UserCruds:
                                 detail="Попытка установить неподдерживаемый статус аккаунта")
         request.answer = db_answer
         request.status = request_status
-        print(request_status)
         self.db.commit()
         answer_obj = jsonable_encoder(db_answer)
         answer_obj['time_created'] = db_answer.time_created.strftime(
