@@ -1,9 +1,9 @@
 import os
 from sqlalchemy.orm import Session
-from db.db import get_db
-from models.user import File
+from backend.db.db import get_db
+from backend.models.user import File
 from pathlib import Path
-from core.config import settings
+from backend.core.config import settings
 
 
 class FileCruds:

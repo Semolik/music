@@ -4,9 +4,9 @@ import logging
 import shutil
 import uuid
 from fastapi.encoders import jsonable_encoder
-from models.user import File
+from backend.models.user import File
 from fastapi import UploadFile, HTTPException
-from core.config import settings
+from backend.core.config import settings
 from pathlib import Path
 logger = logging.getLogger(__name__)
 supported_image_extensions = {

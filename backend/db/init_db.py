@@ -1,12 +1,13 @@
 import logging
-from schemas.user import UserWithTypeRegister
-from crud.crud_user import user_cruds
+from backend.schemas.user import UserWithTypeRegister
+from backend.crud.crud_user import user_cruds
 logger = logging.getLogger(__name__)
 
 FIRST_SUPERUSER = "admin"
 
 
 def init_db() -> None:  # 1
+    logger.info("Инициализация базы данных")
     if FIRST_SUPERUSER:
         user = user_cruds.get_user_by_username(FIRST_SUPERUSER)  # 2
         if not user:
@@ -16,9 +17,11 @@ def init_db() -> None:  # 1
                 is_superuser=True,
                 password='abobus'
             )
-            user = user_cruds.create_user(user_in)
+            user_cruds.create_user(user_in)
+            logger.info(f"Администратор {FIRST_SUPERUSER} создан")
         else:
             logger.warning(
-                "Skipping creating superuser. User with username "
-                f"{FIRST_SUPERUSER} already exists. "
+                "Пропуск создания аккаунта администратора. Пользователь с юзернеймом "
+                f"{FIRST_SUPERUSER} уже существует"
             )
+    logger.info("Инициализация базы данных закончена")

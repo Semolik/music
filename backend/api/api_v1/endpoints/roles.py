@@ -1,12 +1,12 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, UploadFile, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from core.config import settings
-from helpers.files import save_file
-from schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
-from schemas.error import HTTP_401_UNAUTHORIZED
-from models.user import File as FileModel
-from crud.crud_user import UserCruds
+from backend.core.config import settings
+from backend.helpers.files import save_file
+from backend.schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
+from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.models.user import File as FileModel
+from backend.crud.crud_user import UserCruds
 router = APIRouter(tags=['Роли'])
 user_cruds = UserCruds()
 

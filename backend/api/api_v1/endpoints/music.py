@@ -1,10 +1,10 @@
 from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from schemas.track import UploadTrack
-from helpers.files import save_file
+from backend.schemas.track import UploadTrack
+from backend.helpers.files import save_file
 
-from schemas.error import HTTP_401_UNAUTHORIZED
-from crud.crud_user import user_cruds
+from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.crud.crud_user import user_cruds
 router = APIRouter(tags=['Треки'])
 
 

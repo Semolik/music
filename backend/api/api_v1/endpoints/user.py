@@ -1,10 +1,10 @@
 from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from helpers.files import save_file
-from helpers.images import set_picture
-from schemas.user import PublicProfile, PublicProfileLinks, PublicProfileModifiable, UserInfo, UserModifiableForm
-from schemas.error import HTTP_401_UNAUTHORIZED
-from crud.crud_user import user_cruds
+from backend.helpers.files import save_file
+from backend.helpers.images import set_picture
+from backend.schemas.user import PublicProfile, PublicProfileLinks, PublicProfileModifiable, UserInfo, UserModifiableForm
+from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.crud.crud_user import user_cruds
 router = APIRouter(tags=['Профили пользователей'])
 
 

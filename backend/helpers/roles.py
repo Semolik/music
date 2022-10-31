@@ -1,6 +1,6 @@
-from models.user import User
-from core.config import settings
-from db.session import SessionLocal
+from backend.models.user import User
+from backend.core.config import settings
+from backend.db.session import SessionLocal
 
 
 def set_status(db: SessionLocal, user: User, status: settings.USER_ACCOUNT_STATUSES):

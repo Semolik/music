@@ -1,9 +1,8 @@
-from models.user import *
-# from models.file import 
-from core.config import settings
-from db.base import Base
+from backend.models.user import *
+from backend.core.config import settings
+from backend.db.base import Base
 from logging.config import fileConfig
-
+from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -35,12 +34,18 @@ def run_migrations_online() -> None:
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = get_url()
+    url = get_url()
+    
+    configuration["sqlalchemy.url"] = url
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+    if not database_exists(url):
+        print('asdasd')
+        create_database(url)
+        target_metadata.create_all(connectable)
 
     with connectable.connect() as connection:
         context.configure(

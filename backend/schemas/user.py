@@ -1,8 +1,8 @@
 from typing import List
 from pydantic import BaseModel
-from core.config import settings
-from schemas.file import File
-from helpers.forms import form_body
+from backend.core.config import settings
+from backend.schemas.file import File
+from backend.helpers.forms import form_body
 
 
 class UserAuth(BaseModel):

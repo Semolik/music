@@ -2,19 +2,18 @@ from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
 
-from helpers.roles import set_status
-from helpers.images import set_picture
-from core.config import settings
-from helpers.files import add_url
-from crud.crud_file import FileCruds
-from db.session import SessionLocal
-from schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
-from models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
-from models.user import PublicProfileLinks as PublicProfileLinksModel
+from backend.helpers.roles import set_status
+from backend.helpers.images import set_picture
+from backend.core.config import settings
+from backend.helpers.files import add_url
+from backend.crud.crud_file import FileCruds
+from backend.db.session import SessionLocal
+from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
+from backend.models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
+from backend.models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
-from sqlalchemy import select
 
 
 class UserCruds:

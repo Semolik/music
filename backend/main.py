@@ -1,11 +1,18 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, APIRouter
+from backend.initial_data import init
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.middleware.cors import CORSMiddleware
-from core.config import settings
-from api.api_v1.api import api_v1_router
+from backend.core.config import settings
+from backend.api.api_v1.api import api_v1_router
+from backend.initial_data import init
 app = FastAPI()
+
+
+@app.on_event("startup")
+def startup():
+    init()
 
 
 @AuthJWT.load_config

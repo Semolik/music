@@ -2,10 +2,10 @@ import os
 from werkzeug.utils import secure_filename
 from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import FileResponse
-from db.db import get_db
-from db.session import SessionLocal
-from crud.crud_file import FileCruds
-from core.config import settings
+from backend.db.db import get_db
+from backend.db.session import SessionLocal
+from backend.crud.crud_file import FileCruds
+from backend.core.config import settings
 
 router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 

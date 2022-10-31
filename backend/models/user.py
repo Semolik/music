@@ -1,8 +1,8 @@
 from sqlalchemy.sql import func
-from db.base_class import Base
+from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime
 from sqlalchemy.orm import relationship
-from core.config import env_config
+from backend.core.config import env_config
 
 
 class User(Base):

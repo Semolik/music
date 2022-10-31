@@ -1,15 +1,8 @@
-import io
-import shutil
-from fastapi import UploadFile, HTTPException, Depends
-from PIL import Image
-import uuid
-# from schemas.file import File
-from db.base import CRUDBase
-from models.user import File, User
+
+from backend.models.user import File
 # import models.user as user_models
-from core.config import settings
-from db.session import Session
-from db.db import get_db
+from backend.core.config import settings
+
 
 
 def set_picture(user_data: dict, picture: File):

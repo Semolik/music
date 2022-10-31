@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Tuple, get_args
 from dotenv import dotenv_values
 
 
-env_config = dotenv_values('../.env')
+env_config = dotenv_values('.env')
 
 
 class Settings(BaseSettings):

@@ -1,10 +1,10 @@
 from typing import Any
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi_jwt_auth import AuthJWT
-from schemas.error import HTTP_401_UNAUTHORIZED
-from schemas.user import UserAuth, UserInfo
-from crud.crud_user import user_cruds
-from schemas.user import UserRegister
+from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.schemas.user import UserAuth, UserInfo
+from backend.crud.crud_user import user_cruds
+from backend.schemas.user import UserRegister
 router = APIRouter(tags=['Авторизация'])
 
 
