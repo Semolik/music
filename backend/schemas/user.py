@@ -1,13 +1,24 @@
 from typing import List
 from pydantic import BaseModel
-from backend.core.config import settings
+from fastapi import Query
+from backend.core.config import settings, env_config
 from backend.schemas.file import File
 from backend.helpers.forms import form_body
 
 
-class UserAuth(BaseModel):
-    username: str
-    password: str
+class UserUsername(BaseModel):
+    username: str = Query(
+        default=None,
+        min_length=int(env_config.get('VITE_MIN_LOGIN_LENGTH')),
+        max_length=int(env_config.get('VITE_MAX_LOGIN_LENGTH'))
+    )
+
+
+class UserAuth(UserUsername):
+    password: str = Query(
+        default=None,
+        min_length=int(env_config.get('VITE_MIN_PASSWORD_LENGTH'))
+    )
 
 
 class UserBase(BaseModel):
@@ -38,9 +49,8 @@ class UserModifiableForm(UserBase):
     remove_picture: bool = False
 
 
-class UserInfo(UserTypes, UserBase):
+class UserInfo(UserTypes, UserBase, UserUsername):
     id: int
-    username: str
     picture: str | None = None
 
 

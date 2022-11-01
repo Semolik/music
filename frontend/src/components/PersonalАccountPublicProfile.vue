@@ -12,9 +12,12 @@
                         {{ nameLenghtLimit }}
                     </span>
                 </FormField>
-                <FormTextArea :borderRadius="10" label="Описание профиля" placeholder="Напишите о себе"
-                    v-model="description" :rows="5">
-                    <!-- asdas -->
+                <FormTextArea class="description" :borderRadius="10" label="Описание профиля"
+                    placeholder="Напишите о себе" v-model="description" :rows="5" :paddingRight="20"
+                    :maxLength="VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH">
+                    <span :class="['count', { wrong: descriptionLenghtLimit < 0 }]" v-if="descriptionLenghtLimit">
+                        {{ descriptionLenghtLimit }}
+                    </span>
                 </FormTextArea>
             </div>
             <div class="buttons">
@@ -79,13 +82,14 @@ library.add(faUser, faFloppyDisk, faTrash, faImage, faYoutube, faTelegram, faVk)
 export default {
     setup() {
         const toast = useToast();
-        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH, VITE_MAX_TELEGRAM_USERNAME_LENGTH, VITE_MAX_VK_USERNAME_LENGTH, VITE_MAX_YOUTUBE_ID_LENGTH } = import.meta.env;
+        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH, VITE_MAX_TELEGRAM_USERNAME_LENGTH, VITE_MAX_VK_USERNAME_LENGTH, VITE_MAX_YOUTUBE_ID_LENGTH, VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH } = import.meta.env;
         return {
             toast,
             VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH,
             VITE_MAX_TELEGRAM_USERNAME_LENGTH,
             VITE_MAX_VK_USERNAME_LENGTH,
-            VITE_MAX_YOUTUBE_ID_LENGTH
+            VITE_MAX_YOUTUBE_ID_LENGTH,
+            VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH
         }
     },
     data() {
@@ -178,10 +182,13 @@ export default {
             return this.userData.name !== this.name || this.userData.description !== this.description || this.file_changed
         },
         fieldsWrong() {
-            return this.nameWrong || this.telegramWrong || this.vkWrong || this.ytWrong
+            return this.nameWrong || this.telegramWrong || this.vkWrong || this.ytWrong || this.descriptionWrong
         },
         nameWrong() {
-            return this.nameLenghtLimit < 0 || this.name.length === 0
+            return this.nameLenghtLimit < 0 || this.name?.length === 0
+        },
+        descriptionWrong() {
+            return this.descriptionLenghtLimit < 0
         },
         telegramWrong() {
             return this.telegramLenghtLimit < 0
@@ -196,6 +203,11 @@ export default {
             let lenght = this.name?.length;
             if (!lenght) return
             return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - lenght
+        },
+        descriptionLenghtLimit() {
+            let lenght = this.description?.length;
+            if (!lenght) return
+            return this.VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH - lenght
         },
         telegramLenghtLimit() {
             let lenght = this.telegram?.length;
@@ -430,13 +442,13 @@ export default {
             gap: 10px;
             padding-top: 5px;
 
-            .fields {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+            .description {
+                position: relative;
 
-                @include breakpoints.lg(true) {
-                    grid-template-columns: 2fr;
+                .count {
+                    position: absolute;
+                    right: 0px;
+                    bottom: 8px;
                 }
             }
 

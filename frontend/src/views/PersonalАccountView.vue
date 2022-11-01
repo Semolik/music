@@ -116,6 +116,7 @@ export default {
         background-color: var(--color-background-mute-2);
         border-radius: 20px;
         padding: 10px;
+        height: min-content;
     }
 }
 </style>

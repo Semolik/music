@@ -6,8 +6,9 @@
                 <div :class="['formkit-inner', { focused: focused }]" style="--inner-radius:10px;">
                     <textarea @focus="focused = true" @blur="focused = false" @input="updateValue" :name="name"
                         v-model="modelValue" id="" :placeholder="placeholder" :cols="cols" :rows="rows"
-                        :style="{ '--radius': borderRadius + 'px' }"></textarea>
-                    <slot class="content"></slot>
+                        :style="{ '--radius': borderRadius + 'px', paddingRight: paddingRight + 'px' }"
+                        :maxlength="maxLengthResult"></textarea>
+                    <slot></slot>
                 </div>
             </div>
         </div>
@@ -23,6 +24,8 @@ export default {
         borderRadius: Number,
         placeholder: String,
         label: String,
+        paddingRight: Number,
+        maxLength: Number
     },
     data() {
         return {
@@ -35,18 +38,17 @@ export default {
             let text = event.target.value;
             this.$emit('update:modelValue', text);
         }
+    },
+    computed: {
+        maxLengthResult() {
+            if (!this.maxLength) return
+            return Number(this.maxLength) + 10
+        }
     }
 }
 </script>
 <style lang="scss">
 .formkit-inner {
-    overflow: auto;
-
-    &:has(.content) {
-        textarea {
-            padding-right: 10px;
-        }
-    }
 
     &.focused {
         box-shadow: 0 0 0 1px var(--purple-1) !important;
@@ -65,7 +67,14 @@ export default {
         color: var(--color-text);
         font-size: 1.1em;
 
+        &::-webkit-scrollbar {
+            width: 5px;
+            border-radius: var(--radius);
+        }
+    }
 
+    .count {
+        color: var(--fields-border-color);
     }
 }
 </style>
