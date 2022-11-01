@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SERVER_LINK: str = 'http://localhost:3000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        'http://localhost:4000', 'http://192.168.50.106:4000']
+        'http://localhost:4000', 'http://192.168.50.106:4000', 'http://192.168.1.133:4000']
     DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/semolik_music"
     TEST_DATABASE_URI: Optional[str] = "postgresql://postgres:aboba@localhost:5432/semolik_music_test"
     FIRST_SUPERUSER: str = "admin"

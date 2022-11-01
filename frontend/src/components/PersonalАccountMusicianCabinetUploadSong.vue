@@ -25,7 +25,7 @@
             </div>
         </div>
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
-            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }]">
+            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }, { wrong: wrongFile }]">
                 <div class="text">{{ fileName || 'выбрать аудиофайл' }}</div>
                 <input type="file" @change="validFile" :ref="refAudioName" :accept="acceptedFormats">
             </div>
@@ -62,6 +62,7 @@ export default {
     },
     mounted() {
         this.mounted = true;
+        this.updateDataParent();
     },
     data() {
         return {
@@ -75,6 +76,7 @@ export default {
                 audioFileTarget: null,
                 pictureTarget: null,
             },
+            wrongFile: false,
             refAudioName: `audio-${this.id}`,
             fileName: null,
             mounted: false,
@@ -90,10 +92,11 @@ export default {
         };
     },
     components: { SelectImage, FormField, FontAwesomeIcon },
+    inject: ['runValidation'],
     watch: {
         data: {
             handler() {
-                this.$emit('update', this.data);
+                this.updateDataParent();
             },
             deep: true,
         },
@@ -104,11 +107,22 @@ export default {
         },
         trackIsValid(value) {
             this.data.isValid = value;
+        },
+        runValidation(value) {
+            if (value && !this.data.audioFileTarget) {
+                this.wrongFile = true;
+            }
         }
     },
     methods: {
         pictureUpdated(file) {
             this.data.pictureTarget = file;
+        },
+        sendFile() {
+
+        },
+        updateDataParent() {
+            this.$emit('update', this.data);
         },
         setFollowingAlbumName() {
             let name = this.data.name;
@@ -123,7 +137,7 @@ export default {
         resetInputAudio() {
             this.$refs[this.refAudioName].value = null;
             this.fileName = null;
-            this.audioFileTarget = null;
+            this.data.audioFileTarget = null;
         },
         validFile(event) {
             let file = event.target.files;
@@ -141,8 +155,9 @@ export default {
                 this.resetInputAudio();
                 return
             }
+            this.wrongFile = false;
             this.fileName = fileName;
-            this.audioFileTarget = file[0];
+            this.data.audioFileTarget = file[0];
         }
     },
     computed: {
@@ -165,9 +180,9 @@ export default {
             return this.albumLimit - this.albumLenght
         },
         trackIsValid() {
-            var result = this.nameIsValid && this.featIsValid;
+            var result = (this.nameLenght > 0 && this.upToNameLimit >= 0) && (this.upToFeatLimit >= 0);
             if (this.isSingle) {
-                result = result && this.albumIsValid;
+                result = result && this.upToAlbumLimit >= 0;
             }
             return result;
         }
@@ -228,6 +243,10 @@ export default {
         height: 100%;
         @include helpers.flex-center;
         position: relative;
+
+        &.wrong {
+            border: 2px dashed red;
+        }
 
         &.active {
             border-color: var(--green);

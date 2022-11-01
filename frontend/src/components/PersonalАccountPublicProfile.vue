@@ -179,7 +179,14 @@ export default {
         dataChanged() {
             if (!this.userData) return
             if (this.fieldsWrong) return
-            return this.userData.name !== this.name || this.userData.description !== this.description || this.file_changed
+            let links = this.userData.links;
+            return (
+                this.userData.name !== this.name ||
+                this.userData.description !== this.description ||
+                this.file_changed || this.vk !== links.vk ||
+                this.yt !== links.youtube ||
+                this.telegram !== links.telegram
+            )
         },
         fieldsWrong() {
             return this.nameWrong || this.telegramWrong || this.vkWrong || this.ytWrong || this.descriptionWrong
