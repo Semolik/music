@@ -60,12 +60,7 @@ export const useAuthStore = defineStore({
       }
     },
     setMessage(error) {
-      let message = error?.response?.data?.detail;
-      if (message) {
-        this.message = message;
-      } else {
-        this.message = handleError(error).message
-      }
+      this.message = handleError(error).message
     },
     logout() {
       this.logined = false;

@@ -254,6 +254,7 @@ export default {
         width: 100%;
         left: 0;
         bottom: calc(100% + 10px);
+        gap: 5px;
         background-color: var(--red-0-hover);
         @include helpers.flex-center;
         padding: 10px;

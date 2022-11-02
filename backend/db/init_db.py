@@ -15,7 +15,7 @@ def init_db() -> None:  # 1
                 username=FIRST_SUPERUSER,
                 first_name=FIRST_SUPERUSER,
                 is_superuser=True,
-                password='abobus'
+                password='abobus123'
             )
             user_cruds.create_user(user_in)
             logger.info(f"Администратор {FIRST_SUPERUSER} создан")
