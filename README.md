@@ -9,7 +9,14 @@
 	
 	$ cd frontend
 	$ npm i
+<h3>Setting</h3>
+create a .env.local file in the root folder with the following content
 
+	DB_NAME=*****
+	DB_USER=*****
+	DB_PASSWORD=*****
+	DB_PORT=5432
+	DB_HOST=localhost
 <h3>Run</h3>
 
 <h4>backend</h4>
