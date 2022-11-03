@@ -10,15 +10,18 @@
     <div class="songs">
         <template v-if="!singleMode">
             <div class="columns">
-                <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty />
-                <date-picker v-model="date" is-dark mode="dateTime" is24hr>
-                    <template v-slot="{ inputValue, inputEvents }">
-                        <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents"
-                            label="Начало активности" :borderRadius="10" off-margin>
-                            <FontAwesomeIcon icon="fa-calendar" />
-                        </FormField>
-                    </template>
-                </date-picker>
+                <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
+                <div class="container">
+                    <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName" />
+                    <date-picker v-model="date" is-dark mode="dateTime" is24hr>
+                        <template v-slot="{ inputValue, inputEvents }">
+                            <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents"
+                                label="Начало активности" :borderRadius="10" off-margin>
+                                <FontAwesomeIcon icon="fa-calendar" />
+                            </FormField>
+                        </template>
+                    </date-picker>
+                </div>
             </div>
         </template>
         <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single v-if="singleMode" />
@@ -47,22 +50,31 @@ import { HTTP } from '../http-common.vue';
 import FormField from './FormField.vue';
 import { useToast } from "vue-toastification";
 import { DatePicker } from 'v-calendar';
+import SelectImage from './SelectImage.vue';
+import moment from 'moment';
 
 library.add(faPlus, faFloppyDisk, faCalendar);
 export default {
     setup() {
         const toast = useToast();
+        const {
+            VITE_DATE_FORMAT
+        } = import.meta.env;
         return {
-            toast
+            toast,
+            VITE_DATE_FORMAT
         }
     },
+    components: { FormField, UploadSong, FontAwesomeIcon, DatePicker, SelectImage },
     data() {
         return {
             activeSelection: "single",
+            albumName: "",
             tracks: [{}],
             track: {},
             runValidation: false,
             date: new Date(),
+            album_id: null,
         };
     },
     provide() {
@@ -85,9 +97,13 @@ export default {
                 this.runValidation = false;
             }, 300)
         },
+        updatedPicture(target) {
+            this.album_pucture = target;
+        },
         trackUpdate(event, index) {
             if (this.singleMode) {
                 this.track = event;
+                this.albumName = event.album;
             } else {
                 this.tracks[index] = event;
             }
@@ -99,8 +115,9 @@ export default {
             this.toggleRunValidation();
             if (this.buttonActive) {
                 var formData = new FormData();
-                var formDatas = new FormData();
-                formData.append('albumData', {'asdasdasd'})
+                formData.append('name', this.albumName);
+                formData.append('albumPicture', this.$refs.selectPicAlbum.target[0]);
+                formData.append('date', moment(this.date).format(this.VITE_DATE_FORMAT));
                 let album = await HTTP.post('/create_album', formData)
                     .then(response => response.data)
                     .catch(error => { });
@@ -117,7 +134,7 @@ export default {
             }
         }
     },
-    components: { FormField, UploadSong, FontAwesomeIcon, DatePicker },
+
     computed: {
         singleMode() {
             return this.activeSelection === 'single'
@@ -158,8 +175,15 @@ export default {
 
     .columns {
         display: grid;
-        grid-template-columns: 1fr 200px;
+        grid-template-columns: 140px 1fr;
         gap: 10px;
+
+        .container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-direction: column;
+        }
 
         @include breakpoints.md(true) {
             grid-template-columns: 1fr;

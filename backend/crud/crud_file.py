@@ -11,7 +11,6 @@ class FileCruds:
         self.db = db
 
     def delete_file(self, file: File) -> None:
-        # ':
         path = '/'.join([settings.IMAGES_FOLDER if file.type ==
                         'image' else settings.OTHER_FILES_FOLDER, file.file_name])
         if Path(path).exists():

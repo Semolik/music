@@ -28,7 +28,7 @@ def init_folders_structure():
 
 
 def save_file(upload_file: UploadFile, user_id: int, force_image=False) -> File:
-    if not upload_file.filename:
+    if not upload_file or not upload_file.filename:
         return
     originalFileName = upload_file.filename
     originalFilePath = Path(originalFileName)

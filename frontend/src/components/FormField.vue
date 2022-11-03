@@ -6,8 +6,8 @@
                 <div :class="['formkit-inner', { error: notValid }, { setColor: !offChangeColor }]"
                     :style="{ '--inner-radius': borderRadius + 'px' }">
                     <slot name="right"></slot>
-                    <input v-on="inputEvents || {}" :placeholder="placeholder" class="formkit-input" type="text" :name="name" :id="id"
-                        v-model="modelValue">
+                    <input v-on="inputEvents || {}" :placeholder="placeholder" class="formkit-input" type="text"
+                        :name="name" :id="id" v-model="modelValue">
                     <slot></slot>
                 </div>
                 <slot name="side"></slot>
@@ -93,7 +93,7 @@ export default {
         notEmpty: Boolean,
         offChangeColor: Boolean,
         value: String,
-        inputEvents: Function,
+        inputEvents: Object,
     },
     inject: ['runValidation'],
     data() {

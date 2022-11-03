@@ -20,6 +20,7 @@
     "axios": "^0.27.2",
     "detect-touch": "^1.1.2",
     "gsap": "^3.11.0",
+    "moment": "^2.29.4",
     "pinia": "^2.0.17",
     "postcss": "^8.4.16",
     "postcss-cli": "^10.0.0",

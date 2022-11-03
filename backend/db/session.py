@@ -14,6 +14,6 @@ if not database_exists(engine.url):
     Base.metadata.create_all(engine)
 
 
-
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)  # 4
+session: Session = SessionLocal()

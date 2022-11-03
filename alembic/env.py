@@ -1,4 +1,6 @@
 from backend.models.user import *
+from backend.models.music import *
+
 from backend.core.config import settings
 from backend.db.base import Base
 from logging.config import fileConfig
@@ -35,7 +37,7 @@ def run_migrations_online() -> None:
     """
     configuration = config.get_section(config.config_ini_section)
     url = get_url()
-    
+
     configuration["sqlalchemy.url"] = url
     connectable = engine_from_config(
         configuration,
