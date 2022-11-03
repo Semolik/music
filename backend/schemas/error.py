@@ -13,3 +13,7 @@ class HTTPError(BaseModel):
 
 class HTTP_401_UNAUTHORIZED(BaseModel):
     detail: str = "неправильное имя пользователя или пароль"
+
+
+class USER_NOT_FOUND(BaseModel):
+    detail: str = "Пользователь не найден"

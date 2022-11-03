@@ -141,6 +141,7 @@ export default {
         },
         validFile(event) {
             let file = event.target.files;
+            this.data.audioFileTarget = null;
             if (!(file && file[0])) {
                 this.resetInputAudio();
                 return;
@@ -180,7 +181,7 @@ export default {
             return this.albumLimit - this.albumLenght
         },
         trackIsValid() {
-            var result = (this.nameLenght > 0 && this.upToNameLimit >= 0) && (this.upToFeatLimit >= 0);
+            var result = (this.nameLenght > 0 && this.upToNameLimit >= 0) && (this.upToFeatLimit >= 0) && this.data?.audioFileTarget;
             if (this.isSingle) {
                 result = result && this.upToAlbumLimit >= 0;
             }

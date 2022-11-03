@@ -13,8 +13,8 @@
                 <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty />
                 <date-picker v-model="date" is-dark mode="dateTime" is24hr>
                     <template v-slot="{ inputValue, inputEvents }">
-                        <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents" label="Начало активности"
-                            :borderRadius="10" off-margin>
+                        <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents"
+                            label="Начало активности" :borderRadius="10" off-margin>
                             <FontAwesomeIcon icon="fa-calendar" />
                         </FormField>
                     </template>
@@ -98,7 +98,10 @@ export default {
         async save() {
             this.toggleRunValidation();
             if (this.buttonActive) {
-                let album = await HTTP.post('/create-album')
+                var formData = new FormData();
+                var formDatas = new FormData();
+                formData.append('albumData', {'asdasdasd'})
+                let album = await HTTP.post('/create_album', formData)
                     .then(response => response.data)
                     .catch(error => { });
                 if (!album) {
