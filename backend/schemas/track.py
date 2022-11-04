@@ -8,7 +8,7 @@ from backend.core.config import env_config
 class UploadTrackBase(BaseModel):
     name: str
     album_id: int
-    feat: str | None = None
+    feat: str | None
 
 
 class UploadTrack(UploadTrackBase):

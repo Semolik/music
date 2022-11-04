@@ -41,6 +41,9 @@ import SelectImage from './SelectImage.vue';
 import FormField from './FormField.vue';
 import { useToast } from "vue-toastification";
 import { HTTP } from '../http-common.vue';
+import moment from 'moment';
+import handleError from '../composables/errors';
+
 library.add(faPaperclip);
 
 export default {
@@ -54,11 +57,13 @@ export default {
             VITE_MAX_TRACK_NAME_LENGTH,
             VITE_MAX_TRACK_FEAT_LENGTH,
             VITE_MAX_ALBUM_NAME_LENGTH,
+            VITE_DATE_FORMAT
         } = import.meta.env;
         return {
             VITE_MAX_TRACK_NAME_LENGTH,
             VITE_MAX_TRACK_FEAT_LENGTH,
             VITE_MAX_ALBUM_NAME_LENGTH,
+            VITE_DATE_FORMAT,
             toast
         }
     },
@@ -129,7 +134,7 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
-                form.append('date', this.album_date);
+                form.append('date', moment(this.album_date).format(this.VITE_DATE_FORMAT));
                 HTTP.post('upload_song', form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -139,8 +144,7 @@ export default {
                     }.bind(this)
                 })
                     .then((response) => {
-
-                        this.toast(response.data.detail);
+                        // this.toast(response.data?.detail);
                         this.uploadPercentage = 0;
                     })
                     .catch((error) => {
