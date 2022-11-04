@@ -124,7 +124,7 @@ export default {
     },
     methods: {
         pictureUpdated(file) {
-            this.data.pictureTarget = file;
+            this.data.pictureTarget = file[0];
         },
         sendFile() {
             if (this.album_id) {
@@ -134,6 +134,7 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
+                form.append('trackPicture', this.$refs.selectPic?.target[0]);
                 form.append('date', moment(this.album_date).format(this.VITE_DATE_FORMAT));
                 HTTP.post('upload_song', form, {
                     headers: {

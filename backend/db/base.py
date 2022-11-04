@@ -11,12 +11,14 @@ class CRUDBase:
         return self.db.query(model).filter(self.model.id == id).first()
 
     def get_multi(
-        self,  *, skip: int = 0, limit: int = 100, model
-    ) -> List:
+            self, model, skip: int = 0, limit: int = 100, ) -> List:
         return self.db.query(model).offset(skip).limit(limit).all()  # 4
 
-    def create(self,  *,  model):
+    def create(self,  model):
         self.db.add(model)
         self.db.commit()  # 5
         self.db.refresh(model)
         return model
+
+
+crud_base = CRUDBase()

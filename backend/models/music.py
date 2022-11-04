@@ -1,5 +1,5 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Time
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
@@ -29,4 +29,10 @@ class Track(Base):
         String(int(env_config.get('VITE_MAX_TRACK_NAME_LENGTH'))), nullable=False)
     feat = Column(String(int(env_config.get('VITE_MAX_TRACK_FEAT_LENGTH'))))
     open_date = Column(DateTime, nullable=False)
-    length = Column(Time, nullable=False)
+    duration = Column(DECIMAL, nullable=False)
+    album_id = Column(Integer, ForeignKey("albums.id"), nullable=False)
+    album = relationship("Album", foreign_keys=[album_id])
+    file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
+    file = relationship("File", foreign_keys=[file_id])
+    picture_id = Column(Integer, ForeignKey("files.id"))
+    picture = relationship("File", foreign_keys=[picture_id])

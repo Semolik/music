@@ -10,6 +10,7 @@ psycopg2
 sqlalchemy-utils
 python-dotenv
 uvicorn
+pydub
+requests
 
 pytest
-requests

@@ -16,7 +16,11 @@
             <div class="columns">
                 <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
                 <div class="container" id="upload-album">
-                    <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName" />
+                    <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName">
+                        <span :class="['count', { wrong: upToAlbumLimit < 0 }]" v-if="upToAlbumLimit">
+                            {{ upToAlbumLimit }}
+                        </span>
+                    </FormField>
                     <SelectDate v-model="date" />
                 </div>
             </div>
@@ -52,11 +56,13 @@ export default {
     setup() {
         const toast = useToast();
         const {
-            VITE_DATE_FORMAT
+            VITE_DATE_FORMAT,
+            VITE_MAX_ALBUM_NAME_LENGTH
         } = import.meta.env;
         return {
             toast,
-            VITE_DATE_FORMAT
+            VITE_DATE_FORMAT,
+            VITE_MAX_ALBUM_NAME_LENGTH
         }
     },
     components: { FormField, UploadSong, FontAwesomeIcon, SelectImage, SelectDate },
@@ -70,6 +76,7 @@ export default {
             date: new Date(),
             album_id: null,
             mounted: false,
+            albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
         };
     },
     provide() {
@@ -132,11 +139,11 @@ export default {
                 if (this.singleMode) {
                     this.$refs.track.sendFile();
                 }
-                // else {
-                //     for (let index = 0; index < this.tracks.length; index++) {
-                //         this.$refs[`track-${index}`].sendFile();
-                //     }
-                // }
+                else {
+                    for (let index = 0; index < this.tracks.length; index++) {
+                        this.$refs[`track-${index}`][0].sendFile();
+                    }
+                }
             }
         }
     },
@@ -146,14 +153,18 @@ export default {
             return this.activeSelection === 'single'
         },
         buttonActive() {
-            console.log(this.track);
             if (this.activeSelection === 'single') {
                 return this.track.isValid
             }
             else {
-                return this.tracks.filter(el => el?.isValid).length == this.tracks.length
+                return this.tracks.filter(el => el?.isValid).length == this.tracks.length && this.albumName.length > 0
             }
-        }
+        },
+        upToAlbumLimit() {
+            let length = this.albumName?.length;
+            if (!length) return
+            return this.albumLimit - length
+        },
     }
 }
 </script>

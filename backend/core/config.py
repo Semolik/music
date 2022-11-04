@@ -16,8 +16,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
     IMAGES_FOLDER: str = ASSETS_FOLDER+'images'
+    TRACKS_FOLDER: str = ASSETS_FOLDER+'tracks'
     OTHER_FILES_FOLDER: str = ASSETS_FOLDER+'other'
     IMAGES_EXTENTION: str = '.png'
+    SONGS_EXTENTION: str = '.mp3'
     UPLOADS_ROUTE: str = '/uploads'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
     ALLOWED_STATUSES = Literal['in-progress',

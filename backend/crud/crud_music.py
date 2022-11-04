@@ -15,8 +15,5 @@ class MusicCrud(CRUDBase):
                          open_date=date, picture=db_image)
         return self.create(model=db_album)
 
-    def create_track(self, musician_id: int, name: str, date: datetime, track):
-        ...
-
 
 music_crud = MusicCrud()

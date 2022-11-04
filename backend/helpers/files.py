@@ -8,6 +8,7 @@ from backend.models.user import File
 from fastapi import UploadFile, HTTPException
 from backend.core.config import settings
 from pathlib import Path
+
 logger = logging.getLogger(__name__)
 supported_image_extensions = {
     ex for ex, f in Image.registered_extensions().items() if f in Image.OPEN}
@@ -15,7 +16,8 @@ supported_image_extensions = {
 
 def init_folders_structure():
     pathes = [Path(path) for path in [settings.IMAGES_FOLDER,
-                                      settings.OTHER_FILES_FOLDER]]
+                                      settings.OTHER_FILES_FOLDER,
+                                      settings.TRACKS_FOLDER]]
     flag = False
     for path in pathes:
         if not path.exists():

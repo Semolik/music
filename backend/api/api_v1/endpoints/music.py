@@ -1,6 +1,7 @@
 from fastapi import Depends, APIRouter,  UploadFile, File
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
+from backend.helpers.music import save_track
 from backend.helpers.users import get_public_profile_as_dict
 from backend.helpers.validate_role import validate_musician
 from backend.responses import NOT_FOUND_USER, UNAUTHORIZED_401
@@ -31,6 +32,9 @@ def update_user_data(trackData: UploadTrackForm = Depends(UploadTrackForm), trac
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = validate_musician(user_id=current_user_id)
-    db_image = save_file(upload_file=trackPicture,user_id=db_user.id, force_image=True)
-    db_track_file = save_file(upload_file=track,user_id=db_user.id)
-
+    db_image = save_file(upload_file=trackPicture,
+                         user_id=db_user.id, force_image=True)
+    # db_track_file = save_file(upload_file=track,user_id=db_user.id)
+    db_track = save_track(
+        upload_file=track, user_id=current_user_id, track=trackData, picture=db_image)
+    return db_track.as_dict()
