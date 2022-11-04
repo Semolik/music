@@ -5,25 +5,24 @@ from backend.helpers.forms import form_body
 from backend.core.config import env_config
 
 
-class Date(BaseModel):
-    birthdate: datetime
-
-    @validator("birthdate", pre=True)
-    def parse_birthdate(cls, value):
-        return datetime.strptime(
-            value,
-            env_config.get('VITE_DATE_FORMAT')
-        ).date()
-
-
-class UploadTrack(BaseModel):
+class UploadTrackBase(BaseModel):
     name: str
     album_id: int
     feat: str | None = None
 
 
-class Track(UploadTrack):
+class UploadTrack(UploadTrackBase):
+    date: datetime
+
+
+@form_body
+class UploadTrackForm(UploadTrack):
+    ...
+
+
+class Track(UploadTrackBase):
     id: int
+    year: int
 
 
 class CreateAlbum(BaseModel):
@@ -36,8 +35,15 @@ class CreateAlbumForm(CreateAlbum):
     ...
 
 
-class Album(BaseModel):
+class AlbumBase(BaseModel):
     id: int
     name: str
     year: int
+
+
+class AlbumAfterUpload(AlbumBase):
+    artist_id: int
+
+
+class AlbumInfo(AlbumBase):
     artist: PublicProfile

@@ -2,13 +2,13 @@
 
 <h3>Install</h3>
 
-	$ cd backend
-	$ pip install -r reqirements.txt
+	cd backend
+	pip install -r reqirements.txt
 
-	$ cd ..
+	cd ..
 	
-	$ cd frontend
-	$ npm i
+	cd frontend
+	npm i
 <h3>Setting</h3>
 create a .env.local file in the root folder with the following content
 

@@ -18,36 +18,36 @@ const router = createRouter({
     {
       path: '/lk',
       meta: { requireAuth: true },
-      component: () => import('../views/PersonalАccountView.vue'),
+      component: () => import('../views/PersonalAccountView.vue'),
       children: [
         {
           path: '',
           name: 'Личный кабинет',
-          component: () => import('../components/PersonalАccountProfile.vue'),
+          component: () => import('../components/PersonalAccountProfile.vue'),
         },
         {
           path: 'public',
           name: 'Публичный профиль',
-          component: () => import('../components/PersonalАccountPublicProfile.vue'),
+          component: () => import('../components/PersonalAccountPublicProfile.vue'),
         },
         {
           path: 'music',
           name: 'Моя музыка',
-          component: () => import('../components/PersonalАccountMusic.vue'),
+          component: () => import('../components/PersonalAccountMusic.vue'),
         },
         {
           path: 'my-music',
-          component: () => import('../components/PersonalАccountMusicianCabinet.vue'),
+          component: () => import('../components/PersonalAccountMusicianCabinet.vue'),
           children: [
             {
               path: '',
               name: 'Кабинет музыканта',
-              component: () => import('../components/PersonalАccountMusicianCabinetMain.vue'),
+              component: () => import('../components/PersonalAccountMusicianCabinetMain.vue'),
             },
             {
               path: 'upload',
               name: 'Загрузить',
-              component: () => import('../components/PersonalАccountMusicianCabinetUpload.vue'),
+              component: () => import('../components/PersonalAccountMusicianCabinetUpload.vue'),
             },
 
           ]
@@ -56,7 +56,7 @@ const router = createRouter({
           path: 'update-status',
           name: 'Изменение статуса аккаунта',
           meta: { requireAuth: true, roles: [Role.User, Role.Musician, Role.RadioStation] },
-          component: () => import('../components/PersonalАccountChangeStatatus.vue'),
+          component: () => import('../components/PersonalAccountChangeStatatus.vue'),
           children: [
             {
               path: 'history',
@@ -69,7 +69,7 @@ const router = createRouter({
           path: 'update-status-requests',
           name: 'Запросы на изменение статуса',
           meta: { requireAuth: true, roles: [Role.Admin] },
-          component: () => import('../components/PersonalАccountChangeStatatusRequests.vue'),
+          component: () => import('../components/PersonalAccountChangeStatatusRequests.vue'),
         },
       ]
     },

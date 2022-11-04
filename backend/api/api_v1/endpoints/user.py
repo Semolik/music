@@ -2,6 +2,7 @@ from fastapi import Depends, APIRouter, status, UploadFile, File, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.helpers.files import save_file
 from backend.helpers.images import set_picture
+from backend.helpers.users import get_public_profile_as_dict
 from backend.schemas.user import PublicProfile, PublicProfileLinks, PublicProfileModifiable, UserInfo, UserModifiableForm
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.crud.crud_user import user_cruds
@@ -72,9 +73,4 @@ def get_user_public_profile_info(Authorize: AuthJWT = Depends()):
     if not db_user.is_musician and not db_user.is_radio_station:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
-    db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
-    public_profile_data = db_public_profile.as_dict()
-    public_profile_data['links'] = db_public_profile.links.as_dict()
-    public_profile_data = set_picture(
-        public_profile_data, db_public_profile.picture)
-    return public_profile_data
+    return get_public_profile_as_dict(user_id=current_user_id)

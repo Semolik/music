@@ -25,7 +25,8 @@
             </div>
         </div>
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
-            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }, { wrong: wrongFile }]">
+            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }, { wrong: wrongFile }, { progress: uploadPercentage > 0 }]"
+                :style="{ '--progress': uploadPercentage + '%' }">
                 <div class="text">{{ fileName || 'выбрать аудиофайл' }}</div>
                 <input type="file" @change="validFile" :ref="refAudioName" :accept="acceptedFormats">
             </div>
@@ -39,6 +40,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import SelectImage from './SelectImage.vue';
 import FormField from './FormField.vue';
 import { useToast } from "vue-toastification";
+import { HTTP } from '../http-common.vue';
 library.add(faPaperclip);
 
 export default {
@@ -88,11 +90,12 @@ export default {
             albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
-            acceptedFormats: '.mp3, .ogg'
+            acceptedFormats: '.mp3, .ogg',
+            uploadPercentage: 0,
         };
     },
     components: { SelectImage, FormField, FontAwesomeIcon },
-    inject: ['runValidation'],
+    inject: ['runValidation', 'album_id', 'album_date'],
     watch: {
         data: {
             handler() {
@@ -119,7 +122,32 @@ export default {
             this.data.pictureTarget = file;
         },
         sendFile() {
+            if (this.album_id) {
+                let data = this.data;
+                let form = new FormData();
+                form.append('name', data.name);
+                form.append('album_id', this.album_id);
+                form.append('feat', data.feat);
+                form.append('track', data.audioFileTarget);
+                form.append('date', this.album_date);
+                HTTP.post('upload_song', form, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    onUploadProgress: function (progressEvent) {
+                        this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100));
+                    }.bind(this)
+                })
+                    .then((response) => {
 
+                        this.toast(response.data.detail);
+                        this.uploadPercentage = 0;
+                    })
+                    .catch((error) => {
+                        this.toast.error(handleError(error, `При загрузке трека ${this.fileName} произошла ошибка`).message)
+
+                    });
+            }
         },
         updateDataParent() {
             this.$emit('update', this.data);
@@ -245,12 +273,28 @@ export default {
         @include helpers.flex-center;
         position: relative;
 
+
         &.wrong {
             border: 2px dashed red;
         }
 
         &.active {
             border-color: var(--green);
+
+            &.progress {
+                overflow: hidden;
+                isolation: isolate;
+
+                &::after {
+                    z-index: -1;
+                    content: '';
+                    position: absolute;
+                    height: 100%;
+                    background-color: var(--green-128-hover);
+                    width: var(--progress);
+                    left: 0;
+                }
+            }
         }
 
         &:hover {

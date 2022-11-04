@@ -8,24 +8,18 @@
         </div>
     </div>
     <div class="songs">
-        <template v-if="!singleMode">
+        <template v-if="singleMode">
+            <SelectDate v-model="date" />
+            <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single />
+        </template>
+        <template v-else>
             <div class="columns">
                 <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
-                <div class="container">
+                <div class="container" id="upload-album">
                     <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName" />
-                    <date-picker v-model="date" is-dark mode="dateTime" is24hr>
-                        <template v-slot="{ inputValue, inputEvents }">
-                            <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents"
-                                label="Начало активности" :borderRadius="10" off-margin>
-                                <FontAwesomeIcon icon="fa-calendar" />
-                            </FormField>
-                        </template>
-                    </date-picker>
+                    <SelectDate v-model="date" />
                 </div>
             </div>
-        </template>
-        <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single v-if="singleMode" />
-        <template v-else>
             <UploadSong :ref="`track-${index}`" :id="index" :track="track" @update="trackUpdate($event, index)"
                 v-for="(track, index) in tracks" />
         </template>
@@ -41,19 +35,19 @@
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlus, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed } from '@vue/reactivity';
-import UploadSong from '../components/PersonalАccountMusicianCabinetUploadSong.vue'
+import UploadSong from './PersonalAccountMusicianCabinetUploadSong.vue'
 import { HTTP } from '../http-common.vue';
 import FormField from './FormField.vue';
 import { useToast } from "vue-toastification";
-import { DatePicker } from 'v-calendar';
 import SelectImage from './SelectImage.vue';
 import moment from 'moment';
+import SelectDate from './PersonalAccountMusicianCabinetUploadDate.vue';
 
-library.add(faPlus, faFloppyDisk, faCalendar);
+library.add(faPlus, faFloppyDisk);
 export default {
     setup() {
         const toast = useToast();
@@ -65,7 +59,7 @@ export default {
             VITE_DATE_FORMAT
         }
     },
-    components: { FormField, UploadSong, FontAwesomeIcon, DatePicker, SelectImage },
+    components: { FormField, UploadSong, FontAwesomeIcon, SelectImage, SelectDate },
     data() {
         return {
             activeSelection: "single",
@@ -75,17 +69,24 @@ export default {
             runValidation: false,
             date: new Date(),
             album_id: null,
+            mounted: false,
         };
     },
     provide() {
         return {
-            runValidation: computed(() => this.runValidation)
+            runValidation: computed(() => this.runValidation),
+            album_id: computed(() => this.album_id),
+            album_date: computed(() => this.date),
         }
+    },
+    mounted() {
+        this.mounted = true
     },
     watch: {
         singleMode(value) {
             this.tracks = [{}];
             this.track = {};
+            this.albumName = "";
         },
 
     },
@@ -116,7 +117,10 @@ export default {
             if (this.buttonActive) {
                 var formData = new FormData();
                 formData.append('name', this.albumName);
-                formData.append('albumPicture', this.$refs.selectPicAlbum.target[0]);
+                let picture = this.$refs.selectPicAlbum?.target[0];
+                if (picture) {
+                    formData.append('albumPicture', picture);
+                }
                 formData.append('date', moment(this.date).format(this.VITE_DATE_FORMAT));
                 let album = await HTTP.post('/create_album', formData)
                     .then(response => response.data)
@@ -124,9 +128,11 @@ export default {
                 if (!album) {
                     this.toast.error('Произошла ошибка при создании альбома');
                 }
-                // if (this.singleMode) {
-                //     this.$refs.sendFile();
-                // } else {
+                this.album_id = album.id;
+                if (this.singleMode) {
+                    this.$refs.track.sendFile();
+                }
+                // else {
                 //     for (let index = 0; index < this.tracks.length; index++) {
                 //         this.$refs[`track-${index}`].sendFile();
                 //     }
@@ -189,11 +195,7 @@ export default {
             grid-template-columns: 1fr;
         }
 
-        .calendar {
-            svg {
-                padding: 10px;
-            }
-        }
+
     }
 
     .buttons-container {

@@ -6,7 +6,7 @@ from backend.helpers.roles import set_status
 from backend.helpers.images import set_picture
 from backend.core.config import settings
 from backend.helpers.files import add_url
-from backend.crud.crud_file import FileCruds
+from backend.crud.crud_file import file_cruds
 from backend.db.session import SessionLocal
 from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
 from backend.models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
@@ -59,10 +59,10 @@ class UserCruds:
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if remove_picture:
-            FileCruds(self.db).delete_file(user.picture)
+            file_cruds.delete_file(user.picture)
         elif userPic:
             if user.picture:
-                FileCruds(self.db).delete_file(user.picture)
+                file_cruds.delete_file(user.picture)
             user.picture = self.create(userPic)
         self.db.add(user)
         self.db.commit()
@@ -99,10 +99,10 @@ class UserCruds:
             if value is not None:
                 setattr(public_proile_links, var, value)
         if remove_picture:
-            FileCruds(self.db).delete_file(public_proile.picture)
+            file_cruds.delete_file(public_proile.picture)
         elif userPublicPicture:
             if public_proile.picture:
-                FileCruds(self.db).delete_file(public_proile.picture)
+                file_cruds.delete_file(public_proile.picture)
             public_proile.picture = self.create(userPublicPicture)
         self.db.add(public_proile)
         self.db.commit()
