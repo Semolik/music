@@ -8,10 +8,7 @@
         </div>
     </div>
     <div class="songs">
-        <template v-if="singleMode">
-            <SelectDate v-model="date" />
-            <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single />
-        </template>
+        <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single v-if="singleMode" />
         <template v-else>
             <div class="columns">
                 <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
@@ -28,11 +25,12 @@
                 v-for="(track, index) in tracks" />
         </template>
         <div class="buttons-container">
-            <div class="button-block" @click="addTrack" v-if="!singleMode">
+            <div class="button-block" @[!loadingActive&&`click`]="addTrack" v-if="!singleMode">
                 <FontAwesomeIcon icon="fa-plus" />
             </div>
-            <div :class="['button-block', { active: buttonActive }]" @click="save">
-                <FontAwesomeIcon icon="fa-floppy-disk" />
+            <div :class="['button-block', { active: buttonActive }, { loading: loadingActive }]"
+                @[!loadingActive&&`click`]="save">
+                <FontAwesomeIcon :icon="loadingActive ? 'spinner' : 'fa-floppy-disk'" />
             </div>
         </div>
     </div>
@@ -40,7 +38,7 @@
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed } from '@vue/reactivity';
 import UploadSong from './PersonalAccountMusicianCabinetUploadSong.vue'
@@ -51,7 +49,7 @@ import SelectImage from './SelectImage.vue';
 import moment from 'moment';
 import SelectDate from './PersonalAccountMusicianCabinetUploadDate.vue';
 
-library.add(faPlus, faFloppyDisk);
+library.add(faPlus, faFloppyDisk, faSpinner);
 export default {
     setup() {
         const toast = useToast();
@@ -95,7 +93,11 @@ export default {
             this.track = {};
             this.albumName = "";
         },
-
+        allTracksUploaded(value) {
+            if (value) {
+                this.toast(`Загрузка трек${this.singleMode ? "а" : "ов"} завершена`)
+            }
+        }
     },
     methods: {
         toggleRunValidation() {
@@ -121,19 +123,23 @@ export default {
         },
         async save() {
             this.toggleRunValidation();
-            if (this.buttonActive) {
+            if (this.buttonActive && !this.loadingActive) {
                 var formData = new FormData();
                 formData.append('name', this.albumName);
-                let picture = this.$refs.selectPicAlbum?.target[0];
+                let picture = this.singleMode ? this.$refs.track.trackPicture : this.$refs.selectPicAlbum?.target;
                 if (picture) {
-                    formData.append('albumPicture', picture);
+                    formData.append('albumPicture', picture[0]);
                 }
-                formData.append('date', moment(this.date).format(this.VITE_DATE_FORMAT));
+                let date = this.singleMode ? this.track.date : this.date;
+                formData.append('date', moment(date).format(this.VITE_DATE_FORMAT));
                 let album = await HTTP.post('/create_album', formData)
                     .then(response => response.data)
-                    .catch(error => { });
+                    .catch(error => {
+                        return null
+                    });
                 if (!album) {
                     this.toast.error('Произошла ошибка при создании альбома');
+                    return
                 }
                 this.album_id = album.id;
                 if (this.singleMode) {
@@ -153,11 +159,30 @@ export default {
             return this.activeSelection === 'single'
         },
         buttonActive() {
-            if (this.activeSelection === 'single') {
+            if (this.allTracksUploaded) {
+                return
+            }
+            if (this.singleMode) {
                 return this.track.isValid
             }
             else {
                 return this.tracks.filter(el => el?.isValid).length == this.tracks.length && this.albumName.length > 0
+            }
+        },
+        loadingActive() {
+            if (this.singleMode) {
+                return this.track.loading
+            }
+            else {
+                return this.tracks.filter(el => el?.loading).length == this.tracks.length
+            }
+        },
+        allTracksUploaded() {
+            if (this.singleMode) {
+                return this.track.uploaded
+            }
+            else {
+                return this.tracks.filter(el => el?.uploaded).length == this.tracks.length
             }
         },
         upToAlbumLimit() {
@@ -220,8 +245,29 @@ export default {
             height: 45px;
             width: 45px;
 
-            &.active {
+            &.active:not(.loading) {
                 background-color: var(--purple-1);
+            }
+
+            &.loading {
+                svg {
+
+                    @keyframes spin {
+                        from {
+                            transform: rotate(0deg);
+                        }
+
+                        to {
+                            transform: rotate(360deg);
+                        }
+                    }
+
+                    animation-name: spin;
+                    animation-duration: 1s;
+                    animation-iteration-count: infinite;
+                    animation-timing-function: linear;
+
+                }
             }
 
             svg {

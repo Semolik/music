@@ -57,7 +57,7 @@ def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FI
 
 
 @router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
-def send_update_role_request(data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends()):
+def send_update_role_request_answer(data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not user_cruds.is_admin(user_id=current_user_id):

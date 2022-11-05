@@ -1,5 +1,6 @@
 <template>
     <div class="upload-song-container">
+        <SelectDate v-model="data.date" v-if="isSingle" />
         <FormField @empty="nameIsValid = $event" :borderRadius="borderRadius" label="Название" v-model="data.name"
             off-margin notEmpty>
             <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
@@ -25,8 +26,7 @@
             </div>
         </div>
         <Teleport :disabled="isSingle" :to="`#fields-${id}`" v-if="mounted">
-            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }, { wrong: wrongFile }, { progress: uploadPercentage > 0 }]"
-                :style="{ '--progress': uploadPercentage + '%' }">
+            <div :class="['music-selector', { setMinHeight: isSingle }, { active: fileName }, { wrong: wrongFile }]">
                 <div class="text">{{ fileName || 'выбрать аудиофайл' }}</div>
                 <input type="file" @change="validFile" :ref="refAudioName" :accept="acceptedFormats">
             </div>
@@ -43,6 +43,7 @@ import { useToast } from "vue-toastification";
 import { HTTP } from '../http-common.vue';
 import moment from 'moment';
 import handleError from '../composables/errors';
+import SelectDate from '../components/PersonalAccountMusicianCabinetUploadDate.vue';
 
 library.add(faPaperclip);
 
@@ -51,6 +52,7 @@ export default {
         isSingle: Boolean,
         id: Number,
     },
+    components: { SelectImage, FormField, FontAwesomeIcon, SelectDate },
     setup() {
         const toast = useToast();
         const {
@@ -82,6 +84,9 @@ export default {
                 isValid: false,
                 audioFileTarget: null,
                 pictureTarget: null,
+                loading: false,
+                uploaded: false,
+                date: new Date(),
             },
             wrongFile: false,
             refAudioName: `audio-${this.id}`,
@@ -96,10 +101,9 @@ export default {
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,
             followingName: this.isSingle,
             acceptedFormats: '.mp3, .ogg',
-            uploadPercentage: 0,
+
         };
     },
-    components: { SelectImage, FormField, FontAwesomeIcon },
     inject: ['runValidation', 'album_id', 'album_date'],
     watch: {
         data: {
@@ -128,29 +132,31 @@ export default {
         },
         sendFile() {
             if (this.album_id) {
+                this.data.loading = true;
                 let data = this.data;
                 let form = new FormData();
+                let picture = this.trackPicture;
                 form.append('name', data.name);
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
-                form.append('trackPicture', this.$refs.selectPic?.target[0]);
+                if (picture) {
+                    form.append('trackPicture', picture[0]);
+                }
                 form.append('date', moment(this.album_date).format(this.VITE_DATE_FORMAT));
                 HTTP.post('upload_song', form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },
-                    onUploadProgress: function (progressEvent) {
-                        this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100));
-                    }.bind(this)
                 })
-                    .then((response) => {
-                        // this.toast(response.data?.detail);
-                        this.uploadPercentage = 0;
+                    .then(() => {
+                        this.data.uploaded = true;
                     })
                     .catch((error) => {
                         this.toast.error(handleError(error, `При загрузке трека ${this.fileName} произошла ошибка`).message)
 
+                    }).finally(() => {
+                        this.data.loading = false;
                     });
             }
         },
@@ -219,6 +225,9 @@ export default {
                 result = result && this.upToAlbumLimit >= 0;
             }
             return result;
+        },
+        trackPicture() {
+            return this.$refs.selectPic?.target
         }
     }
 }
@@ -285,21 +294,6 @@ export default {
 
         &.active {
             border-color: var(--green);
-
-            &.progress {
-                overflow: hidden;
-                isolation: isolate;
-
-                &::after {
-                    z-index: -1;
-                    content: '';
-                    position: absolute;
-                    height: 100%;
-                    background-color: var(--green-128-hover);
-                    width: var(--progress);
-                    left: 0;
-                }
-            }
         }
 
         &:hover {
