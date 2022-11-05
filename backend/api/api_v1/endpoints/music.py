@@ -1,12 +1,15 @@
+from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
-from backend.helpers.music import save_track
+from backend.crud.crud_user import user_cruds
+from backend.helpers.music import save_track, set_album_info
 from backend.helpers.users import get_public_profile_as_dict
 from backend.helpers.validate_role import validate_musician
 from backend.responses import NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.track import AlbumAfterUpload, CreateAlbumForm, TrackAfterUpload, UploadTrackForm
+from backend.schemas.track import AlbumAfterUpload, AlbumInfo, CreateAlbumForm, TrackAfterUpload, UploadTrackForm
 from backend.helpers.files import save_file
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter(tags=['Музыка'])
 
@@ -19,12 +22,9 @@ def create_album(albumData: CreateAlbumForm = Depends(CreateAlbumForm), albumPic
     db_image = save_file(upload_file=albumPicture,
                          user_id=db_user.id, force_image=True)
     db_album = music_crud.create_album(
-        name=albumData.name, musician_id=current_user_id, date=albumData.date, picture=db_image)
+        name=albumData.name, user_id=current_user_id, date=albumData.date, picture=db_image)
     db_album_obj = db_album.as_dict()
-    db_album_obj['year'] = db_album.open_date.year
-    db_album_obj['artist'] = get_public_profile_as_dict(
-        user_id=current_user_id)
-    return db_album_obj
+    return set_album_info(db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
 
 
 @router.post('/upload_song', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
@@ -39,9 +39,16 @@ def upload_song(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPict
     return db_track.as_dict()
 
 
-@router.post('/get_my_albums', responses={**UNAUTHORIZED_401})
-def get_musician_albums(Authorize: AuthJWT = Depends()):
+@router.get('/get_my_albums', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
+def get_my_albums(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    db_user = validate_musician(user_id=current_user_id)
-    
+    validate_musician(user_id=current_user_id)
+    db_musician = user_cruds.get_public_profile(user_id=current_user_id)
+    return [
+        set_album_info(
+            db_album=db_album,
+            db_album_obj=db_album.as_dict(),
+            user_id=current_user_id
+        )
+        for db_album in music_crud.get_albums(musician_id=db_musician.id)]

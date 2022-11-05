@@ -8,7 +8,7 @@ const HTTP = axios.create({
 });
 HTTP.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error_1) => {
 
     if (localStorage.getItem('logined') === 'false' || error?.response?.data?.detail !== "Signature has expired") {
       return Promise.reject(error);
@@ -23,7 +23,8 @@ HTTP.interceptors.response.use(
               resolve(response);
             })
             .catch((error) => {
-              reject(error);
+              router.push('/login');
+              reject(error_1);
             });
         });
       })

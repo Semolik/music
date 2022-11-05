@@ -22,11 +22,12 @@ class AlbumBase(BaseModel):
 
 
 class AlbumAfterUpload(AlbumBase):
-    artist_id: int
+    musician_id: int
 
 
 class AlbumInfo(AlbumBase):
-    artist: PublicProfile
+    musician: PublicProfile
+    picture: str | None
 
 
 class UploadTrackBase(BaseModel):

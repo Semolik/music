@@ -8,9 +8,9 @@ class Album(Base):
     __tablename__ = 'albums'
 
     id = Column(Integer, primary_key=True, index=True)
-    artist_id = Column(Integer, ForeignKey(
+    musician_id = Column(Integer, ForeignKey(
         "public_profiles.id"), nullable=False)
-    artist = relationship("PublicProfile", foreign_keys=[artist_id])
+    musician = relationship("PublicProfile", foreign_keys=[musician_id])
     name = Column(
         String(int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH'))), nullable=False)
     open_date = Column(DateTime, nullable=False)
