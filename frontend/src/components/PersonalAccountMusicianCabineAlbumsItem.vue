@@ -1,12 +1,13 @@
 <template>
-    <router-link class="album" :to="`albums/${albumInfo.id}`">
-        <dib class="picture">
+    <router-link class="album" :to="`/lk/my-music/albums/${albumInfo.id}`">
+        <div class="picture">
             <img :src="albumInfo.picture" alt="" v-if="albumInfo.picture">
             <div class="empty-picture" v-else>
                 <FontAwesomeIcon icon="fa-music" />
             </div>
-        </dib>
+        </div>
         <div class="name">{{ albumInfo.name }}</div>
+        <div class="year">{{ albumInfo.year }}</div>
     </router-link>
 </template>
 <script>
@@ -14,6 +15,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faMusic } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(faMusic);
+
 export default {
     props: {
         albumInfo: Object
@@ -30,15 +32,10 @@ export default {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    gap: 5px;
-    text-align: center;
     color: var(--color-text);
     text-decoration: none;
-
-    .name {
-        text-align: center;
-    }
-
+    text-align: center;
+    
     .picture {
         aspect-ratio: 1;
         border-radius: 10px;
@@ -46,6 +43,7 @@ export default {
         overflow: hidden;
         isolation: isolate;
         position: relative;
+        margin-bottom: 5px;
 
         &:hover {
             .empty-picture {
@@ -91,6 +89,15 @@ export default {
 
             }
         }
+    }
+    .name {
+        font-weight: 600;
+        padding-left: 10px;
+        
+    }
+    .year {
+        color: var(--vt-c-white-150);
+        font-size: 0.9em;
     }
 
 }

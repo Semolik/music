@@ -23,8 +23,7 @@ def create_album(albumData: CreateAlbumForm = Depends(CreateAlbumForm), albumPic
                          user_id=db_user.id, force_image=True)
     db_album = music_crud.create_album(
         name=albumData.name, user_id=current_user_id, date=albumData.date, picture=db_image)
-    db_album_obj = db_album.as_dict()
-    return set_album_info(db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
+    return set_album_info(db_album=db_album, user_id=current_user_id)
 
 
 @router.post('/upload_song', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
@@ -48,7 +47,6 @@ def get_my_albums(Authorize: AuthJWT = Depends()):
     return [
         set_album_info(
             db_album=db_album,
-            db_album_obj=db_album.as_dict(),
             user_id=current_user_id
         )
         for db_album in music_crud.get_albums(musician_id=db_musician.id)]

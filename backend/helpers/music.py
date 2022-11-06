@@ -16,8 +16,6 @@ import io
 
 def save_track(upload_file: UploadFile, picture: File, user_id: int, track: UploadTrackForm):
     originalFileName = upload_file.filename
-    # originalFilePath = Path(originalFileName)
-    # suffix = originalFilePath.suffix
     uuid_filename = str(uuid.uuid4())
     buf = io.BytesIO()
     shutil.copyfileobj(upload_file.file, buf)
@@ -53,7 +51,8 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
         raise HTTPException(status_code=500, detail="поврежденный файл")
 
 
-def set_album_info(db_album: Album, db_album_obj: dict, user_id: int):
+def set_album_info(db_album: Album, user_id: int):
+    db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['musician'] = get_public_profile_as_dict(
         user_id=user_id)

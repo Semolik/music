@@ -10,12 +10,12 @@ HTTP.interceptors.response.use(
   (response) => response,
   (error_1) => {
 
-    if (localStorage.getItem('logined') === 'false' || error?.response?.data?.detail !== "Signature has expired") {
-      return Promise.reject(error);
+    if (localStorage.getItem('logined') === 'false' || error_1?.response?.data?.detail !== "Signature has expired") {
+      return Promise.reject(error_1);
     }
     axios.post(HTTP.defaults.baseURL + 'refresh', { withCredentials: true })
       .then((res) => {
-        const config = error.config;
+        const config = error_1.config;
         return new Promise((resolve, reject) => {
           axios
             .request(config)

@@ -1,7 +1,7 @@
 <template>
-    <FormField placeholder="Поиск" :borderRadius="10"></FormField>
+    <FormField placeholder="Поиск" :borderRadius="10" v-model="text"></FormField>
     <div class="albums">
-        <Album :albumInfo="album" v-for="album in albums" />
+        <Album :albumInfo="album" v-for="album in filteredAlbums" />
     </div>
 </template>
 <script>
@@ -23,7 +23,8 @@ export default {
     },
     data() {
         return {
-            albums: []
+            albums: [],
+            text: ''
         }
     },
     mounted() {
@@ -34,6 +35,12 @@ export default {
             .catch(error => {
                 this.toast.error(handleError(error, `При получении альбомов произошла ошибка`).message)
             });
+    },
+    computed: {
+        filteredAlbums(){
+            if (!this.text) return this.albums
+            return this.albums.filter(album => album.name.includes(this.text))
+        }
     }
 }
 </script>

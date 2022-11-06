@@ -54,7 +54,11 @@ const router = createRouter({
               name: 'Альбомы',
               component: () => import('../components/PersonalAccountMusicianCabineAlbums.vue'),
             },
-
+            {
+              path: 'albums/:id',
+              name: 'Альбом',
+              component: () => import('../components/PersonalAccountMusicianCabineAlbumsAlbum.vue'),
+            }
           ]
         },
         {

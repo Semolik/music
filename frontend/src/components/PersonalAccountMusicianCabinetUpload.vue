@@ -95,7 +95,8 @@ export default {
         },
         allTracksUploaded(value) {
             if (value) {
-                this.toast(`Загрузка трек${this.singleMode ? "а" : "ов"} завершена`)
+                this.toast(`Загрузка трек${this.singleMode ? "а" : "ов"} завершена`);
+                this.$router.push({ path: `/lk/my-music/albums/${this.album_id}` });
             }
         }
     },
