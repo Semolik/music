@@ -37,7 +37,7 @@ export default {
             });
     },
     computed: {
-        filteredAlbums(){
+        filteredAlbums() {
             if (!this.text) return this.albums
             return this.albums.filter(album => album.name.includes(this.text))
         }
@@ -47,18 +47,19 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/breakpoints';
+
 .albums {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px
-    // @include breakpoints.lg(true) {
-    //     grid-template-columns: repeat(4, 1fr);
-    // }
-    // @include breakpoints.md(true) {
-    //     grid-template-columns: repeat(3, 1fr);
-    // }
-    // @include breakpoints.sm(true) {
-    //     grid-template-columns: repeat(2, 1fr);
-    // }
+    gap: 10px;
+
+
+    @include breakpoints.md(true) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include breakpoints.sm(true) {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 </style>

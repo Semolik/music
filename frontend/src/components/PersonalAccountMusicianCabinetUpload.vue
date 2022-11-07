@@ -228,7 +228,7 @@ export default {
             flex-direction: column;
         }
 
-        @include breakpoints.md(true) {
+        @include breakpoints.sm(true) {
             grid-template-columns: 1fr;
         }
 

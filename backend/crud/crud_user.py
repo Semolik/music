@@ -84,6 +84,10 @@ class UserCruds:
         )
         return self.create(new_db_public_profile)
 
+    def get_public_profile_by_id(self, id):
+        return self.db.query(PublicProfile).filter(
+            PublicProfile.id == id).first()
+
     def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileModifiable,  userPublicPicture: File) -> PublicProfile:
         if public_proile is None:
             raise Exception(

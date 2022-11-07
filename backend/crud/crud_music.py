@@ -16,8 +16,11 @@ class MusicCrud(CRUDBase):
                          open_date=date, picture=db_image)
         return self.create(model=db_album)
 
-    def get_albums(self, musician_id: int) -> List[Album]:
+    def get_musician_albums(self, musician_id: int) -> List[Album]:
         return self.db.query(Album).filter(Album.musician_id == musician_id).all()
+
+    def get_album(self, album_id: int):
+        return self.get(album_id, Album)
 
 
 music_crud = MusicCrud()

@@ -17,3 +17,7 @@ class HTTP_401_UNAUTHORIZED(BaseModel):
 
 class USER_NOT_FOUND(BaseModel):
     detail: str = "Пользователь не найден"
+
+
+class ALBUM_NOT_FOUND(BaseModel):
+    detail: str = "Альбом не найден"

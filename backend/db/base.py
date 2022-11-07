@@ -8,7 +8,7 @@ class CRUDBase:
         self.db = session
 
     def get(self, id: Any, model):
-        return self.db.query(model).filter(self.model.id == id).first()
+        return self.db.query(model).filter(model.id == id).first()
 
     def get_multi(
             self, model, skip: int = 0, limit: int = 100, ) -> List:

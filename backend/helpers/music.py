@@ -51,10 +51,10 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
         raise HTTPException(status_code=500, detail="поврежденный файл")
 
 
-def set_album_info(db_album: Album, user_id: int):
+def set_album_info(db_album: Album, user_id: int | None = None):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['musician'] = get_public_profile_as_dict(
-        user_id=user_id)
+        user_id=user_id, musician_id=db_album.musician_id)
     db_album_obj = set_picture(db_album_obj, db_album.picture)
     return db_album_obj
