@@ -4,17 +4,21 @@
         <div class="empty-picture" v-else>
             <FontAwesomeIcon icon="fa-music" />
         </div>
+        <div class="icon" v-if="editIcon">
+            <FontAwesomeIcon icon="fa-pen" />
+        </div>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faMusic } from '@fortawesome/free-solid-svg-icons';
+import { faMusic, faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faMusic);
+library.add(faMusic, faPen);
 export default {
     props: {
         src: String,
-        offHover: Boolean
+        offHover: Boolean,
+        editIcon: Boolean
     },
     components: {
         FontAwesomeIcon
@@ -43,16 +47,38 @@ export default {
                 opacity: 1;
             }
         }
+
+        .icon {
+            opacity: 1;
+        }
     }
 
-    &.hoverable::after {
-        content: '';
-        position: absolute;
-        transition: .2s opacity;
-        inset: 0;
-        opacity: 0;
-        z-index: 2;
-        background-color: rgba($color: white, $alpha: 0.15);
+
+
+    &.hoverable {
+
+        .icon,
+        &::after {
+            content: '';
+            position: absolute;
+            transition: .2s opacity;
+            inset: 0;
+            opacity: 0;
+            z-index: 2;
+            background-color: rgba($color: white, $alpha: 0.15);
+        }
+
+        .icon {
+            @include helpers.flex-center;
+            color: var(--color-text-rev);
+            z-index: 3;
+            cursor: pointer;
+
+            svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
     }
 
     img {

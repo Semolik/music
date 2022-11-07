@@ -21,3 +21,11 @@ class USER_NOT_FOUND(BaseModel):
 
 class ALBUM_NOT_FOUND(BaseModel):
     detail: str = "Альбом не найден"
+
+
+class NOT_ENOUGH_RIGHTS_403(BaseModel):
+    detail: str = "Недостаточно прав"
+
+
+class GENRE_IS_NOT_UNIQUE(BaseModel):
+    detail: str = "Название жанра должно быть уникальным"

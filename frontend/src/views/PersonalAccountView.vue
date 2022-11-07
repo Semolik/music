@@ -3,10 +3,11 @@
         <aside>
             <router-link class="item" to="/lk">{{ lkButtonText }}</router-link>
             <router-link class="item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
+            <router-link class="item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
             <router-link class="item" to="/lk/music">Моя музыка</router-link>
             <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
             <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
-            <router-link class="item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
+            <router-link class="item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел</router-link>
         </aside>
         <div class="active-route">
             <router-view></router-view>

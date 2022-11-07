@@ -3,10 +3,12 @@ from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
+from backend.helpers.images import set_picture
 from backend.helpers.music import save_track, set_album_info
-from backend.helpers.validate_role import validate_musician
-from backend.responses import NOT_FOUND_ALBUM, NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.track import AlbumAfterUpload, AlbumInfo, CreateAlbumForm, TrackAfterUpload, UploadTrackForm
+from backend.helpers.validate_role import validate_admin, validate_musician
+from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_USER, UNAUTHORIZED_401
+from backend.schemas.error import GENRE_IS_NOT_UNIQUE
+from backend.schemas.track import AlbumAfterUpload, AlbumInfo, CreateAlbumForm, CreateGenre, Genre, TrackAfterUpload, UploadTrackForm
 from backend.helpers.files import save_file
 
 router = APIRouter(tags=['Музыка'])
@@ -54,3 +56,22 @@ def get_album_by_id(id: int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
     return set_album_info(db_album=db_album)
+
+
+@router.get('/genres',  response_model=List[Genre])
+def get_genres():
+    return [set_picture(genre.as_dict(), genre.picture) for genre in music_crud.get_genres()]
+
+
+@router.post('/genres', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre)
+def create_genre(name: str, genrePicture: UploadFile = File(...), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    validate_admin(user_id=current_user_id)
+    if music_crud.get_genre_by_name(name=name):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail="Название жанра должно быть уникальным")
+    db_image = save_file(upload_file=genrePicture,
+                         user_id=current_user_id, force_image=True)
+    db_genre = music_crud.create_genre(name=name, picture=db_image)
+    return set_picture(db_genre.as_dict(), db_genre.picture)

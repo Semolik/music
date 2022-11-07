@@ -28,6 +28,7 @@ const router = createRouter({
         {
           path: 'public',
           name: 'Публичный профиль',
+          meta: { requireAuth: true, roles: [Role.Musician, Role.RadioStation] },
           component: () => import('../components/PersonalAccountPublicProfile.vue'),
         },
         {
@@ -38,25 +39,30 @@ const router = createRouter({
         {
           path: 'my-music',
           component: () => import('../components/PersonalAccountMusicianCabinet.vue'),
+          meta: { requireAuth: true, roles: [Role.Musician] },
           children: [
             {
               path: '',
               name: 'Кабинет музыканта',
+              meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/PersonalAccountMusicianCabinetMain.vue'),
             },
             {
               path: 'upload',
               name: 'Загрузить',
+              meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/PersonalAccountMusicianCabinetUpload.vue'),
             },
             {
               path: 'albums',
               name: 'Альбомы',
+              meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/PersonalAccountMusicianCabineAlbums.vue'),
             },
             {
               path: 'albums/:id',
               name: 'Альбом',
+              meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/PersonalAccountMusicianCabineAlbumsAlbum.vue'),
             }
           ]
@@ -80,6 +86,26 @@ const router = createRouter({
           meta: { requireAuth: true, roles: [Role.Admin] },
           component: () => import('../components/PersonalAccountChangeStatatusRequests.vue'),
         },
+        {
+          path: 'edit-musician-section',
+          name: 'Музыкальный раздел',
+          meta: { requireAuth: true, roles: [Role.Admin] },
+          component: () => import('../components/PersonalAccountAdminEditMusiciansSection.vue'),
+          children: [
+            {
+              path: 'genres',
+              name: 'Жанры',
+              meta: { requireAuth: true, roles: [Role.Admin] },
+              component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenres.vue'),
+            }
+          ]
+        },
+        {
+          path: 'edit-musician-section/genres',
+          name: 'Жанры',
+          meta: { requireAuth: true, roles: [Role.Admin] },
+          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenres.vue'),
+        }
       ]
     },
     {

@@ -16,6 +16,8 @@ class Album(Base):
     open_date = Column(DateTime, nullable=False)
     picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
     picture = relationship("File", foreign_keys=[picture_id])
+    genre_id = Column(Integer, ForeignKey("genres.id"))
+    genre = relationship("Genre", foreign_keys=[genre_id])
 
 
 class Track(Base):
@@ -35,4 +37,16 @@ class Track(Base):
     file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
     file = relationship("File", foreign_keys=[file_id])
     picture_id = Column(Integer, ForeignKey("files.id"))
+    picture = relationship("File", foreign_keys=[picture_id])
+    genre_id = Column(Integer, ForeignKey("genres.id"))
+    genre = relationship("Genre", foreign_keys=[genre_id])
+
+
+class Genre(Base):
+    __tablename__ = 'genres'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(
+        String(int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH'))), nullable=False, unique=True)
+    picture_id = Column(Integer, ForeignKey("files.id"), nullable=False)
     picture = relationship("File", foreign_keys=[picture_id])

@@ -1,9 +1,9 @@
 <template>
     <header>
         <router-link to="/" class="text" @click="this.$emit('reset_error')">Музыка</router-link>
-        <div class="buttons">
+        <div class="header-buttons">
             <router-link @[logined&&`mouseover`]="panelActive = true"
-                :class="['button', 'login', { logined: logined }, { normal: !panelActive }]"
+                :class="['header-button', 'login', { logined: logined }, { normal: !panelActive }]"
                 :to="!logined ? '/login' : '/lk'">
                 <div class="icon">
                     <FontAwesomeIcon icon="fa-user" v-if="logined" />
@@ -84,7 +84,7 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/assets/styles/breakpoints';
 @use '@/assets/styles/helpers';
 
@@ -177,11 +177,11 @@ header {
     }
 
 
-    .buttons {
+    .header-buttons {
         display: flex;
         gap: 10px;
 
-        .button {
+        .header-button {
             height: 40px;
             width: 40px;
             border-radius: 50%;

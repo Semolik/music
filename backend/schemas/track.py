@@ -60,3 +60,12 @@ class Track(UploadTrackBase):
 
 class TrackClosedInformation(Track):
     open_date: datetime
+
+
+class CreateGenre(BaseModel):
+    name: str
+
+
+class Genre(CreateGenre):
+    id: int
+    picture: str
