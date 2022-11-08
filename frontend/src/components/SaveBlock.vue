@@ -1,5 +1,5 @@
 <template>
-    <div class="buttons">
+    <div class="buttons custom">
         <slot></slot>
         <div :class="['button', 'save', { active: active }, { wrong: wrong }]">
             <FontAwesomeIcon icon="fa-floppy-disk" />
@@ -24,6 +24,8 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/breakpoints';
+@use '@/assets/styles/components';
+
 
 .buttons {
     margin-top: auto;
@@ -32,13 +34,16 @@ export default {
     justify-content: right;
 
     .button {
-        cursor: auto;
-        @include helpers.flex-center;
-        border-radius: 10px;
-        padding: 5px;
-        background-color: var(--color-background-mute-4);
-        width: 40px;
-        height: 40px;
+        @include components.button;
+        &.custom {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            padding: 5px;
+            cursor: auto;
+            @include helpers.flex-center;
+            background-color: var(--color-background-mute-4);
+        }
 
         @include breakpoints.xl(true) {
             width: 100%;

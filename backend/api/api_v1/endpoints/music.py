@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
@@ -50,10 +51,16 @@ def get_my_albums(Authorize: AuthJWT = Depends()):
 
 
 @router.get('/get_album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumInfo)
-def get_album_by_id(id: int):
+def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_optional()
     db_album = music_crud.get_album(album_id=id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    if db_album.open_date > datetime.now():
+        current_user_id = Authorize.get_jwt_subject()
+        if current_user_id is None or not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
     return set_album_info(db_album=db_album)
 

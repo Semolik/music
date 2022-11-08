@@ -8,6 +8,7 @@ from backend.core.config import settings
 from backend.helpers.files import add_url
 from backend.crud.crud_file import file_cruds
 from backend.db.session import SessionLocal
+from backend.models.music import Album
 from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
 from backend.models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
 from backend.models.user import PublicProfileLinks as PublicProfileLinksModel
@@ -184,6 +185,13 @@ class UserCruds:
 
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
+
+    def album_belongs_to_user(self, album: Album, user_id: int):
+        db_public_profile: PublicProfile = self.db.query(PublicProfile).filter(
+            PublicProfile.user_id == user_id).first()
+        if not db_public_profile:
+            return False
+        return bool(album.musician_id == db_public_profile.id)
 
     def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: settings.ALLOWED_STATUSES, account_status: str = None):
         if request.answer:

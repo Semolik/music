@@ -19,7 +19,7 @@ class MusicCrud(CRUDBase):
     def get_musician_albums(self, musician_id: int) -> List[Album]:
         return self.db.query(Album).filter(Album.musician_id == musician_id).all()
 
-    def get_album(self, album_id: int):
+    def get_album(self, album_id: int) -> Album:
         return self.get(album_id, Album)
 
     def get_genres(self):

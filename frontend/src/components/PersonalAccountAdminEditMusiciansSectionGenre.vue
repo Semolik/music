@@ -27,7 +27,9 @@ library.add(faTrash);
 
 export default {
     props: {
-        id: Number,
+        id: {
+            type: [Number, String],
+        },
         add: Boolean,
     },
     components: { SelectImage, FormField, SaveBlock, FontAwesomeIcon },

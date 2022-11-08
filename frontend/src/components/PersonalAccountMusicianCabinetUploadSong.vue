@@ -7,7 +7,7 @@
         </FormField>
         <div class="block">
             <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic"
-                notEmpty />
+                 />
             <div class="fields-container" :id="`fields-${id}`">
                 <FormField @empty="albumIsValid = $event" v-model="data.album" :borderRadius="borderRadius"
                     label="Альбом" off-margin notEmpty v-if="isSingle">
