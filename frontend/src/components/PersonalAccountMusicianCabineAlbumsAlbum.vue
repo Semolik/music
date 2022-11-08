@@ -25,13 +25,18 @@ export default {
             toast
         };
     },
+    props: {
+        id: {
+            type: [Number],
+        },
+    },
     data() {
         return {
             albumInfo: null
         };
     },
     mounted() {
-        HTTP.get("get_album", { params: { id: this.$route.params.id } })
+        HTTP.get("get_album", { params: { id: this.id } })
             .then(response => {
                 this.albumInfo = response.data;
             })

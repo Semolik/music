@@ -27,11 +27,7 @@
                     </div>
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
-                    <div class="buttons">
-                        <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
-                            <FontAwesomeIcon icon="fa-floppy-disk" />
-                        </div>
-                    </div>
+                    <SaveBlock @click="save" :active="dataChanged" :wrong="fieldsWrong" />
                 </Teleport>
             </div>
         </form>
@@ -50,6 +46,7 @@ import FormField from './FormField.vue';
 import AnimateInteger from './AnimateInteger.vue';
 import { Role } from '../helpers/roles.js';
 import SelectImage from './SelectImage.vue';
+import SaveBlock from './SaveBlock.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
@@ -91,7 +88,8 @@ export default {
         FontAwesomeIcon,
         FormField,
         AnimateInteger,
-        SelectImage
+        SelectImage,
+        SaveBlock
     },
     watch: {
         userData(value) {
@@ -294,40 +292,6 @@ export default {
         .remove-picture {
             grid-row: 2;
             @include helpers.flex-center;
-        }
-
-        .buttons {
-            // grid-column: 1 / -1;
-            margin-top: auto;
-            display: flex;
-            gap: 5px;
-            justify-content: right;
-
-            .button {
-                cursor: auto;
-                @include helpers.flex-center;
-                border-radius: 10px;
-                padding: 5px;
-                background-color: var(--color-background-mute-4);
-                width: 40px;
-                height: 40px;
-
-                @include breakpoints.xl(true) {
-                    width: 100%;
-                }
-
-                &.save {
-
-                    &.wrong {
-                        background-color: var(--red-0);
-                    }
-
-                    &.active {
-                        background-color: var(--purple-1);
-                        cursor: pointer;
-                    }
-                }
-            }
         }
 
         .user-info {

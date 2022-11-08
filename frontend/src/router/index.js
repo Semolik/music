@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { Role } from '../helpers/roles.js';
-import HomeView from '../views/HomeView.vue'
-
+import HomeView from '../views/HomeView.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -62,6 +61,7 @@ const router = createRouter({
             {
               path: 'albums/:id',
               name: 'Альбом',
+              props: true,
               meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/PersonalAccountMusicianCabineAlbumsAlbum.vue'),
             }
@@ -91,20 +91,26 @@ const router = createRouter({
           name: 'Музыкальный раздел',
           meta: { requireAuth: true, roles: [Role.Admin] },
           component: () => import('../components/PersonalAccountAdminEditMusiciansSection.vue'),
-          children: [
-            {
-              path: 'genres',
-              name: 'Жанры',
-              meta: { requireAuth: true, roles: [Role.Admin] },
-              component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenres.vue'),
-            }
-          ]
         },
         {
           path: 'edit-musician-section/genres',
           name: 'Жанры',
           meta: { requireAuth: true, roles: [Role.Admin] },
           component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenres.vue'),
+        },
+        {
+          path: 'edit-musician-section/genres/:id',
+          name: 'Жанр',
+          meta: { requireAuth: true, roles: [Role.Admin] },
+          props: true,
+          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenre.vue'),
+        },
+        {
+          path: 'edit-musician-section/genres/add',
+          name: 'Добавить жанр',
+          meta: { requireAuth: true, roles: [Role.Admin] },
+          props: { add: true },
+          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenre.vue'),
         }
       ]
     },

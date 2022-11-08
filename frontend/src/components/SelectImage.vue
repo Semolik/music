@@ -1,5 +1,5 @@
 <template>
-    <div :class="['select-image', { empty: !picture }]">
+    <div :class="['select-image', { empty: !picture }, {wrong: notEmpty && !target}]">
         <FontAwesomeIcon icon="fa-image" v-if="!picture" />
         <img :src="picture" v-else>
         <div class="edit-area">
@@ -15,7 +15,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { computed } from '@vue/reactivity';
 library.add(faImage);
 import { useToast } from "vue-toastification";
 export default {
@@ -28,6 +27,7 @@ export default {
     props: {
         pictureUrl: String,
         name: String,
+        notEmpty: Boolean,
     },
     emits: ['changed'],
     components: { FontAwesomeIcon },
@@ -97,16 +97,14 @@ export default {
         @include helpers.flex-center;
         overflow: hidden;
         border: 2px dashed transparent;
-
         border-color: var(--color-text);
-
-
         svg {
             width: 40%;
             height: 40%;
         }
-
-
+    }
+    &.wrong {
+        border: 2px dashed red;
     }
 
     &:hover {

@@ -66,6 +66,19 @@ class CreateGenre(BaseModel):
     name: str
 
 
-class Genre(CreateGenre):
+@form_body
+class CreateGenreForm(CreateGenre):
+    ...
+
+
+class UpdateGenre(CreateGenre):
     id: int
+
+
+@form_body
+class UpdateGenreForm(UpdateGenre):
+    ...
+
+
+class Genre(UpdateGenre):
     picture: str

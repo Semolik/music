@@ -24,7 +24,7 @@
         </div>
         <div class="empty" v-else>тут пусто</div>
         <div class="buttons" v-if="show_button && !loading">
-            <div class="button" @click="getNextPage">Загрузить еще</div>
+            <div class="button-load-more" @click="getNextPage">Загрузить еще</div>
         </div>
     </div>
 </template>
@@ -48,7 +48,6 @@ export default {
     components: { StatusHistoryItem },
     watch: {
         current(value) {
-            // this.loading = true;
             this.requests = [];
             this.page = 1;
             this.show_button = true;
@@ -168,7 +167,7 @@ export default {
         justify-content: center;
         width: 100%;
 
-        .button {
+        .button-load-more {
             background-color: var(--color-background-mute-4);
             padding: 10px 30px;
             border-radius: 15px;

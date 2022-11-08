@@ -1,10 +1,16 @@
 <template>
-    <div class="headline">Жанры</div>
+    <div class="headline">
+        <div class="text">Жанры</div>
+        <router-link to="/lk/edit-musician-section/genres/add" class="add-genre-button">
+            <FontAwesomeIcon icon="fa-plus" />
+        </router-link>
+    </div>
     <FormField placeholder="Поиск" :borderRadius="10" v-model="searchText"></FormField>
-    <div class="genres-list">
-        <div class="genre-item" v-for="genre in filteredGenres">
+    <div class="genres-list" v-auto-animate>
+        <router-link :to="`/lk/edit-musician-section/genres/${genre.id}`" class="genre-item"
+            v-for="(genre, index) in filteredGenres" :key="index">
             {{ genre.name }}
-        </div>
+        </router-link>
     </div>
 </template>
 <script>
@@ -13,6 +19,10 @@ import { useToast } from "vue-toastification";
 import handleError from '../composables/errors';
 import AlbumPicture from './AlbumPicture.vue';
 import FormField from './FormField.vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+library.add(faPlus);
 
 export default {
     setup() {
@@ -37,25 +47,47 @@ export default {
             });
     },
     computed: {
-        filteredGenres(){
+        filteredGenres() {
             if (!this.searchText) return this.genres
             return this.genres.filter(genre => genre.name.includes(this.searchText))
         }
     },
-    components: { AlbumPicture, FormField }
+    components: { AlbumPicture, FormField, FontAwesomeIcon }
+
+
 }
 </script>
 <style lang="scss">
+@use '@/assets/styles/animations';
 @use '@/assets/styles/breakpoints';
-
+@use '@/assets/styles/components';
+@use '@/assets/styles/helpers';
+@include animations.list;
 .headline {
-    text-align: center;
-    font-size: x-large;
-    font-weight: 600;
-    margin-bottom: 20px;
+    display: flex;
+
+    .text {
+        text-align: center;
+        font-size: x-large;
+        font-weight: 600;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .add-genre-button {
+        @include components.button;
+        @include helpers.flex-center;
+        border-radius: 10px;
+        padding: 5px;
+
+        width: 40px;
+        height: 40px;
+
+    }
 }
 
 .genres-list {
+ 
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
@@ -69,15 +101,17 @@ export default {
     }
 
     .genre-item {
+        color: var(--color-text);
+        text-decoration: none;
         background-color: var(--color-background-mute-3);
         padding: 10px;
         border-radius: 10px;
         text-align: center;
+        height: min-content;
 
         &:hover {
             background-color: var(--color-background-mute-4);
             cursor: pointer;
-            
         }
     }
 }

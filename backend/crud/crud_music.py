@@ -28,8 +28,23 @@ class MusicCrud(CRUDBase):
     def create_genre(self, name: str, picture: File):
         return self.create(Genre(name=name, picture=self.create(picture)))
 
-    def get_genre_by_name(self, name: str):
+    def get_genre_by_name(self, name: str) -> Genre | None:
         return self.db.query(Genre).filter(Genre.name == name).all()
+
+    def get_genre_by_id(self, id: int) -> Genre | None:
+        return self.get(id=id, model=Genre)
+
+    def update_genre(self, name: str, picture: File, genre: Genre):
+        genre.name = name
+        if picture:
+            genre.picture = self.create(picture)
+        self.db.add(genre)
+        self.db.commit()
+        self.db.refresh(genre)
+        return genre
+
+    def detete_genre(self, genre_id: int):
+        return self.db.query(Genre).filter(Genre.id == genre_id).delete()
 
 
 music_crud = MusicCrud()

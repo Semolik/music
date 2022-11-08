@@ -23,6 +23,10 @@ class ALBUM_NOT_FOUND(BaseModel):
     detail: str = "Альбом не найден"
 
 
+class GENRE_NOT_FOUND(BaseModel):
+    detail: str = "Жанр не найден"
+
+
 class NOT_ENOUGH_RIGHTS_403(BaseModel):
     detail: str = "Недостаточно прав"
 

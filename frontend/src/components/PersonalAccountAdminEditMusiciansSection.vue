@@ -1,6 +1,6 @@
 <template>
-    <div class="buttons">
-        <router-link to="/lk/edit-musician-section/genres" class="button">
+    <div class="selections">
+        <router-link to="/lk/edit-musician-section/genres" class="selection">
             <div class="text">Жанры</div>
         </router-link>
     </div>
@@ -10,13 +10,13 @@
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/components';
 
-.buttons {
+.selections {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 
-    .button {
+    .selection {
         @include components.button;
     }
 }
