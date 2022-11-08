@@ -1,7 +1,8 @@
 <template>
     <div class="headline">Жанры</div>
+    <FormField placeholder="Поиск" :borderRadius="10" v-model="searchText"></FormField>
     <div class="genres-list">
-        <div class="genre-item" v-for="genre in genres">
+        <div class="genre-item" v-for="genre in filteredGenres">
             {{ genre.name }}
         </div>
     </div>
@@ -11,6 +12,7 @@ import { HTTP } from '../http-common.vue';
 import { useToast } from "vue-toastification";
 import handleError from '../composables/errors';
 import AlbumPicture from './AlbumPicture.vue';
+import FormField from './FormField.vue';
 
 export default {
     setup() {
@@ -21,7 +23,8 @@ export default {
     },
     data() {
         return {
-            genres: []
+            genres: [],
+            searchText: '',
         };
     },
     mounted() {
@@ -33,7 +36,13 @@ export default {
                 this.toast.error(handleError(error).message);
             });
     },
-    components: { AlbumPicture }
+    computed: {
+        filteredGenres(){
+            if (!this.searchText) return this.genres
+            return this.genres.filter(genre => genre.name.includes(this.searchText))
+        }
+    },
+    components: { AlbumPicture, FormField }
 }
 </script>
 <style lang="scss">
