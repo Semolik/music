@@ -5,8 +5,8 @@
             <div class="album-info">
                 <div class="headline">{{ albumInfo.name }}</div>
                 <div class="extra-info">
-                    <div class="item">{{ albumInfo.year }}</div>
-                    <router-link to="" class="item">{{ albumInfo.musician.name }}</router-link>
+                    <div class="item">Год: {{ albumInfo.year }}</div>
+                    <router-link to="" class="item">Музыкант: {{ albumInfo.musician.name }}</router-link>
                     <router-link to="" class="item">сюда жанр</router-link>
                 </div>
             </div>
@@ -48,6 +48,7 @@ export default {
 }
 </script>
 <style lang="scss">
+@use '@/assets/styles/helpers';
 .album-editor {
     display: flex;
     flex-direction: column;
@@ -66,11 +67,14 @@ export default {
                 font-weight: 600;
                 font-size: x-large;
                 margin-bottom: 10px;
+                width: 100%;
+                @include helpers.flex-center;
             }
 
             .extra-info {
                 display: flex;
-                justify-content: center;
+                // justify-content: center;
+                gap: 10px;
 
 
                 .item {
@@ -79,15 +83,18 @@ export default {
                     display: flex;
                     align-items: center;
                     transition: .2s color;
+                    background-color: var(--color-background-mute-3);
+                    padding: 8px 16px;
+                    border-radius: 10px;
 
-                    &:not(:last-child)::after {
-                        content: '';
-                        background-color: var(--vt-c-white-100);
-                        height: 3px;
-                        width: 3px;
-                        border-radius: 50%;
-                        margin-inline: 5px;
-                    }
+                    // &:not(:last-child)::after {
+                    //     content: '';
+                    //     background-color: var(--vt-c-white-100);
+                    //     height: 3px;
+                    //     width: 3px;
+                    //     border-radius: 50%;
+                    //     margin-inline: 5px;
+                    // }
                 }
 
                 a.item:hover {

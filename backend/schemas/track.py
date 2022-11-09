@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 from pydantic import BaseModel, validator
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
@@ -34,6 +35,7 @@ class UploadTrackBase(BaseModel):
     name: str
     album_id: int
     feat: str | None
+    genres_ids: List[int]
 
 
 class UploadTrack(UploadTrackBase):

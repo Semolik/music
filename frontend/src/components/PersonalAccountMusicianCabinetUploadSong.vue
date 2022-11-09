@@ -140,6 +140,10 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
+                // [1].forEach(element => {
+                //     form.append('genres_ids', element);
+                    
+                // });
                 if (picture) {
                     form.append('trackPicture', picture[0]);
                 }

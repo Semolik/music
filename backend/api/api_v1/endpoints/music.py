@@ -34,6 +34,13 @@ def upload_song(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPict
     db_user = validate_musician(user_id=current_user_id)
     db_image = save_file(upload_file=trackPicture,
                          user_id=db_user.id, force_image=True)
+    not_found_genres_ids = []
+    for genre_id in trackData.genres_ids:
+        if not music_crud.get_genre_by_id(id=genre_id):
+            not_found_genres_ids.append(genre_id)
+    if len(not_found_genres_ids) > 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Жанры с id {','.join(map(str, not_found_genres_ids))} не найдены")
     db_track = save_track(
         upload_file=track, user_id=current_user_id, track=trackData, picture=db_image)
     return db_track.as_dict()
@@ -61,7 +68,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
         current_user_id = Authorize.get_jwt_subject()
         if current_user_id is None or not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Альбом не найден")
+                                detail="Альбом не найден")
     return set_album_info(db_album=db_album)
 
 

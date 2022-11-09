@@ -33,9 +33,9 @@ export default {
     gap: 5px;
     justify-content: right;
 
-    .button {
-        @include components.button;
-        &.custom {
+    &.custom {
+        .button {
+
             width: 40px;
             height: 40px;
             border-radius: 10px;
@@ -43,7 +43,12 @@ export default {
             cursor: auto;
             @include helpers.flex-center;
             background-color: var(--color-background-mute-4);
+
         }
+    }
+
+    .button {
+        @include components.button;
 
         @include breakpoints.xl(true) {
             width: 100%;

@@ -44,7 +44,9 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
                 duration=segment.duration_seconds,
                 file=db_file,
                 album_id=track.album_id,
-                picture=db_picture)
+                picture=db_picture,
+                genres=track.genres
+            )
         )
         return db_track
     except:

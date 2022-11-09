@@ -1,5 +1,5 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, Table
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
@@ -20,6 +20,14 @@ class Album(Base):
     genre = relationship("Genre", foreign_keys=[genre_id])
 
 
+association_tracks_genres_table = Table(
+    "tracks_genres_table",
+    Base.metadata,
+    Column("track_id", ForeignKey("tracks.id"), primary_key=True),
+    Column("genre_id", ForeignKey("genres.id"), primary_key=True),
+)
+
+
 class Track(Base):
     __tablename__ = 'tracks'
 
@@ -38,8 +46,9 @@ class Track(Base):
     file = relationship("File", foreign_keys=[file_id])
     picture_id = Column(Integer, ForeignKey("files.id"))
     picture = relationship("File", foreign_keys=[picture_id])
-    genre_id = Column(Integer, ForeignKey("genres.id"))
-    genre = relationship("Genre", foreign_keys=[genre_id])
+    genres = relationship(
+        "Genre", secondary=association_tracks_genres_table
+    )
 
 
 class Genre(Base):
