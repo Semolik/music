@@ -18,7 +18,10 @@
                             {{ upToAlbumLimit }}
                         </span>
                     </FormField>
-                    <SelectDate v-model="date" />
+                    <div class="group">
+                        <SelectDate v-model="date" :borderRadius="10" />
+                        <GenresSelector :borderRadius="borderRadius" :border-radius="10" ref="genres" />
+                    </div>
                 </div>
             </div>
             <UploadSong :ref="`track-${index}`" :id="index" :track="track" @update="trackUpdate($event, index)"
@@ -48,6 +51,7 @@ import { useToast } from "vue-toastification";
 import SelectImage from './SelectImage.vue';
 import moment from 'moment';
 import SelectDate from './PersonalAccountMusicianCabinetUploadDate.vue';
+import GenresSelector from './GenresSelector.vue';
 
 library.add(faPlus, faFloppyDisk, faSpinner);
 export default {
@@ -63,7 +67,7 @@ export default {
             VITE_MAX_ALBUM_NAME_LENGTH
         }
     },
-    components: { FormField, UploadSong, FontAwesomeIcon, SelectImage, SelectDate },
+    components: { FormField, UploadSong, FontAwesomeIcon, SelectImage, SelectDate, GenresSelector },
     data() {
         return {
             activeSelection: "single",
@@ -232,6 +236,15 @@ export default {
             grid-template-columns: 1fr;
         }
 
+        .group {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 10px;
+
+            @include breakpoints.sm(true) {
+                grid-template-columns: 1fr;
+            }
+        }
 
     }
 

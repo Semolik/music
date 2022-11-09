@@ -2,7 +2,7 @@
     <date-picker v-model="date" is-dark mode="dateTime" is24hr>
         <template v-slot="{ inputValue, inputEvents }">
             <FormField class="calendar" :modelValue="inputValue" :inputEvents="inputEvents" label="Начало активности"
-                :borderRadius="10" off-margin>
+                :borderRadius="borderRadius" off-margin>
                 <FontAwesomeIcon icon="fa-calendar" />
             </FormField>
         </template>
@@ -16,7 +16,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 library.add(faCalendar);
 export default {
-    props: { modelValue: Date },
+    props: { modelValue: Date, borderRadius: Number },
     components: { DatePicker, FormField, FontAwesomeIcon },
     emits: ['update:modelValue'],
     data() {

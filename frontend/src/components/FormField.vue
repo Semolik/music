@@ -3,7 +3,7 @@
         <div class="formkit-wrapper">
             <label class="formkit-label" :for="id" v-if="label">{{ label }}</label>
             <div class="formkit-inner-container">
-                <div :class="['formkit-inner', { error: notValid }, { setColor: !offChangeColor }]"
+                <div :class="['formkit-inner', { error: notValid }, { setColor: !offChangeColor }, formkitInnerClass]"
                     :style="{ '--inner-radius': borderRadius + 'px' }">
                     <slot name="right"></slot>
                     <input v-on="inputEvents || {}" :placeholder="placeholder" class="formkit-input" type="text"
@@ -94,6 +94,7 @@ export default {
         offChangeColor: Boolean,
         value: String,
         inputEvents: Object,
+        formkitInnerClass: Object
     },
     inject: ['runValidation'],
     data() {

@@ -1,13 +1,15 @@
 <template>
     <div class="upload-song-container">
-        <SelectDate v-model="data.date" v-if="isSingle" />
-        <FormField @empty="nameIsValid = $event" :borderRadius="borderRadius" label="Название" v-model="data.name"
-            off-margin notEmpty>
-            <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
-        </FormField>
+        <div :class="['line', { isSingle: isSingle }]">
+            <SelectDate v-model="data.date" v-if="isSingle" :borderRadius="borderRadius" />
+            <FormField @empty="nameIsValid = $event" :borderRadius="borderRadius" label="Название" v-model="data.name"
+                off-margin notEmpty>
+                <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
+            </FormField>
+        </div>
+        <GenresSelector :borderRadius="borderRadius" ref="genres" v-if="isSingle"/>
         <div class="block">
-            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic"
-                 />
+            <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
             <div class="fields-container" :id="`fields-${id}`">
                 <FormField @empty="albumIsValid = $event" v-model="data.album" :borderRadius="borderRadius"
                     label="Альбом" off-margin notEmpty v-if="isSingle">
@@ -44,6 +46,7 @@ import { HTTP } from '../http-common.vue';
 import moment from 'moment';
 import handleError from '../composables/errors';
 import SelectDate from '../components/PersonalAccountMusicianCabinetUploadDate.vue';
+import GenresSelector from './GenresSelector.vue';
 
 library.add(faPaperclip);
 
@@ -52,7 +55,7 @@ export default {
         isSingle: Boolean,
         id: Number,
     },
-    components: { SelectImage, FormField, FontAwesomeIcon, SelectDate },
+    components: { SelectImage, FormField, FontAwesomeIcon, SelectDate, GenresSelector },
     setup() {
         const toast = useToast();
         const {
@@ -140,10 +143,9 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
-                // [1].forEach(element => {
-                //     form.append('genres_ids', element);
-                    
-                // });
+                this.$refs.genres.selectedGenres.forEach(element => {
+                    form.append('genres_ids', element);
+                });
                 if (picture) {
                     form.append('trackPicture', picture[0]);
                 }
@@ -248,6 +250,20 @@ export default {
     padding: 10px;
     display: grid;
     gap: 10px;
+
+    .line {
+        display: grid;
+        gap: 10px;
+
+        &.isSingle {
+            grid-template-columns: 180px 1fr;
+
+            @include breakpoints.md(true) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    }
 
     .block {
         display: grid;
