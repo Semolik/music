@@ -9,11 +9,11 @@ from backend.models.user import File
 
 class MusicCrud(CRUDBase):
 
-    def create_album(self, user_id: int, name: str,  date: datetime, picture: File | None):
+    def create_album(self, user_id: int, name: str,  date: datetime, picture: File | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
         musician = user_cruds.get_public_profile(user_id=user_id)
         db_album = Album(musician_id=musician.id, name=name,
-                         open_date=date, picture=db_image)
+                         open_date=date, picture=db_image, genres=genres)
         return self.create(model=db_album)
 
     def get_musician_albums(self, musician_id: int) -> List[Album]:
@@ -21,6 +21,9 @@ class MusicCrud(CRUDBase):
 
     def get_album(self, album_id: int) -> Album:
         return self.get(album_id, Album)
+
+    def get_album_tracks(self, album_id: int) -> List[Track]:
+        return self.db.query(Track).filter(Track.album_id == album_id).all()
 
     def get_genres(self):
         return self.db.query(Genre).all()

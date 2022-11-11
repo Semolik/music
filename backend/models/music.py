@@ -16,16 +16,14 @@ class Album(Base):
     open_date = Column(DateTime, nullable=False)
     picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
     picture = relationship("File", foreign_keys=[picture_id])
-    genre_id = Column(Integer, ForeignKey("genres.id"))
-    genre = relationship("Genre", foreign_keys=[genre_id])
-
-
-association_tracks_genres_table = Table(
-    "tracks_genres_table",
-    Base.metadata,
-    Column("track_id", ForeignKey("tracks.id"), primary_key=True),
-    Column("genre_id", ForeignKey("genres.id"), primary_key=True),
-)
+    genres = relationship(
+        "Genre", secondary=Table(
+            "albums_genres_table",
+            Base.metadata,
+            Column("album_id", ForeignKey("albums.id"), primary_key=True),
+            Column("genre_id", ForeignKey("genres.id"), primary_key=True),
+        )
+    )
 
 
 class Track(Base):
@@ -41,14 +39,11 @@ class Track(Base):
     open_date = Column(DateTime, nullable=False)
     duration = Column(DECIMAL, nullable=False)
     album_id = Column(Integer, ForeignKey("albums.id"), nullable=False)
-    album = relationship("Album", foreign_keys=[album_id])
+    album = relationship("Album", foreign_keys=[album_id], backref="tracks")
     file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
     file = relationship("File", foreign_keys=[file_id])
     picture_id = Column(Integer, ForeignKey("files.id"))
     picture = relationship("File", foreign_keys=[picture_id])
-    genres = relationship(
-        "Genre", secondary=association_tracks_genres_table
-    )
 
 
 class Genre(Base):

@@ -143,14 +143,12 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
-                this.$refs.genres.selectedGenres.forEach(element => {
-                    form.append('genres_ids', element);
-                });
+                
                 if (picture) {
                     form.append('trackPicture', picture[0]);
                 }
                 form.append('date', moment(this.album_date).format(this.VITE_DATE_FORMAT));
-                HTTP.post('upload_song', form, {
+                HTTP.post('song', form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },

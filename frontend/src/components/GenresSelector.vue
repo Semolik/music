@@ -4,10 +4,10 @@
             :class="{ active: focused }" v-model="searchText" placeholder="Поиск по жанрам" :borderRadius="borderRadius"
             label="Жанры" :formkitInnerClass="{ focused: focused }" off-margin offChangeColor>
             <template v-if="focused">
-                <label class="search-items" for="genres-selector">
+                <div class="search-items">
                     <SearchItem :genre="genre" v-for="genre in filteredGenres" :selectedGenres="selectedGenres"
                         @selectGenre="selectGenre(genre)" />
-                </label>
+                </div>
             </template>
         </FormField>
         <div class="selected-genres" v-if="selectedGenres.length !== 0">
@@ -102,6 +102,9 @@ export default {
             border-radius: 10px;
             padding: 10px;
             background-color: var(--purple);
+            &:hover {
+                background-color: var(--red-0);
+            }
         }
     }
 

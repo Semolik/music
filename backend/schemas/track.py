@@ -9,59 +9,12 @@ from backend.core.config import env_config
 class CreateAlbum(BaseModel):
     name: str
     date: datetime
+    genres_ids: List[int] | None = None
 
 
 @form_body
 class CreateAlbumForm(CreateAlbum):
     ...
-
-
-class AlbumBase(BaseModel):
-    id: int
-    name: str
-    year: int
-
-
-class AlbumAfterUpload(AlbumBase):
-    musician_id: int
-
-
-class AlbumInfo(AlbumBase):
-    musician: PublicProfile
-    picture: str | None
-
-
-class UploadTrackBase(BaseModel):
-    name: str
-    album_id: int
-    feat: str | None
-    genres_ids: List[int]
-
-
-class UploadTrack(UploadTrackBase):
-    date: datetime
-
-
-@form_body
-class UploadTrackForm(UploadTrack):
-    ...
-
-
-class TrackAfterUpload(UploadTrackBase):
-    id: int
-    picture_id: int | None
-
-
-class Track(UploadTrackBase):
-    id: int
-    year: int
-    pictute: str
-    duration: float
-    album: AlbumInfo
-
-
-class TrackClosedInformation(Track):
-    open_date: datetime
 
 
 class CreateGenre(BaseModel):
@@ -84,3 +37,50 @@ class UpdateGenreForm(UpdateGenre):
 
 class Genre(UpdateGenre):
     picture: str
+
+
+class AlbumBase(BaseModel):
+    id: int
+    name: str
+    year: int
+    genres: List[Genre]
+
+
+class AlbumAfterUpload(AlbumBase):
+    musician_id: int
+
+
+class UploadTrackBase(BaseModel):
+    name: str
+    album_id: int
+    feat: str | None
+
+
+class UploadTrack(UploadTrackBase):
+    date: datetime
+
+
+@form_body
+class UploadTrackForm(UploadTrack):
+    ...
+
+
+class TrackAfterUpload(UploadTrackBase):
+    id: int
+    pictute: str | None = None
+
+
+class AlbumTrack(UploadTrackBase):
+    duration: float
+
+
+class AlbumInfo(AlbumBase):
+    musician: PublicProfile
+    picture: str | None
+    date: datetime
+    tracks: List[AlbumTrack]
+
+
+class Track(AlbumTrack):
+    year: int
+    album: AlbumInfo

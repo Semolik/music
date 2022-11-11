@@ -99,7 +99,7 @@ export default {
         },
         allTracksUploaded(value) {
             if (value) {
-                this.toast(`Загрузка трек${this.singleMode ? "а" : "ов"} завершена`);
+                // this.toast(`Загрузка трек${this.singleMode ? "а" : "ов"} завершена`);
                 this.$router.push({ path: `/lk/my-music/albums/${this.album_id}` });
             }
         }
@@ -131,13 +131,23 @@ export default {
             if (this.buttonActive && !this.loadingActive) {
                 var formData = new FormData();
                 formData.append('name', this.albumName);
-                let picture = this.singleMode ? this.$refs.track.trackPicture : this.$refs.selectPicAlbum?.target;
+                if (this.singleMode) {
+                    let track = this.$refs.track;
+                    var picture = track.trackPicture;
+                    track.$refs.genres.selectedGenres.forEach(element => {
+                        formData.append('genres_ids', element.id);
+                    });
+                } else {
+                    var picture = this.$refs.selectPicAlbum?.target;
+                }
+
                 if (picture) {
                     formData.append('albumPicture', picture[0]);
                 }
+
                 let date = this.singleMode ? this.track.date : this.date;
                 formData.append('date', moment(date).format(this.VITE_DATE_FORMAT));
-                let album = await HTTP.post('/create_album', formData)
+                let album = await HTTP.post('/album', formData)
                     .then(response => response.data)
                     .catch(error => {
                         return null
