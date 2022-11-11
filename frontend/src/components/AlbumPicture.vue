@@ -35,7 +35,6 @@ export default {
     overflow: hidden;
     isolation: isolate;
     position: relative;
-    margin-bottom: 5px;
 
     &.hoverable:hover {
         .empty-picture {

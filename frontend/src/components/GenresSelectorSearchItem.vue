@@ -1,5 +1,5 @@
 <template>
-    <div :class="['item', { disabled: disabled }, { wrong: wrong }]" @click="select">
+    <div :class="['item', { active: active }, { wrong: wrong }]" @click="select">
         {{ genre.name }}
     </div>
 </template>
@@ -27,7 +27,7 @@ export default {
     },
     methods: {
         select() {
-            if (!this.disabled && this.selectedGenres.length >= this.VITE_MAX_SELECT_GENRES_COUNT) {
+            if (!this.active && this.selectedGenres.length >= this.VITE_MAX_SELECT_GENRES_COUNT) {
                 this.wrong = true;
                 this.toast.error(`Можно выбрать до ${this.VITE_MAX_SELECT_GENRES_COUNT} жанров`)
                 setTimeout(() => {
@@ -39,7 +39,7 @@ export default {
         }
     },
     computed: {
-        disabled() {
+        active() {
             return this.selectedGenres.includes(this.genre)
         }
     }
@@ -51,9 +51,8 @@ export default {
         border: none;
     }
 
-    &.disabled {
-        background-color: var(--color-background-mute);
-        cursor: auto;
+    &.active {
+        background-color: var(--purple);
     }
 
     &.wrong {
@@ -62,11 +61,15 @@ export default {
 
     cursor: pointer;
     border-top: 1px solid var(--accent-color);
-    padding: 10px;
-    background-color: var(--color-background-mute-3);
+    padding: 10px 20px;
+    text-align: center;
+    background-color: var(--color-background-mute-4);
+    border-radius: 5px;
+    height: min-content;
+    user-select: none;
 
-    &:not(.disabled):hover {
-        background-color: var(--color-background-mute-4);
+    &:not(.active):hover {
+        background-color: var(--color-background-mute-5);
     }
 }
 </style>

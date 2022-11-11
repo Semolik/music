@@ -72,12 +72,16 @@ class TrackAfterUpload(UploadTrackBase):
 
 class AlbumTrack(UploadTrackBase):
     duration: float
+    url: str
 
 
 class AlbumInfo(AlbumBase):
     musician: PublicProfile
     picture: str | None
     date: datetime
+
+
+class AlbumWithTracks(AlbumInfo):
     tracks: List[AlbumTrack]
 
 

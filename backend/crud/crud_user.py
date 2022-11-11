@@ -99,10 +99,12 @@ class UserCruds:
             if value is not None:
                 setattr(public_proile, var, value)
         public_proile_links = public_proile.links
-        for var, _ in public_proile_links.as_dict().items():
+        public_proile_links_obj = public_proile_links.as_dict()
+        public_proile_links_obj.pop('id')
+        public_proile_links_obj.pop('public_profile_id')
+        for var, _ in public_proile_links_obj.items():
             value = data_obj.get(var)
-            if value is not None:
-                setattr(public_proile_links, var, value)
+            setattr(public_proile_links, var, value)
         if remove_picture:
             file_cruds.delete_file(public_proile.picture)
         elif userPublicPicture:

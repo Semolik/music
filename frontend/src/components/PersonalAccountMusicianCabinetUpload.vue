@@ -13,15 +13,16 @@
             <div class="columns">
                 <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
                 <div class="container" id="upload-album">
-                    <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName">
-                        <span :class="['count', { wrong: upToAlbumLimit < 0 }]" v-if="upToAlbumLimit">
-                            {{ upToAlbumLimit }}
-                        </span>
-                    </FormField>
                     <div class="group">
                         <SelectDate v-model="date" :borderRadius="10" />
-                        <GenresSelector :borderRadius="borderRadius" :border-radius="10" ref="genres" />
+                        <FormField :borderRadius="10" label="Название альбома" off-margin notEmpty v-model="albumName">
+                            <span :class="['count', { wrong: upToAlbumLimit < 0 }]" v-if="upToAlbumLimit">
+                                {{ upToAlbumLimit }}
+                            </span>
+                        </FormField>
+                        
                     </div>
+                    <GenresSelector :borderRadius="borderRadius" :border-radius="10" ref="genres" />
                 </div>
             </div>
             <UploadSong :ref="`track-${index}`" :id="index" :track="track" @update="trackUpdate($event, index)"

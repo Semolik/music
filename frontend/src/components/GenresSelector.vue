@@ -2,16 +2,15 @@
     <div class="genres-selector">
         <FormField id="genres-selector" :inputEvents="{ focus: onFocus }" v-on-click-outside="onBlur"
             :class="{ active: focused }" v-model="searchText" placeholder="Поиск по жанрам" :borderRadius="borderRadius"
-            label="Жанры" :formkitInnerClass="{ focused: focused }" off-margin offChangeColor>
-            <template v-if="focused">
-                <div class="search-items">
-                    <SearchItem :genre="genre" v-for="genre in filteredGenres" :selectedGenres="selectedGenres"
-                        @selectGenre="selectGenre(genre)" />
-                </div>
-            </template>
+            label="Жанры" :formkitInnerClass="{ focused: focused }" borderColor="transparent" off-margin offChangeColor>
+            <div class="search-items" v-if="focused">
+                <SearchItem :genre="genre" v-for="(genre, index) in filteredGenres" :key="index"
+                    :selectedGenres="selectedGenres" @selectGenre="selectGenre(genre)" />
+            </div>
         </FormField>
-        <div class="selected-genres" v-if="selectedGenres.length !== 0">
-            <div class="item" v-for="genre in selectedGenres" @click="deleteGenre(genre)">{{ genre.name }}</div>
+        <div class="selected-genres" v-if="!focused && selectedGenres.length !== 0" v-auto-animate>
+            <SearchItem :genre="genre" v-for="(genre, index) in selectedGenres" :key="index"
+                :selectedGenres="selectedGenres" @selectGenre="selectGenre(genre)" />
         </div>
     </div>
 </template>
@@ -85,49 +84,69 @@ export default {
 }
 </script>
 <style lang="scss">
+@use '@/assets/styles/breakpoints';
+
 .genres-selector {
+    @mixin columns {
+        grid-template-columns: repeat(4, 1fr);
+
+        @include breakpoints.md(true) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @include breakpoints.sm(true) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--fields-border-color);
+    border-radius: 10px;
 
     .selected-genres {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        @include columns;
         gap: 10px;
-
-        .item {
-            flex-grow: 1;
-            min-width: 100px;
-            text-align: center;
-            border-radius: 10px;
-            padding: 10px;
-            background-color: var(--purple);
-            &:hover {
-                background-color: var(--red-0);
-            }
-        }
     }
 
     .formkit-inner {
         flex-direction: column;
         position: relative;
 
+        input {
+            background-color: rgba($color: #000000, $alpha: 0.1);
+        }
+
         &.focused {
             overflow: inherit !important;
-            border-radius: var(--inner-radius) var(--inner-radius) 0 0 !important;
+
+            .formkit-input {
+                border-radius: 5px 5px 0 0;
+            }
+
+            input {
+                border-radius: 5px 5px 0 0;
+                background-color: rgba($color: #000000, $alpha: 0.2);
+                border: 1px solid var(--fields-border-color);
+                border-bottom: none;
+            }
         }
 
         .search-items {
-            top: 100%;
-            position: absolute;
-            display: flex;
-            flex-direction: column;
             width: 100%;
-            outline: 1px solid var(--accent-color);
-            z-index: 99;
-            border-radius: 0 0 var(--inner-radius) var(--inner-radius);
-            max-height: 114px;
+            border: 1px solid var(--fields-border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 110px;
+            height: 110px;
             overflow: auto;
+            padding: 10px;
+            gap: 10px;
+            display: grid;
+            @include columns;
         }
     }
 }

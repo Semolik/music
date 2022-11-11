@@ -53,7 +53,6 @@ export default {
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 
-
     @include breakpoints.md(true) {
         grid-template-columns: repeat(3, 1fr);
     }

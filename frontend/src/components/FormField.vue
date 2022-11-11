@@ -1,5 +1,6 @@
 <template>
-    <div :class="['formkit-outer', { 'off-margin': offMargin }]" data-family="text" data-type="text">
+    <div :class="['formkit-outer', { 'off-margin': offMargin }]" :style="{ '--border-color': borderColor }"
+        data-family="text" data-type="text">
         <div class="formkit-wrapper">
             <label class="formkit-label" :for="id" v-if="label">{{ label }}</label>
             <div class="formkit-inner-container">
@@ -32,7 +33,7 @@
             gap: 10px;
 
             .formkit-inner {
-                --accent-color: var(--fields-border-color);
+                --accent-color: var(--border-color, var(--fields-border-color));
                 flex-grow: 1;
                 border-radius: var(--inner-radius);
                 box-shadow: 0 0 0 1px var(--accent-color);
@@ -94,7 +95,8 @@ export default {
         offChangeColor: Boolean,
         value: String,
         inputEvents: Object,
-        formkitInnerClass: Object
+        formkitInnerClass: Object,
+        borderColor: String,
     },
     inject: ['runValidation'],
     data() {

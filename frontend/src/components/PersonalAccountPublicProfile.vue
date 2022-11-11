@@ -155,9 +155,9 @@ export default {
                 let data = new FormData(form);
                 data.append('name', name);
                 data.append('description', description);
-                data.append('telegram', telegram);
-                data.append('vk', vk);
-                data.append('youtube', yt);
+                data.append('telegram', telegram || '');
+                data.append('vk', vk || '');
+                data.append('youtube', yt || '');
                 data.append('remove_picture', remove_picture);
                 HTTP.put('/me/public', data)
                     .then((response) => {

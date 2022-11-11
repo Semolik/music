@@ -98,7 +98,7 @@ export default {
             nameIsValid: false,
             featIsValid: false,
             albumIsValid: false,
-            borderRadius: 5,
+            borderRadius: 10,
             nameLimit: this.VITE_MAX_TRACK_NAME_LENGTH,
             albumLimit: this.VITE_MAX_ALBUM_NAME_LENGTH,
             featLimit: this.VITE_MAX_TRACK_FEAT_LENGTH,

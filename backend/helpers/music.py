@@ -67,6 +67,18 @@ def set_album_info(db_album: Album, user_id: int | None = None):
 
 
 def set_album_tracks(db_album, db_album_obj):
-    db_album_obj['tracks'] = [set_picture(track.as_dict(), track.picture)
+    db_album_obj['tracks'] = [set_track_data(track)
                               for track in music_crud.get_album_tracks(album_id=db_album.id)]
     return db_album_obj
+
+
+def set_track_data(track: Track):
+    track_obj = set_picture(track.as_dict(), track.picture)
+    track_obj['url'] = get_track_url(track)
+    return track_obj
+
+
+def get_track_url(track: Track):
+    return ''.join(
+        [settings.SERVER_LINK, settings.API_V1_STR,  settings.TRACKS_FOLDER, '/', track.file.file_name])
+
