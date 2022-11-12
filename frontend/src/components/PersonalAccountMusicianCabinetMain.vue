@@ -15,7 +15,7 @@
     </div>
     <FormField placeholder="Поиск" :borderRadius="10"></FormField>
 </template>
-<style lang="scss">
+<style lang="scss" scoped>
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/components';
 

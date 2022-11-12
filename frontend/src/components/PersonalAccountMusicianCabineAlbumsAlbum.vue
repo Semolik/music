@@ -3,7 +3,20 @@
         <div class="album-head">
             <AlbumPicture :src="albumInfo.picture" offHover />
             <div class="album-info">
-                <div class="headline">{{ albumInfo.name }}</div>
+                <div class="headline">
+                    <div class="name">{{ albumInfo.name }}</div>
+                    <div class="album-buttons">
+                        <div class="button">
+                            <FontAwesomeIcon icon="fa-pen" />
+                        </div>
+                        <div class="button" @click="openDeleteDialog">
+                            <FontAwesomeIcon icon="fa-trash" />
+                        </div>
+                        <ModalDialog @close="closeDeleteDialog" @no="closeDeleteDialog" headline="Удаление альбома"
+                            :active="deleteDialogOpened" :text="`Вы точно хотите удалить альбом ${albumInfo.name}?`"
+                            yesButton noButton />
+                    </div>
+                </div>
                 <div class="extra-info">
                     <div class="item">Год: {{ albumInfo.year }}</div>
                     <div class="item">Дата выхода: {{ albumInfo.date }}</div>
@@ -25,6 +38,11 @@ import { HTTP } from '../http-common.vue';
 import { useToast } from "vue-toastification";
 import handleError from '../composables/errors';
 import AlbumPicture from './AlbumPicture.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import ModalDialog from './ModalDialog.vue';
+library.add(faPen, faTrash);
 export default {
     setup() {
         const toast = useToast();
@@ -39,7 +57,8 @@ export default {
     },
     data() {
         return {
-            albumInfo: null
+            albumInfo: null,
+            deleteDialogOpened: false,
         };
     },
     mounted() {
@@ -51,17 +70,26 @@ export default {
                 this.toast.error(handleError(error).message);
             });
     },
-    components: { AlbumPicture },
+    components: { AlbumPicture, FontAwesomeIcon, ModalDialog },
     computed: {
         showGenres() {
             if (!this.albumInfo) return
             return this.albumInfo.genres.length > 0;
         }
+    },
+    methods: {
+        openDeleteDialog() {
+            this.deleteDialogOpened = true;
+        },
+        closeDeleteDialog() {
+            this.deleteDialogOpened = false;
+        },
     }
 }
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/components';
 
 .album-editor {
     display: flex;
@@ -83,6 +111,21 @@ export default {
                 margin-bottom: 10px;
                 width: 100%;
                 @include helpers.flex-center;
+
+                .name {
+                    flex-grow: 1;
+                }
+
+                .album-buttons {
+                    display: flex;
+                    gap: 5px;
+
+                    .button {
+                        @include components.button;
+                        @include components.button-sizes;
+                        border-radius: 10px;
+                    }
+                }
             }
 
             .extra-info {

@@ -7,7 +7,7 @@
                 <span :class="['count', { wrong: upToNameLimit < 0 }]" v-if="nameLenght">{{ upToNameLimit }}</span>
             </FormField>
         </div>
-        <GenresSelector :borderRadius="borderRadius" ref="genres" v-if="isSingle"/>
+        <GenresSelector :borderRadius="borderRadius" ref="genres" v-if="isSingle" />
         <div class="block">
             <SelectImage @changed="pictureUpdated" :pictureUrl="data.picture" name="userPicture" ref="selectPic" />
             <div class="fields-container" :id="`fields-${id}`">
@@ -143,7 +143,7 @@ export default {
                 form.append('album_id', this.album_id);
                 form.append('feat', data.feat);
                 form.append('track', data.audioFileTarget);
-                
+
                 if (picture) {
                     form.append('trackPicture', picture[0]);
                 }

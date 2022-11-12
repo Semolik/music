@@ -11,7 +11,7 @@
         <UploadSong :track="track" ref="track" @update="trackUpdate($event)" is-single v-if="singleMode" />
         <template v-else>
             <div class="columns">
-                <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmpty />
+                <SelectImage @changed="updatedPicture" ref="selectPicAlbum" notEmptyEvent />
                 <div class="container" id="upload-album">
                     <div class="group">
                         <SelectDate v-model="date" :borderRadius="10" />
@@ -20,7 +20,7 @@
                                 {{ upToAlbumLimit }}
                             </span>
                         </FormField>
-                        
+
                     </div>
                     <GenresSelector :borderRadius="borderRadius" :border-radius="10" ref="genres" />
                 </div>
@@ -233,7 +233,7 @@ export default {
 
     .columns {
         display: grid;
-        grid-template-columns: 140px 1fr;
+        grid-template-columns: 160px 1fr;
         gap: 10px;
 
         .container {

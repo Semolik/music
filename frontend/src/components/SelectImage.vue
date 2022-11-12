@@ -1,5 +1,5 @@
 <template>
-    <div :class="['select-image', { empty: !picture }, {wrong: notEmpty && !target}]">
+    <div :class="['select-image', { empty: !picture }, { wrong: (notEmpty && !target) || warning }]">
         <FontAwesomeIcon icon="fa-image" v-if="!picture" />
         <img :src="picture" v-else>
         <div class="edit-area">
@@ -28,6 +28,7 @@ export default {
         pictureUrl: String,
         name: String,
         notEmpty: Boolean,
+        notEmptyEvent: Boolean,
     },
     emits: ['changed'],
     components: { FontAwesomeIcon },
@@ -36,11 +37,19 @@ export default {
             picture: this.pictureUrl,
             acceptedFormats: '.jpg, .jpeg, .png',
             target: null,
+            warning: false,
         }
     },
+    inject: ['runValidation'],
     watch: {
         pictureUrl(value) {
             this.picture = value;
+        },
+        runValidation(value) {
+            console.log(this.notEmptyEvent )
+            if (this.notEmptyEvent && value && !this.target) {
+                this.warning = true;
+            }
         }
     },
     methods: {
@@ -50,7 +59,7 @@ export default {
                 this.detelePicture();
                 return;
             }
-            this.target = file;
+            
             var fileName = file[0].name;
             var idxDot = fileName.lastIndexOf(".") + 1;
             var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
@@ -61,6 +70,8 @@ export default {
                 this.detelePicture()
                 return
             }
+            this.target = file;
+            this.warning = false;
             let reader = new FileReader;
             reader.onload = e => {
                 this.picture = e.target.result;
@@ -98,11 +109,13 @@ export default {
         overflow: hidden;
         border: 2px dashed transparent;
         border-color: var(--color-text);
+
         svg {
             width: 40%;
             height: 40%;
         }
     }
+
     &.wrong {
         border: 2px dashed red;
     }

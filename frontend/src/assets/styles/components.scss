@@ -31,3 +31,13 @@
         text-align: center;
     }
 }
+
+@mixin button-sizes {
+    width: 40px;
+    height: 40px;
+
+    svg {
+        height: 18px;
+        width: 18px;
+    }
+}
