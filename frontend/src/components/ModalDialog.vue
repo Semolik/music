@@ -13,7 +13,10 @@
                         {{ text }}
                     </div>
                     <div class="modal-buttons">
-                        <div class="button" v-if="yesButton" @click="$emit('yes')">Да</div>
+                        <div :class="['button', { loading: yesLoading }]" v-if="yesButton" @click="$emit('yes')">
+                            <span v-if="!yesLoading">Да</span>
+                            <FontAwesomeIcon icon="fa-spinner" v-else/>
+                        </div>
                         <div class="button" v-if="noButton" @click="$emit('no')">Нет</div>
                     </div>
                 </div>
@@ -23,9 +26,9 @@
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faX, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faX);
+library.add(faX, faSpinner);
 
 export default {
     props: {
@@ -33,6 +36,7 @@ export default {
         headline: String,
         text: String,
         yesButton: Boolean,
+        yesLoading: Boolean,
         noButton: Boolean,
     },
     emits: ['close'],

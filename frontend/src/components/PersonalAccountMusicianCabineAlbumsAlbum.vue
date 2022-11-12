@@ -12,9 +12,9 @@
                         <div class="button" @click="openDeleteDialog">
                             <FontAwesomeIcon icon="fa-trash" />
                         </div>
-                        <ModalDialog @close="closeDeleteDialog" @no="closeDeleteDialog" headline="Удаление альбома"
+                        <ModalDialog @close="closeDeleteDialog" @yes="deleteAlbum" @no="closeDeleteDialog" headline="Удаление альбома"
                             :active="deleteDialogOpened" :text="`Вы точно хотите удалить альбом ${albumInfo.name}?`"
-                            yesButton noButton />
+                            yesButton noButton :yesLoading="deleteLoading" />
                     </div>
                 </div>
                 <div class="extra-info">
@@ -29,6 +29,7 @@
                         </div>
                     </div>
                 </div>
+                {{albumInfo.tracks}}
             </div>
         </div>
     </div>
@@ -59,6 +60,7 @@ export default {
         return {
             albumInfo: null,
             deleteDialogOpened: false,
+            deleteLoading: false,
         };
     },
     mounted() {
@@ -84,6 +86,16 @@ export default {
         closeDeleteDialog() {
             this.deleteDialogOpened = false;
         },
+        deleteAlbum(){
+            HTTP.delete('album', {params: {id: this.albumInfo.id}})
+            .then(response => {
+                this.closeDeleteDialog();
+                this.$router.push('/lk/my-music/albums/')
+            })
+            .catch(error => {
+                this.toast.error(handleError(error).message);
+            })
+        }
     }
 }
 </script>

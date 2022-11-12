@@ -1,5 +1,8 @@
 from datetime import datetime
+import os
+from pathlib import Path
 from typing import List
+from backend.crud.crud_file import file_cruds
 from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
@@ -30,6 +33,28 @@ class MusicCrud(CRUDBase):
 
     def create_genre(self, name: str, picture: File):
         return self.create(Genre(name=name, picture=self.create(picture)))
+
+    def delete_track(self, track: Track):
+        picture = track.picture
+        if picture:
+            track.picture = None
+            file_cruds.delete_picture(file=picture)
+        track_file = track.file
+        path = '/'.join([settings.TRACKS_FOLDER, track_file.file_name])
+        if Path(path).exists():
+            os.remove(path)
+        self.db.delete(track)
+        self.db.commit()
+
+    def delete_album(self, album: Album):
+        for track in album.tracks:
+            self.delete_track(track=track)
+        picture = album.picture
+        if picture:
+            album.picture = None
+            file_cruds.delete_picture(file=picture)
+        self.db.delete(album)
+        self.db.commit()
 
     def get_genre_by_name(self, name: str) -> Genre | None:
         return self.db.query(Genre).filter(Genre.name == name).all()

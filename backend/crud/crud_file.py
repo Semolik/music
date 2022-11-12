@@ -8,7 +8,7 @@ from backend.core.config import settings
 
 
 class FileCruds(CRUDBase):
-    def delete_file(self, file: File) -> None:
+    def delete_picture(self, file: File) -> None:
         path = '/'.join([settings.IMAGES_FOLDER if file.type ==
                         'image' else settings.OTHER_FILES_FOLDER, file.file_name])
         if Path(path).exists():

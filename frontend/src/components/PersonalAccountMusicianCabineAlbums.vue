@@ -1,6 +1,7 @@
 <template>
-    <FormField placeholder="Поиск" :borderRadius="10" v-model="text"></FormField>
-    <div class="albums">
+    <FormField placeholder="Поиск" :borderRadius="10" v-model="text" off-margin></FormField>
+    <div class="empty" v-if="albumsEmpty">У вас пока нет альбомов</div>
+    <div class="albums" v-else>
         <Album :albumInfo="album" v-for="album in filteredAlbums" />
     </div>
 </template>
@@ -40,6 +41,9 @@ export default {
         filteredAlbums() {
             if (!this.text) return this.albums
             return this.albums.filter(album => album.name.includes(this.text))
+        },
+        albumsEmpty() {
+            return this.albums.length === 0;
         }
     }
 }
@@ -60,5 +64,13 @@ export default {
     @include breakpoints.sm(true) {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+.empty {
+    border: 2px dashed var(--color-text);
+    padding: 10px;
+    min-height: 100px;
+    @include helpers.flex-center;
+    border-radius: 15px;
 }
 </style>

@@ -57,6 +57,21 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj)
 
 
+@router.delete('/album', responses={**NOT_FOUND_ALBUM})
+def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    db_album = music_crud.get_album(album_id=id)
+    if not db_album:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    current_user_id = Authorize.get_jwt_subject()
+    if not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Нет прав на удаление данного альбома")
+    music_crud.delete_album(album=db_album)
+    return {'detail': 'Альбом удален'}
+
+
 @router.post('/song', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
 def upload_song(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPicture: UploadFile = File(default=False), track: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()

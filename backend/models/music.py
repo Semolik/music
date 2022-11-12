@@ -14,7 +14,7 @@ class Album(Base):
     name = Column(
         String(int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH'))), nullable=False)
     open_date = Column(DateTime, nullable=False)
-    picture_id = Column(Integer, ForeignKey("files.id", ondelete='SET NULL'))
+    picture_id = Column(Integer, ForeignKey("files.id"))
     picture = relationship("File", foreign_keys=[picture_id])
     genres = relationship(
         "Genre", secondary=Table(
@@ -41,7 +41,7 @@ class Track(Base):
     album_id = Column(Integer, ForeignKey("albums.id"), nullable=False)
     album = relationship("Album", foreign_keys=[album_id], backref="tracks")
     file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
-    file = relationship("File", foreign_keys=[file_id])
+    file = relationship("File", foreign_keys=[file_id], cascade="all, delete")
     picture_id = Column(Integer, ForeignKey("files.id"))
     picture = relationship("File", foreign_keys=[picture_id])
 

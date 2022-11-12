@@ -60,10 +60,10 @@ class UserCruds:
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if remove_picture:
-            file_cruds.delete_file(user.picture)
+            file_cruds.delete_picture(user.picture)
         elif userPic:
             if user.picture:
-                file_cruds.delete_file(user.picture)
+                file_cruds.delete_picture(user.picture)
             user.picture = self.create(userPic)
         self.db.add(user)
         self.db.commit()
@@ -106,10 +106,10 @@ class UserCruds:
             value = data_obj.get(var)
             setattr(public_proile_links, var, value)
         if remove_picture:
-            file_cruds.delete_file(public_proile.picture)
+            file_cruds.delete_picture(public_proile.picture)
         elif userPublicPicture:
             if public_proile.picture:
-                file_cruds.delete_file(public_proile.picture)
+                file_cruds.delete_picture(public_proile.picture)
             public_proile.picture = self.create(userPublicPicture)
         self.db.add(public_proile)
         self.db.commit()
