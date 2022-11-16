@@ -1,7 +1,5 @@
 import os
-from sqlalchemy.orm import Session
 from backend.db.base import CRUDBase
-from backend.db.db import get_db
 from backend.models.user import File
 from pathlib import Path
 from backend.core.config import settings

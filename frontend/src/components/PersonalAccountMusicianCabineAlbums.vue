@@ -1,6 +1,11 @@
 <template>
     <FormField placeholder="Поиск" :borderRadius="10" v-model="text" off-margin></FormField>
-    <div class="empty" v-if="albumsEmpty">У вас пока нет альбомов</div>
+    <div class="empty" v-if="albumsEmpty">
+        <div class="message">
+            У вас пока нет альбомов
+        </div>
+        <router-link class="upload-button" to="/lk/my-music/upload">Загрузить альбом</router-link>
+    </div>
     <div class="albums" v-else>
         <Album :albumInfo="album" v-for="album in filteredAlbums" />
     </div>
@@ -50,6 +55,7 @@ export default {
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/components';
 @use '@/assets/styles/breakpoints';
 
 .albums {
@@ -69,8 +75,17 @@ export default {
 .empty {
     border: 2px dashed var(--color-text);
     padding: 10px;
+    padding-top: 30px;
     min-height: 100px;
     @include helpers.flex-center;
     border-radius: 15px;
+    flex-direction: column;
+    gap: 20px;
+
+    .upload-button {
+        @include components.button;
+        border-radius: 10px;
+        padding: 5px 10px;
+    }
 }
 </style>

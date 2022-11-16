@@ -40,7 +40,7 @@ export default {
     },
     computed: {
         active() {
-            return this.selectedGenres.includes(this.genre)
+            return this.selectedGenres.map(genre => genre.id).includes(this.genre.id)
         }
     }
 }

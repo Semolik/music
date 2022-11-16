@@ -35,6 +35,7 @@ export default {
     .name {
         font-weight: 600;
         padding-left: 10px;
+        word-break: break-all;
 
     }
 

@@ -7,18 +7,23 @@
         <div class="icon" v-if="editIcon">
             <FontAwesomeIcon icon="fa-pen" />
         </div>
+        <div :class="['play-icon', { active: playIcon }]">
+            <FontAwesomeIcon icon="fa-play" />
+        </div>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faMusic, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faMusic, faPen, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faMusic, faPen);
+library.add(faMusic, faPen, faPlay);
 export default {
     props: {
         src: String,
         offHover: Boolean,
-        editIcon: Boolean
+        editIcon: Boolean,
+        isTrack: Boolean,
+        playIcon: Boolean
     },
     components: {
         FontAwesomeIcon
@@ -30,15 +35,34 @@ export default {
 
 .picture {
     aspect-ratio: 1;
-    border-radius: 10px;
+    border-radius: var(--picture-border-radius, 10px);
     width: 100%;
     overflow: hidden;
     isolation: isolate;
     position: relative;
 
+    .play-icon {
+        &.active {
+            opacity: 1;
+        }
+
+        transition: opacity .2s;
+        opacity: 0;
+        position: absolute;
+        inset: 0;
+        @include helpers.flex-center;
+        color: var(--yellow);
+        background-color: rgba($color: #000000, $alpha: 0.4);
+
+        svg {
+            width: var(--svg-size, 24px);
+            height: var(--svg-size, 24px);
+        }
+    }
+
     &.hoverable:hover {
         .empty-picture {
-            background-color: var(--color-background-mute-6);
+            background-color: var(--hover-picture-color, var(--color-background-mute-6));
         }
 
         &:has(img) {
@@ -74,8 +98,8 @@ export default {
             cursor: pointer;
 
             svg {
-                width: 24px;
-                height: 24px;
+                width: var(--svg-size, 24px);
+                height: var(--svg-size, 24px);
             }
         }
     }
@@ -89,15 +113,15 @@ export default {
     }
 
     .empty-picture {
-        background-color: var(--color-background-mute-3);
+        background-color: var(--picture-color, var(--color-background-mute-3));
         width: 100%;
         height: 100%;
         @include helpers.flex-center;
 
         svg {
-            height: 20%;
-            width: 20%;
-
+            height: var(--svg-size, 20%);
+            width: var(--svg-size, 20%);
+            color: var(--svg-color);
         }
     }
 }

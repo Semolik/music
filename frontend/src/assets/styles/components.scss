@@ -11,12 +11,16 @@
     text-decoration: none;
     color: var(--color-text);
 
-    &:not(.active):hover {
+    &:not(:where(.active, .wrong)):hover {
         background-color: var(--color-background-mute-4);
     }
 
     &.active {
         background-color: var(--purple);
+    }
+
+    &.wrong {
+        background-color: var(--red-0);
     }
 
     .icon {

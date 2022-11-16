@@ -67,12 +67,13 @@ class UploadTrackForm(UploadTrack):
 
 class TrackAfterUpload(UploadTrackBase):
     id: int
-    pictute: str | None = None
+    picture: str | None = None
 
 
-class AlbumTrack(UploadTrackBase):
+class AlbumTrack(TrackAfterUpload):
     duration: float
     url: str
+    
 
 
 class AlbumInfo(AlbumBase):
@@ -83,6 +84,7 @@ class AlbumInfo(AlbumBase):
 
 class AlbumWithTracks(AlbumInfo):
     tracks: List[AlbumTrack]
+    date: datetime | None = None
 
 
 class Track(AlbumTrack):

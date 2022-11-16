@@ -20,7 +20,6 @@
                                 {{ upToAlbumLimit }}
                             </span>
                         </FormField>
-
                     </div>
                     <GenresSelector :borderRadius="borderRadius" :border-radius="10" ref="genres" />
                 </div>

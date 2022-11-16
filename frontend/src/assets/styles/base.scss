@@ -23,12 +23,8 @@
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
   --vt-c-text-dark-3: rgba(206, 206, 206, 0.64);
-  --vt-c-white-60: rgb(60, 60, 60);
-  --vt-c-white-68: rgb(68, 68, 68);
-  --vt-c-white-76: rgb(76, 76, 76);
-  --vt-c-white-84: rgb(84, 84, 84);
-  --vt-c-white-92: rgb(92, 92, 92);
-  --vt-c-white-100: rgb(100, 100, 100);
+
+  --vt-c-white-200: rgb(200, 200, 200);
   --vt-c-white-190: rgb(190, 190, 190);
   --vt-c-white-170: rgb(180, 180, 180);
   --vt-c-white-170: rgb(170, 170, 170);
@@ -38,7 +34,13 @@
   --vt-c-white-130: rgb(130, 130, 130);
   --vt-c-white-120: rgb(120, 120, 120);
   --vt-c-white-110: rgb(110, 110, 110);
+  --vt-c-white-100: rgb(100, 100, 100);
   --vt-c-white-90: rgb(90, 90, 90);
+  --vt-c-white-92: rgb(92, 92, 92);
+  --vt-c-white-84: rgb(84, 84, 84);
+  --vt-c-white-76: rgb(76, 76, 76);
+  --vt-c-white-68: rgb(68, 68, 68);
+  --vt-c-white-60: rgb(60, 60, 60);
 
 
 
@@ -107,6 +109,7 @@
   --white-0-6: rgba(255, 255, 255, 0.6);
 
   --fields-border-color-dark: #94929c;
+  --yellow: #fc0;
 
 }
 
@@ -183,7 +186,7 @@ html {
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
-  transition: background-color .2s, border-color .2s;
+  transition: background-color .2s, border-color .2s, color .2s;
 }
 
 html {

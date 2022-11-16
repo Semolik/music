@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from backend.crud.crud_music import music_crud
 from backend.helpers.images import set_picture
@@ -54,10 +55,11 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
         raise HTTPException(status_code=500, detail="поврежденный файл")
 
 
-def set_album_info(db_album: Album, user_id: int | None = None):
+def set_album_info(db_album: Album, user_id: int | None = None, validate_date=False,):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
-    db_album_obj['date'] = db_album.open_date
+    db_album_obj['date'] = (db_album.open_date if db_album.open_date > datetime.now(
+    ) else None) if validate_date else db_album.open_date
     db_album_obj['musician'] = get_public_profile_as_dict(
         user_id=user_id, musician_id=db_album.musician_id)
     db_album_obj['genres'] = [set_picture(
@@ -80,5 +82,4 @@ def set_track_data(track: Track):
 
 def get_track_url(track: Track):
     return ''.join(
-        [settings.SERVER_LINK, settings.API_V1_STR,  settings.TRACKS_FOLDER, '/', track.file.file_name])
-
+        [settings.SERVER_LINK, settings.API_V1_STR, '/',  settings.TRACKS_FOLDER, '/', track.file.file_name])

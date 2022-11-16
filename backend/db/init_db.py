@@ -1,6 +1,6 @@
 import logging
 from backend.schemas.user import UserWithTypeRegister
-from backend.crud.crud_user import user_cruds
+from backend.crud.crud_user import UserCruds
 logger = logging.getLogger(__name__)
 
 FIRST_SUPERUSER = "admin"
@@ -9,6 +9,7 @@ FIRST_SUPERUSER = "admin"
 def init_db() -> None:  # 1
     logger.info("Инициализация базы данных")
     if FIRST_SUPERUSER:
+        user_cruds = UserCruds()
         user = user_cruds.get_user_by_username(FIRST_SUPERUSER)  # 2
         if not user:
             user_in = UserWithTypeRegister(

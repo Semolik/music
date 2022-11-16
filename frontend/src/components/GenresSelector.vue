@@ -25,6 +25,8 @@ import SearchItem from './GenresSelectorSearchItem.vue';
 export default {
     props: {
         borderRadius: Number,
+        selectedGenresIn: Array,
+        forceOpen: Boolean,
     },
     components: { FormField, SearchItem },
     setup() {
@@ -37,11 +39,12 @@ export default {
         OnClickOutside: vOnClickOutside,
     },
     data() {
+        this.$emit('change', this.selectedGenresIn);
         return {
             genres: [],
-            focused: false,
+            focused: this.forceOpen,
             searchText: '',
-            selectedGenres: [],
+            selectedGenres: this.selectedGenresIn || [],
             interval: null,
         }
     },
@@ -50,6 +53,7 @@ export default {
             return this.genres.filter(genre => genre.name.includes(this.searchText))
         }
     },
+
     methods: {
         onFocus() {
             this.focused = true;
@@ -58,15 +62,17 @@ export default {
             }
         },
         onBlur() {
-            this.focused = false;
+            if (!this.forceOpen) {
+                this.focused = false;
+            }
         },
         selectGenre(genre) {
-            if (this.selectedGenres.includes(genre)) {
+            if (this.selectedGenres.map(genre => genre.id).includes(genre.id)) {
                 this.deleteGenre(genre);
             } else {
                 this.selectedGenres.push(genre);
             }
-
+            this.$emit('change', this.selectedGenres);
         },
         deleteGenre(genre) {
             this.selectedGenres = this.selectedGenres.filter(selectedGenre => selectedGenre.id !== genre.id);
@@ -141,7 +147,8 @@ export default {
             border-top: none;
             border-radius: 0 0 5px 5px;
             max-height: 110px;
-            height: 110px;
+            height: min-content;
+            min-height: 60px;
             overflow: auto;
             padding: 10px;
             gap: 10px;

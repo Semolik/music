@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
+from backend.db.base import CRUDBase
 
 from backend.helpers.roles import set_status
 from backend.helpers.images import set_picture
 from backend.core.config import settings
 from backend.helpers.files import add_url
 from backend.crud.crud_file import file_cruds
-from backend.db.session import SessionLocal
+from backend.db.session import session
 from backend.models.music import Album
 from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
 from backend.models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
@@ -20,7 +21,7 @@ from fastapi import HTTPException, status
 class UserCruds:
     def __init__(self) -> None:
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        self.db: Session = SessionLocal()
+        self.db = session
 
     def create(self, model):
         self.db.add(model)

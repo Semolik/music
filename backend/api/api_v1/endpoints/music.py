@@ -53,7 +53,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
         if current_user_id is None or not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Альбом не найден")
-    db_album_obj = set_album_info(db_album=db_album)
+    db_album_obj = set_album_info(db_album=db_album, validate_date=True)
     return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj)
 
 
