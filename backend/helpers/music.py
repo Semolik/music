@@ -8,8 +8,7 @@ from backend.schemas.track import UploadTrackForm
 from backend.crud.crud_user import user_cruds
 from backend.db.base import crud_base
 from pydub import AudioSegment
-from fastapi import UploadFile, HTTPException
-from pathlib import Path
+from fastapi import UploadFile, HTTPException, status
 import uuid
 import shutil
 from backend.core.config import settings
@@ -58,8 +57,9 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
 def set_album_info(db_album: Album, user_id: int | None = None, validate_date=False,):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
-    db_album_obj['date'] = (db_album.open_date if db_album.open_date > datetime.now(
-    ) else None) if validate_date else db_album.open_date
+    # db_album_obj['date'] = (db_album.open_date if db_album.open_date > datetime.now(
+    # ) else None) if validate_date else db_album.open_date
+    db_album_obj['date'] = db_album.open_date
     db_album_obj['musician'] = get_public_profile_as_dict(
         user_id=user_id, musician_id=db_album.musician_id)
     db_album_obj['genres'] = [set_picture(
@@ -83,3 +83,19 @@ def set_track_data(track: Track):
 def get_track_url(track: Track):
     return ''.join(
         [settings.SERVER_LINK, settings.API_V1_STR, '/',  settings.TRACKS_FOLDER, '/', track.file.file_name])
+
+
+def validate_genres(genres_ids: List[int]):
+    not_found_genres_ids = []
+    genres = []
+    if genres_ids:
+        for genre_id in genres_ids:
+            genre = music_crud.get_genre_by_id(id=genre_id)
+            if not genre:
+                not_found_genres_ids.append(genre_id)
+            else:
+                genres.append(genre)
+        if len(not_found_genres_ids) > 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Жанры с id {','.join(map(str, not_found_genres_ids))} не найдены")
+    return genres

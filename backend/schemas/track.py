@@ -12,6 +12,15 @@ class CreateAlbum(BaseModel):
     genres_ids: List[int] | None = None
 
 
+class UpdateAlbum(CreateAlbum):
+    id: int
+
+
+@form_body
+class UpdateAlbumForm(UpdateAlbum):
+    ...
+
+
 @form_body
 class CreateAlbumForm(CreateAlbum):
     ...
@@ -73,7 +82,6 @@ class TrackAfterUpload(UploadTrackBase):
 class AlbumTrack(TrackAfterUpload):
     duration: float
     url: str
-    
 
 
 class AlbumInfo(AlbumBase):

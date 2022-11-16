@@ -38,8 +38,8 @@ export default {
     directives: {
         OnClickOutside: vOnClickOutside,
     },
+    emits: ['change-genre'],
     data() {
-        this.$emit('change', this.selectedGenresIn);
         return {
             genres: [],
             focused: this.forceOpen,
@@ -56,9 +56,11 @@ export default {
 
     methods: {
         onFocus() {
-            this.focused = true;
-            if (this.interval !== null) {
-                clearInterval(this.interval);
+            if (!this.forceOpen) {
+                this.focused = true;
+                if (this.interval !== null) {
+                    clearInterval(this.interval);
+                }
             }
         },
         onBlur() {
@@ -71,16 +73,19 @@ export default {
                 this.deleteGenre(genre);
             } else {
                 this.selectedGenres.push(genre);
+                this.$emit('change-genre', this.selectedGenres);
             }
-            this.$emit('change', this.selectedGenres);
         },
         deleteGenre(genre) {
-            this.selectedGenres = this.selectedGenres.filter(selectedGenre => selectedGenre.id !== genre.id);
+            const result = this.selectedGenres.filter(selectedGenre => selectedGenre.id !== genre.id)
+            this.selectedGenres = result;
+            this.$emit('change-genre', result);
         }
     },
     mounted() {
         HTTP.get("/genres")
             .then(response => {
+                this.$emit('change-genre', this.selectedGenres);
                 this.genres = response.data;
             })
             .catch(error => {

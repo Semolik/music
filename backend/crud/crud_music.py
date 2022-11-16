@@ -19,6 +19,21 @@ class MusicCrud(CRUDBase):
                          open_date=date, picture=db_image, genres=genres)
         return self.create(model=db_album)
 
+    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: File):
+        album.name = name
+        album.open_date = date
+        album.genres = genres
+        if image:
+            picture = album.picture
+            album.picture = None
+            if picture:
+                file_cruds.delete_picture(file=picture)
+            album.picture = self.create(image)
+        self.db.add(album)
+        self.db.commit()
+        self.db.refresh(album)
+        return album
+
     def get_musician_albums(self, musician_id: int) -> List[Album]:
         return self.db.query(Album).filter(Album.musician_id == musician_id).all()
 

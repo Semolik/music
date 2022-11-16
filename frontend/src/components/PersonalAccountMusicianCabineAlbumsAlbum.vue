@@ -2,7 +2,8 @@
     <div class="album-editor" v-if="albumInfo">
         <div class="album-head">
             <div class="picture-container">
-                <AlbumPicture :src="albumInfo.picture" offHover />
+                <SelectImage v-if="editorOpened" :pictureUrl="albumInfo.picture" ref="albumPicture" />
+                <AlbumPicture :src="albumInfo.picture" offHover v-else />
                 <UploadDate v-if="editorOpened && date" :border-radius="10" v-model="date" />
             </div>
             <div class="album-info">
@@ -10,11 +11,11 @@
                     <div class="name">{{ albumInfo.name }}</div>
                     <div class="album-buttons">
                         <template v-if="editorOpened">
-                            <div :class="['button', { wrong: isWrong }, { active: buttonActive }]" @click="save">
-                                <FontAwesomeIcon icon="fa-floppy-disk" />
-                            </div>
                             <div class="button" @click="editorOpened = false">
                                 <FontAwesomeIcon icon="fa-x" />
+                            </div>
+                            <div :class="['button', { wrong: isWrong }, { active: buttonActive }]" @click="save">
+                                <FontAwesomeIcon icon="fa-floppy-disk" />
                             </div>
                         </template>
                         <template v-else>
@@ -37,7 +38,8 @@
                             {{ upToAlbumLimit }}
                         </span>
                     </FormField>
-                    <GenresSelector @change="onGenreChange" :selected-genres-in="albumInfo.genres" force-open />
+                    <GenresSelector @change-genre="onGenreChange" ref="genres" :selected-genres-in="albumInfo.genres"
+                        force-open />
                 </div>
                 <div class="extra-info" v-else>
                     <div class="item">Год: {{ albumInfo.year }}</div>
@@ -53,6 +55,7 @@
                 </div>
             </div>
         </div>
+
         <div class="tracks">
             <Track :track-data="track" :musician-data="albumInfo.musician" :key="index"
                 v-for="(track, index) in albumInfo.tracks" />
@@ -73,6 +76,7 @@ import FormField from './FormField.vue';
 import GenresSelector from './GenresSelector.vue';
 import UploadDate from './PersonalAccountMusicianCabinetUploadDate.vue';
 import moment from 'moment';
+import SelectImage from './SelectImage.vue';
 library.add(faPen, faTrash, faX, faFloppyDisk);
 export default {
     setup() {
@@ -119,13 +123,12 @@ export default {
             this.setData();
         }
     },
-    components: { AlbumPicture, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, UploadDate },
+    components: { AlbumPicture, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, UploadDate, SelectImage },
     computed: {
         showGenres() {
             if (!this.albumInfo) return
             return this.albumInfo.genres.length > 0;
         },
-
         upToAlbumLimit() {
             let length = this.albumName?.length;
             if (!length) return
@@ -136,7 +139,11 @@ export default {
             if (!length) return true
         },
         buttonActive() {
-            return this.albumName !== this.albumInfo.name || this.genresChanged;
+            var pic = this.$refs.albumPicture?.target;
+            return this.albumName !== this.albumInfo.name || this.genresChanged || pic || this.dateChanged;
+        },
+        dateChanged() {
+            return !moment(this.albumInfo.date, this.VITE_DATE_FORMAT).isSame(this.date)
         },
         genresChanged() {
             var newGenresId = this.genres.map(genre => genre.id);
@@ -152,13 +159,33 @@ export default {
             this.genres = value;
         },
         save() {
-
+            if (this.isWrong || !this.buttonActive) return
+            var form = new FormData();
+            var pic = this.$refs.albumPicture.target;
+            form.append('id', this.albumInfo.id);
+            form.append('name', this.albumName);
+            form.append('date', moment(this.date).format(this.VITE_DATE_FORMAT));
+            if (pic) {
+                form.append('albumPicture', pic[0]);
+            }
+            this.genres.forEach(element => {
+                form.append('genres_ids', element.id);
+            });
+            HTTP.put('/album', form)
+                .then(response => {
+                    this.albumInfo = response.data;
+                    this.editorOpened = false;
+                })
+                .catch(error => {
+                    this.toast.error(handleError(error).message);
+                })
         },
 
         setData() {
-            const { name, date } = this.albumInfo;
+            const { name, date, genres } = this.albumInfo;
             this.albumName = name;
             this.date = date ? moment(date, this.VITE_DATE_FORMAT).toDate() : null;
+            this.genres = genres;
         },
         closeDeleteDialog() {
             this.deleteDialogOpened = false;

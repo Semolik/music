@@ -15,6 +15,7 @@ export default {
             wrong: false
         }
     },
+    emits: ['selectGenre'],
     setup() {
         const toast = useToast();
         const {

@@ -5,11 +5,11 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import set_picture
-from backend.helpers.music import save_track, set_album_info, set_album_tracks
+from backend.helpers.music import save_track, set_album_info, set_album_tracks, validate_genres
 from backend.helpers.validate_role import validate_admin, validate_musician
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_GENRE, NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenre, CreateGenreForm, Genre, TrackAfterUpload, UpdateGenreForm, UploadTrackForm
+from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenre, CreateGenreForm, Genre, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
 from backend.helpers.files import save_file
 
 router = APIRouter(tags=['Музыка'])
@@ -20,19 +20,7 @@ def create_album(albumData: CreateAlbumForm = Depends(CreateAlbumForm), albumPic
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = validate_musician(user_id=current_user_id)
-    not_found_genres_ids = []
-    genres = []
-    genres_ids = albumData.genres_ids
-    if genres_ids:
-        for genre_id in genres_ids:
-            genre = music_crud.get_genre_by_id(id=genre_id)
-            if not genre:
-                not_found_genres_ids.append(genre_id)
-            else:
-                genres.append(genre)
-        if len(not_found_genres_ids) > 0:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Жанры с id {','.join(map(str, not_found_genres_ids))} не найдены")
+    genres = validate_genres(genres_ids=albumData.genres_ids)
     db_image = save_file(upload_file=albumPicture,
                          user_id=db_user.id, force_image=True)
     db_album = music_crud.create_album(
@@ -41,7 +29,27 @@ def create_album(albumData: CreateAlbumForm = Depends(CreateAlbumForm), albumPic
     return album_obj
 
 
-@router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.put('/album', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+def create_album(albumData: UpdateAlbumForm = Depends(UpdateAlbumForm), albumPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    db_album = music_crud.get_album(album_id=albumData.id)
+    if not db_album:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    current_user_id = Authorize.get_jwt_subject()
+    if not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Нет прав изменять этот альбом")
+    genres = validate_genres(genres_ids=albumData.genres_ids)
+    db_image = save_file(upload_file=albumPicture,
+                         user_id=current_user_id, force_image=True)
+    db_album = music_crud.update_album(album=db_album,
+                                       name=albumData.name, date=albumData.date, genres=genres, image=db_image)
+    album_obj = set_album_info(db_album=db_album)
+    return set_album_tracks(db_album=db_album, db_album_obj=album_obj)
+
+
+@ router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_optional()
     db_album = music_crud.get_album(album_id=id)
@@ -57,7 +65,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj)
 
 
-@router.delete('/album', responses={**NOT_FOUND_ALBUM})
+@ router.delete('/album', responses={**NOT_FOUND_ALBUM})
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     db_album = music_crud.get_album(album_id=id)
@@ -72,7 +80,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     return {'detail': 'Альбом удален'}
 
 
-@router.post('/song', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
+@ router.post('/song', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
 def upload_song(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPicture: UploadFile = File(default=False), track: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
