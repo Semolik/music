@@ -6,6 +6,7 @@ import AppError from './components/AppError.vue';
 import handleError from './composables/errors';
 import { useAuthStore } from './stores/auth';
 import { storeToRefs } from 'pinia';
+import AppPlayer from './components/AppPlayer.vue';
 
 export default {
   setup() {
@@ -19,7 +20,8 @@ export default {
   components: {
     RouterView,
     AppHeader,
-    AppError
+    AppError,
+    AppPlayer
   },
   data() {
     return {
@@ -87,6 +89,7 @@ export default {
       </transition>
     </router-view>
   </div>
+  <AppPlayer />
 </template>
 
 <style scoped lang="scss">
@@ -97,6 +100,7 @@ export default {
   transition: filter .3s;
   width: 100%;
   height: 100%;
+  padding: 5px;
 
   @media only screen and (hover: none) {
     padding-inline: 10px;

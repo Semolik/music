@@ -148,7 +148,7 @@ export default {
                     form.append('trackPicture', picture[0]);
                 }
                 form.append('date', moment(this.album_date).format(this.VITE_DATE_FORMAT));
-                HTTP.post('song', form, {
+                HTTP.post('track', form, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },

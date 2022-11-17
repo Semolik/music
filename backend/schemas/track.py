@@ -97,5 +97,4 @@ class AlbumWithTracks(AlbumInfo):
 
 
 class Track(AlbumTrack):
-    year: int
     album: AlbumInfo

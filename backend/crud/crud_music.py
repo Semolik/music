@@ -68,6 +68,9 @@ class MusicCrud(CRUDBase):
         self.db.delete(track)
         self.db.commit()
 
+    def get_track(self, track_id: int):
+        return self.get(id=track_id, model=Track)
+
     def delete_album(self, album: Album):
         for track in album.tracks:
             self.delete_track(track=track)

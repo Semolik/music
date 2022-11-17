@@ -43,7 +43,7 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
                 name=track.name,
                 feat=track.feat,
                 open_date=track.date,
-                duration=segment.duration_seconds,
+                duration=round(segment.duration_seconds),
                 file=db_file,
                 album_id=track.album_id,
                 picture=db_picture
@@ -57,8 +57,6 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
 def set_album_info(db_album: Album, user_id: int | None = None, validate_date=False,):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
-    # db_album_obj['date'] = (db_album.open_date if db_album.open_date > datetime.now(
-    # ) else None) if validate_date else db_album.open_date
     db_album_obj['date'] = db_album.open_date
     db_album_obj['musician'] = get_public_profile_as_dict(
         user_id=user_id, musician_id=db_album.musician_id)
@@ -77,6 +75,12 @@ def set_album_tracks(db_album, db_album_obj):
 def set_track_data(track: Track):
     track_obj = set_picture(track.as_dict(), track.picture)
     track_obj['url'] = get_track_url(track)
+    return track_obj
+
+
+def set_full_track_data(track: Track):
+    track_obj = set_track_data(track)
+    track_obj['album'] = set_album_info(track.album)
     return track_obj
 
 
