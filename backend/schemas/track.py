@@ -14,6 +14,7 @@ class CreateAlbum(BaseModel):
 
 class UpdateAlbum(CreateAlbum):
     id: int
+    tracks_ids: List[int]
 
 
 @form_body

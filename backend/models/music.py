@@ -40,6 +40,7 @@ class Track(Base):
     duration = Column(DECIMAL, nullable=False)
     album_id = Column(Integer, ForeignKey("albums.id"), nullable=False)
     album = relationship("Album", foreign_keys=[album_id], backref="tracks")
+    track_position = Column(Integer)
     file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
     file = relationship("File", foreign_keys=[file_id], cascade="all, delete")
     picture_id = Column(Integer, ForeignKey("files.id"))

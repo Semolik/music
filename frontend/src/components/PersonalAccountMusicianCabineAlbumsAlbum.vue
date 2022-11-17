@@ -42,10 +42,10 @@
                         force-open />
                 </div>
                 <div class="extra-info" v-else>
-                    <div class="item">Год: {{ albumInfo.year }}</div>
-                    <div class="item">Дата выхода: {{ albumInfo.date }}</div>
-                    <router-link to="" class="item">Музыкант: {{ albumInfo.musician.name }}</router-link>
-                    <div class="item genres" v-if="showGenres">
+                    <div class="extra-info-item">Год: {{ albumInfo.year }}</div>
+                    <div class="extra-info-item">Дата выхода: {{ albumInfo.date }}</div>
+                    <router-link to="" class="extra-info-item">Музыкант: {{ albumInfo.musician.name }}</router-link>
+                    <div class="extra-info-item genres" v-if="showGenres">
                         Жанр{{ albumInfo.genres.length > 1 ? 'ы' : '' }}:
                         <div v-for="(genre, index) in albumInfo.genres">
                             <router-link to="">{{ genre.name }}</router-link>
@@ -55,11 +55,13 @@
                 </div>
             </div>
         </div>
-
-        <div class="tracks">
-            <Track :track-data="track" :musician-data="albumInfo.musician" :key="index"
-                v-for="(track, index) in albumInfo.tracks" />
-        </div>
+        <div class="message" v-if="editorOpened">Перетяните трек чтобы поменять его положение в альбоме</div>
+        <draggable v-model="tracks" :class="['tracks', { draggable: editorOpened }]" item-key="id"
+            :disabled="!editorOpened">
+            <template #item="{ element }">
+                <Track :track-data="element" :musician-data="albumInfo.musician" />
+            </template>
+        </draggable>
     </div>
 </template>
 <script>
@@ -72,6 +74,7 @@ import { faPen, faTrash, faX, faFloppyDisk } from '@fortawesome/free-solid-svg-i
 import { library } from '@fortawesome/fontawesome-svg-core';
 import ModalDialog from './ModalDialog.vue';
 import Track from './Track.vue';
+import draggable from 'vuedraggable'
 import FormField from './FormField.vue';
 import GenresSelector from './GenresSelector.vue';
 import UploadDate from './PersonalAccountMusicianCabinetUploadDate.vue';
@@ -91,6 +94,7 @@ export default {
             VITE_MAX_ALBUM_NAME_LENGTH
         };
     },
+    components: { AlbumPicture, draggable, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, UploadDate, SelectImage },
     props: {
         id: {
             type: [Number, String],
@@ -105,6 +109,7 @@ export default {
             albumName: null,
             date: null,
             genres: [],
+            tracks: []
         };
     },
     mounted() {
@@ -123,7 +128,6 @@ export default {
             this.setData();
         }
     },
-    components: { AlbumPicture, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, UploadDate, SelectImage },
     computed: {
         showGenres() {
             if (!this.albumInfo) return
@@ -140,7 +144,7 @@ export default {
         },
         buttonActive() {
             var pic = this.$refs.albumPicture?.target;
-            return this.albumName !== this.albumInfo.name || this.genresChanged || pic || this.dateChanged;
+            return this.albumName !== this.albumInfo.name || this.genresChanged || pic || this.dateChanged || this.tracksPostionChanged;
         },
         dateChanged() {
             return !moment(this.albumInfo.date, this.VITE_DATE_FORMAT).isSame(this.date)
@@ -150,10 +154,25 @@ export default {
             var oldGenresId = this.albumInfo.genres.map(genre => genre.id);
             return !(JSON.stringify(oldGenresId.sort()) === JSON.stringify(newGenresId.sort()));
         },
+        tracksPostionChanged() {
+            return !this.arraysEqual(this.tracksToId(this.tracks), this.tracksToId(this.albumInfo.tracks))
+        }
     },
     methods: {
         openDeleteDialog() {
             this.deleteDialogOpened = true;
+        },
+        tracksToId(tracks) {
+            return tracks.map(track => track.id)
+        },
+        arraysEqual(a, b) {
+            if (a === b) return true;
+            if (a == null || b == null) return false;
+            if (a.length !== b.length) return false;
+            for (var i = 0; i < a.length; ++i) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
         },
         onGenreChange(value) {
             this.genres = value;
@@ -165,6 +184,9 @@ export default {
             form.append('id', this.albumInfo.id);
             form.append('name', this.albumName);
             form.append('date', moment(this.date).format(this.VITE_DATE_FORMAT));
+            this.tracks.forEach(track => {
+                form.append('tracks_ids', track.id);
+            });
             if (pic) {
                 form.append('albumPicture', pic[0]);
             }
@@ -182,10 +204,11 @@ export default {
         },
 
         setData() {
-            const { name, date, genres } = this.albumInfo;
+            const { name, date, genres, tracks } = this.albumInfo;
             this.albumName = name;
             this.date = date ? moment(date, this.VITE_DATE_FORMAT).toDate() : null;
             this.genres = genres;
+            this.tracks = tracks;
         },
         closeDeleteDialog() {
             this.deleteDialogOpened = false;
@@ -258,7 +281,7 @@ export default {
                 gap: 10px;
 
 
-                .item {
+                .extra-info-item {
                     @include helpers.flex-center;
                     flex-grow: 1;
                     color: var(--color-header-text);
@@ -291,10 +314,21 @@ export default {
         }
     }
 
+    .message {
+        background-color: var(--yellow-dark);
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
     .tracks {
         display: flex;
         flex-direction: column;
         gap: 5px;
+
+        &.draggable {
+            user-select: none;
+        }
     }
 }
 </style>

@@ -19,7 +19,7 @@ class MusicCrud(CRUDBase):
                          open_date=date, picture=db_image, genres=genres)
         return self.create(model=db_album)
 
-    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: File):
+    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: File, tracks_ids: List[int]):
         album.name = name
         album.open_date = date
         album.genres = genres
@@ -29,6 +29,12 @@ class MusicCrud(CRUDBase):
             if picture:
                 file_cruds.delete_picture(file=picture)
             album.picture = self.create(image)
+        tracks = album.tracks
+        for index, track_id in enumerate(tracks_ids):
+            for track in tracks:
+                if track.id == track_id:
+                    track.track_position = index
+
         self.db.add(album)
         self.db.commit()
         self.db.refresh(album)
@@ -41,7 +47,8 @@ class MusicCrud(CRUDBase):
         return self.get(album_id, Album)
 
     def get_album_tracks(self, album_id: int) -> List[Track]:
-        return self.db.query(Track).filter(Track.album_id == album_id).all()
+        tracks = self.db.query(Track).filter(Track.album_id == album_id).all()
+        return tracks if None in [track.track_position for track in tracks] else sorted(tracks, key=lambda track: track.track_position)
 
     def get_genres(self):
         return self.db.query(Genre).all()

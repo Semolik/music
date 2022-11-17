@@ -41,7 +41,7 @@
                 В сообщении будут передано имя которое указано у ваc в настройках аккаунта
             </div>
             <div class="request-form">
-                <textarea name="message" v-model="messageText" id="" cols="30" rows="10"></textarea>
+                <textarea name="message" placeholder="Напишите зачем вам нужен этот статус" v-model="messageText" id="" cols="30" rows="10"></textarea>
             </div>
             <div class="line">
                 <div :class="['button','files', {active: isFilesSelected}]">

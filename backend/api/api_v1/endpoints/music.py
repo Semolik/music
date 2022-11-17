@@ -36,6 +36,10 @@ def create_album(albumData: UpdateAlbumForm = Depends(UpdateAlbumForm), albumPic
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
+    tracks_ids = albumData.tracks_ids
+    if sorted(i.id for i in db_album.tracks) != sorted(tracks_ids):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Переданые id треков не соответствуют трекам в альбоме")
     current_user_id = Authorize.get_jwt_subject()
     if not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
@@ -44,12 +48,12 @@ def create_album(albumData: UpdateAlbumForm = Depends(UpdateAlbumForm), albumPic
     db_image = save_file(upload_file=albumPicture,
                          user_id=current_user_id, force_image=True)
     db_album = music_crud.update_album(album=db_album,
-                                       name=albumData.name, date=albumData.date, genres=genres, image=db_image)
+                                       name=albumData.name, date=albumData.date, genres=genres, image=db_image, tracks_ids=tracks_ids)
     album_obj = set_album_info(db_album=db_album)
     return set_album_tracks(db_album=db_album, db_album_obj=album_obj)
 
 
-@ router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_optional()
     db_album = music_crud.get_album(album_id=id)
@@ -65,7 +69,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj)
 
 
-@ router.delete('/album', responses={**NOT_FOUND_ALBUM})
+@router.delete('/album', responses={**NOT_FOUND_ALBUM})
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     db_album = music_crud.get_album(album_id=id)
