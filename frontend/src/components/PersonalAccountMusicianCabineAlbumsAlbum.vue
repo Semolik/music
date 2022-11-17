@@ -327,7 +327,19 @@ export default {
         gap: 5px;
 
         &.draggable {
-            user-select: none;
+
+            .track {
+                user-select: none;
+                position: relative;
+
+                &::after {
+                    position: absolute;
+                    cursor: move;
+                    content: '';
+                    inset: 0;
+                }
+            }
+
         }
     }
 }

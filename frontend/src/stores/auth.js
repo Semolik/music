@@ -3,7 +3,7 @@ import { HTTP } from '../http-common.vue';
 import handleError from '../composables/errors'
 import { useSessionStorage } from '@vueuse/core';
 import { Role } from '../helpers/roles.js';
-
+import router from '../router';
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
@@ -66,6 +66,13 @@ export const useAuthStore = defineStore({
       this.logined = false;
       this.userData = null;
       this.userRole = null;
+    },
+    refresh() {
+      HTTP.post('refresh', { withCredentials: true }).then(response => {
+
+      }).catch(error => {
+        router.push('/login');
+      });
     },
     logoutRequest() {
       this.clearMessage();

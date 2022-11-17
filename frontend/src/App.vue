@@ -10,9 +10,10 @@ import { storeToRefs } from 'pinia';
 export default {
   setup() {
     const { logined } = storeToRefs(useAuthStore());
-
+    const { refresh } = useAuthStore();
     return {
-      logined
+      logined,
+      refresh
     }
   },
   components: {
@@ -38,6 +39,7 @@ export default {
     }
   },
   mounted() {
+    setInterval(this.refresh, 1000 * 60 * 5);
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     });
