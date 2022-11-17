@@ -8,22 +8,23 @@
             <FontAwesomeIcon icon="fa-pen" />
         </div>
         <div :class="['play-icon', { active: playIcon }]">
-            <FontAwesomeIcon icon="fa-play" />
+            <FontAwesomeIcon :icon="paused ? 'fa-pause' : 'fa-play'" />
         </div>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faMusic, faPen, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faMusic, faPen, faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faMusic, faPen, faPlay);
+library.add(faMusic, faPen, faPlay, faPause);
 export default {
     props: {
         src: String,
         offHover: Boolean,
         editIcon: Boolean,
         isTrack: Boolean,
-        playIcon: Boolean
+        playIcon: Boolean,
+        paused: Boolean,
     },
     components: {
         FontAwesomeIcon

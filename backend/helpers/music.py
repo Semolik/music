@@ -86,7 +86,7 @@ def set_full_track_data(track: Track):
 
 def get_track_url(track: Track):
     return ''.join(
-        [settings.SERVER_LINK, settings.API_V1_STR, '/',  settings.TRACKS_FOLDER, '/', track.file.file_name])
+        [settings.SERVER_LINK, settings.API_V1_STR, settings.UPLOADS_ROUTE, '/tracks/', track.file.file_name])
 
 
 def validate_genres(genres_ids: List[int]):

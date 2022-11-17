@@ -8,8 +8,14 @@ from backend.crud.crud_file import file_cruds
 from backend.core.config import settings
 
 router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
+folders = {
+    'image': settings.IMAGES_FOLDER,
+    'file': settings.OTHER_FILES_FOLDER,
+    'track': settings.TRACKS_FOLDER,
+}
 
 
+@router.get('/tracks/{fileName}', response_class=FileResponse)
 @router.get('/images/{fileName}', response_class=FileResponse)
 @router.get('/{fileName}', response_class=FileResponse)
 def get_file(fileName, db: SessionLocal = Depends(get_db)):
@@ -17,8 +23,7 @@ def get_file(fileName, db: SessionLocal = Depends(get_db)):
     db_file = file_cruds.get_file_by_name(file_name=file_name)
     if not db_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    file_path = os.path.join(settings.IMAGES_FOLDER if db_file.type ==
-                             'image' else settings.OTHER_FILES_FOLDER, file_name)
+    file_path = os.path.join(folders.get(db_file.type), file_name)
     original_file_name: str = db_file.original_file_name
     if os.path.exists(file_path):
         return FileResponse(file_path, filename=original_file_name)

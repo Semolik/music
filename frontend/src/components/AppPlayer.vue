@@ -5,14 +5,15 @@
                 <div class="player-button">
                     <FontAwesomeIcon icon="fa-backward" />
                 </div>
-                <div class="player-button">
-                    <FontAwesomeIcon icon="fa-play" />
+                <div class="player-button" @click="togglePlaying">
+                    <FontAwesomeIcon :icon="playing ? 'fa-pause' : 'fa-play'" />
                 </div>
                 <div class="player-button">
                     <FontAwesomeIcon icon="fa-forward" />
                 </div>
             </div>
         </div>
+        <audio controls ref="player" preload="auto"></audio>
     </div>
 </template>
 <script>
@@ -20,15 +21,42 @@ import { usePlayerStore } from '../stores/player';
 import { storeToRefs } from 'pinia';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlay, faForward, faBackward } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faForward, faBackward);
+import { faPlay, faPause, faForward, faBackward } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faForward, faBackward);
 export default {
     setup() {
-        const { } = storeToRefs(usePlayerStore());
-        const { } = usePlayerStore();
-        return {};
+        const { currentTrack, playing } = storeToRefs(usePlayerStore());
+        const { togglePlaying } = usePlayerStore();
+        return { currentTrack, togglePlaying, playing };
     },
-    components: { FontAwesomeIcon }
+    components: { FontAwesomeIcon },
+    watch: {
+        currentTrack() {
+            if (!this.currentTrack) return
+            var player = this.$refs.player;
+            if (!player) return
+            var url = this.currentTrack.url;
+            if (player.src !== url) {
+                player.src = url;
+                player.load();
+            }
+            this.togglePlayer(this.playing);
+        },
+        playing(value){
+            this.togglePlayer(value);
+        }
+    },
+    methods: {
+        togglePlayer(play) {
+            var player = this.$refs.player;
+            if (!player) return
+            if (play) {
+                player.play()
+            } else {
+                player.pause()
+            }
+        }
+    }
 }
 </script>
 <style lang="scss">
