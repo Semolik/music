@@ -6,15 +6,23 @@ import AppError from './components/AppError.vue';
 import handleError from './composables/errors';
 import { useAuthStore } from './stores/auth';
 import { storeToRefs } from 'pinia';
+import { usePlayerStore } from './stores/player';
 import AppPlayer from './components/AppPlayer.vue';
+
+
 
 export default {
   setup() {
+
+    const { currentTrack, playing, loading } = storeToRefs(usePlayerStore());
+    const { togglePlaying } = usePlayerStore();
+
+
     const { logined } = storeToRefs(useAuthStore());
     const { refresh } = useAuthStore();
     return {
       logined,
-      refresh
+      refresh, currentTrack, togglePlaying, playing, loading
     }
   },
   components: {
@@ -31,6 +39,7 @@ export default {
       error: null,
     }
   },
+
   provide() {
     return {
       loading: computed(() => this.loading),
@@ -69,7 +78,7 @@ export default {
     },
     handleAppError(error) {
       this.error = handleError(error);
-    }
+    },
   },
 
 }
@@ -78,7 +87,7 @@ export default {
 
 <template >
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
-  <div :class="['app-content', { blur: blur_content }]">
+  <div :class="['app-content', { blur: blur_content }]" @play="play">
     <router-view v-slot="{ Component, route }">
       <transition name="list" mode="out-in">
         <div :key="route.name" class="transition-wrapper">
@@ -89,7 +98,7 @@ export default {
       </transition>
     </router-view>
   </div>
-  <AppPlayer />
+  <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" loop xhrWithCredentials html5 ref="player"/>
 </template>
 
 <style scoped lang="scss">

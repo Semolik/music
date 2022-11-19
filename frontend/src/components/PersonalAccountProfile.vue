@@ -93,9 +93,11 @@ export default {
     },
     watch: {
         userData(value) {
-            this.firstName = value?.first_name;
-            this.lastName = value?.last_name;
-            this.original_image = value?.picture;
+            if (!value) return
+            const { first_name, last_name, picture } = value;
+            this.firstName = first_name;
+            this.lastName = last_name;
+            this.original_image = picture;
         }
     },
     methods: {

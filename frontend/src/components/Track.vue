@@ -46,7 +46,7 @@ export default {
     },
     methods: {
         OnClickTrack() {
-            this.playerStore.play(this.trackData.id)
+            this.playerStore.play(this.trackData.id);
         }
     }
 }
