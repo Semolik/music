@@ -7,6 +7,8 @@ export const usePlayerStore = defineStore({
         tracks: [],
         currentTrackIndex: null,
         playing: false,
+        player: null,
+        playerMounted: false,
     }),
     getters: {
         currentTrack() {
@@ -32,14 +34,20 @@ export const usePlayerStore = defineStore({
         },
         async play(id) {
             if (this.currentTrack && this.currentTrack.id === id) {
-                this.togglePlaying();
+                if (this.playing) {
+                    this.player.pause();
+                } else {
+                    this.player.play();
+                }
                 return
             }
+
+
+
             this.currentTrackIndex = await this.getTrack(id);
-            this.playing = true;
+            if (this.player) {
+                // this.player.stop();
+            }
         },
-        togglePlaying() {
-            this.playing = !this.playing;
-        }
     }
 });

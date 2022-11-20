@@ -4,6 +4,7 @@ import values from "object-values";
 import assign from "object-assign";
 
 export default {
+
   props: {
     /**
      * A string type url of audio file
@@ -67,6 +68,7 @@ export default {
   },
 
   data() {
+    
     return {
       /**
        * The Howl instance used for playback
@@ -75,7 +77,7 @@ export default {
       /**
        * Whether audio is currently playing
        */
-      playing: false,
+      // playing: false,
       /**
        * Whether the audio playback is muted
        */

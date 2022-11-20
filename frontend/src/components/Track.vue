@@ -1,6 +1,6 @@
 <template>
     <div class="track" @mouseover="hovered = true" @mouseleave="hovered = false" @click="OnClickTrack">
-        <AlbumPicture :play-icon="isPlaying || hovered" :paused="playing" :src="trackData.picture" off-hover />
+        <AlbumPicture :play-icon="isPlaying || hovered" :paused="isPlaying && playing" :src="trackData.picture" off-hover />
         <div class="track-info-wrapper">
             <div class="track-info">
                 <div class="name">{{ trackData.name }}</div>
@@ -21,9 +21,9 @@ export default {
         musicianData: Object,
     },
     setup() {
-        const { currentTrack, playing } = storeToRefs(usePlayerStore());
+        const { currentTrack, playing, player} = storeToRefs(usePlayerStore());
         const playerStore = usePlayerStore();
-        return { currentTrack, playerStore, playing };
+        return { currentTrack, playerStore, playing, player };
     },
     data() {
         return {
@@ -42,12 +42,12 @@ export default {
         isPlaying() {
             if (!this.currentTrack) return
             return this.currentTrack.id === this.trackData.id;
-        }
+        },
     },
     methods: {
         OnClickTrack() {
             this.playerStore.play(this.trackData.id);
-        }
+        },
     }
 }
 </script>

@@ -14,7 +14,7 @@ import AppPlayer from './components/AppPlayer.vue';
 export default {
   setup() {
 
-    const { currentTrack, playing, loading } = storeToRefs(usePlayerStore());
+    const { currentTrack, playing, loading, player, playerMounted } = storeToRefs(usePlayerStore());
     const { togglePlaying } = usePlayerStore();
 
 
@@ -22,7 +22,7 @@ export default {
     const { refresh } = useAuthStore();
     return {
       logined,
-      refresh, currentTrack, togglePlaying, playing, loading
+      refresh, currentTrack, togglePlaying, playing, loading, player, playerMounted
     }
   },
   components: {
@@ -37,6 +37,7 @@ export default {
       windowWidth: window.innerWidth,
       blur_content: false,
       error: null,
+
     }
   },
 
@@ -54,6 +55,7 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     });
+    this.player = this.$refs.player;
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
@@ -80,14 +82,12 @@ export default {
       this.error = handleError(error);
     },
   },
-
 }
-
 </script>
 
 <template >
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
-  <div :class="['app-content', { blur: blur_content }]" @play="play">
+  <div :class="['app-content', { blur: blur_content }]">
     <router-view v-slot="{ Component, route }">
       <transition name="list" mode="out-in">
         <div :key="route.name" class="transition-wrapper">
@@ -98,7 +98,8 @@ export default {
       </transition>
     </router-view>
   </div>
-  <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" loop xhrWithCredentials html5 ref="player"/>
+  <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload
+    ref="player" />
 </template>
 
 <style scoped lang="scss">

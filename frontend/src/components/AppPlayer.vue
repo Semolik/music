@@ -5,7 +5,7 @@
                 <div class="player-button">
                     <FontAwesomeIcon icon="fa-backward" />
                 </div>
-                <div class="player-button" @click="togglePlaying">
+                <div class="player-button" @click="togglePlayback">
                     <FontAwesomeIcon :icon="playing ? 'fa-pause' : 'fa-play'" />
                 </div>
                 <div class="player-button">
@@ -20,8 +20,6 @@
                         <span style="font-weight: 700;">{{ curProgress }}%</span>
                     </div>
                     <div class="operatorButton">
-                        <span class="iconfont icon-playcircle-fill" @click="togglePlayback" v-if="!playing">play</span>
-                        <span class="iconfont icon-pausecircle-fill" @click="togglePlayback" v-else>pause</span>
                         <span class="iconfont icon-stopcircle-fill" @click="stop"></span>
                         <span class="iconfont icon-notificationfill" @click="handleToggleMute" v-if="isMute"></span>
                         <span class="iconfont icon-notificationforbidfill" @click="handleToggleMute" v-else></span>
@@ -41,8 +39,6 @@
                 </div>
             </div>
         </div>
-        <audio controls ref="player" @play="playing = true" @loadstart="loading = true" @canplay="loading = false"
-            @pause="playing = false" preload="auto"></audio>
     </div>
 </template>
 <script>
@@ -51,9 +47,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlay, faPause, faForward, faBackward } from '@fortawesome/free-solid-svg-icons';
 library.add(faPlay, faPause, faForward, faBackward);
+import { usePlayerStore } from '../stores/player';
+import { storeToRefs } from 'pinia';
 import Audio from '../mixins/audio';
 export default {
-
     mixins: [Audio],
     components: { FontAwesomeIcon },
     data() {
@@ -69,12 +66,18 @@ export default {
             totalWidth: 500
         }
     },
+    setup() {
+        const { playing } = storeToRefs(usePlayerStore());
+        return {
+            playing
+        }
+    },
     watch: {
-        currentTrack() {
-            if (!this.currentTrack) return
+        currentTrack(value) {
+            if (!value) return
             var player = this.$refs.player;
             if (!player) return
-            var url = this.currentTrack.url;
+            var url = value.url;
             if (player.src !== url) {
                 player.src = url;
                 player.load();
