@@ -124,7 +124,6 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
   document.title = to.name;
-
   let flag = sessionStorage.getItem('logined');
   let role = sessionStorage.getItem('user-role');
   if (to.meta.requireAuth == true) {

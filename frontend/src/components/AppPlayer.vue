@@ -38,6 +38,11 @@
                     </div>
                 </div>
             </div>
+            <div class="player-buttons">
+                <div :class="['player-button', 'like', { active: currentTrackIndex.liked }]">
+                    <FontAwesomeIcon icon="fa-heart" />
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -45,8 +50,8 @@
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlay, faPause, faForward, faBackward } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faForward, faBackward);
+import { faPlay, faPause, faForward, faBackward, faHeart } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faForward, faBackward, faHeart);
 import { usePlayerStore } from '../stores/player';
 import { storeToRefs } from 'pinia';
 import Audio from '../mixins/audio';
@@ -67,7 +72,7 @@ export default {
         }
     },
     setup() {
-        const { playing } = storeToRefs(usePlayerStore());
+        const { playing, currentTrackIndex } = storeToRefs(usePlayerStore());
         return {
             playing
         }
@@ -213,6 +218,11 @@ export default {
         width: 100%;
         border-radius: 20px;
         display: flex;
+
+        .column {
+            flex-grow: 1;
+            display: flex;
+        }
 
         .player-buttons {
             display: flex;
