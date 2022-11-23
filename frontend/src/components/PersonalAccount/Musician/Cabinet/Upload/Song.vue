@@ -39,14 +39,14 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import SelectImage from './SelectImage.vue';
-import FormField from './FormField.vue';
+import SelectImage from '/src/components/SelectImage.vue';
+import FormField from '/src/components/FormField.vue';
 import { useToast } from "vue-toastification";
-import { HTTP } from '../http-common.vue';
+import { HTTP } from '/src/http-common.vue';
 import moment from 'moment';
-import handleError from '../composables/errors';
-import SelectDate from '../components/PersonalAccountMusicianCabinetUploadDate.vue';
-import GenresSelector from './GenresSelector.vue';
+import handleError from '/src/composables/errors';
+import SelectDate from './Date.vue';
+import GenresSelector from '/src/components/GenresSelector/index.vue';
 
 library.add(faPaperclip);
 

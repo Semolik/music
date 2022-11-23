@@ -10,7 +10,7 @@
 </template>
 <script>
 import { DatePicker } from 'v-calendar';
-import FormField from './FormField.vue';
+import FormField from '/src/components/FormField.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';

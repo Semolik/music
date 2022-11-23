@@ -1,6 +1,6 @@
 from sqlalchemy.sql import func
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime, Table
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
@@ -29,6 +29,14 @@ class User(Base):
     picture = relationship("File", foreign_keys=[picture_id])
     public_profile = relationship(
         "PublicProfile", back_populates="user", uselist=False)
+    favorite_tracks = relationship(
+        "Track", secondary=Table(
+            "favorite_tracks",
+            Base.metadata,
+            Column("tracks_id", ForeignKey("tracks.id"), primary_key=True),
+            Column("user_id", ForeignKey("users.id"), primary_key=True),
+        )
+    )
 
 
 class PublicProfile(Base):

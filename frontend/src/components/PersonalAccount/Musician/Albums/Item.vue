@@ -9,7 +9,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faMusic } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import AlbumPicture from './AlbumPicture.vue';
+import AlbumPicture from '/src/components/AlbumPicture.vue';
 library.add(faMusic);
 
 export default {

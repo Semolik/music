@@ -38,15 +38,15 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { storeToRefs } from 'pinia';
-import { HTTP } from '../http-common.vue';
-import { useAuthStore } from '../stores/auth';
-import handleError from '../composables/errors';
+import { HTTP } from '/src/http-common.vue';
+import { useAuthStore } from '/src/stores/auth';
+import handleError from '/src/composables/errors';
 import { useToast } from "vue-toastification";
-import FormField from './FormField.vue';
-import AnimateInteger from './AnimateInteger.vue';
-import { Role } from '../helpers/roles.js';
-import SelectImage from './SelectImage.vue';
-import SaveBlock from './SaveBlock.vue';
+import FormField from '/src/components/FormField.vue';
+import AnimateInteger from '/src/components/AnimateInteger.vue';
+import { Role } from '/src/helpers/roles.js';
+import SelectImage from '/src/components/SelectImage.vue';
+import SaveBlock from '/src/components/PersonalAccount/SaveBlock.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 

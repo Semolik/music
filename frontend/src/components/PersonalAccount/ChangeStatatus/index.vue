@@ -75,12 +75,12 @@ import { faPaperclip, faXmark, faImage, faFile } from '@fortawesome/free-solid-s
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useMemoize } from '@vueuse/core';
 import { useBase64 } from '@vueuse/core';
-import handleError from '../composables/errors';
-import { HTTP } from '../http-common.vue'
+import handleError from '/src/composables/errors';
+import { HTTP } from '/src/http-common.vue'
 import { files } from '@formkit/inputs';
-import { Role } from '../helpers/roles.js';
+import { Role } from '/src/helpers/roles.js';
 import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '/src/stores/auth';
 library.add(faPaperclip, faXmark, faImage, faFile);
 
 export default {

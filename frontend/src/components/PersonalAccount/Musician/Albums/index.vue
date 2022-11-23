@@ -11,11 +11,11 @@
     </div>
 </template>
 <script>
-import { HTTP } from '../http-common.vue';
-import FormField from './FormField.vue';
+import { HTTP } from '/src/http-common.vue';
+import FormField from '/src/components/FormField.vue';
 import { useToast } from "vue-toastification";
-import handleError from '../composables/errors';
-import Album from '../components/PersonalAccountMusicianCabineAlbumsItem.vue';
+import handleError from '/src/composables/errors';
+import Album from './Item.vue';
 export default {
     setup() {
         const toast = useToast();

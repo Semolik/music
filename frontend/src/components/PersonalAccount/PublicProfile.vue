@@ -66,16 +66,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
 import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
-import { HTTP } from '../http-common.vue';
-
-import handleError from '../composables/errors';
+import handleError from '/src/composables/errors';
 import { useToast } from "vue-toastification";
-import FormField from './FormField.vue';
-import AnimateInteger from './AnimateInteger.vue';
-
-import SelectImage from './SelectImage.vue';
-import FormTextArea from './FormTextArea.vue';
+import FormField from '/src/components/FormField.vue';
+import AnimateInteger from '/src/components/AnimateInteger.vue';
+import SelectImage from '/src/components/SelectImage.vue';
+import FormTextArea from '/src/components/FormTextArea.vue';
+import { HTTP } from '/src/http-common.vue';
 
 library.add(faUser, faFloppyDisk, faTrash, faImage, faYoutube, faTelegram, faVk);
 

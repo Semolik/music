@@ -18,10 +18,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
 
 
-class UserCruds:
+class UserCruds(CRUDBase):
+
     def __init__(self) -> None:
+        super().__init__()
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        self.db = session
 
     def create(self, model):
         self.db.add(model)

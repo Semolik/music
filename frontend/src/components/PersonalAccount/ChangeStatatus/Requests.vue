@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="requests" v-if="!requestsEmpty">
-            <status-history-item :adminMode="true" :ырщц="current!==all" :request="request"
+            <history-item :adminMode="true" :ырщц="current!==all" :request="request"
                 v-for="request in this.requests" />
         </div>
         <div class="empty" v-else>тут пусто</div>
@@ -29,8 +29,8 @@
     </div>
 </template>
 <script>
-import { HTTP } from '../http-common.vue';
-import StatusHistoryItem from './PersonalAccountChangeStatusHistoryItem.vue';
+import { HTTP } from '/src/http-common.vue';
+import HistoryItem from './History/Item.vue';
 export default {
     data() {
         return {
@@ -45,7 +45,7 @@ export default {
             show_button: true,
         }
     },
-    components: { StatusHistoryItem },
+    components: { HistoryItem },
     watch: {
         current(value) {
             this.requests = [];

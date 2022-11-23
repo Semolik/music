@@ -1,6 +1,6 @@
 <template>
     <div class="requests-container">
-        <status-history-item :request="request" v-for="request in this.requests" />
+        <history-item :request="request" v-for="request in this.requests" />
     </div>
 </template>
 <style lang="scss">
@@ -11,8 +11,8 @@
 }
 </style>
 <script>
-import { HTTP } from '../http-common.vue';
-import StatusHistoryItem from './PersonalAccountChangeStatusHistoryItem.vue';
+import { HTTP } from '/src/http-common.vue';
+import HistoryItem from './Item.vue';
 
 export default {
     data() {
@@ -29,6 +29,6 @@ export default {
                 this.requests = [];
             });
     },
-    components: { StatusHistoryItem }
+    components: { HistoryItem }
 }
 </script>

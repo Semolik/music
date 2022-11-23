@@ -44,14 +44,14 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faFloppyDisk, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed } from '@vue/reactivity';
-import UploadSong from './PersonalAccountMusicianCabinetUploadSong.vue'
-import { HTTP } from '../http-common.vue';
-import FormField from './FormField.vue';
+import UploadSong from './Song.vue';
+import { HTTP } from '/src/http-common.vue';
+import FormField from '/src/components/FormField.vue';
 import { useToast } from "vue-toastification";
-import SelectImage from './SelectImage.vue';
+import SelectImage from '/src/components/SelectImage.vue';
 import moment from 'moment';
-import SelectDate from './PersonalAccountMusicianCabinetUploadDate.vue';
-import GenresSelector from './GenresSelector.vue';
+import SelectDate from './Date.vue';
+import GenresSelector from '/src/components/GenresSelector/index.vue';
 
 library.add(faPlus, faFloppyDisk, faSpinner);
 export default {

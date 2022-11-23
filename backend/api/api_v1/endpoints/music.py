@@ -113,7 +113,7 @@ def upload_track(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPic
 
 @tracks_router.get('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
 def get_track(id: int, Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
+    Authorize.jwt_optional()
     db_track = music_crud.get_track(track_id=id)
     if not db_track:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

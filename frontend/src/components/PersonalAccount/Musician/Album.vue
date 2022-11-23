@@ -65,21 +65,21 @@
     </div>
 </template>
 <script>
-import { HTTP } from '../http-common.vue';
+import { HTTP } from '/src/http-common.vue';
 import { useToast } from "vue-toastification";
-import handleError from '../composables/errors';
-import AlbumPicture from './AlbumPicture.vue';
+import handleError from '/src/composables/errors';
+import AlbumPicture from '/src/components/AlbumPicture.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faPen, faTrash, faX, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import ModalDialog from './ModalDialog.vue';
-import Track from './Track.vue';
+import ModalDialog from '/src/components/ModalDialog.vue';
+import Track from '/src/components/Track.vue';
 import draggable from 'vuedraggable'
-import FormField from './FormField.vue';
-import GenresSelector from './GenresSelector.vue';
-import UploadDate from './PersonalAccountMusicianCabinetUploadDate.vue';
+import FormField from '/src/components/FormField.vue';
+import GenresSelector from '/src/components/GenresSelector/index.vue';
+import UploadDate from './Cabinet/Upload/Date.vue';
 import moment from 'moment';
-import SelectImage from './SelectImage.vue';
+import SelectImage from '/src/components/SelectImage.vue';
 library.add(faPen, faTrash, faX, faFloppyDisk);
 export default {
     setup() {

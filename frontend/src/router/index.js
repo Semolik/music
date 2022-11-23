@@ -22,48 +22,48 @@ const router = createRouter({
         {
           path: '',
           name: 'Личный кабинет',
-          component: () => import('../components/PersonalAccountProfile.vue'),
+          component: () => import('../components/PersonalAccount/Profile.vue'),
         },
         {
           path: 'public',
           name: 'Публичный профиль',
           meta: { requireAuth: true, roles: [Role.Musician, Role.RadioStation] },
-          component: () => import('../components/PersonalAccountPublicProfile.vue'),
+          component: () => import('../components/PersonalAccount/PublicProfile.vue'),
         },
         {
           path: 'music',
           name: 'Моя музыка',
-          component: () => import('../components/PersonalAccountMusic.vue'),
+          component: () => import('../components/PersonalAccount/Music/index.vue'),
         },
         {
           path: 'my-music',
-          component: () => import('../components/PersonalAccountMusicianCabinet.vue'),
+          component: () => import('../components/PersonalAccount/Musician/Cabinet/index.vue'),
           meta: { requireAuth: true, roles: [Role.Musician] },
           children: [
             {
               path: '',
               name: 'Кабинет музыканта',
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/PersonalAccountMusicianCabinetMain.vue'),
+              component: () => import('../components/PersonalAccount/Musician/Cabinet/Main.vue'),
             },
             {
               path: 'upload',
               name: 'Загрузить',
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/PersonalAccountMusicianCabinetUpload.vue'),
+              component: () => import('../components/PersonalAccount/Musician/Cabinet/Upload/index.vue'),
             },
             {
               path: 'albums',
               name: 'Альбомы',
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/PersonalAccountMusicianCabineAlbums.vue'),
+              component: () => import('../components/PersonalAccount/Musician/Albums/index.vue'),
             },
             {
               path: 'albums/:id',
               name: 'Альбом',
               props: true,
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/PersonalAccountMusicianCabineAlbumsAlbum.vue'),
+              component: () =>  import('../components/PersonalAccount/Musician/Album.vue'),
             }
           ]
         },
@@ -71,12 +71,12 @@ const router = createRouter({
           path: 'update-status',
           name: 'Изменение статуса аккаунта',
           meta: { requireAuth: true, roles: [Role.User, Role.Musician, Role.RadioStation] },
-          component: () => import('../components/PersonalAccountChangeStatatus.vue'),
+          component: () => import('../components/PersonalAccount/ChangeStatatus/index.vue'),
           children: [
             {
               path: 'history',
               name: 'История запросов',
-              component: () => import('../components/PersonalAccountChangeStatusHistory.vue'),
+              component: () => import('../components/PersonalAccount/ChangeStatatus/History/index.vue'),
             }
           ]
         },
@@ -84,33 +84,33 @@ const router = createRouter({
           path: 'update-status-requests',
           name: 'Запросы на изменение статуса',
           meta: { requireAuth: true, roles: [Role.Admin] },
-          component: () => import('../components/PersonalAccountChangeStatatusRequests.vue'),
+          component: () => import('../components/PersonalAccount/ChangeStatatus/Requests.vue'),
         },
         {
           path: 'edit-musician-section',
           name: 'Музыкальный раздел',
           meta: { requireAuth: true, roles: [Role.Admin] },
-          component: () => import('../components/PersonalAccountAdminEditMusiciansSection.vue'),
+          component: () => import('../components/PersonalAccount/AdminEditMusicians/Section.vue'),
         },
         {
           path: 'edit-musician-section/genres',
           name: 'Жанры',
           meta: { requireAuth: true, roles: [Role.Admin] },
-          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenres.vue'),
+          component: () => import('../components/PersonalAccount/AdminEditMusicians/Genres.vue'),
         },
         {
           path: 'edit-musician-section/genres/:id',
           name: 'Жанр',
           meta: { requireAuth: true, roles: [Role.Admin] },
           props: true,
-          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenre.vue'),
+          component: () => import('../components/PersonalAccount/AdminEditMusicians/Genre.vue'),
         },
         {
           path: 'edit-musician-section/genres/add',
           name: 'Добавить жанр',
           meta: { requireAuth: true, roles: [Role.Admin] },
           props: { add: true },
-          component: () => import('../components/PersonalAccountAdminEditMusiciansSectionGenre.vue'),
+          component: () => import('../components/PersonalAccount/AdminEditMusicians/Genre.vue'),
         }
       ]
     },

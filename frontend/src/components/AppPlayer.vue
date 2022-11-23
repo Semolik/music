@@ -39,8 +39,15 @@
                 </div>
             </div>
             <div class="player-buttons">
-                <div :class="['player-button', 'like', { active: currentTrackIndex.liked }]">
+                <div :class="['player-button', 'like', { active: currentTrackIndex?.liked }]">
                     <FontAwesomeIcon icon="fa-heart" />
+                </div>
+                <div class="player-button">
+                    <FontAwesomeIcon icon="fa-volume-off" @click="toggleVolumeBlock" />
+                </div>
+                {{volumeBlockOpened}}
+                <div class="volume-block" v-if="volumeBlockOpened">
+                    <input type="range" min="0" max="100" v-model="sliderVolume">
                 </div>
             </div>
         </div>
@@ -50,8 +57,10 @@
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlay, faPause, faForward, faBackward, faHeart } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faForward, faBackward, faHeart);
+
+import { faPlay, faPause, faForward, faBackward, faHeart, faVolumeOff, faVolumeLow, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faForward, faBackward, faHeart, faVolumeOff, faVolumeLow, faVolumeHigh);
+
 import { usePlayerStore } from '../stores/player';
 import { storeToRefs } from 'pinia';
 import Audio from '../mixins/audio';
@@ -68,7 +77,9 @@ export default {
             rate: 1,
             isMute: true,
             curVolume: 0.5,
-            totalWidth: 500
+            sliderVolume: 50,
+            totalWidth: 500,
+            volumeBlockOpened: false,
         }
     },
     setup() {
@@ -89,6 +100,10 @@ export default {
             }
             this.togglePlayer(this.playing);
         },
+        sliderVolume(value) {
+            this.curVolume = value / 100;
+            this.setVolume(this.curVolume);
+        },
         playing(value) {
             this.togglePlayer(value);
         },
@@ -99,6 +114,15 @@ export default {
         }
     },
     methods: {
+        openVolumeBlock() {
+            this.volumeBlockOpened = true;
+        },
+        closeVolumeBlock() {
+            this.volumeBlockOpened = false;
+        },
+        toggleVolumeBlock() {
+            this.volumeBlockOpened = !this.volumeBlockOpened;
+        },
         togglePlayer(play) {
             var player = this.$refs.player;
             if (!player) return
@@ -222,11 +246,31 @@ export default {
         .column {
             flex-grow: 1;
             display: flex;
+
         }
 
         .player-buttons {
             display: flex;
             gap: 5px;
+            position: relative;
+
+            .volume-block {
+                position: absolute;
+                background-color: var(--color-background-mute);
+                bottom: calc(100% + 15px);
+                right: -10px;
+                border-radius: 10px;
+                padding: 10px;
+
+                input[type=range] {
+
+                    height: 36px;
+                    width: 100px;
+                    border-radius: 3px;
+                    background: var(--color-background-mute-3);
+                    cursor: pointer;
+                }
+            }
 
             .player-button {
                 @include helpers.flex-center;

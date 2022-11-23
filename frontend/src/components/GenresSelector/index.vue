@@ -15,12 +15,12 @@
     </div>
 </template>
 <script>
-import { HTTP } from '../http-common.vue';
-import FormField from './FormField.vue';
+import { HTTP } from '/src/http-common.vue';
+import FormField from '/src/components/FormField.vue';
 import { useToast } from "vue-toastification";
-import handleError from '../composables/errors';
+import handleError from '/src/composables/errors';
 import { vOnClickOutside } from '@vueuse/components';
-import SearchItem from './GenresSelectorSearchItem.vue';
+import SearchItem from './SearchItem.vue';
 
 export default {
     props: {

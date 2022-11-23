@@ -33,7 +33,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus, faMusic } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import FormField from './FormField.vue';
+import FormField from '/src/components/FormField.vue';
 library.add(faPlus, faMusic);
 export default {
     components: {

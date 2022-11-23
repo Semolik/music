@@ -14,11 +14,11 @@
     </div>
 </template>
 <script>
-import { HTTP } from '../http-common.vue';
+import { HTTP } from '/src/http-common.vue';
 import { useToast } from "vue-toastification";
-import handleError from '../composables/errors';
-import AlbumPicture from './AlbumPicture.vue';
-import FormField from './FormField.vue';
+import handleError from '/src/composables/errors';
+import AlbumPicture from '/src/components/AlbumPicture.vue';
+import FormField from '/src/components/FormField.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';

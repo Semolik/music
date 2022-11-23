@@ -88,11 +88,11 @@
     </div>
 </template>
 <script>
-import FileBlock from "./FileBlock.vue";
+import FileBlock from "../FileBlock.vue";
 import { useToast } from "vue-toastification";
-import { HTTP } from "../http-common.vue";
-import { Role } from '../helpers/roles';
-import handleError from '../composables/errors'
+import { HTTP } from "/src/http-common.vue";
+import { Role } from '/src/helpers/roles';
+import handleError from '/src/composables/errors'
 
 export default {
     props: {
