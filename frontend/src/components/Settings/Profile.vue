@@ -46,7 +46,7 @@ import FormField from '/src/components/FormField.vue';
 import AnimateInteger from '/src/components/AnimateInteger.vue';
 import { Role } from '/src/helpers/roles.js';
 import SelectImage from '/src/components/SelectImage.vue';
-import SaveBlock from '/src/components/PersonalAccount/SaveBlock.vue';
+import SaveBlock from '/src/components/Settings/SaveBlock.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 

@@ -1,13 +1,13 @@
 <template>
     <div class="lk-container">
         <aside>
-            <router-link class="item" to="/lk">{{ lkButtonText }}</router-link>
-            <router-link class="item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
-            <router-link class="item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
-            <router-link class="item" to="/lk/music">Моя музыка</router-link>
-            <router-link class="item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
-            <router-link class="item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
-            <router-link class="item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел</router-link>
+            <router-link class="aside-item" to="/lk">{{ lkButtonText }}</router-link>
+            <router-link class="aside-item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
+            <router-link class="aside-item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
+            <router-link class="aside-item" to="/lk/music">Моя музыка</router-link>
+            <router-link class="aside-item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
+            <router-link class="aside-item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
+            <router-link class="aside-item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел</router-link>
         </aside>
         <div class="active-route">
             <router-view></router-view>
@@ -42,22 +42,22 @@ export default {
 @use '@/assets/styles/helpers';
 
 .lk-container {
+    overflow: hidden;
     display: grid;
     grid-template-columns: 270px 1fr;
     background-color: var(--color-background-mute);
-    padding: 10px;
     width: 100%;
-    border-radius: 30px;
-    gap: 10px;
+    border-radius: 15px;
+
 
     @include breakpoints.lg(true) {
         grid-template-columns: 1fr;
     }
 
     aside {
-        background-color: var(--color-background-mute-2);
-        border-radius: 20px;
-        padding: 5px;
+        // background-color: var(--color-background-mute-2);
+        // border-radius: 20px;
+        padding: 10px;
         display: flex;
         flex-wrap: wrap;
         flex-direction: column;
@@ -69,7 +69,7 @@ export default {
             flex-direction: row;
         }
 
-        .item {
+        .aside-item {
             flex-grow: 1;
             position: relative;
             display: flex;
@@ -77,47 +77,33 @@ export default {
             text-decoration: none;
             overflow: hidden;
             color: var(--color-text);
-            border-radius: 15px;
-            background-color: var(--color-background-mute-3);
+            border-radius: 5px;
+
+            // background-color: var(--color-background-mute-3);
+            isolation: isolate;
 
             @include breakpoints.lg(true) {
                 @include helpers.flex-center;
 
-                &.router-link-exact-active {
-                    background-color: var(--purple);
-                }
+
             }
 
-            @include breakpoints.lg {
-                &.router-link-exact-active::after {
-                    opacity: 1;
-                }
+            &.router-link-exact-active {
+                background-color: var(--color-background-mute-3);
             }
 
-            &:not(.router-link-exact-active):hover {
-                background-color: var(--color-background-mute-4);
+            &:hover:not(.router-link-exact-active) {
+                background-color: var(--color-background-mute-2);
             }
 
-            &::after {
-                content: '';
-                height: 100%;
-                position: absolute;
-                right: 0;
-                top: 0;
-                background-color: var(--purple-1);
-                width: 3px;
-                opacity: 0;
-                transition: opacity .2s;
-            }
 
         }
     }
 
     .active-route {
         background-color: var(--color-background-mute-2);
-        border-radius: 20px;
         padding: 10px;
-        height: min-content;
+        height: 100%;
     }
 }
 </style>

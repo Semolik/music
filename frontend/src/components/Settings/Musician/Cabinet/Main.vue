@@ -13,7 +13,7 @@
             <div class="text">Альбомы</div>
         </router-link>
     </div>
-    <FormField placeholder="Поиск" :borderRadius="10"></FormField>
+    <FormField placeholder="Поиск" :borderRadius="7"></FormField>
 </template>
 <style lang="scss" scoped>
 @use '@/assets/styles/helpers';

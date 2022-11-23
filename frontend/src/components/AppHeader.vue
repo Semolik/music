@@ -100,7 +100,7 @@ header {
 
     @include breakpoints.xl {
         margin: 10px 0px;
-        border-radius: 20px;
+        border-radius: 15px;
     }
 
     transition: border-color .2s;
@@ -206,37 +206,6 @@ header {
 
                 &:hover {
                     background-color: var(--login-icon-color-hover);
-                }
-            }
-        }
-
-        .themeswitch {
-            position: relative;
-            overflow: hidden;
-
-            &.light {
-                background-color: var(--light-theme-toggle-color);
-            }
-
-            &.dark {
-                background-color: var(--dark-theme-toggle-color);
-
-                .icons {
-                    top: -100%;
-                }
-            }
-
-            .icons {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                transition: .2s top;
-
-                .icon {
-                    padding: 8px;
                 }
             }
         }

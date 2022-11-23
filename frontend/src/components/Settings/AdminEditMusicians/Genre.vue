@@ -17,7 +17,7 @@
 import FormField from '/src/components/FormField.vue';
 import SelectImage from '/src/components/SelectImage.vue';
 import handleError from '/src/composables/errors';
-import SaveBlock from '/src/components/PersonalAccount/SaveBlock.vue';
+import SaveBlock from '/src/components/Settings/SaveBlock.vue';
 import { HTTP } from '/src/http-common.vue';
 import { useToast } from "vue-toastification";
 import { library } from '@fortawesome/fontawesome-svg-core';

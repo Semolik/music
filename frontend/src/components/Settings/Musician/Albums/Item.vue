@@ -31,6 +31,9 @@ export default {
     text-decoration: none;
     text-align: center;
 
+    .picture {
+        margin-bottom: 5px;
+    }
 
     .name {
         font-weight: 600;

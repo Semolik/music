@@ -82,15 +82,23 @@ export default {
       this.error = handleError(error);
     },
   },
+  watch: {
+    $route(to, from) {
+      const toDepth = to.path.split('/').length
+      const fromDepth = from.path.split('/').length
+      this.transitionName = toDepth < fromDepth ? 'list' : null
+      this.transitionMode = toDepth < fromDepth ? 'list' : null
+    },
+  },
 }
 </script>
 
 <template >
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
   <div :class="['app-content', { blur: blur_content }]">
-    <router-view v-slot="{ Component, route }">
-      <transition name="list" mode="out-in">
-        <div :key="route.name" class="transition-wrapper">
+    <router-view v-slot="{ Component, route }" appear>
+      <transition :name="transitionName" mode="out-in">
+        <div :key="route.path" class="transition-wrapper">
           <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError"
             v-if="!error" />
           <AppError @reset_error="error = null" v-else :inputMessage="error.message" :inputStatusCode="error.status" />

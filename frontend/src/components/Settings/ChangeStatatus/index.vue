@@ -230,7 +230,7 @@ export default {
 .container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 
     .selector {
         display: flex;
@@ -269,7 +269,7 @@ export default {
                 color: var(--color-text);
                 text-align: center;
                 background-color: var(--color-background-mute-3);
-                border-radius: 15px;
+                border-radius: 10px;
                 padding: 5px 10px;
 
                 &:hover {
@@ -292,7 +292,7 @@ export default {
                 text-align: center;
                 flex-grow: 1;
                 padding: 5px 40px;
-                border-radius: 15px;
+                border-radius: 10px;
                 background-color: var(--color-background-mute-3);
 
                 &:not(:where(.active, .disabled)):hover {
@@ -333,7 +333,7 @@ export default {
     .info {
         background-color: var(--color-background-mute-4);
         padding: 5px;
-        border-radius: 15px;
+        border-radius: 10px;
         text-align: center;
     }
 
@@ -396,7 +396,7 @@ export default {
 
         .file {
             background-color: var(--color-background-mute-3);
-            border-radius: 15px;
+            border-radius: 10px;
             padding: 5px;
             cursor: pointer;
 
@@ -447,7 +447,7 @@ export default {
         width: 100%;
         user-select: none;
         background-color: var(--color-background-mute-3);
-        border-radius: 15px;
+        border-radius: 10px;
         padding: 10px;
         text-align: center;
 

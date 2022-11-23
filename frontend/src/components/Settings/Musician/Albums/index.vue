@@ -1,5 +1,5 @@
 <template>
-    <FormField placeholder="Поиск" :borderRadius="10" v-model="text" off-margin></FormField>
+    <FormField placeholder="Поиск" :borderRadius="7" v-model="text" off-margin></FormField>
     <div class="empty" v-if="albumsEmpty">
         <div class="message">
             У вас пока нет альбомов
