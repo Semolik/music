@@ -1,5 +1,5 @@
 <template>
-    <div :class="['select-image', { empty: !picture }, { wrong: (notEmpty && !target) || warning }]">
+    <div :class="['select-image', { 'empty-pic': !picture }, { wrong: (notEmpty && !target) || warning }]">
         <FontAwesomeIcon icon="fa-image" v-if="!picture" />
         <img :src="picture" v-else>
         <div class="edit-area">
@@ -104,7 +104,7 @@ export default {
         height: 100%;
     }
 
-    &.empty {
+    &.empty-pic {
         @include helpers.flex-center;
         overflow: hidden;
         border: 2px dashed transparent;

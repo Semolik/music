@@ -14,7 +14,7 @@
                 </FormField>
                 <FormTextArea class="description" :borderRadius="10" label="Описание профиля"
                     placeholder="Напишите о себе" v-model="description" :rows="5" :paddingRight="20"
-                    :maxLength="VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH">
+                    :maxLength="Number(VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH)">
                     <span :class="['count', { wrong: descriptionLenghtLimit < 0 }]" v-if="descriptionLenghtLimit">
                         {{ descriptionLenghtLimit }}
                     </span>

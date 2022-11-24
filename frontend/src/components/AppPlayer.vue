@@ -1,6 +1,13 @@
 <template>
     <div class="app-player-wrapper">
         <div class="app-player">
+            <div class="slider" ref="slider" @click="handleModifyProgress">
+                <div class="progressInfo"></div>
+                <div class="process" :style="{ width: pWidth }"></div>
+                <div class="thunk" ref="trunk" :style="{ left }">
+                    <div class="block"></div>
+                </div>
+            </div>
             <div class="player-buttons">
                 <div class="player-button">
                     <FontAwesomeIcon icon="fa-backward" />
@@ -13,10 +20,18 @@
                 </div>
             </div>
             <div class="column">
-                <div class="info"></div>
-                <div class="controls">
+                <div class="info">
+                    <div class="track-info">
+                        <div class="name">{{ currentTrack.name }}</div>
+                        <router-link to="/" class="artist">{{ currentTrack.album.musician.name }}</router-link>
+                    </div>
+                    <div class="progress">
+                        {{ _sToMs(seek) }} / {{ _sToMs(duration) }}
+                    </div>
+                </div>
+                <!-- <div class="controls">
                     <div class="total">
-                        <span style="font-weight: 700;">{{ _sToMs(seek) }} / {{ _sToMs(duration) }}</span>
+                       
                         <span style="font-weight: 700;">{{ curProgress }}%</span>
                     </div>
                     <div class="operatorButton">
@@ -29,23 +44,16 @@
                         <span class="iconfont icon-speed-1 rate" @click="handleSetRate" v-if="rate === 1"></span>
                         <span class="iconfont icon-speed- rate" @click="handleSetRate" v-if="rate === 1.2"></span>
                     </div>
-                    <div class="slider" ref="slider" @click="handleModifyProgress">
-                        <div class="progressInfo"></div>
-                        <div class="process" :style="{ width: pWidth }"></div>
-                        <div class="thunk" ref="trunk" :style="{ left }">
-                            <div class="block"></div>
-                        </div>
-                    </div>
-                </div>
+
+                </div> -->
             </div>
             <div class="player-buttons">
-                <div :class="['player-button', 'like', { active: currentTrackIndex?.liked }]">
+                <div :class="['player-button', 'like', { active: currentTrack?.liked }]">
                     <FontAwesomeIcon icon="fa-heart" />
                 </div>
-                <div class="player-button">
-                    <FontAwesomeIcon icon="fa-volume-off" @click="toggleVolumeBlock" />
+                <div class="player-button" @click="toggleVolumeBlock">
+                    <FontAwesomeIcon :icon="iconVolumeName" />
                 </div>
-                {{volumeBlockOpened}}
                 <div class="volume-block" v-if="volumeBlockOpened">
                     <input type="range" min="0" max="100" v-model="sliderVolume">
                 </div>
@@ -54,13 +62,10 @@
     </div>
 </template>
 <script>
-
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-
 import { faPlay, faPause, faForward, faBackward, faHeart, faVolumeOff, faVolumeLow, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 library.add(faPlay, faPause, faForward, faBackward, faHeart, faVolumeOff, faVolumeLow, faVolumeHigh);
-
 import { usePlayerStore } from '../stores/player';
 import { storeToRefs } from 'pinia';
 import Audio from '../mixins/audio';
@@ -83,9 +88,9 @@ export default {
         }
     },
     setup() {
-        const { playing, currentTrackIndex } = storeToRefs(usePlayerStore());
+        const { playing, currentTrack } = storeToRefs(usePlayerStore());
         return {
-            playing
+            playing, currentTrack
         }
     },
     watch: {
@@ -173,6 +178,18 @@ export default {
         }
     },
     computed: {
+        iconVolumeName() {
+            var volume = Number(this.sliderVolume);
+            if (volume === 0) {
+                return 'fa-volume-off'
+            }
+            if (volume <= 50) {
+                return 'fa-volume-low'
+            }
+            if (volume > 50) {
+                return 'fa-volume-high'
+            }
+        },
         curProgress() {
             let curProgress = ((Math.round((this.progress * 10000))) / 100.00).toFixed(2);
             return curProgress;
@@ -227,8 +244,7 @@ export default {
 
 .app-player-wrapper {
     position: absolute;
-    padding: 0px 5px;
-    bottom: 10px;
+    bottom: 0px;
     display: flex;
     width: min(1200px, 100%);
 
@@ -240,13 +256,69 @@ export default {
         background-color: var(--color-background-mute);
         padding: 10px;
         width: 100%;
-        border-radius: 20px;
         display: flex;
+        gap: 10px;
+        position: relative;
+
+        .slider {
+            height: 10px;
+            position: absolute;
+            border: 0;
+            width: 100%;
+            left: 0;
+            bottom: 100%;
+            isolation: isolate;
+            overflow: hidden;
+            cursor: pointer;
+
+            .progressInfo {
+                position: absolute;
+                inset: 0;
+                background-color: var(--color-background-mute-3);
+            }
+
+            .process {
+                position: absolute;
+                inset: 0;
+                background-color: var(--color-background-mute-5);
+            }
+
+            .thunk {
+                position: absolute;
+                inset: 0;
+                z-index: 2;
+            }
+        }
 
         .column {
             flex-grow: 1;
             display: flex;
 
+            .info {
+                display: flex;
+                align-items: center;
+                width: 100%;
+
+                .track-info {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .progress {
+                    margin-left: auto;
+                    color: var(--color-header-text);
+                }
+
+                .artist {
+                    font-size: 0.9em;
+                    color: var(--color-header-text);
+                    text-decoration: none;
+
+                    &:hover {
+                        color: var(--yellow);
+                    }
+                }
+            }
         }
 
         .player-buttons {
@@ -260,7 +332,8 @@ export default {
                 bottom: calc(100% + 15px);
                 right: -10px;
                 border-radius: 10px;
-                padding: 10px;
+                padding: 0px 10px;
+                @include helpers.flex-center;
 
                 input[type=range] {
 

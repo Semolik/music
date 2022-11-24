@@ -165,7 +165,7 @@ export default {
     .user-info-container {
         display: grid;
         gap: 10px;
-        grid-template-columns: 200px 1fr;
+        grid-template-columns: 210px 1fr;
 
         @include breakpoints.lg(true) {
             grid-template-columns: 160px 1fr;
@@ -235,7 +235,6 @@ export default {
                     flex-direction: column;
                     background-color: rgba($color: #000000, $alpha: 0.2);
                     padding: 5px;
-                    // border-radius: 10px;
                     aspect-ratio: 1;
 
                     svg {

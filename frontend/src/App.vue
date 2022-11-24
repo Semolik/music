@@ -82,14 +82,7 @@ export default {
       this.error = handleError(error);
     },
   },
-  watch: {
-    $route(to, from) {
-      const toDepth = to.path.split('/').length
-      const fromDepth = from.path.split('/').length
-      this.transitionName = toDepth < fromDepth ? 'list' : null
-      this.transitionMode = toDepth < fromDepth ? 'list' : null
-    },
-  },
+
 }
 </script>
 
@@ -97,13 +90,13 @@ export default {
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
   <div :class="['app-content', { blur: blur_content }]">
     <router-view v-slot="{ Component, route }" appear>
-      <transition :name="transitionName" mode="out-in">
-        <div :key="route.path" class="transition-wrapper">
+      <Transition name="list" mode="out-in">
+        <div :key="route.matched[0]?.path" class="transition-wrapper">
           <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError"
             v-if="!error" />
           <AppError @reset_error="error = null" v-else :inputMessage="error.message" :inputStatusCode="error.status" />
         </div>
-      </transition>
+      </Transition>
     </router-view>
   </div>
   <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload

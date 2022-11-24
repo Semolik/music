@@ -1,16 +1,25 @@
 <template>
     <div class="lk-container">
         <aside>
-            <router-link class="aside-item" to="/lk">{{ lkButtonText }}</router-link>
+            <router-link class="aside-item lk-link" to="/lk">{{ lkButtonText }}</router-link>
             <router-link class="aside-item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
             <router-link class="aside-item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
             <router-link class="aside-item" to="/lk/music">Моя музыка</router-link>
-            <router-link class="aside-item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта</router-link>
-            <router-link class="aside-item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса</router-link>
-            <router-link class="aside-item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел</router-link>
+            <router-link class="aside-item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта
+            </router-link>
+            <router-link class="aside-item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса
+            </router-link>
+            <router-link class="aside-item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел
+            </router-link>
         </aside>
         <div class="active-route">
-            <router-view></router-view>
+            <router-view v-slot="{ Component, route }" appear>
+                <Transition name="list" mode="out-in">
+                    <div :key="route.fullPath" class="transition-wrapper">
+                        <component :is="Component"/>
+                    </div>
+                </Transition>
+            </router-view>
         </div>
     </div>
 </template>
@@ -40,6 +49,7 @@ export default {
 <style lang="scss" scoped>
 @use '@/assets/styles/breakpoints';
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/animations';
 
 .lk-container {
     overflow: hidden;
@@ -55,8 +65,6 @@ export default {
     }
 
     aside {
-        // background-color: var(--color-background-mute-2);
-        // border-radius: 20px;
         padding: 10px;
         display: flex;
         flex-wrap: wrap;
@@ -78,8 +86,6 @@ export default {
             overflow: hidden;
             color: var(--color-text);
             border-radius: 5px;
-
-            // background-color: var(--color-background-mute-3);
             isolation: isolate;
 
             @include breakpoints.lg(true) {
@@ -87,12 +93,12 @@ export default {
 
 
             }
-
-            &.router-link-exact-active {
+            &.lk-link.router-link-exact-active,
+            &.router-link-active:not(.lk-link) {
                 background-color: var(--color-background-mute-3);
             }
-
-            &:hover:not(.router-link-exact-active) {
+            &.lk-link:not(.lk-link.router-link-exact-active):hover,
+            &:hover:not(.router-link-active) {
                 background-color: var(--color-background-mute-2);
             }
 
@@ -104,6 +110,7 @@ export default {
         background-color: var(--color-background-mute-2);
         padding: 10px;
         height: 100%;
+        @include animations.list;
     }
 }
 </style>

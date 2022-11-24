@@ -229,6 +229,7 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/components';
+@use '@/assets/styles/breakpoints';
 
 .album-editor {
     display: flex;
@@ -239,6 +240,9 @@ export default {
         display: grid;
         grid-template-columns: 200px 1fr;
         gap: 10px;
+        @include breakpoints.sm(true) {
+            grid-template-columns: 1fr;
+        }
 
         .picture-container {
             display: flex;
