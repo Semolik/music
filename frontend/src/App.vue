@@ -65,14 +65,12 @@ export default {
       this.loading = status;
     },
     blurAppContent(value) {
-      console.log(value)
       this.blur_content = value;
     },
     onResize() {
       this.windowWidth = window.innerWidth
     },
     hideBodyOverflow(value) {
-      console.log(value)
       document.body.style.overflow = value ? 'hidden' : '';
     },
     setError(data) {
@@ -81,6 +79,9 @@ export default {
     handleAppError(error) {
       this.error = handleError(error);
     },
+    test(e){
+      console.log(e)
+    }
   },
 
 }
@@ -90,8 +91,8 @@ export default {
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
   <div :class="['app-content', { blur: blur_content }]">
     <router-view v-slot="{ Component, route }" appear>
-      <transition :name="transitionName" mode="out-in">
-        <div :key="route.path" class="transition-wrapper">
+      <transition name="list" mode="out-in">
+        <div :key="route.matched[0]?.path" class="transition-wrapper">
           <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError"
             v-if="!error" />
           <AppError @reset_error="error = null" v-else :inputMessage="error.message" :inputStatusCode="error.status" />
@@ -100,7 +101,7 @@ export default {
     </router-view>
   </div>
   <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload
-    ref="player" />
+    ref="player" @play="test"/>
 </template>
 
 <style scoped lang="scss">
@@ -129,6 +130,6 @@ export default {
     align-items: center;
   }
 
-  // @include animations.list;
+  @include animations.list;
 }
 </style>

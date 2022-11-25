@@ -15,7 +15,7 @@
                     <div class="modal-buttons">
                         <div :class="['button', { loading: yesLoading }]" v-if="yesButton" @click="$emit('yes')">
                             <span v-if="!yesLoading">Да</span>
-                            <FontAwesomeIcon icon="fa-spinner" v-else/>
+                            <FontAwesomeIcon icon="fa-spinner" v-else />
                         </div>
                         <div class="button" v-if="noButton" @click="$emit('no')">Нет</div>
                     </div>
@@ -39,7 +39,7 @@ export default {
         yesLoading: Boolean,
         noButton: Boolean,
     },
-    emits: ['close'],
+    emits: ['close', 'yes', 'no'],
     methods: {
         closeModal() {
             this.$emit('close');

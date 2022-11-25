@@ -5,6 +5,7 @@ export const usePlayerStore = defineStore({
     id: 'player',
     state: () => ({
         tracks: [],
+        geted_albums: [],
         currentTrackIndex: null,
         playing: false,
         player: null,
@@ -17,6 +18,10 @@ export const usePlayerStore = defineStore({
         },
         tracksIds() {
             return this.tracks.map(track => track.id)
+        },
+        currentTrackId() {
+            if (!this.currentTrack) return
+            return this.currentTrack.id
         }
     },
     actions: {
@@ -32,7 +37,31 @@ export const usePlayerStore = defineStore({
                 return;
             }
         },
-        async play(id) {
+        async getAlbum(track_id, album_id) {
+            try {
+                var saved_album = this.geted_albums.find((album) => album.id === album_id);
+                if (saved_album) {
+                    var tracks = this.tracks.slice(saved_album.start, saved_album.end);
+                    var startIndex = saved_album.start;
+                } else {
+                    const response = await HTTP.get('album', { params: { id: album_id } });
+                    let startIndex = this.tracks.length;
+                    var tracks = response.data.tracks;
+                    this.geted_albums.push({ id: album_id, start: startIndex, end: startIndex + tracks.length - 1 });
+                    this.tracks.push(...tracks.map(track => {
+                        track['album'] = {
+                            musician: response.data.musician
+                        };
+                        return track
+                    }));
+                }
+                var startIndexInAlbum = tracks.map(track => track.id).indexOf(track_id);
+                return startIndex + (startIndexInAlbum > 0 ? startIndexInAlbum : 0);
+            } catch (error) {
+                return;
+            }
+        },
+        async play(id, album_id = null) {
             if (this.currentTrack && this.currentTrack.id === id) {
                 if (this.playing) {
                     this.player.pause();
@@ -41,13 +70,21 @@ export const usePlayerStore = defineStore({
                 }
                 return
             }
-
-
-
-            this.currentTrackIndex = await this.getTrack(id);
-            if (this.player) {
-                // this.player.stop();
+            if (album_id) {
+                this.currentTrackIndex = await this.getAlbum(id, album_id);
+            } else {
+                this.currentTrackIndex = await this.getTrack(id);
             }
         },
+        likeTrack(track_id) {
+            if (!this.currentTrack) return
+            HTTP.post('like', null, { params: { track_id: track_id } })
+                .then(response => {
+                    this.tracks[this.currentTrackIndex].liked = response.data.liked;
+                }).catch(error => {
+                    console.log('Произошла ошибка при отправке запроса на добавление трека в избранное.')
+                })
+
+        }
     }
 });

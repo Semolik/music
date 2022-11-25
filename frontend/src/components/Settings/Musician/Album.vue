@@ -59,7 +59,7 @@
         <draggable v-model="tracks" :class="['tracks', { draggable: editorOpened }]" item-key="id"
             :disabled="!editorOpened">
             <template #item="{ element }">
-                <Track :track-data="element" :musician-data="albumInfo.musician" />
+                <Track :track-data="element" :musician-data="albumInfo.musician" :album-id="albumInfo.id" />
             </template>
         </draggable>
     </div>
@@ -240,6 +240,7 @@ export default {
         display: grid;
         grid-template-columns: 200px 1fr;
         gap: 10px;
+
         @include breakpoints.sm(true) {
             grid-template-columns: 1fr;
         }

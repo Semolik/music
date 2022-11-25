@@ -83,6 +83,7 @@ class TrackAfterUpload(UploadTrackBase):
 class AlbumTrack(TrackAfterUpload):
     duration: float
     url: str
+    liked: bool = False
 
 
 class AlbumInfo(AlbumBase):
@@ -98,3 +99,8 @@ class AlbumWithTracks(AlbumInfo):
 
 class Track(AlbumTrack):
     album: AlbumInfo
+
+
+class Liked(BaseModel):
+    liked: bool
+    track_id: int

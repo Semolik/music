@@ -72,12 +72,20 @@ class MusicCrud(CRUDBase):
         return self.get(id=track_id, model=Track)
 
     def toggle_like_track(self, track_id: int, user_id: int):
-        liked = self.db.query(FavoriteTracks).filter(
-            FavoriteTracks.track_id == track_id and FavoriteTracks.user_id == user_id).first()
+        liked = self.get_liked_model(track_id=track_id, user_id=user_id)
         if not liked:
-            return bool(self.create(FavoriteTracks(track_id=track_id, user_id=user_id)))
+            self.create(FavoriteTracks(track_id=track_id, user_id=user_id))
+            return True
         else:
             self.delete(model=liked)
+            return False
+
+    def track_is_liked(self, track_id: int, user_id: int):
+        return bool(self.get_liked_model(track_id=track_id, user_id=user_id))
+
+    def get_liked_model(self, track_id: int, user_id: int):
+        return self.db.query(FavoriteTracks).filter(
+            FavoriteTracks.track_id == track_id and FavoriteTracks.user_id == user_id).first()
 
     def delete_album(self, album: Album):
         for track in album.tracks:

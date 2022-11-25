@@ -66,20 +66,23 @@ def set_album_info(db_album: Album, user_id: int | None = None, validate_date=Fa
     return db_album_obj
 
 
-def set_album_tracks(db_album, db_album_obj):
-    db_album_obj['tracks'] = [set_track_data(track)
+def set_album_tracks(db_album, db_album_obj, user_id: int = None):
+    db_album_obj['tracks'] = [set_track_data(track=track, user_id=user_id)
                               for track in music_crud.get_album_tracks(album_id=db_album.id)]
     return db_album_obj
 
 
-def set_track_data(track: Track):
+def set_track_data(track: Track, user_id: int = None):
     track_obj = set_picture(track.as_dict(), track.picture)
     track_obj['url'] = get_track_url(track)
+    if user_id:
+        track_obj['liked'] = music_crud.track_is_liked(
+            track_id=track.id, user_id=user_id)
     return track_obj
 
 
-def set_full_track_data(track: Track):
-    track_obj = set_track_data(track)
+def set_full_track_data(track: Track, user_id: int = None):
+    track_obj = set_track_data(track, user_id=user_id)
     track_obj['album'] = set_album_info(track.album)
     return track_obj
 

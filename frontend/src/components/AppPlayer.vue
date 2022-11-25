@@ -48,7 +48,8 @@
                 </div> -->
             </div>
             <div class="player-buttons">
-                <div :class="['player-button', 'like', { active: currentTrack?.liked }]">
+                <div :class="['player-button', 'like', { active: currentTrack?.liked }]"
+                    @click="likeTrack(currentTrackId)">
                     <FontAwesomeIcon icon="fa-heart" />
                 </div>
                 <div class="player-button" @click="toggleVolumeBlock">
@@ -88,9 +89,10 @@ export default {
         }
     },
     setup() {
-        const { playing, currentTrack } = storeToRefs(usePlayerStore());
+        const { playing, currentTrack, currentTrackId } = storeToRefs(usePlayerStore());
+        const { likeTrack } = usePlayerStore();
         return {
-            playing, currentTrack
+            playing, currentTrack, currentTrackId, likeTrack
         }
     },
     watch: {
@@ -270,6 +272,7 @@ export default {
             isolation: isolate;
             overflow: hidden;
             cursor: pointer;
+            border-radius: 5px 5px 0px 0px;
 
             .progressInfo {
                 position: absolute;
@@ -329,9 +332,9 @@ export default {
             .volume-block {
                 position: absolute;
                 background-color: var(--color-background-mute);
-                bottom: calc(100% + 15px);
+                bottom: calc(100% + 25px);
                 right: -10px;
-                border-radius: 10px;
+                border-radius: 5px;
                 padding: 0px 10px;
                 @include helpers.flex-center;
 
@@ -355,6 +358,10 @@ export default {
 
                 svg {
                     color: var(--color-header-text);
+                }
+
+                &.like.active svg {
+                    color: var(--red-0)
                 }
 
                 &:hover {

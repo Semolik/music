@@ -5,12 +5,12 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import set_picture
-from backend.helpers.music import save_track, set_album_info, set_album_tracks, set_full_track_data, set_track_data, validate_genres
+from backend.helpers.music import save_track, set_album_info, set_album_tracks, set_full_track_data,validate_genres
 from backend.helpers.validate_role import validate_admin, validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_GENRE,  NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenre, CreateGenreForm, Genre, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
+from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenre, CreateGenreForm, Genre, Liked, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
 from backend.helpers.files import save_file
 
 
@@ -64,13 +64,13 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
+    current_user_id = Authorize.get_jwt_subject()
     if db_album.open_date > datetime.now():
-        current_user_id = Authorize.get_jwt_subject()
         if current_user_id is None or not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Альбом не найден")
     db_album_obj = set_album_info(db_album=db_album, validate_date=True)
-    return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj)
+    return set_album_tracks(db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
 
 
 @albums_router.get('/get_my_albums', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
@@ -119,15 +119,15 @@ def get_track(id: int, Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")
     db_album: Album = db_track.album
+    current_user_id = Authorize.get_jwt_subject()
     if db_album.open_date > datetime.now():
-        current_user_id = Authorize.get_jwt_subject()
         if current_user_id is None or not user_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Трек не найден")
-    return set_full_track_data(db_track)
+    return set_full_track_data(db_track, user_id=current_user_id)
 
 
-@tracks_router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
+@tracks_router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
 def like_track(track_id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     db_track = music_crud.get_track(track_id=track_id)
@@ -135,7 +135,9 @@ def like_track(track_id: int, Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")
     current_user_id = Authorize.get_jwt_subject()
-    return music_crud.toggle_like_track(track_id == db_track.id, user_id=current_user_id)
+    liked = music_crud.toggle_like_track(
+        track_id=db_track.id, user_id=current_user_id)
+    return Liked(liked=liked, track_id=db_track.id)
 
 
 @genres_router.get('/genres',  response_model=List[Genre])
