@@ -20,5 +20,9 @@ class CRUDBase:
         self.db.refresh(model)
         return model
 
+    def delete(self, model):
+        self.db.delete(model)
+        self.db.commit()
+
 
 crud_base = CRUDBase()

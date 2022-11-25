@@ -127,6 +127,17 @@ def get_track(id: int, Authorize: AuthJWT = Depends()):
     return set_full_track_data(db_track)
 
 
+@tracks_router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
+def like_track(track_id: int, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    db_track = music_crud.get_track(track_id=track_id)
+    if not db_track:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Трек не найден")
+    current_user_id = Authorize.get_jwt_subject()
+    return music_crud.toggle_like_track(track_id == db_track.id, user_id=current_user_id)
+
+
 @genres_router.get('/genres',  response_model=List[Genre])
 def get_genres():
     return [set_picture(genre.as_dict(), genre.picture) for genre in music_crud.get_genres()]

@@ -5,6 +5,12 @@ from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
 
+class FavoriteTracks(Base):
+    __tablename__ = 'favorite_tracks'
+    track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+
+
 class User(Base):
     __tablename__ = 'users'
 
@@ -29,14 +35,6 @@ class User(Base):
     picture = relationship("File", foreign_keys=[picture_id])
     public_profile = relationship(
         "PublicProfile", back_populates="user", uselist=False)
-    favorite_tracks = relationship(
-        "Track", secondary=Table(
-            "favorite_tracks",
-            Base.metadata,
-            Column("tracks_id", ForeignKey("tracks.id"), primary_key=True),
-            Column("user_id", ForeignKey("users.id"), primary_key=True),
-        )
-    )
 
 
 class PublicProfile(Base):

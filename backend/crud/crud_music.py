@@ -7,7 +7,7 @@ from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.music import Album, Genre, Track
-from backend.models.user import File
+from backend.models.user import FavoriteTracks, File, User
 
 
 class MusicCrud(CRUDBase):
@@ -70,6 +70,14 @@ class MusicCrud(CRUDBase):
 
     def get_track(self, track_id: int):
         return self.get(id=track_id, model=Track)
+
+    def toggle_like_track(self, track_id: int, user_id: int):
+        liked = self.db.query(FavoriteTracks).filter(
+            FavoriteTracks.track_id == track_id and FavoriteTracks.user_id == user_id).first()
+        if not liked:
+            return bool(self.create(FavoriteTracks(track_id=track_id, user_id=user_id)))
+        else:
+            self.delete(model=liked)
 
     def delete_album(self, album: Album):
         for track in album.tracks:

@@ -90,8 +90,8 @@ export default {
   <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
   <div :class="['app-content', { blur: blur_content }]">
     <router-view v-slot="{ Component, route }" appear>
-      <Transition name="list" mode="out-in">
-        <div :key="route.matched[0]?.path" class="transition-wrapper">
+      <transition :name="transitionName" mode="out-in">
+        <div :key="route.path" class="transition-wrapper">
           <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError"
             v-if="!error" />
           <AppError @reset_error="error = null" v-else :inputMessage="error.message" :inputStatusCode="error.status" />
@@ -129,6 +129,6 @@ export default {
     align-items: center;
   }
 
-  @include animations.list;
+  // @include animations.list;
 }
 </style>
