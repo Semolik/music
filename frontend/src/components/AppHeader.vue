@@ -39,7 +39,6 @@ export default {
     setup() {
         const AuthStore = useAuthStore();
         const themeStore = useThemeStore();
-
         const { logined, userData } = storeToRefs(AuthStore);
         const { themeName } = storeToRefs(themeStore);
         const { toggleTheme } = themeStore;
@@ -79,7 +78,7 @@ export default {
     methods: {
         clicked(func) {
             this.panelActive = false;
-            if (func) func();
+            if (func && typeof func === 'function') func();
         }
     }
 }

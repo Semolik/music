@@ -31,7 +31,7 @@ export default {
     gap: 10px;
     background-color: var(--color-background-mute);
     padding: 10px;
-    border-radius: 30px;
+    border-radius: 15px;
 
     &.center {
         @include helpers.flex-center;

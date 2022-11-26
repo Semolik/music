@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
         USER_ACCOUNT_STATUSES)
     ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
+    SOCIAL_LINKS_FORMAT = {
+        'telegram': 'https://t.me/{0}',
+        'vk': 'https://vk.com/{0}',
+        'youtube': 'https://www.youtube.com/channel/{0}'
+    }
 
     class Config:
         case_sensitive = True  # 4

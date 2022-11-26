@@ -10,7 +10,6 @@ export const usePlayerStore = defineStore({
         playing: false,
         player: null,
         playerMounted: false,
-        autoplay: false,
     }),
     getters: {
         currentTrack() {
@@ -61,7 +60,6 @@ export const usePlayerStore = defineStore({
 
         },
         async play(id, album_id = null) {
-            this.autoplay = !this.player;
             if (this.currentTrack && this.currentTrack.id === id) {
                 if (this.playing) {
                     this.player.pause();

@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy.orm import Session
 from backend.db.base import CRUDBase
-
 from backend.helpers.roles import set_status
 from backend.helpers.images import set_picture
 from backend.core.config import settings
@@ -106,6 +104,7 @@ class UserCruds(CRUDBase):
         public_proile_links_obj.pop('public_profile_id')
         for var, _ in public_proile_links_obj.items():
             value = data_obj.get(var)
+            
             setattr(public_proile_links, var, value)
         if remove_picture:
             file_cruds.delete_picture(public_proile.picture)

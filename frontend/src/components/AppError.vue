@@ -58,7 +58,7 @@ export default {
     background-color: var(--color-background-mute-3);
     width: 100%;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 10px;
     transition: transform .2s, background-color .2s;
 
     .hoverable &:hover {

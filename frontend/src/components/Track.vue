@@ -1,11 +1,11 @@
 <template>
     <div class="track" @mouseover="hovered = true" @mouseleave="hovered = false" @click.self="OnClickTrack">
         <AlbumPicture :play-icon="isPlaying || hovered" :paused="isPlaying && playing" :src="trackData.picture"
-            off-hover />
+            off-hover @click="OnClickTrack" />
         <div class="track-info-wrapper" @click.self="OnClickTrack">
             <div class="track-info">
                 <div class="name">{{ trackData.name }}</div>
-                <router-link to="/" class="musician">{{ musicianData.name }}</router-link>
+                <router-link :to="`/musician/${musicianData.id}`" class="musician">{{ musicianData.name }}</router-link>
             </div>
         </div>
         <div class="track-duration" @click.self="OnClickTrack">{{ duration }}</div>

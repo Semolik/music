@@ -1,28 +1,32 @@
-<script >
+<script>
 import { RouterView } from 'vue-router';
 import AppHeader from './components/AppHeader.vue';
-import { computed } from 'vue';
+import { computed, ref, onErrorCaptured } from 'vue';
 import AppError from './components/AppError.vue';
 import handleError from './composables/errors';
 import { useAuthStore } from './stores/auth';
 import { storeToRefs } from 'pinia';
 import { usePlayerStore } from './stores/player';
 import AppPlayer from './components/AppPlayer.vue';
-
-
-
 export default {
   setup() {
-
     const { currentTrack, playing, loading, player, playerMounted, autoplay } = storeToRefs(usePlayerStore());
     const { togglePlaying } = usePlayerStore();
-
-
     const { logined } = storeToRefs(useAuthStore());
     const { refresh } = useAuthStore();
+    const error = ref(null);
+    onErrorCaptured((e) => (error.value = e));
     return {
+      error,
       logined,
-      refresh, currentTrack, togglePlaying, playing, loading, player, playerMounted, autoplay
+      refresh,
+      currentTrack,
+      togglePlaying,
+      playing,
+      loading,
+      player,
+      playerMounted,
+      autoplay
     }
   },
   components: {
@@ -36,8 +40,7 @@ export default {
       loading: false,
       windowWidth: window.innerWidth,
       blur_content: false,
-      error: null,
-
+      // error: null,
     }
   },
 
@@ -79,26 +82,35 @@ export default {
     handleAppError(error) {
       this.error = handleError(error);
     },
+    resetError() {
+      this.error = null;
+      console.log(this.error)
+    }
   },
 
 }
 </script>
 
 <template >
-  <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="error = null" />
+  <AppHeader @blur_content="blurAppContent" @hide_body_overflow="hideBodyOverflow" @reset_error="resetError" />
   <div :class="['app-content', { blur: blur_content }]">
     <router-view v-slot="{ Component, route }" appear>
       <transition name="list" mode="out-in">
         <div :key="route.matched[0]?.path" class="transition-wrapper">
-          <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError"
-            v-if="!error" />
-          <AppError @reset_error="error = null" v-else :inputMessage="error.message" :inputStatusCode="error.status" />
+          <AppError @reset_error="resetError" :inputMessage="error.message" :inputStatusCode="error.status"
+            v-if="error" />
+          <Suspense v-else>
+            <div class="app-content-wrapper">
+              <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError" />
+            </div>
+            <template #fallback>
+              Loading...
+            </template>
+          </Suspense>
         </div>
       </Transition>
     </router-view>
-    {{ autoplay }}
   </div>
-
   <AppPlayer :audio-source="currentTrack?.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload
     ref="player" />
 </template>
@@ -111,7 +123,6 @@ export default {
   transition: filter .3s;
   width: 100%;
   height: 100%;
-  padding: 5px;
 
   @media only screen and (hover: none) {
     padding-inline: 10px;
@@ -127,6 +138,13 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .app-content-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   @include animations.list;

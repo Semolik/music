@@ -74,3 +74,12 @@ def get_user_public_profile_info(Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
     return get_public_profile_as_dict(user_id=current_user_id)
+
+
+@router.get('/public-profile',  response_model=PublicProfile)
+def get_public_profile_info(profile_id: int):
+    db_musician_obj = get_public_profile_as_dict(musician_id=profile_id)
+    if not db_musician_obj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Публичный профиль не найден")
+    return db_musician_obj

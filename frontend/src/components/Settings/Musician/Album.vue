@@ -44,7 +44,7 @@
                 <div class="extra-info" v-else>
                     <div class="extra-info-item">Год: {{ albumInfo.year }}</div>
                     <div class="extra-info-item">Дата выхода: {{ albumInfo.date }}</div>
-                    <router-link to="" class="extra-info-item">Музыкант: {{ albumInfo.musician.name }}</router-link>
+                    <router-link :to="`/musician/${albumInfo.musician.id}`" class="extra-info-item">Музыкант: {{ albumInfo.musician.name }}</router-link>
                     <div class="extra-info-item genres" v-if="showGenres">
                         Жанр{{ albumInfo.genres.length > 1 ? 'ы' : '' }}:
                         <div v-for="(genre, index) in albumInfo.genres">

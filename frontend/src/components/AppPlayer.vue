@@ -15,7 +15,7 @@
                 <div class="player-button" @click="togglePlayback">
                     <FontAwesomeIcon :icon="playing ? 'fa-pause' : 'fa-play'" />
                 </div>
-                <div class="player-button">
+                <div class="player-button" @click="playNext">
                     <FontAwesomeIcon icon="fa-forward" />
                 </div>
             </div>
@@ -56,7 +56,7 @@
                     <FontAwesomeIcon :icon="iconVolumeName" />
                 </div>
                 <div class="volume-block" v-if="volumeBlockOpened">
-                    <input type="range" min="0" max="100" v-model="sliderVolume">
+                    <input type="range" :min="min" :max="max" v-model="sliderVolume">
                 </div>
             </div>
         </div>

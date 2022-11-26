@@ -15,6 +15,12 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
+      path: '/musician/:id',
+      name: 'Страница музыканта',
+      props: true,
+      component: () => import('../views/PublicProfileView.vue')
+    },
+    {
       path: '/lk',
       meta: { requireAuth: true },
       component: () => import('../views/SettingsView.vue'),
@@ -63,7 +69,7 @@ const router = createRouter({
               name: 'Альбом',
               props: true,
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () =>  import('../components/Settings/Musician/Album.vue'),
+              component: () => import('../components/Settings/Musician/Album.vue'),
             }
           ]
         },
