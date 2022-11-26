@@ -6,56 +6,96 @@
             </div>
             <div :class="['musician-container-picture', { empty: !publicProfileData.picture }]">
                 <img :src="publicProfileData.picture" alt="" v-if="publicProfileData.picture">
-                <FontAwesomeIcon icon="fa-image" />
+                <FontAwesomeIcon icon="fa-user" />
             </div>
-            <div class="social-links-container">
-                <div class="social-links">
-                    <a class="link" v-if="vkLink" :href="vkLink" target="_blank">
-                        <FontAwesomeIcon :icon="['fab', 'vk']" />
-                    </a>
+            <div class="info">
+                <div class="social-links-container">
+                    <div class="social-links">
+                        <a class="link" v-if="vkLink" :href="vkLink" target="_blank">
+                            <FontAwesomeIcon :icon="['fab', 'vk']" />
+                        </a>
+                        <a class="link" v-if="youtubeLink" :href="youtubeLink" target="_blank">
+                            <FontAwesomeIcon :icon="['fab', 'youtube']" />
+                        </a>
+                        <a class="link" v-if="telegramLink" :href="telegramLink" target="_blank">
+                            <FontAwesomeIcon :icon="['fab', 'telegram']" />
+                        </a>
+                    </div>
+                </div>
+                <div class="name">{{ publicProfileData.name }}</div>
+                <div class="social-links-container">
+                    <div class="social-links">
+                        <div :class="['link', 'liked', { active: liked }]" @click="toggleLike">
+                            <FontAwesomeIcon icon="fa-heart" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="musician-container-content">
-            sdasd
+            <div class="description" v-if="publicProfileData.description">
+                {{ publicProfileData.description }}
+            </div>
         </div>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'vue-toastification';
 import { HTTP } from '../http-common.vue';
-library.add(faImage, faYoutube, faTelegram, faVk);
+library.add(faUser, faYoutube, faTelegram, faVk);
 export default {
     props: {
         id: String,
     },
     async setup(props) {
         const toast = useToast();
-        const response = await HTTP.get("public-profile", { params: { profile_id: props.id } });
+        const response = await HTTP.get("musician/", { params: { profile_id: props.id } });
         const publicProfileData = response.data;
         const { name } = publicProfileData;
         document.title = name;
         return { toast, publicProfileData };
     },
+    data() {
+        return {
+            liked: this.publicProfileData.liked,
+        }
+    },
     components: { FontAwesomeIcon },
     computed: {
         vkLink() {
             return this.publicProfileData.links.vk
+        },
+        youtubeLink() {
+            return this.publicProfileData.links.youtube
+        },
+        telegramLink() {
+            return this.publicProfileData.links.telegram
+        }
+    },
+    methods: {
+        async toggleLike() {
+            const { data: { liked } } = await HTTP.post("musician/like", null, { params: { profile_id: this.id } });
+            this.liked = liked;
         }
     }
 }
 </script>
 <style lang="scss">
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/breakpoints';
 
 .musician-container {
     background-color: var(--color-background-soft);
     width: 100%;
-    border-radius: 15px;
+
+    @include breakpoints.xl {
+        border-radius: 15px;
+    }
+
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -66,6 +106,7 @@ export default {
         position: relative;
         isolation: isolate;
         overflow: hidden;
+        gap: 10px;
         padding: 10px;
 
         .head-bg {
@@ -114,30 +155,54 @@ export default {
             }
         }
 
-        .social-links-container {
+        .info {
             display: flex;
-            justify-content: right;
+            flex-direction: column;
+            gap: 10px;
 
-            .social-links {
+            .name {
+                font-size: 40px;
+                text-align: center;
+                @include helpers.flex-center;
+                flex-grow: 1;
+            }
+
+            .social-links-container {
                 display: flex;
-                height: min-content;
+                justify-content: right;
 
-                .link {
-                    background-color: var(--color-background-mute-2);
-                    height: 40px;
-                    width: 40px;
-                    @include helpers.flex-center;
-                    border-radius: 10px;
-                    cursor: pointer;
+                .social-links {
+                    display: flex;
+                    height: min-content;
+                    gap: 5px;
 
-                    &:hover {
-                        background-color: var(--color-background-mute-3);
-                    }
+                    .link {
+                        background-color: var(--color-background-mute-2);
+                        height: 40px;
+                        width: 40px;
+                        @include helpers.flex-center;
+                        border-radius: 10px;
+                        cursor: pointer;
 
-                    svg {
-                        height: 20px;
-                        width: 20px;
-                        color: var(--color-text);
+                        &.liked.active svg{
+                            color: var(--red);
+                        }
+
+                        &.favotite-button {
+                            position: absolute;
+                            bottom: 10px;
+                            right: 10px;
+                        }
+
+                        &:hover {
+                            background-color: var(--color-background-mute-3);
+                        }
+
+                        svg {
+                            height: 18px;
+                            width: 18px;
+                            color: var(--color-text);
+                        }
                     }
                 }
             }
@@ -145,7 +210,9 @@ export default {
     }
 
     .musician-container-content {
-        padding: 10px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
     }
 }
 </style>

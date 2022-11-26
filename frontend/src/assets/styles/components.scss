@@ -1,4 +1,5 @@
 @use '@/assets/styles/helpers';
+@use '@/assets/styles/breakpoints';
 
 @mixin button {
     display: flex;
@@ -43,5 +44,15 @@
     svg {
         height: 18px;
         width: 18px;
+    }
+}
+
+@mixin container-with-select-image {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 210px 1fr;
+
+    @include breakpoints.sm(true) {
+        grid-template-columns: 1fr;
     }
 }

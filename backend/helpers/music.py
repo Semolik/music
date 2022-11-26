@@ -59,7 +59,7 @@ def set_album_info(db_album: Album, user_id: int | None = None, validate_date=Fa
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['date'] = db_album.open_date
     db_album_obj['musician'] = get_public_profile_as_dict(
-        user_id=user_id, musician_id=db_album.musician_id)
+        user_id=user_id, public_profile_id=db_album.musician_id)
     db_album_obj['genres'] = [set_picture(
         db_genre.as_dict(), db_genre.picture) for db_genre in db_album.genres]
     db_album_obj = set_picture(db_album_obj, db_album.picture)

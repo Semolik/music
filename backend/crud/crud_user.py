@@ -6,10 +6,10 @@ from backend.helpers.images import set_picture
 from backend.core.config import settings
 from backend.helpers.files import add_url
 from backend.crud.crud_file import file_cruds
-from backend.db.session import session
 from backend.models.music import Album
 from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
-from backend.models.user import AnswerChangeRoleRequest, File, PublicProfile, User, ChangeRoleRequest
+from backend.models.user import File, PublicProfile, User
+from backend.models.roles import AnswerChangeRoleRequest, ChangeRoleRequest
 from backend.models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
@@ -96,7 +96,7 @@ class UserCruds(CRUDBase):
         data_obj = new_public_proile_data.dict()
         remove_picture = data_obj.pop('remove_picture')
         for var, value in data_obj.items():
-            if value is not None:
+            if value is not None or var == 'description':
                 setattr(public_proile, var, value)
         public_proile_links = public_proile.links
         public_proile_links_obj = public_proile_links.as_dict()
@@ -104,7 +104,7 @@ class UserCruds(CRUDBase):
         public_proile_links_obj.pop('public_profile_id')
         for var, _ in public_proile_links_obj.items():
             value = data_obj.get(var)
-            
+
             setattr(public_proile_links, var, value)
         if remove_picture:
             file_cruds.delete_picture(public_proile.picture)

@@ -103,4 +103,3 @@ class Track(AlbumTrack):
 
 class Liked(BaseModel):
     liked: bool
-    track_id: int

@@ -34,7 +34,7 @@ export default {
         }
     },
     mounted() {
-        HTTP.get('get_my_albums')
+        HTTP.get('/albums/get_my_albums')
             .then(response => {
                 this.albums = response.data;
             })

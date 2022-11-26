@@ -1,13 +1,13 @@
-from sqlalchemy.sql import func
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, ARRAY, DateTime, Table
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
 
-class FavoriteTracks(Base):
-    __tablename__ = 'favorite_tracks'
-    track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
+class FavoriteMusicians(Base):
+    __tablename__ = 'favorite_musicians'
+    musician_id = Column(Integer, ForeignKey(
+        "public_profiles.id"), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
 
 
@@ -84,24 +84,3 @@ class File(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", foreign_keys=[user_id])
     type = Column(String, default='file')
-
-
-class ChangeRoleRequest(Base):
-    __tablename__ = 'change_role_requests'
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    user = relationship("User", foreign_keys=[user_id])
-    message = Column(String)
-    files_ids = Column(ARRAY(Integer))
-    status = Column(String, default='in-progress')
-    account_status = Column(String, nullable=False)
-    time_created = Column(DateTime(timezone=True), server_default=func.now())
-    answer = relationship("AnswerChangeRoleRequest", uselist=False)
-
-
-class AnswerChangeRoleRequest(Base):
-    __tablename__ = 'answers_change_role_requests'
-    id = Column(Integer, primary_key=True, index=True)
-    time_created = Column(DateTime(timezone=True), server_default=func.now())
-    message = Column(String)
-    request_id = Column(Integer, ForeignKey("change_role_requests.id"))

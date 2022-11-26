@@ -4,6 +4,12 @@ from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 
 
+class FavoriteTracks(Base):
+    __tablename__ = 'favorite_tracks'
+    track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+
+
 class Album(Base):
     __tablename__ = 'albums'
 
@@ -54,4 +60,18 @@ class Genre(Base):
     name = Column(
         String(int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH'))), nullable=False, unique=True)
     picture_id = Column(Integer, ForeignKey("files.id"), nullable=False)
+    picture = relationship("File", foreign_keys=[picture_id])
+
+
+class Clip(Base):
+    __tablename__ = 'clips'
+
+    id = Column(Integer, primary_key=True, index=True)
+    musician_id = Column(Integer, ForeignKey(
+        "public_profiles.id"), nullable=False)
+    musician = relationship("PublicProfile", foreign_keys=[musician_id])
+    name = Column(
+        String(int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))), nullable=False)
+    video_id = Column(String(12), nullable=False)  # id видео на youtube
+    picture_id = Column(Integer, ForeignKey("files.id"))
     picture = relationship("File", foreign_keys=[picture_id])

@@ -113,7 +113,7 @@ export default {
         };
     },
     mounted() {
-        HTTP.get("album", { params: { id: this.id } })
+        HTTP.get("/albums/album", { params: { id: this.id } })
             .then(response => {
                 this.albumInfo = response.data;
                 this.setData();
@@ -193,7 +193,7 @@ export default {
             this.genres.forEach(element => {
                 form.append('genres_ids', element.id);
             });
-            HTTP.put('/album', form)
+            HTTP.put('/albums/album', form)
                 .then(response => {
                     this.albumInfo = response.data;
                     this.editorOpened = false;
@@ -214,7 +214,7 @@ export default {
             this.deleteDialogOpened = false;
         },
         deleteAlbum() {
-            HTTP.delete('album', { params: { id: this.albumInfo.id } })
+            HTTP.delete('/albums/album', { params: { id: this.albumInfo.id } })
                 .then(response => {
                     this.closeDeleteDialog();
                     this.$router.push('/lk/my-music/albums/')

@@ -6,8 +6,9 @@ from backend.crud.crud_file import file_cruds
 from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
-from backend.models.music import Album, Genre, Track
-from backend.models.user import FavoriteTracks, File, User
+from backend.models.music import Album, Clip, Genre, Track
+from backend.models.user import FavoriteMusicians, File
+from backend.models.music import FavoriteTracks
 
 
 class MusicCrud(CRUDBase):
@@ -43,6 +44,9 @@ class MusicCrud(CRUDBase):
     def get_musician_albums(self, musician_id: int) -> List[Album]:
         return self.db.query(Album).filter(Album.musician_id == musician_id).all()
 
+    def get_musician_clips(self, musician_id: int):
+        return self.db.query(Clip).filter(Clip.musician_id == musician_id).all()
+
     def get_album(self, album_id: int) -> Album:
         return self.get(album_id, Album)
 
@@ -72,7 +76,7 @@ class MusicCrud(CRUDBase):
         return self.get(id=track_id, model=Track)
 
     def toggle_like_track(self, track_id: int, user_id: int):
-        liked = self.get_liked_model(track_id=track_id, user_id=user_id)
+        liked = self.get_liked_track_model(track_id=track_id, user_id=user_id)
         if not liked:
             self.create(FavoriteTracks(track_id=track_id, user_id=user_id))
             return True
@@ -80,12 +84,30 @@ class MusicCrud(CRUDBase):
             self.delete(model=liked)
             return False
 
-    def track_is_liked(self, track_id: int, user_id: int):
-        return bool(self.get_liked_model(track_id=track_id, user_id=user_id))
+    def toggle_like_musician(self, musician_id: int, user_id: int):
+        liked = self.get_liked_musician_model(
+            musician_id=musician_id, user_id=user_id)
+        if not liked:
+            self.create(FavoriteMusicians(
+                musician_id=musician_id, user_id=user_id))
+            return True
+        else:
+            self.delete(model=liked)
+            return False
 
-    def get_liked_model(self, track_id: int, user_id: int):
+    def track_is_liked(self, track_id: int, user_id: int):
+        return bool(self.get_liked_track_model(track_id=track_id, user_id=user_id))
+
+    def musician_is_liked(self, musician_id: int, user_id: int):
+        return bool(self.get_liked_musician_model(musician_id=musician_id, user_id=user_id))
+
+    def get_liked_track_model(self, track_id: int, user_id: int) -> FavoriteTracks | None:
         return self.db.query(FavoriteTracks).filter(
             FavoriteTracks.track_id == track_id and FavoriteTracks.user_id == user_id).first()
+
+    def get_liked_musician_model(self, musician_id: int, user_id: int) -> FavoriteMusicians | None:
+        return self.db.query(FavoriteMusicians).filter(
+            FavoriteMusicians.musician_id == musician_id and FavoriteMusicians.user_id == user_id).first()
 
     def delete_album(self, album: Album):
         for track in album.tracks:

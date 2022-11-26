@@ -109,7 +109,6 @@ export default {
         this.mounted = true;
         HTTP.get('/me/public')
             .then(response => {
-
                 this.setData(response.data);
             })
             .catch(error => {
@@ -234,19 +233,14 @@ export default {
 <style lang="scss" scoped>
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/breakpoints';
+@use '@/assets/styles/components';
 
 .profile-container {
     display: flex;
     flex-direction: column;
 
     .user-info-container {
-        display: grid;
-        gap: 10px;
-        grid-template-columns: 210px 1fr;
-
-        @include breakpoints.sm(true) {
-            grid-template-columns: 1fr;
-        }
+        @include components.container-with-select-image;
 
         .user-pic {
             aspect-ratio: 1;

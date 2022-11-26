@@ -16,7 +16,8 @@ const router = createRouter({
     },
     {
       path: '/musician/:id',
-      name: 'Страница музыканта',
+      // name: 'Страница музыканта',
+      meta: { loadingTitle: true },
       props: true,
       component: () => import('../views/PublicProfileView.vue')
     },
@@ -43,26 +44,45 @@ const router = createRouter({
         },
         {
           path: 'my-music',
-          component: () => import('../components/Settings/Musician/Cabinet/index.vue'),
+          component: () => import('../components/Settings/Musician/index.vue'),
           meta: { requireAuth: true, roles: [Role.Musician] },
           children: [
             {
               path: '',
               name: 'Кабинет музыканта',
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/Settings/Musician/Cabinet/Main.vue'),
+              component: () => import('../components/Settings/Musician/Main.vue'),
             },
             {
               path: 'upload',
               name: 'Загрузить',
               meta: { requireAuth: true, roles: [Role.Musician] },
-              component: () => import('../components/Settings/Musician/Cabinet/Upload/index.vue'),
+              component: () => import('../components/Settings/Musician/Upload/index.vue'),
             },
             {
               path: 'albums',
               name: 'Альбомы',
               meta: { requireAuth: true, roles: [Role.Musician] },
               component: () => import('../components/Settings/Musician/Albums/index.vue'),
+            },
+            {
+              path: 'clips',
+              meta: { requireAuth: true, roles: [Role.Musician] },
+              component: () => import('../components/Settings/Musician/Clips/index.vue'),
+              children: [
+                {
+                  path: '',
+                  name: 'Клипы',
+                  meta: { requireAuth: true, roles: [Role.Musician] },
+                  component: () => import('../components/Settings/Musician/Clips/main.vue'),
+                },
+                {
+                  path: 'add',
+                  name: 'Добавить клип',
+                  meta: { requireAuth: true, roles: [Role.Musician] },
+                  component: () => import('../components/Settings/Musician/Clips/add.vue'),
+                }
+              ]
             },
             {
               path: 'albums/:id',
@@ -129,7 +149,7 @@ const router = createRouter({
   ]
 });
 router.beforeEach((to, from, next) => {
-  document.title = to.name;
+  document.title = to.meta.loadingTitle ? 'Загрузка...' : to.name;
   let flag = sessionStorage.getItem('logined');
   let role = sessionStorage.getItem('user-role');
   if (to.meta.requireAuth == true) {

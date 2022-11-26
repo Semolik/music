@@ -3,7 +3,7 @@ from fastapi_jwt_auth import AuthJWT
 from backend.helpers.files import save_file
 from backend.helpers.images import set_picture
 from backend.helpers.users import get_public_profile_as_dict
-from backend.schemas.user import PublicProfile, PublicProfileLinks, PublicProfileModifiable, UserInfo, UserModifiableForm
+from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserModifiableForm
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.crud.crud_user import user_cruds
 router = APIRouter(tags=['Профили пользователей'])
@@ -74,12 +74,3 @@ def get_user_public_profile_info(Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
     return get_public_profile_as_dict(user_id=current_user_id)
-
-
-@router.get('/public-profile',  response_model=PublicProfile)
-def get_public_profile_info(profile_id: int):
-    db_musician_obj = get_public_profile_as_dict(musician_id=profile_id)
-    if not db_musician_obj:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Публичный профиль не найден")
-    return db_musician_obj

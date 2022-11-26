@@ -5,18 +5,19 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import set_picture
-from backend.helpers.music import save_track, set_album_info, set_album_tracks, set_full_track_data,validate_genres
+from backend.helpers.music import save_track, set_album_info, set_album_tracks, set_full_track_data, validate_genres
 from backend.helpers.validate_role import validate_admin, validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_GENRE,  NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenre, CreateGenreForm, Genre, Liked, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
+from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenreForm, Genre, Liked, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
 from backend.helpers.files import save_file
 
 
-albums_router = APIRouter(tags=['Альбомы'])
-tracks_router = APIRouter(tags=['Треки'])
-genres_router = APIRouter(tags=['Жанры'])
+albums_router = APIRouter(prefix="/albums", tags=['Альбомы'])
+tracks_router = APIRouter(prefix="/tracks", tags=['Треки'])
+genres_router = APIRouter(prefix="/genres", tags=['Жанры'])
+clips_router = APIRouter(prefix="/clips", tags=['Клипы'])
 
 
 @albums_router.post('/album', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
@@ -137,15 +138,15 @@ def like_track(track_id: int, Authorize: AuthJWT = Depends()):
     current_user_id = Authorize.get_jwt_subject()
     liked = music_crud.toggle_like_track(
         track_id=db_track.id, user_id=current_user_id)
-    return Liked(liked=liked, track_id=db_track.id)
+    return Liked(liked=liked)
 
 
-@genres_router.get('/genres',  response_model=List[Genre])
+@genres_router.get('/all',  response_model=List[Genre])
 def get_genres():
     return [set_picture(genre.as_dict(), genre.picture) for genre in music_crud.get_genres()]
 
 
-@genres_router.get('/genre', responses={**NOT_FOUND_GENRE}, response_model=Genre)
+@genres_router.get('', responses={**NOT_FOUND_GENRE}, response_model=Genre)
 def get_genre(id: int):
     genre = music_crud.get_genre_by_id(id=id)
     if not genre:
@@ -197,7 +198,18 @@ def delete_genre(id: int, Authorize: AuthJWT = Depends()):
     return {'detail': 'Жанр удален'}
 
 
+@clips_router.get('/my')
+def get_my_clips(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    validate_musician(user_id=current_user_id)
+    db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
+    clips = music_crud.get_musician_clips(musician_id=db_public_profile.id)
+    return [clip.as_dict() for clip in clips]
+
+
 router = APIRouter()
 router.include_router(albums_router)
 router.include_router(tracks_router)
 router.include_router(genres_router)
+router.include_router(clips_router)

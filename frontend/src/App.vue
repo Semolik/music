@@ -40,7 +40,6 @@ export default {
       loading: false,
       windowWidth: window.innerWidth,
       blur_content: false,
-      // error: null,
     }
   },
 
@@ -87,7 +86,6 @@ export default {
       console.log(this.error)
     }
   },
-
 }
 </script>
 

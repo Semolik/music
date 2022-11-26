@@ -1,7 +1,7 @@
 <template>
     <div class="buttons custom">
         <slot></slot>
-        <div :class="['button', 'save', { active: active }, { wrong: wrong }]">
+        <div :class="['button', 'save', { active: active }, { wrong: wrong }]" @click="$emit('save')">
             <FontAwesomeIcon icon="fa-floppy-disk" />
         </div>
     </div>
@@ -35,7 +35,6 @@ export default {
 
     &.custom {
         .button {
-
             width: 40px;
             height: 40px;
             border-radius: 10px;
@@ -43,7 +42,6 @@ export default {
             cursor: auto;
             @include helpers.flex-center;
             background-color: var(--color-background-mute-4);
-
         }
     }
 
@@ -59,11 +57,19 @@ export default {
             &.wrong {
                 background-color: var(--red-0);
                 cursor: not-allowed;
+
+                &:hover {
+                    background-color: var(--red-0);
+                }
             }
 
             &.active {
                 background-color: var(--purple-1);
                 cursor: pointer;
+
+                &:hover {
+                    background-color: var(--purple-1);
+                }
             }
         }
 

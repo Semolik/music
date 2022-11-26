@@ -83,7 +83,7 @@ export default {
         }
     },
     mounted() {
-        HTTP.get("/genres")
+        HTTP.get("/genres/all")
             .then(response => {
                 this.$emit('change-genre', this.selectedGenres);
                 this.genres = response.data;

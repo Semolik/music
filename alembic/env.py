@@ -1,5 +1,6 @@
 from backend.models.user import *
 from backend.models.music import *
+from backend.models.roles import *
 
 from backend.core.config import settings
 from backend.db.base import Base

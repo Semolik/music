@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
-                    <SaveBlock @click="save" :active="dataChanged" :wrong="fieldsWrong" />
+                    <SaveBlock @save="save" :active="dataChanged" :wrong="fieldsWrong" />
                 </Teleport>
             </div>
         </form>
@@ -157,24 +157,18 @@ export default {
 <style lang="scss">
 @use '@/assets/styles/helpers';
 @use '@/assets/styles/breakpoints';
+@use '@/assets/styles/components';
 
 .profile-container {
     display: flex;
     flex-direction: column;
 
     .user-info-container {
-        display: grid;
-        gap: 10px;
-        grid-template-columns: 210px 1fr;
+        @include components.container-with-select-image;
 
         @include breakpoints.lg(true) {
             grid-template-columns: 160px 1fr;
         }
-
-        @include breakpoints.sm(true) {
-            grid-template-columns: 1fr;
-        }
-
         .user-pic {
             aspect-ratio: 1;
             position: relative;

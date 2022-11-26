@@ -147,7 +147,7 @@ export default {
 
                 let date = this.singleMode ? this.track.date : this.date;
                 formData.append('date', moment(date).format(this.VITE_DATE_FORMAT));
-                let album = await HTTP.post('/album', formData)
+                let album = await HTTP.post('/albums/album', formData)
                     .then(response => response.data)
                     .catch(error => {
                         return null
