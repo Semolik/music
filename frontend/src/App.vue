@@ -14,7 +14,7 @@ import AppPlayer from './components/AppPlayer.vue';
 export default {
   setup() {
 
-    const { currentTrack, playing, loading, player, playerMounted } = storeToRefs(usePlayerStore());
+    const { currentTrack, playing, loading, player, playerMounted, autoplay } = storeToRefs(usePlayerStore());
     const { togglePlaying } = usePlayerStore();
 
 
@@ -22,7 +22,7 @@ export default {
     const { refresh } = useAuthStore();
     return {
       logined,
-      refresh, currentTrack, togglePlaying, playing, loading, player, playerMounted
+      refresh, currentTrack, togglePlaying, playing, loading, player, playerMounted, autoplay
     }
   },
   components: {
@@ -79,9 +79,6 @@ export default {
     handleAppError(error) {
       this.error = handleError(error);
     },
-    test(e){
-      console.log(e)
-    }
   },
 
 }
@@ -99,9 +96,11 @@ export default {
         </div>
       </Transition>
     </router-view>
+    {{ autoplay }}
   </div>
-  <AppPlayer :audio-source="currentTrack.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload
-    ref="player" @play="test"/>
+
+  <AppPlayer :audio-source="currentTrack?.url" v-if="currentTrack" autoplay xhrWithCredentials html5 preload
+    ref="player" />
 </template>
 
 <style scoped lang="scss">

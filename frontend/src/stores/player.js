@@ -10,6 +10,7 @@ export const usePlayerStore = defineStore({
         playing: false,
         player: null,
         playerMounted: false,
+        autoplay: false,
     }),
     getters: {
         currentTrack() {
@@ -38,30 +39,29 @@ export const usePlayerStore = defineStore({
             }
         },
         async getAlbum(track_id, album_id) {
-            try {
-                var saved_album = this.geted_albums.find((album) => album.id === album_id);
-                if (saved_album) {
-                    var tracks = this.tracks.slice(saved_album.start, saved_album.end);
-                    var startIndex = saved_album.start;
-                } else {
-                    const response = await HTTP.get('album', { params: { id: album_id } });
-                    let startIndex = this.tracks.length;
-                    var tracks = response.data.tracks;
-                    this.geted_albums.push({ id: album_id, start: startIndex, end: startIndex + tracks.length - 1 });
-                    this.tracks.push(...tracks.map(track => {
-                        track['album'] = {
-                            musician: response.data.musician
-                        };
-                        return track
-                    }));
-                }
-                var startIndexInAlbum = tracks.map(track => track.id).indexOf(track_id);
-                return startIndex + (startIndexInAlbum > 0 ? startIndexInAlbum : 0);
-            } catch (error) {
-                return;
+            var saved_album = this.geted_albums.find((album) => album.id === album_id);
+            if (saved_album) {
+                var tracks = this.tracks.slice(saved_album.start, saved_album.end + 1);
+                var startIndex = saved_album.start;
+            } else {
+                const response = await HTTP.get('album', { params: { id: album_id } });
+                var startIndex = this.tracks.length;
+                var tracks = response.data.tracks;
+                this.geted_albums.push({ id: album_id, start: startIndex, end: startIndex + tracks.length - 1 });
+                this.tracks.push(...tracks.map(track => {
+                    track['album'] = {
+                        musician: response.data.musician
+                    };
+                    return track
+                }));
             }
+            var startIndexInAlbum = tracks.map(track => track.id).indexOf(track_id);
+            var resultStartIndex = startIndex + (startIndexInAlbum > 0 ? startIndexInAlbum : 0);
+            return resultStartIndex;
+
         },
         async play(id, album_id = null) {
+            this.autoplay = !this.player;
             if (this.currentTrack && this.currentTrack.id === id) {
                 if (this.playing) {
                     this.player.pause();
@@ -84,7 +84,11 @@ export const usePlayerStore = defineStore({
                 }).catch(error => {
                     console.log('Произошла ошибка при отправке запроса на добавление трека в избранное.')
                 })
-
+        },
+        playNext() {
+            if (this.currentTrackIndex + 1 < this.tracks.length) {
+                this.currentTrackIndex = this.currentTrackIndex + 1;
+            }
         }
     }
 });

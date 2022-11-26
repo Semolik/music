@@ -1,14 +1,14 @@
 <template>
-    <div class="track" @mouseover="hovered = true" @mouseleave="hovered = false" @click="OnClickTrack">
+    <div class="track" @mouseover="hovered = true" @mouseleave="hovered = false" @click.self="OnClickTrack">
         <AlbumPicture :play-icon="isPlaying || hovered" :paused="isPlaying && playing" :src="trackData.picture"
             off-hover />
-        <div class="track-info-wrapper">
+        <div class="track-info-wrapper" @click.self="OnClickTrack">
             <div class="track-info">
                 <div class="name">{{ trackData.name }}</div>
                 <router-link to="/" class="musician">{{ musicianData.name }}</router-link>
             </div>
         </div>
-        <div class="track-duration">{{ duration }}</div>
+        <div class="track-duration" @click.self="OnClickTrack">{{ duration }}</div>
     </div>
 </template>
 <script>
@@ -50,7 +50,7 @@ export default {
         },
     },
     methods: {
-        OnClickTrack() {
+        OnClickTrack(event) {
             this.playerStore.play(this.trackData.id, this.albumId);
         },
     }

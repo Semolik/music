@@ -68,7 +68,7 @@ export default {
   },
 
   data() {
-    
+
     return {
       /**
        * The Howl instance used for playback
@@ -134,6 +134,7 @@ export default {
           name: "end",
           hook: () => {
             this.playing = false;
+            this.playNext();
           }
         },
         {
@@ -167,7 +168,7 @@ export default {
         {
           name: "seek",
           hook: () => {
-            if(!this.playing) this.seek = this.$data._howl.seek();
+            if (!this.playing) this.seek = this.$data._howl.seek();
           }
         },
         "fade"

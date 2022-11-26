@@ -90,9 +90,9 @@ export default {
     },
     setup() {
         const { playing, currentTrack, currentTrackId } = storeToRefs(usePlayerStore());
-        const { likeTrack } = usePlayerStore();
+        const { likeTrack, playNext } = usePlayerStore();
         return {
-            playing, currentTrack, currentTrackId, likeTrack
+            playing, currentTrack, currentTrackId, likeTrack, playNext
         }
     },
     watch: {
