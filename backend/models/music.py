@@ -67,11 +67,28 @@ class Clip(Base):
     __tablename__ = 'clips'
 
     id = Column(Integer, primary_key=True, index=True)
-    musician_id = Column(Integer, ForeignKey(
-        "public_profiles.id"), nullable=False)
-    musician = relationship("PublicProfile", foreign_keys=[musician_id])
+    musician_id = Column(
+        Integer,
+        ForeignKey("public_profiles.id"),
+        nullable=False
+    )
+    musician = relationship(
+        "PublicProfile",
+        foreign_keys=[musician_id]
+    )
     name = Column(
-        String(int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))), nullable=False)
-    video_id = Column(String(12), nullable=False)  # id видео на youtube
-    picture_id = Column(Integer, ForeignKey("files.id"))
-    picture = relationship("File", foreign_keys=[picture_id])
+        String(int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))),
+        nullable=False
+    )
+    video_id = Column(
+        String(int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH'))),
+        nullable=False
+    )  # id видео на youtube
+    picture_id = Column(
+        Integer,
+        ForeignKey("files.id")
+    )
+    picture = relationship(
+        "File",
+        foreign_keys=[picture_id]
+    )

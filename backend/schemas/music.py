@@ -1,13 +1,17 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+from fastapi import Query, Form
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
 from backend.core.config import env_config
 
 
 class CreateAlbum(BaseModel):
-    name: str
+    name: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH'))
+    )
     date: datetime
     genres_ids: List[int] | None = None
 
@@ -28,7 +32,10 @@ class CreateAlbumForm(CreateAlbum):
 
 
 class CreateGenre(BaseModel):
-    name: str
+    name: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH'))
+    )
 
 
 @form_body
@@ -51,7 +58,10 @@ class Genre(UpdateGenre):
 
 class AlbumBase(BaseModel):
     id: int
-    name: str
+    name: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH'))
+    )
     year: int
     genres: List[Genre]
 
@@ -61,9 +71,15 @@ class AlbumAfterUpload(AlbumBase):
 
 
 class UploadTrackBase(BaseModel):
-    name: str
+    name: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_TRACK_NAME_LENGTH'))
+    )
     album_id: int
-    feat: str | None
+    feat: str | None = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_TRACK_FEAT_LENGTH'))
+    )
 
 
 class UploadTrack(UploadTrackBase):
@@ -103,3 +119,25 @@ class Track(AlbumTrack):
 
 class Liked(BaseModel):
     liked: bool
+
+
+class CreateMusicianClip(BaseModel):
+
+    name: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))
+    )
+    video_id: str = Query(
+        default=None,
+        max_length=int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH'))
+    )
+
+
+@form_body
+class CreateMusicianClipForm(CreateMusicianClip):
+    image_from_youtube: bool
+
+
+class MusicianClip(CreateMusicianClip):
+    id: int
+    musician_id: int

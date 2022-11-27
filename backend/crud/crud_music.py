@@ -47,6 +47,9 @@ class MusicCrud(CRUDBase):
     def get_musician_clips(self, musician_id: int):
         return self.db.query(Clip).filter(Clip.musician_id == musician_id).all()
 
+    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: File):
+        return self.create(Clip(musician_id=musician_id, picture=self.create(image_model), name=name, video_id=video_id,))
+
     def get_album(self, album_id: int) -> Album:
         return self.get(album_id, Album)
 

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
+from backend.crud.crud_file import file_cruds
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import set_picture
@@ -10,8 +11,8 @@ from backend.helpers.validate_role import validate_admin, validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_GENRE,  NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.track import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenreForm, Genre, Liked, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
-from backend.helpers.files import save_file
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenreForm, CreateMusicianClipForm, Genre, Liked, MusicianClip, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
+from backend.helpers.files import save_file, save_image_in_db_by_url
 
 
 albums_router = APIRouter(prefix="/albums", tags=['Альбомы'])
@@ -198,7 +199,7 @@ def delete_genre(id: int, Authorize: AuthJWT = Depends()):
     return {'detail': 'Жанр удален'}
 
 
-@clips_router.get('/my')
+@clips_router.get('/my', response_model=List[MusicianClip])
 def get_my_clips(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
@@ -206,6 +207,24 @@ def get_my_clips(Authorize: AuthJWT = Depends()):
     db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
     clips = music_crud.get_musician_clips(musician_id=db_public_profile.id)
     return [clip.as_dict() for clip in clips]
+
+
+@clips_router.post('/clip', response_model=MusicianClip)
+def create_clip(clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm), clipPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    validate_musician(user_id=current_user_id)
+    db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
+    if clipData.image_from_youtube:
+        image_model = save_image_in_db_by_url(
+            f'http://img.youtube.com/vi/{clipData.video_id}/hqdefault.jpg', user_id=current_user_id)
+    else:
+        image_model = save_file(upload_file=clipPicture,
+                                user_id=current_user_id, force_image=True)
+    print(image_model)
+    clip = music_crud.create_clip(
+        musician_id=db_public_profile.id, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
+    return clip.as_dict()
 
 
 router = APIRouter()

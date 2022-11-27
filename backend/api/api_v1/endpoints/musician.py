@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
 from backend.helpers.users import get_public_profile_as_dict
-from backend.schemas.track import Liked
+from backend.schemas.music import Liked
 from backend.schemas.user import MusicianFullInfo
 from backend.crud.crud_user import user_cruds
 router = APIRouter(prefix='/musician', tags=['Музыканты'])

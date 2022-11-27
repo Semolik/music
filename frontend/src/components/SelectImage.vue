@@ -1,21 +1,27 @@
 <template>
-    <div :class="['select-image', { 'empty-pic': !picture }, { wrong: (notEmpty && !target) || warning }]">
-        <FontAwesomeIcon icon="fa-image" v-if="!picture" />
+    <div :class="[
+        'select-image',
+        { 'empty-pic': !picture },
+        { wrong: (notEmpty && !target) || warning },
+        { disabled: disabled }
+    ]">
+        <FontAwesomeIcon :icon="disabled ? 'fa-ban' : 'fa-image'" v-if="!picture" />
         <img :src="picture" v-else>
         <div class="edit-area">
             <div class="edit-area-container">
-                <FontAwesomeIcon icon="fa-image" v-if="picture" />
+                <FontAwesomeIcon :icon="disabled ? 'fa-ban' : 'fa-image'" v-if="picture" />
                 <div class="edit-area-text">выбрать файл</div>
-                <input type="file" :name="name" ref="fileupload" :accept="acceptedFormats" @change="previewFiles">
+                <input :disabled="disabled" type="file" :name="name" ref="fileupload" :accept="acceptedFormats"
+                    @change="previewFiles">
             </div>
         </div>
     </div>
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faBan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faImage);
+library.add(faImage, faBan);
 import { useToast } from "vue-toastification";
 export default {
     setup() {
@@ -29,6 +35,7 @@ export default {
         name: String,
         notEmpty: Boolean,
         notEmptyEvent: Boolean,
+        disabled: Boolean,
     },
     emits: ['changed'],
     components: { FontAwesomeIcon },
@@ -46,10 +53,13 @@ export default {
             this.picture = value;
         },
         runValidation(value) {
-            console.log(this.notEmptyEvent )
+            console.log(this.notEmptyEvent)
             if (this.notEmptyEvent && value && !this.target) {
                 this.warning = true;
             }
+        },
+        disabled() {
+            this.detelePicture();
         }
     },
     methods: {
@@ -59,7 +69,6 @@ export default {
                 this.detelePicture();
                 return;
             }
-            
             var fileName = file[0].name;
             var idxDot = fileName.lastIndexOf(".") + 1;
             var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
@@ -83,6 +92,7 @@ export default {
             this.$refs.fileupload.value = null;
             this.picture = null;
             this.target = null;
+            this.$emit('changed', null)
         },
     }
 }
@@ -116,11 +126,11 @@ export default {
         }
     }
 
-    &.wrong {
+    &:not(.disabled).wrong {
         border: 2px dashed red;
     }
 
-    &:hover {
+    &:not(.disabled):hover {
         .edit-area {
             opacity: 1;
         }

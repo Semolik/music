@@ -245,7 +245,7 @@ export default {
     .button {
         background-color: var(--color-background-mute-2);
         padding: 5px;
-        border-radius: 20px;
+        border-radius: 10px;
         user-select: none;
     }
 
@@ -273,7 +273,7 @@ export default {
         .item {
             text-align: center;
             flex-grow: 1;
-            border-radius: 15px;
+            border-radius: 5px;
             padding: 5px;
             cursor: pointer;
             border: 1px solid transparent;
@@ -317,7 +317,7 @@ export default {
                     font-size: 1.02em;
                     outline: none;
                     width: 100%;
-                    border-radius: 10px;
+                    border-radius: 5px;
                     border: 1px solid transparent;
 
                     &.wrong {

@@ -4,7 +4,7 @@ from backend.crud.crud_music import music_crud
 from backend.helpers.images import set_picture
 from backend.helpers.users import get_public_profile_as_dict
 from backend.models.music import Album, Track
-from backend.schemas.track import UploadTrackForm
+from backend.schemas.music import UploadTrackForm
 from backend.crud.crud_user import user_cruds
 from backend.db.base import crud_base
 from pydub import AudioSegment
