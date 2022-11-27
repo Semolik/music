@@ -35,6 +35,7 @@ class Settings(BaseSettings):
         'vk': 'https://vk.com/{0}',
         'youtube': 'https://www.youtube.com/channel/{0}'
     }
+    YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
 
     class Config:
         case_sensitive = True  # 4

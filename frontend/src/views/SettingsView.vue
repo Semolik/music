@@ -58,10 +58,11 @@ export default {
     background-color: var(--color-background-mute);
     width: 100%;
     border-radius: 15px;
-
-
     @include breakpoints.lg(true) {
         grid-template-columns: 1fr;
+    }
+    @include breakpoints.xl(true) {
+        border-radius: 0;
     }
 
     aside {
@@ -101,8 +102,6 @@ export default {
             &:hover:not(.router-link-active) {
                 background-color: var(--color-background-mute-2);
             }
-
-
         }
     }
 

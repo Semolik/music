@@ -1,9 +1,9 @@
-from datetime import datetime
+
 from typing import List
 from backend.crud.crud_music import music_crud
 from backend.helpers.images import set_picture
-from backend.helpers.users import get_public_profile_as_dict
-from backend.models.music import Album, Track
+from backend.helpers.users import get_musician_profile_as_dict
+from backend.models.music import Album,  Track
 from backend.schemas.music import UploadTrackForm
 from backend.crud.crud_user import user_cruds
 from backend.db.base import crud_base
@@ -54,11 +54,11 @@ def save_track(upload_file: UploadFile, picture: File, user_id: int, track: Uplo
         raise HTTPException(status_code=500, detail="поврежденный файл")
 
 
-def set_album_info(db_album: Album, user_id: int | None = None, validate_date=False,):
+def set_album_info(db_album: Album, user_id: int | None = None):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['date'] = db_album.open_date
-    db_album_obj['musician'] = get_public_profile_as_dict(
+    db_album_obj['musician'] = get_musician_profile_as_dict(
         user_id=user_id, public_profile_id=db_album.musician_id)
     db_album_obj['genres'] = [set_picture(
         db_genre.as_dict(), db_genre.picture) for db_genre in db_album.genres]

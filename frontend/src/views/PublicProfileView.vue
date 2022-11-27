@@ -33,9 +33,7 @@
             </div>
         </div>
         <div class="musician-container-content">
-            <div class="description" v-if="publicProfileData.description">
-                {{ publicProfileData.description }}
-            </div>
+            <router-view></router-view>
         </div>
     </div>
 </template>
@@ -46,7 +44,9 @@ import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'vue-toastification';
 import { HTTP } from '../http-common.vue';
+
 library.add(faUser, faYoutube, faTelegram, faVk);
+
 export default {
     props: {
         id: String,
@@ -55,9 +55,13 @@ export default {
         const toast = useToast();
         const response = await HTTP.get("musician/", { params: { profile_id: props.id } });
         const publicProfileData = response.data;
-        const { name } = publicProfileData;
-        document.title = name;
+
         return { toast, publicProfileData };
+    },
+    provide() {
+        return {
+            publicProfileData: this.publicProfileData
+        }
     },
     data() {
         return {
@@ -108,6 +112,9 @@ export default {
         overflow: hidden;
         gap: 10px;
         padding: 10px;
+        @include breakpoints.sm(true) {
+            grid-template-columns:  1fr;
+        }
 
         .head-bg {
             position: absolute;
@@ -184,7 +191,7 @@ export default {
                         border-radius: 10px;
                         cursor: pointer;
 
-                        &.liked.active svg{
+                        &.liked.active svg {
                             color: var(--red);
                         }
 
@@ -213,6 +220,16 @@ export default {
         padding: 20px;
         display: flex;
         flex-direction: column;
+        gap: 20px;
+
+        .headline {
+            font-size: 22px;
+            color: var(--color-header-text);
+            &.center {
+                text-align: center;
+            }
+        }
+
     }
 }
 </style>

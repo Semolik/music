@@ -31,7 +31,7 @@ def init_folders_structure():
         logger.info("Структура папок создана")
 
 
-def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_image=True, bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл") -> File | None:
+def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл") -> File | None:
     if not bytes_io_file and (not upload_file or not upload_file.filename):
         return
     if bytes_io_file:
@@ -50,8 +50,7 @@ def save_file(upload_file: UploadFile, user_id: int, force_image=False, resize_i
             buf.seek(0)
         try:
             image = Image.open(buf)
-            if resize_image:
-                image.thumbnail((400, 400))
+            image.thumbnail(resize_image_options)
             fileName = uuid_filename + settings.IMAGES_EXTENTION
             image.save('/'.join([settings.IMAGES_FOLDER, fileName]))
             newFileName = originalFilePath.with_suffix(
@@ -76,7 +75,7 @@ def save_image_in_db_by_url(url: str, user_id: int) -> File | None:
         buf.name = url.split('/')[-1]
         buf.seek(0)
         return save_file(
-            upload_file=None, user_id=user_id, force_image=True, bytes_io_file=buf, resize_image=False, detail_error_message="не удалось скачать обложку ролика")
+            upload_file=None, user_id=user_id, force_image=True, bytes_io_file=buf, resize_image_options=(1000, 1000), detail_error_message="не удалось скачать обложку ролика")
 
 
 def add_url(file: File) -> dict:

@@ -45,7 +45,7 @@ export default {
     computed: {
         filteredAlbums() {
             if (!this.text) return this.albums
-            return this.albums.filter(album => album.name.includes(this.text))
+            return this.albums.filter(album => album.name.toLowerCase().includes(this.text.toLowerCase()))
         },
         albumsEmpty() {
             return this.albums.length === 0;

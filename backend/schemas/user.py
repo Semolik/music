@@ -101,10 +101,6 @@ class PublicProfile(PublicProfileBase):
     picture: str | None
 
 
-class MusicianFullInfo(PublicProfile):
-    liked: bool
-
-
 @form_body
 class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks):
     remove_picture: bool = False

@@ -1,9 +1,9 @@
 from fastapi import Depends, APIRouter, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_music import music_crud
-from backend.helpers.users import get_public_profile_as_dict
+from backend.helpers.users import get_musician_profile_as_dict
 from backend.schemas.music import Liked
-from backend.schemas.user import MusicianFullInfo
+from backend.schemas.music import MusicianFullInfo
 from backend.crud.crud_user import user_cruds
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
@@ -12,8 +12,8 @@ router = APIRouter(prefix='/musician', tags=['Музыканты'])
 def get_public_profile_info(profile_id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_optional()
     current_user_id = Authorize.get_jwt_subject()
-    public_profile_obj = get_public_profile_as_dict(
-        public_profile_id=profile_id, full_links=True, liked_user_id=current_user_id)
+    public_profile_obj = get_musician_profile_as_dict(
+        public_profile_id=profile_id, full_links=True, user_id=current_user_id)
     if not public_profile_obj:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")

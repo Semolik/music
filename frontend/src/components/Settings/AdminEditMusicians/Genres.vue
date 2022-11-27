@@ -38,7 +38,7 @@ export default {
         };
     },
     mounted() {
-        HTTP.get("/genres")
+        HTTP.get("/genres/all")
             .then(response => {
                 this.genres = response.data;
             })

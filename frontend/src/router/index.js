@@ -16,11 +16,24 @@ const router = createRouter({
     },
     {
       path: '/musician/:id',
-      // name: 'Страница музыканта',
       meta: { loadingTitle: true },
       props: true,
-      component: () => import('../views/PublicProfileView.vue')
+      component: () => import('../views/PublicProfileView.vue'),
+      children: [
+        {
+          path: '',
+          meta: { requireAuth: true, roles: [Role.Musician] },
+          component: () => import('../components/PublicProfile/index.vue'),
+        },
+        {
+          path: 'clips',
+          meta: { requireAuth: true, roles: [Role.Musician] },
+          component: () => import('../components/PublicProfile/clips.vue'),
+          props: true
+        },
+      ]
     },
+
     {
       path: '/lk',
       meta: { requireAuth: true },
@@ -80,7 +93,13 @@ const router = createRouter({
                   path: 'add',
                   name: 'Добавить клип',
                   meta: { requireAuth: true, roles: [Role.Musician] },
-                  component: () => import('../components/Settings/Musician/Clips/add.vue'),
+                  component: () => import('../components/Settings/Musician/Clips/clip.vue'),
+                },
+                {
+                  path: ':id',
+                  meta: { requireAuth: true, roles: [Role.Musician], loadingTitle: true },
+                  component: () => import('../components/Settings/Musician/Clips/clip.vue'),
+                  props: true,
                 }
               ]
             },
@@ -149,7 +168,11 @@ const router = createRouter({
   ]
 });
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.loadingTitle ? 'Загрузка...' : to.name;
+  if (to.meta.loadingTitle) {
+    document.title = 'Загрузка...'
+  } else if (to.name) {
+    document.title = to.name;
+  }
   let flag = sessionStorage.getItem('logined');
   let role = sessionStorage.getItem('user-role');
   if (to.meta.requireAuth == true) {

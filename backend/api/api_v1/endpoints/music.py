@@ -7,11 +7,12 @@ from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import set_picture
 from backend.helpers.music import save_track, set_album_info, set_album_tracks, set_full_track_data, validate_genres
+from backend.helpers.clips import set_clip_data
 from backend.helpers.validate_role import validate_admin, validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM, NOT_FOUND_GENRE,  NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenreForm, CreateMusicianClipForm, Genre, Liked, MusicianClip, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UploadTrackForm
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumWithTracks, CreateAlbumForm, CreateGenreForm, CreateMusicianClipForm, Genre, Liked, MusicianClip, Track, TrackAfterUpload, UpdateAlbum, UpdateAlbumForm, UpdateGenreForm, UpdateMusicianClipForm, UploadTrackForm
 from backend.helpers.files import save_file, save_image_in_db_by_url
 
 
@@ -147,7 +148,7 @@ def get_genres():
     return [set_picture(genre.as_dict(), genre.picture) for genre in music_crud.get_genres()]
 
 
-@genres_router.get('', responses={**NOT_FOUND_GENRE}, response_model=Genre)
+@genres_router.get('/genre', responses={**NOT_FOUND_GENRE}, response_model=Genre)
 def get_genre(id: int):
     genre = music_crud.get_genre_by_id(id=id)
     if not genre:
@@ -200,13 +201,25 @@ def delete_genre(id: int, Authorize: AuthJWT = Depends()):
 
 
 @clips_router.get('/my', response_model=List[MusicianClip])
-def get_my_clips(Authorize: AuthJWT = Depends()):
+def get_my_clips(page: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(user_id=current_user_id)
     db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
-    clips = music_crud.get_musician_clips(musician_id=db_public_profile.id)
-    return [clip.as_dict() for clip in clips]
+    clips = music_crud.get_musician_clips(
+        musician_id=db_public_profile.id, page=page)
+    return [set_clip_data(clip=clip) for clip in clips]
+
+
+@clips_router.get('', response_model=List[MusicianClip])
+def get_my_clips(musician_id: int, page: int):
+    db_public_profile = user_cruds.get_public_profile_by_id(id=musician_id)
+    if not db_public_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Профиль музыканта не найден")
+    clips = music_crud.get_musician_clips(
+        musician_id=db_public_profile.id, page=page)
+    return [set_clip_data(clip=clip) for clip in clips]
 
 
 @clips_router.post('/clip', response_model=MusicianClip)
@@ -220,11 +233,46 @@ def create_clip(clipData: CreateMusicianClipForm = Depends(CreateMusicianClipFor
             f'http://img.youtube.com/vi/{clipData.video_id}/hqdefault.jpg', user_id=current_user_id)
     else:
         image_model = save_file(upload_file=clipPicture,
-                                user_id=current_user_id, force_image=True)
-    print(image_model)
+                                user_id=current_user_id, force_image=True, resize_image_options=(1000, 1000))
+    if not image_model:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Необходимо или передать картинку или указать image_from_youtube = true")
     clip = music_crud.create_clip(
         musician_id=db_public_profile.id, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
-    return clip.as_dict()
+    return set_clip_data(clip=clip)
+
+
+@clips_router.put('/clip', response_model=MusicianClip)
+def update_clip(clipData: UpdateMusicianClipForm = Depends(UpdateMusicianClipForm), clipPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    validate_musician(user_id=current_user_id)
+    db_public_profile = user_cruds.get_public_profile(user_id=current_user_id)
+    if clipData.image_from_youtube:
+        image_model = save_image_in_db_by_url(
+            f'http://img.youtube.com/vi/{clipData.video_id}/hqdefault.jpg', user_id=current_user_id)
+    else:
+        image_model = save_file(upload_file=clipPicture,
+                                user_id=current_user_id, force_image=True, resize_image_options=(1000, 1000))
+    db_clip = music_crud.get_clip_by_id(clip_id=clipData.id)
+    if not db_clip:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Клип не найден")
+    if db_clip.musician_id != db_public_profile.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Вы не можете изменять этот клип")
+    clip = music_crud.update_clip(
+        db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
+    return set_clip_data(clip=clip)
+
+
+@clips_router.get('/clip', response_model=MusicianClip)
+def create_clip(id: int):
+    clip = music_crud.get_clip_by_id(clip_id=id)
+    if not clip:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Клип не найден")
+    return set_clip_data(clip=clip)
 
 
 router = APIRouter()

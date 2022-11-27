@@ -138,6 +138,20 @@ class CreateMusicianClipForm(CreateMusicianClip):
     image_from_youtube: bool
 
 
-class MusicianClip(CreateMusicianClip):
+@form_body
+class UpdateMusicianClipForm(CreateMusicianClipForm):
+    id: int
+
+
+class MusicianClip(BaseModel):
     id: int
     musician_id: int
+    name: str
+    video: str
+    video_id: str
+    picture: str
+
+
+class MusicianFullInfo(PublicProfile):
+    liked: bool
+    clips: List[MusicianClip]

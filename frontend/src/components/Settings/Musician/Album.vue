@@ -4,7 +4,7 @@
             <div class="picture-container">
                 <SelectImage v-if="editorOpened" :pictureUrl="albumInfo.picture" ref="albumPicture" />
                 <AlbumPicture :src="albumInfo.picture" offHover v-else />
-                <UploadDate v-if="editorOpened && date" :border-radius="10" v-model="date" />
+                <Date v-if="editorOpened && date" :border-radius="10" v-model="date" />
             </div>
             <div class="album-info">
                 <div class="headline">
@@ -77,9 +77,9 @@ import Track from '/src/components/Track.vue';
 import draggable from 'vuedraggable'
 import FormField from '/src/components/FormField.vue';
 import GenresSelector from '/src/components/GenresSelector/index.vue';
-import UploadDate from './Cabinet/Upload/Date.vue';
 import moment from 'moment';
 import SelectImage from '/src/components/SelectImage.vue';
+import Date from './Upload/Date.vue';
 library.add(faPen, faTrash, faX, faFloppyDisk);
 export default {
     setup() {
@@ -94,7 +94,7 @@ export default {
             VITE_MAX_ALBUM_NAME_LENGTH
         };
     },
-    components: { AlbumPicture, draggable, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, UploadDate, SelectImage },
+    components: { AlbumPicture, draggable, FontAwesomeIcon, ModalDialog, Track, FormField, GenresSelector, SelectImage, Date },
     props: {
         id: {
             type: [Number, String],

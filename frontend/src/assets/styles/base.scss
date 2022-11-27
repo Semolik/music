@@ -212,18 +212,18 @@ body {
 }
 
 #app {
-  height: 100%;
-  // height: minmax(min-content, 100%);
+  height: min-content;
+  min-height: 50vh;
   width: min(1200px, 100%);
   margin: 0 auto;
   display: flex;
   overflow-x: hidden;
   flex-direction: column;
+  padding-bottom: 20px;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {

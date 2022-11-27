@@ -57,7 +57,7 @@ export default {
             }
             return;
         }
-        HTTP.get('genre', { params: { id: this.id } })
+        HTTP.get('genres/genre', { params: { id: this.id } })
             .then(response => {
                 this.genreData = response.data;
                 this.genreName = this.genreData.name;
@@ -75,7 +75,7 @@ export default {
             }
             form.append('name', this.genreName);
             if (this.add) {
-                HTTP.post('/genres/genre', form)
+                HTTP.post('genres/genre', form)
                     .then(response => {
                         this.$router.push({ path: `/lk/edit-musician-section/genres/${response.data.id}`, props: { add: false } })
                     }).catch(error => {
@@ -84,7 +84,7 @@ export default {
                 return
             }
             form.append('id', this.genreData.id);
-            HTTP.put('/genres/genre', form)
+            HTTP.put('genres/genre', form)
                 .then(response => {
                     this.genreData = response.data;
                     this.isPictureUpdated = false;
@@ -93,7 +93,7 @@ export default {
                 })
         },
         detele() {
-            HTTP.delete('/genres/genre', { params: { id: this.genreData.id } })
+            HTTP.delete('genres/genre', { params: { id: this.genreData.id } })
                 .then(response => {
                     this.$router.push({ path: '/lk/edit-musician-section/genres' })
                 }).catch(error => {

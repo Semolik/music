@@ -150,7 +150,7 @@ export default {
                 const form = this.$refs.form;
                 let data = new FormData(form);
                 data.append('name', name);
-                data.append('description', description);
+                data.append('description', description || '');
                 data.append('telegram', telegram || '');
                 data.append('vk', vk || '');
                 data.append('youtube', yt || '');

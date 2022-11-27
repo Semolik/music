@@ -2,7 +2,7 @@
     <Teleport to="#modal">
         <Transition name="modal">
             <div class="modal-bg" v-if="active" @click.self="closeModal">
-                <div class="modal">
+                <div class="modal" :style="{ '--modal-max-width': maxWidth, '--content-padding': padding }">
                     <div class="headline">
                         <div class="text">{{ headline }}</div>
                         <div class="close-button" @click="closeModal">
@@ -11,6 +11,7 @@
                     </div>
                     <div class="modal-content">
                         {{ text }}
+                        <slot></slot>
                     </div>
                     <div class="modal-buttons">
                         <div :class="['button', { loading: yesLoading }]" v-if="yesButton" @click="$emit('yes')">
@@ -38,6 +39,16 @@ export default {
         yesButton: Boolean,
         yesLoading: Boolean,
         noButton: Boolean,
+        maxWidth: String,
+        padding: {
+            type: String,
+            default: '10px',
+        },
+    },
+    data() {
+        return {
+            width: this.maxWidth || '400px',
+        }
     },
     emits: ['close', 'yes', 'no'],
     methods: {
@@ -64,7 +75,7 @@ export default {
 
 
 .modal-bg {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background-color: rgba($color: #000000, $alpha: 0.5);
     @include helpers.flex-center;
@@ -72,7 +83,8 @@ export default {
 
     .modal {
         background-color: var(--color-background-mute);
-        min-width: 400px;
+        max-width: var(--modal-max-width);
+        width: 100%;
         padding: 10px;
         border-radius: 20px;
         display: flex;
@@ -102,7 +114,7 @@ export default {
         }
 
         .modal-content {
-            padding: 10px;
+            padding: var(--content-padding);
         }
 
         .modal-buttons {
