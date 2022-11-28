@@ -43,7 +43,7 @@ export const usePlayerStore = defineStore({
                 var tracks = this.tracks.slice(saved_album.start, saved_album.end + 1);
                 var startIndex = saved_album.start;
             } else {
-                const response = await HTTP.get('album', { params: { id: album_id } });
+                const response = await HTTP.get('albums/album', { params: { id: album_id } });
                 var startIndex = this.tracks.length;
                 var tracks = response.data.tracks;
                 this.geted_albums.push({ id: album_id, start: startIndex, end: startIndex + tracks.length - 1 });
@@ -76,7 +76,7 @@ export const usePlayerStore = defineStore({
         },
         likeTrack(track_id) {
             if (!this.currentTrack) return
-            HTTP.post('like', null, { params: { track_id: track_id } })
+            HTTP.post('tracks/like', null, { params: { track_id: track_id } })
                 .then(response => {
                     this.tracks[this.currentTrackIndex].liked = response.data.liked;
                 }).catch(error => {

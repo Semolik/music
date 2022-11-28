@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     IMAGES_EXTENTION: str = '.png'
     SONGS_EXTENTION: str = '.mp3'
     UPLOADS_ROUTE: str = '/uploads'
+    OTHER_FILES_ROUTE: str = '/other/'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
     ALLOWED_STATUSES = Literal['in-progress',
                                'successfully', 'rejected']

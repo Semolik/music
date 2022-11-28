@@ -21,15 +21,15 @@
                 </router-link>
             </div>
             <div class="items" v-if="!is_history_route">
-                <div :class="['item',{active: active_role === Role.RadioStation},{disabled: userRole === Role.RadioStation}]"
+                <div :class="['item', { active: active_role === Role.RadioStation }, { disabled: userRole === Role.RadioStation }]"
                     @click="this.active_role = Role.RadioStation">
                     Радиостанцию
                 </div>
-                <div :class="['item',{active: active_role === Role.Musician}, {disabled: userRole === Role.Musician}]"
+                <div :class="['item', { active: active_role === Role.Musician }, { disabled: userRole === Role.Musician }]"
                     @click="this.active_role = Role.Musician">
                     Музыканта
                 </div>
-                <div :class="['item',{active: active_role === Role.User}, {disabled: userRole === Role.User}]"
+                <div :class="['item', { active: active_role === Role.User }, { disabled: userRole === Role.User }]"
                     @click="this.active_role = Role.User">
                     Пользователя
                 </div>
@@ -41,17 +41,13 @@
                 В сообщении будут передано имя которое указано у ваc в настройках аккаунта
             </div>
             <div class="request-form">
-                <textarea name="message" placeholder="Напишите зачем вам нужен этот статус" v-model="messageText" id="" cols="30" rows="10"></textarea>
+                <textarea name="message" placeholder="Напишите зачем вам нужен этот статус" v-model="messageText" id=""
+                    cols="30" rows="10"></textarea>
             </div>
             <div class="line">
-                <div :class="['button','files', {active: isFilesSelected}]">
-                    <FontAwesomeIcon icon="fa-paperclip" />
-                    <input type="file" :title="filesTitle" @change="changeFiles" multiple>
-                </div>
-                <div class='button remove' v-if="isFilesSelected" @click="removeFiles">
-                    <FontAwesomeIcon icon="fa-xmark" />
-                </div>
-                <div v-for="(file,index) in files" class="file" @click="removeFile(file)" title="Нажмите чтобы удалить">
+
+                <div v-for="(file, index) in files" class="file" @click="removeFile(file)"
+                    title="Нажмите чтобы удалить">
                     <div class="icon">
                         <template v-if="previews[index]">
                             <img :src="previews[index].base64" alt="">
@@ -59,12 +55,21 @@
                         </template>
                         <FontAwesomeIcon icon="fa-file" v-else />
                     </div>
-                    <div class="name">{{file.name}}</div>
+                    <div class="name">{{ file.name }}</div>
                 </div>
             </div>
-            <div :class="['button', {active: buttonActive}, {preloader: 0 < uploadPercentage < 100}]"
-                :style="{'--i': uploadPercentage}" @click="sendMessageToAdmins">Отправить
-                сообщение</div>
+            <div class="buttons-container">
+                <div :class="['button', 'custom', 'files', { active: isFilesSelected }]">
+                    <FontAwesomeIcon icon="fa-paperclip" />
+                    <input type="file" :title="filesTitle" @change="changeFiles" multiple>
+                </div>
+                <div class='button custom remove' v-if="isFilesSelected" @click="removeFiles">
+                    <FontAwesomeIcon icon="fa-xmark" />
+                </div>
+                <div :class="['button', { active: buttonActive }, { preloader: 0 < uploadPercentage < 100 }]"
+                    :style="{ '--i': uploadPercentage }" @click="sendMessageToAdmins">Отправить
+                    сообщение</div>
+            </div>
         </template>
     </div>
 </template>
@@ -363,37 +368,6 @@ export default {
         flex-wrap: wrap;
         gap: 5px;
 
-        .button {
-            aspect-ratio: 1;
-            @include helpers.flex-center;
-            width: min-content;
-            height: min-content;
-            cursor: pointer;
-
-            &.files {
-                position: relative;
-
-                input {
-                    position: absolute;
-                    inset: 0;
-                    opacity: 0;
-                    cursor: pointer;
-
-                    &.hidden {
-                        display: none;
-                    }
-                }
-            }
-
-            &.remove {
-                background-color: var(--red-0);
-
-                &:hover {
-                    background-color: var(--red-0);
-                }
-            }
-        }
-
         .file {
             background-color: var(--color-background-mute-3);
             border-radius: 10px;
@@ -443,43 +417,78 @@ export default {
         }
     }
 
-    .button {
-        width: 100%;
-        user-select: none;
-        background-color: var(--color-background-mute-3);
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
+    .buttons-container {
+        display: flex;
+        gap: 5px;
 
-        &.preloader {
-            position: relative;
-            isolation: isolate;
-            overflow: hidden;
+        .custom {
+            aspect-ratio: 1;
+            @include helpers.flex-center;
+            width: min-content !important;
+            cursor: pointer;
 
-            &::after {
-                z-index: -1;
-                position: absolute;
-                content: '';
-                left: 0;
-                top: 0;
-                height: 100%;
+            &.files {
+                position: relative;
+
+                input {
+                    position: absolute;
+                    inset: 0;
+                    opacity: 0;
+                    cursor: pointer;
+
+                    &.hidden {
+                        display: none;
+                    }
+                }
+            }
+
+            &.remove {
                 background-color: var(--red-0);
-                width: calc(1% * var(--i));
+
+                &:hover {
+                    background-color: var(--red-0);
+                }
             }
         }
 
-        &:not(.active):hover {
-            background-color: var(--color-background-mute-4);
-        }
+        .button {
+            width: 100%;
+            user-select: none;
+            background-color: var(--color-background-mute-3);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
 
-        &.active {
-            cursor: pointer;
-            background-color: var(--purple);
-        }
+            &.preloader {
+                position: relative;
+                isolation: isolate;
+                overflow: hidden;
 
-        svg {
-            width: 18px;
-            height: 18px;
+                &::after {
+                    z-index: -1;
+                    position: absolute;
+                    content: '';
+                    left: 0;
+                    top: 0;
+                    height: 100%;
+                    background-color: var(--red-0);
+                    width: calc(1% * var(--i));
+                }
+            }
+
+            &:not(.active):hover {
+                background-color: var(--color-background-mute-4);
+            }
+
+            &.active {
+                cursor: pointer;
+                background-color: var(--purple);
+            }
+
+            svg {
+                width: 18px;
+                height: 18px;
+            }
         }
     }
 }

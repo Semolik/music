@@ -70,6 +70,10 @@ class AlbumAfterUpload(AlbumBase):
     musician_id: int
 
 
+class AlbumIsCLosed(BaseModel):
+    closed_uploading: bool
+
+
 class UploadTrackBase(BaseModel):
     name: str = Query(
         default=None,
@@ -82,12 +86,8 @@ class UploadTrackBase(BaseModel):
     )
 
 
-class UploadTrack(UploadTrackBase):
-    date: datetime
-
-
 @form_body
-class UploadTrackForm(UploadTrack):
+class UploadTrackForm(UploadTrackBase):
     ...
 
 

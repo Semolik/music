@@ -5,7 +5,8 @@ from backend.core.config import settings
 from backend.helpers.files import save_file
 from backend.schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.models.user import File as FileModel
+from backend.models.files import File
+
 from backend.crud.crud_user import UserCruds
 router = APIRouter(tags=['Роли'])
 user_cruds = UserCruds()
@@ -18,17 +19,14 @@ def send_update_role_request(Authorize: AuthJWT = Depends(), formData: UpdateUse
     if user_cruds.is_user_have_active_change_role_messages(user_id=current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта")
-    db_files: List[FileModel] = [
-        user_cruds.create(
-            save_file(
-                upload_file=upload_file,
-                user_id=current_user_id
-            )
+    db_files: List[File] = [
+        save_file(
+            upload_file=upload_file,
+            user_id=current_user_id
         )
         for upload_file in files]
-    files_ids = [file.id for file in db_files]
     user_cruds.send_change_role_message(
-        user_id=current_user_id, message=formData.message, files_ids=files_ids, account_status=formData.account_status)
+        user_id=current_user_id, message=formData.message, files=db_files, account_status=formData.account_status)
     return {'detail': 'Сообщение отправлено'}
 
 

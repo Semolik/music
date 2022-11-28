@@ -1,6 +1,7 @@
 from backend.models.user import *
 from backend.models.music import *
 from backend.models.roles import *
+from backend.models.files import *
 
 from backend.core.config import settings
 from backend.db.base import Base
@@ -46,7 +47,6 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
     if not database_exists(url):
-        print('asdasd')
         create_database(url)
         target_metadata.create_all(connectable)
 

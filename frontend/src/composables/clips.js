@@ -9,7 +9,7 @@ export const useClipsGetter = (musician_id, loadOnUse = true, my = false) => {
     var clips = ref([]);
     const getNextPage = async () => {
         page.value++;
-        const { data } = await HTTP.get("clips" + (my ? "/my" : ""), { params: { musician_id: musician_id, page: page.value } });
+        const { data } = await HTTP.get("clips" + (my ? "/my" : "/all"), { params: { musician_id: musician_id, page: page.value } });
         clips.value = [...clips.value, ...data];
         if (data.length < pageLimit) {
             buttonShowed.value = false

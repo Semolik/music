@@ -19,6 +19,7 @@ class File(Base):
     __tablename__ = 'files'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    original_file_name = Column(String)
+    original_file_name = Column(String, nullable=False)
+    extension = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", foreign_keys=[user_id])

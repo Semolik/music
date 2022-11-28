@@ -4,11 +4,12 @@ from backend.db.base import CRUDBase
 from backend.helpers.roles import set_status
 from backend.helpers.images import set_picture
 from backend.core.config import settings
-from backend.helpers.files import add_url
+from backend.helpers.files import set_files_data
 from backend.crud.crud_file import file_cruds
+from backend.models.files import Image
 from backend.models.music import Album
-from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
-from backend.models.user import File, PublicProfile, User
+from backend.schemas.user import ChangeRoleRequestInfo, PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
+from backend.models.user import PublicProfile, User
 from backend.models.roles import AnswerChangeRoleRequest, ChangeRoleRequest
 from backend.models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
@@ -52,7 +53,7 @@ class UserCruds(CRUDBase):
             return None
         return db_user
 
-    def update(self, user: User, new_user_data: UserModifiable, userPic: File) -> User:
+    def update(self, user: User, new_user_data: UserModifiable, userPic: Image) -> User:
         if user is None:
             raise Exception('Update user failed: user is None')
         data_obj = new_user_data.dict()
@@ -60,11 +61,9 @@ class UserCruds(CRUDBase):
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if remove_picture:
-            file_cruds.delete_picture(user.picture)
+            file_cruds.delete_image(user.picture)
         elif userPic:
-            if user.picture:
-                file_cruds.delete_picture(user.picture)
-            user.picture = self.create(userPic)
+            file_cruds.replace_old_picture(model=user, new_picture=userPic)
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
@@ -89,7 +88,7 @@ class UserCruds(CRUDBase):
         return self.db.query(PublicProfile).filter(
             PublicProfile.id == id).first()
 
-    def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileModifiable,  userPublicPicture: File) -> PublicProfile:
+    def update_public_profile(self, public_proile: PublicProfile, new_public_proile_data: PublicProfileModifiable,  userPublicPicture: Image) -> PublicProfile:
         if public_proile is None:
             raise Exception(
                 'Update public_proile failed: public_proile is None')
@@ -104,22 +103,20 @@ class UserCruds(CRUDBase):
         public_proile_links_obj.pop('public_profile_id')
         for var, _ in public_proile_links_obj.items():
             value = data_obj.get(var)
-
             setattr(public_proile_links, var, value)
         if remove_picture:
-            file_cruds.delete_picture(public_proile.picture)
+            file_cruds.delete_image(image=public_proile.picture)
         elif userPublicPicture:
-            if public_proile.picture:
-                file_cruds.delete_picture(public_proile.picture)
-            public_proile.picture = self.create(userPublicPicture)
+            file_cruds.replace_old_picture(
+                model=public_proile, new_picture=userPublicPicture)
         self.db.add(public_proile)
         self.db.commit()
         self.db.refresh(public_proile)
         return public_proile
 
-    def send_change_role_message(self, user_id, message, files_ids, account_status):
+    def send_change_role_message(self, user_id, message, files, account_status):
         db_change_role_request = ChangeRoleRequest(
-            files_ids=files_ids,
+            files=files,
             message=message,
             user_id=user_id,
             account_status=account_status
@@ -142,15 +139,9 @@ class UserCruds(CRUDBase):
             query = query.where(ChangeRoleRequest.status == filter)
         return self.post_processing_change_role_messages(query.slice(end-page_size, end), add_user=True)
 
-    def post_processing_change_role_messages(self, records: List[ChangeRoleRequest], add_user=False):
+    def post_processing_change_role_messages(self, records: List[ChangeRoleRequest], add_user=False) -> ChangeRoleRequestInfo:
         result = list()
         for record in records:
-            files = list()
-            for file_id in record.files_ids:
-                db_file = self.db.query(File).filter(
-                    File.id == file_id).first()
-                if db_file:
-                    files.append(add_url(db_file))
             time_created: datetime = record.time_created
             time_created_str = time_created.strftime(settings.DATETIME_FORMAT)
             record_obj = jsonable_encoder(record)
@@ -160,7 +151,7 @@ class UserCruds(CRUDBase):
                 user_obj = jsonable_encoder(user)
                 user_obj_with_pic = set_picture(user_obj, user.picture)
                 record_obj['user'] = user_obj_with_pic
-            record_obj['files'] = files
+            record_obj['files'] = set_files_data(files=record.files)
             record_obj['time_created'] = time_created_str
             result.append(record_obj)
         return result
@@ -188,13 +179,6 @@ class UserCruds(CRUDBase):
 
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
-
-    def album_belongs_to_user(self, album: Album, user_id: int):
-        db_public_profile: PublicProfile = self.db.query(PublicProfile).filter(
-            PublicProfile.user_id == user_id).first()
-        if not db_public_profile:
-            return False
-        return bool(album.musician_id == db_public_profile.id)
 
     def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: settings.ALLOWED_STATUSES, account_status: str = None):
         if request.answer:

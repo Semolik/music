@@ -6,30 +6,27 @@ from backend.crud.crud_file import file_cruds
 from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings, env_config
+from backend.models.files import Image
 from backend.models.music import Album, Clip, Genre, Track
-from backend.models.user import FavoriteMusicians, File
+from backend.models.user import FavoriteMusicians
 from backend.models.music import FavoriteTracks
 
 
 class MusicCrud(CRUDBase):
 
-    def create_album(self, user_id: int, name: str,  date: datetime, picture: File | None, genres: List[Genre]):
+    def create_album(self, user_id: int, name: str,  date: datetime, picture: Image | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
         musician = user_cruds.get_public_profile(user_id=user_id)
         db_album = Album(musician_id=musician.id, name=name,
                          open_date=date, picture=db_image, genres=genres)
         return self.create(model=db_album)
 
-    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: File, tracks_ids: List[int]):
+    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: Image, tracks_ids: List[int]):
         album.name = name
         album.open_date = date
         album.genres = genres
         if image:
-            picture = album.picture
-            album.picture = None
-            if picture:
-                file_cruds.delete_picture(file=picture)
-            album.picture = self.create(image)
+            file_cruds.replace_old_picture(model=album, new_picture=image)
         tracks = album.tracks
         for index, track_id in enumerate(tracks_ids):
             for track in tracks:
@@ -48,17 +45,14 @@ class MusicCrud(CRUDBase):
         end = page * page_size
         return self.db.query(Clip).filter(Clip.musician_id == musician_id).slice(end-page_size, end).all()
 
-    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: File):
-        return self.create(Clip(musician_id=musician_id, picture=self.create(image_model), name=name, video_id=video_id))
+    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: Image):
+        return self.create(Clip(musician_id=musician_id, picture=image_model, name=name, video_id=video_id))
 
-    def update_clip(self, db_clip: Clip, name: str, video_id: str, image_model: File):
+    def update_clip(self, db_clip: Clip, name: str, video_id: str, image: Image):
         db_clip.name = name
         db_clip.video_id = video_id
-        if image_model:
-            picture = db_clip.picture
-            db_clip.picture = image_model
-            if picture:
-                file_cruds.delete_picture(file=picture)
+        if image:
+            file_cruds.replace_old_picture(model=db_clip, new_picture=image)
         self.db.add(db_clip)
         self.db.commit()
         self.db.refresh(db_clip)
@@ -77,14 +71,14 @@ class MusicCrud(CRUDBase):
     def get_genres(self):
         return self.db.query(Genre).all()
 
-    def create_genre(self, name: str, picture: File):
-        return self.create(Genre(name=name, picture=self.create(picture)))
+    def create_genre(self, name: str, picture: Image):
+        return self.create(Genre(name=name, picture=picture))
 
     def delete_track(self, track: Track):
         picture = track.picture
         if picture:
             track.picture = None
-            file_cruds.delete_picture(file=picture)
+            file_cruds.delete_image(image=picture)
         track_file = track.file
         path = '/'.join([settings.TRACKS_FOLDER, track_file.file_name])
         if Path(path).exists():
@@ -135,7 +129,7 @@ class MusicCrud(CRUDBase):
         picture = album.picture
         if picture:
             album.picture = None
-            file_cruds.delete_picture(file=picture)
+            file_cruds.delete_image(image=picture)
         self.db.delete(album)
         self.db.commit()
 
@@ -145,10 +139,10 @@ class MusicCrud(CRUDBase):
     def get_genre_by_id(self, id: int) -> Genre | None:
         return self.get(id=id, model=Genre)
 
-    def update_genre(self, name: str, picture: File, genre: Genre):
+    def update_genre(self, name: str, picture: Image, genre: Genre):
         genre.name = name
         if picture:
-            genre.picture = self.create(picture)
+            file_cruds.replace_old_picture(model=genre, new_picture=picture)
         self.db.add(genre)
         self.db.commit()
         self.db.refresh(genre)
