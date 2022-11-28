@@ -36,6 +36,10 @@ export default {
         notEmpty: Boolean,
         notEmptyEvent: Boolean,
         disabled: Boolean,
+        aspectRatio: {
+            type: String,
+            default: '1'
+        }
     },
     emits: ['changed'],
     components: { FontAwesomeIcon },
@@ -102,7 +106,7 @@ export default {
 
 
 .select-image {
-    aspect-ratio: 1;
+    aspect-ratio: v-bind(aspectRatio);
     position: relative;
     overflow: hidden;
     border-radius: 7px;
@@ -157,7 +161,7 @@ export default {
             flex-direction: column;
             background-color: rgba($color: #000000, $alpha: 0.2);
             padding: 5px;
-            aspect-ratio: 1;
+            aspect-ratio: v-bind(aspectRatio);
 
             svg {
                 width: 25%;

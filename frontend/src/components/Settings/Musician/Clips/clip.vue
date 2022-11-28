@@ -1,7 +1,7 @@
 <template>
     <form class="add-clip-container">
         <SelectImage :picture-url="imageUrl" :not-empty="notEmpty" :disabled="saveImageFromUrl"
-            @changed="image = $event" ref="image" />
+            @changed="image = $event" ref="image" :aspectRatio="'16 / 9'" />
         <div class="clip-content">
             <FormField :force-wrong="!youtubeId" v-model="url" :border-radius="10"
                 label="Ссылка на видеоролик с youtube" off-margin />
@@ -118,7 +118,7 @@ export default {
 @use '@/assets/styles/components';
 
 .add-clip-container {
-    @include components.container-with-select-image;
+    @include components.container-with-select-image(300px);
 
     .clip-content {
         display: flex;

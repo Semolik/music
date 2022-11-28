@@ -47,10 +47,9 @@ class Track(Base):
     album_id = Column(Integer, ForeignKey("albums.id"), nullable=False)
     album = relationship("Album", foreign_keys=[album_id], backref="tracks")
     track_position = Column(Integer)
-    file_id = Column(Integer, ForeignKey("files.id"), nullable=False)
-    file = relationship("File", foreign_keys=[file_id], cascade="all, delete")
-    picture_id = Column(Integer, ForeignKey("files.id"))
-    picture = relationship("File", foreign_keys=[picture_id])
+    filename = Column(String, nullabe=False)
+    picture_id = Column(Integer, ForeignKey("images.id"))
+    picture = relationship("Image", foreign_keys=[picture_id])
 
 
 class Genre(Base):
@@ -59,8 +58,8 @@ class Genre(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(
         String(int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH'))), nullable=False, unique=True)
-    picture_id = Column(Integer, ForeignKey("files.id"), nullable=False)
-    picture = relationship("File", foreign_keys=[picture_id])
+    picture_id = Column(Integer, ForeignKey("images.id"), nullable=False)
+    picture = relationship("Image", foreign_keys=[picture_id])
 
 
 class Clip(Base):
@@ -83,12 +82,6 @@ class Clip(Base):
     video_id = Column(
         String(int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH'))),
         nullable=False
-    )  # id видео на youtube
-    picture_id = Column(
-        Integer,
-        ForeignKey("files.id")
     )
-    picture = relationship(
-        "File",
-        foreign_keys=[picture_id]
-    )
+    picture_id = Column(Integer, ForeignKey("images.id"), nullable=False)
+    picture = relationship("Image", foreign_keys=[picture_id])

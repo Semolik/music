@@ -47,10 +47,10 @@
     }
 }
 
-@mixin container-with-select-image {
+@mixin container-with-select-image($size: 210px) {
     display: grid;
     gap: 10px;
-    grid-template-columns: 210px 1fr;
+    grid-template-columns: $size 1fr;
 
     @include breakpoints.sm(true) {
         grid-template-columns: 1fr;

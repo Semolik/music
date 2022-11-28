@@ -73,14 +73,3 @@ class PublicProfileLinks(Base):
     vk = Column(
         String(int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
     )
-
-
-class File(Base):
-    __tablename__ = 'files'
-
-    id = Column(Integer, primary_key=True, index=True)
-    file_name = Column(String)
-    original_file_name = Column(String)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user = relationship("User", foreign_keys=[user_id])
-    type = Column(String, default='file')
