@@ -51,7 +51,7 @@ def update_clip(clipData: UpdateMusicianClipForm = Depends(UpdateMusicianClipFor
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Вы не можете изменять этот клип")
     clip = music_crud.update_clip(
-        db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
+        db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image=image_model)
     return set_clip_data(clip=clip)
 
 

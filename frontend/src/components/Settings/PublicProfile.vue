@@ -141,7 +141,7 @@ export default {
         updatePic(target) {
             this.file_changed = true;
             if (!this.file_changed) return
-            let file = target.files;
+            let file = target?.files;
             this.fileChanged = file !== this.userData.picture;
         },
         save() {

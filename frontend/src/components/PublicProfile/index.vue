@@ -2,7 +2,7 @@
     <div class="description" v-if="publicProfileData.description">
         {{ publicProfileData.description }}
     </div>
-    <div class="musician-clips">
+    <div class="musician-clips" v-if="publicProfileData.clips.length > 0">
         <div class="headline">Клипы</div>
         <ClipsList :clips="publicProfileData.clips" :watch-more-link="`/musician/${publicProfileData.id}/clips`" />
     </div>

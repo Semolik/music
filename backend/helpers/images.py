@@ -20,7 +20,8 @@ def set_picture(data: dict, picture: Image):
 
 
 def save_image(upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл"):
-    if not upload_file or not upload_file.filename:
+    print(bytes_io_file)
+    if (not upload_file or not upload_file.filename) if not bytes_io_file else False:
         return
     if bytes_io_file:
         originalFileName = bytes_io_file.name
@@ -37,13 +38,13 @@ def save_image(upload_file: UploadFile, user_id: int, resize_image_options=(400,
         buf = io.BytesIO()
         shutil.copyfileobj(upload_file.file, buf)
         buf.seek(0)
-    # try:
-    image = pillow.open(buf)
-    image.thumbnail(resize_image_options)
-    image_model = file_cruds.create_image(
-        width=image.width, height=image.height, user_id=user_id)
-    image.save('/'.join([settings.IMAGES_FOLDER,
-                         str(image_model.id)+settings.IMAGES_EXTENTION]))
-    return image_model
-    # except:
-    #     raise HTTPException(status_code=500, detail=detail_error_message)
+    try:
+        image = pillow.open(buf)
+        image.thumbnail(resize_image_options)
+        image_model = file_cruds.create_image(
+            width=image.width, height=image.height, user_id=user_id)
+        image.save('/'.join([settings.IMAGES_FOLDER,
+                            str(image_model.id)+settings.IMAGES_EXTENTION]))
+        return image_model
+    except:
+        raise HTTPException(status_code=500, detail=detail_error_message)

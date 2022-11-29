@@ -22,12 +22,10 @@ const router = createRouter({
       children: [
         {
           path: '',
-          meta: { requireAuth: true, roles: [Role.Musician] },
           component: () => import('../components/PublicProfile/index.vue'),
         },
         {
           path: 'clips',
-          meta: { requireAuth: true, roles: [Role.Musician] },
           component: () => import('../components/PublicProfile/clips.vue'),
           props: true
         },
