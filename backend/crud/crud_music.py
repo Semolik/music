@@ -79,8 +79,7 @@ class MusicCrud(CRUDBase):
         if picture:
             track.picture = None
             file_cruds.delete_image(image=picture)
-        track_file = track.file
-        path = '/'.join([settings.TRACKS_FOLDER, track_file.file_name])
+        path = '/'.join([settings.TRACKS_FOLDER, str(track.id)+settings.SONGS_EXTENTION])
         if Path(path).exists():
             os.remove(path)
         self.db.delete(track)

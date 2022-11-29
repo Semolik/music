@@ -1,3 +1,4 @@
+import uuid as uuid_pkg
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
@@ -18,7 +19,7 @@ class CreateAlbum(BaseModel):
 
 class UpdateAlbum(CreateAlbum):
     id: int
-    tracks_ids: List[int]
+    tracks_ids: List[uuid_pkg.UUID]
 
 
 @form_body
@@ -92,7 +93,7 @@ class UploadTrackForm(UploadTrackBase):
 
 
 class TrackAfterUpload(UploadTrackBase):
-    id: int
+    id: uuid_pkg.UUID
     picture: str | None = None
 
 
