@@ -57,13 +57,14 @@ export default {
             this.picture = value;
         },
         runValidation(value) {
-            console.log(this.notEmptyEvent)
             if (this.notEmptyEvent && value && !this.target) {
                 this.warning = true;
             }
         },
-        disabled() {
-            this.detelePicture();
+        disabled(value) {
+            if (value){
+                this.detelePicture();
+            }
         }
     },
     methods: {

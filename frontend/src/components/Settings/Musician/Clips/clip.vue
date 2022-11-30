@@ -11,7 +11,8 @@
                 </span>
             </FormField>
             <Checkbox v-model="saveImageFromUrl" label="Использовать превью ролика как изображние" />
-            <SaveBlock :wrong="wrong" :active="buttonActive" @save="handleButton" />
+            <ButtonsBlock :wrong="wrong" :active="buttonActive" @save="handleButton" @delete="deleteClip"
+                :delete-button="id !== null" />
         </div>
     </form>
 </template>
@@ -20,9 +21,9 @@ import { HTTP } from '/src/http-common.vue';
 import Checkbox from '/src/components/checkbox.vue';
 import FormField from '/src/components/FormField.vue';
 import SelectImage from '/src/components/SelectImage.vue';
-import SaveBlock from '/src/components/Settings/SaveBlock.vue';
+import ButtonsBlock from '/src/components/Settings/ButtonsBlock.vue';
 export default {
-    components: { FormField, SelectImage, SaveBlock, Checkbox },
+    components: { FormField, SelectImage, ButtonsBlock, Checkbox },
     async setup(props) {
         var clipData = { name: '', url: '', imageUrl: '' };
         if (props.id) {
@@ -74,6 +75,10 @@ export default {
                 form.append('id', this.originalClipData.id);
                 await this.update(form);
             }
+        },
+        async deleteClip() {
+            await HTTP.delete('/clips/clip', { params: { clip_id: this.id } });
+            this.$router.push({ path: '/lk/my-music/clips' });
         },
         async update(form) {
             const { data } = await HTTP.put('/clips/clip', form);

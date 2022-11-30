@@ -33,8 +33,15 @@
             </div>
         </div>
         <div class="musician-container-content">
-            <router-view></router-view>
+            <router-view @clip-click="showVideo"></router-view>
         </div>
+        <ModalDialog :active="Boolean(modalData)" padding="" @close="closeVideo" max-width="1000px">
+            <iframe :style="{ aspectRatio: '16 / 9', width: '100%', borderRadius: '10px' }"
+                :src="`https://www.youtube.com/embed/${modalData.video_id}`" title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen v-if="modalData"></iframe>
+        </ModalDialog>
     </div>
 </template>
 <script>
@@ -44,6 +51,7 @@ import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useToast } from 'vue-toastification';
 import { HTTP } from '../http-common.vue';
+import ModalDialog from '/src/components/ModalDialog.vue';
 
 library.add(faUser, faYoutube, faTelegram, faVk);
 
@@ -66,9 +74,10 @@ export default {
     data() {
         return {
             liked: this.publicProfileData.liked,
+            modalData: null,
         }
     },
-    components: { FontAwesomeIcon },
+    components: { FontAwesomeIcon, ModalDialog },
     computed: {
         vkLink() {
             return this.publicProfileData.links.vk
@@ -84,6 +93,12 @@ export default {
         async toggleLike() {
             const { data: { liked } } = await HTTP.post("musician/like", null, { params: { profile_id: this.id } });
             this.liked = liked;
+        },
+        showVideo(videoInfo) {
+            this.modalData = videoInfo;
+        },
+        closeVideo() {
+            this.modalData = null;
         }
     }
 }
@@ -112,8 +127,9 @@ export default {
         overflow: hidden;
         gap: 10px;
         padding: 10px;
+
         @include breakpoints.sm(true) {
-            grid-template-columns:  1fr;
+            grid-template-columns: 1fr;
         }
 
         .head-bg {
@@ -225,6 +241,7 @@ export default {
         .headline {
             font-size: 22px;
             color: var(--color-header-text);
+
             &.center {
                 text-align: center;
             }

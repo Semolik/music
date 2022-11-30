@@ -1,6 +1,9 @@
 <template>
     <div class="buttons custom">
         <slot></slot>
+        <div class="button delete" @click="$emit('delete')" v-if="deleteButton">
+            <FontAwesomeIcon icon="fa-trash" />
+        </div>
         <div :class="['button', 'save', { active: active }, { wrong: wrong }]" @click="$emit('save')">
             <FontAwesomeIcon icon="fa-floppy-disk" />
         </div>
@@ -8,13 +11,14 @@
 </template>
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk,faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-library.add(faFloppyDisk);
+library.add(faFloppyDisk,faTrash);
 export default {
     props: {
         active: Boolean,
         wrong: Boolean,
+        deleteButton: Boolean,
     },
     components: {
         FontAwesomeIcon

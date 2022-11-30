@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
-                    <SaveBlock @save="save" :active="dataChanged" :wrong="fieldsWrong" />
+                    <ButtonsBlock @save="save" :active="dataChanged" :wrong="fieldsWrong" />
                 </Teleport>
             </div>
         </form>
@@ -46,7 +46,7 @@ import FormField from '/src/components/FormField.vue';
 import AnimateInteger from '/src/components/AnimateInteger.vue';
 import { Role } from '/src/helpers/roles.js';
 import SelectImage from '/src/components/SelectImage.vue';
-import SaveBlock from '/src/components/Settings/SaveBlock.vue';
+import ButtonsBlock from '/src/components/Settings/ButtonsBlock.vue';
 
 library.add([faUser, faFloppyDisk, faTrash, faImage])
 
@@ -89,7 +89,7 @@ export default {
         FormField,
         AnimateInteger,
         SelectImage,
-        SaveBlock
+        ButtonsBlock
     },
     watch: {
         userData(value) {

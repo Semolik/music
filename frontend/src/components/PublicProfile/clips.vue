@@ -1,12 +1,6 @@
 <template>
     <selectionHead text="Клипы" :back-url="`/musician/${id}`" />
-    <ClipsList :clips="clips" @clip-click="showVideo" />
-    <ModalDialog :active="Boolean(modalData)" padding="" @close="closeVideo" max-width="1200px" >
-        <iframe :style="{ aspectRatio: '16 / 9', width: '100%', borderRadius: '10px' }"
-            :src="`https://www.youtube.com/embed/${modalData.video_id}`" title="YouTube video player" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen v-if="modalData"></iframe>
-    </ModalDialog>
+    <ClipsList :clips="clips" @clip-click="$emit('clip-click', $event)"/>
     <div class="clip-buttons">
         <div class="load-more" @click="getNextPage" v-if="isbuttonShowed">Загрузить еще</div>
     </div>
@@ -16,7 +10,7 @@
 import selectionHead from './selectionHead.vue';
 import titleMixin from './titleMixin';
 import ClipsList from '/src/components/Settings/Musician/Clips/clipsList.vue';
-import ModalDialog from '/src/components/ModalDialog.vue';
+
 import { useClipsGetter } from '/src/composables/clips';
 export default {
     setup(props) {
@@ -27,22 +21,14 @@ export default {
         id: String
     },
     mixins: [titleMixin],
-    components: { selectionHead, ClipsList, ModalDialog },
+    components: { selectionHead, ClipsList },
     data() {
         return {
             buttonShowed: true,
             countOnPage: Number(this.VITE_CLIP_PAGE_COUNT),
-            modalData: null,
         }
     },
-    methods: {
-        showVideo(videoInfo) {
-            this.modalData = videoInfo;
-        },
-        closeVideo() {
-            this.modalData = null;
-        }
-    }
+    
 }
 </script>
 <style scoped lang="scss">

@@ -5,11 +5,8 @@
             <FormField :border-radius="10" label="Название жанра" v-model="genreName" not-empty>
                 <span :class="['count', { wrong: genreNameLimit < 0 }]">{{ genreNameLimit }}</span>
             </FormField>
-            <SaveBlock @click="save" :active="buttonActive" :wrong="dataWrong">
-                <div class="button delete" @click="detele" v-if="!add">
-                    <FontAwesomeIcon icon="fa-trash" />
-                </div>
-            </SaveBlock>
+            <ButtonsBlock @click="save" :active="buttonActive" :wrong="dataWrong" :delete-button="!add"
+                @delete="deleteGenre" />
         </div>
     </div>
 </template>
@@ -17,7 +14,7 @@
 import FormField from '/src/components/FormField.vue';
 import SelectImage from '/src/components/SelectImage.vue';
 import handleError from '/src/composables/errors';
-import SaveBlock from '/src/components/Settings/SaveBlock.vue';
+import ButtonsBlock from '/src/components/Settings/ButtonsBlock.vue';
 import { HTTP } from '/src/http-common.vue';
 import { useToast } from "vue-toastification";
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -32,7 +29,7 @@ export default {
         },
         add: Boolean,
     },
-    components: { SelectImage, FormField, SaveBlock, FontAwesomeIcon },
+    components: { SelectImage, FormField, ButtonsBlock, FontAwesomeIcon },
     setup() {
         const { VITE_MAX_GENRE_NAME_LENGTH } = import.meta.env;
         const toast = useToast();
@@ -92,7 +89,7 @@ export default {
                     this.toast.error(handleError(error).message);
                 })
         },
-        detele() {
+        deleteGenre() {
             HTTP.delete('genres/genre', { params: { id: this.genreData.id } })
                 .then(response => {
                     this.$router.push({ path: '/lk/edit-musician-section/genres' })

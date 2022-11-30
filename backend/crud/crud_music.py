@@ -5,9 +5,9 @@ from typing import List
 from backend.crud.crud_file import file_cruds
 from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
-from backend.core.config import settings, env_config
+from backend.core.config import settings
 from backend.models.files import Image
-from backend.models.music import Album, Clip, Genre, Track
+from backend.models.music import Album, Genre, Track
 from backend.models.user import FavoriteMusicians
 from backend.models.music import FavoriteTracks
 
@@ -41,26 +41,6 @@ class MusicCrud(CRUDBase):
     def get_musician_albums(self, musician_id: int) -> List[Album]:
         return self.db.query(Album).filter(Album.musician_id == musician_id).all()
 
-    def get_musician_clips(self, musician_id: int, page_size: int = int(env_config.get('VITE_CLIP_PAGE_COUNT')), page: int = 1):
-        end = page * page_size
-        return self.db.query(Clip).filter(Clip.musician_id == musician_id).slice(end-page_size, end).all()
-
-    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: Image):
-        return self.create(Clip(musician_id=musician_id, picture=image_model, name=name, video_id=video_id))
-
-    def update_clip(self, db_clip: Clip, name: str, video_id: str, image: Image):
-        db_clip.name = name
-        db_clip.video_id = video_id
-        if image:
-            file_cruds.replace_old_picture(model=db_clip, new_picture=image)
-        self.db.add(db_clip)
-        self.db.commit()
-        self.db.refresh(db_clip)
-        return db_clip
-
-    def get_clip_by_id(self, clip_id: int) -> Clip | None:
-        return self.db.query(Clip).filter(Clip.id == clip_id).first()
-
     def get_album(self, album_id: int) -> Album:
         return self.get(album_id, Album)
 
@@ -79,7 +59,8 @@ class MusicCrud(CRUDBase):
         if picture:
             track.picture = None
             file_cruds.delete_image(image=picture)
-        path = '/'.join([settings.TRACKS_FOLDER, str(track.id)+settings.SONGS_EXTENTION])
+        path = '/'.join([settings.TRACKS_FOLDER,
+                        str(track.id)+settings.SONGS_EXTENTION])
         if Path(path).exists():
             os.remove(path)
         self.db.delete(track)
