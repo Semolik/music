@@ -83,7 +83,6 @@ export default {
     },
     resetError() {
       this.error = null;
-      console.log(this.error)
     }
   },
 }

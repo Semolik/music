@@ -1,6 +1,7 @@
 from backend.core.config import settings
 from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
+from backend.crud.crud_clips import clips_cruds
 from backend.helpers.images import set_picture
 from backend.helpers.clips import set_clip_data
 
@@ -21,7 +22,6 @@ def get_public_profile_data(db_public_profile, full_links):
         links[key] = ((baseUrl.format(value)
                       if baseUrl else value) if value else None) if full_links else value
     public_profile_data['links'] = links
-
     public_profile_data = set_picture(
         public_profile_data, db_public_profile.picture)
     return public_profile_data
@@ -40,7 +40,7 @@ def get_musician_profile_as_dict(user_id: int = None, public_profile_id: int = N
     public_profile_data['clips'] = list(
         map(
             set_clip_data,
-            music_crud.get_musician_clips(
+            clips_cruds.get_musician_clips(
                 musician_id=db_public_profile.id, page=1, page_size=3)
         )
     )

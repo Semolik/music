@@ -81,6 +81,7 @@ export default {
     border-radius: 15px;
     flex-direction: column;
     gap: 20px;
+    height: 100%;
 
     .upload-button {
         @include components.button;

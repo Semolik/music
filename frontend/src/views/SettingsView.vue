@@ -16,7 +16,7 @@
             <router-view v-slot="{ Component, route }" appear>
                 <Transition name="list" mode="out-in">
                     <div :key="route.fullPath" class="transition-wrapper">
-                        <component :is="Component"/>
+                        <component :is="Component" />
                     </div>
                 </Transition>
             </router-view>
@@ -58,9 +58,11 @@ export default {
     background-color: var(--color-background-mute);
     width: 100%;
     border-radius: 15px;
+
     @include breakpoints.lg(true) {
         grid-template-columns: 1fr;
     }
+
     @include breakpoints.xl(true) {
         border-radius: 0;
     }
@@ -94,10 +96,12 @@ export default {
 
 
             }
+
             &.lk-link.router-link-exact-active,
             &.router-link-active:not(.lk-link) {
                 background-color: var(--color-background-mute-3);
             }
+
             &.lk-link:not(.lk-link.router-link-exact-active):hover,
             &:hover:not(.router-link-active) {
                 background-color: var(--color-background-mute-2);
