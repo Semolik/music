@@ -1,14 +1,16 @@
 from backend.core.config import settings
-from backend.crud.crud_musician import musician_crud
-from backend.crud.crud_user import user_cruds
-from backend.crud.crud_clips import clips_cruds
+from backend.crud.crud_musician import MusicianCrud
+from backend.crud.crud_user import UserCruds
+from backend.db.db import get_db
+from sqlalchemy.orm import Session
+from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.images import set_picture
 from backend.helpers.clips import set_clip_data
 
 
-def get_public_profile_as_dict(user_id: int = None, public_profile_id: int = None, full_links=False):
-    db_public_profile = user_cruds.get_public_profile(
-        user_id=user_id) if user_id else user_cruds.get_public_profile_by_id(id=public_profile_id)
+def get_public_profile_as_dict(db: Session, user_id: int = None, public_profile_id: int = None, full_links=False,):
+    db_public_profile = UserCruds(db).get_public_profile(
+        user_id=user_id) if user_id else UserCruds(db).get_public_profile_by_id(id=public_profile_id)
     if not db_public_profile:
         return
     return get_public_profile_data(db_public_profile=db_public_profile, full_links=full_links)
@@ -27,20 +29,20 @@ def get_public_profile_data(db_public_profile, full_links):
     return public_profile_data
 
 
-def get_musician_profile_as_dict(user_id: int = None, public_profile_id: int = None, full_links=False):
-    db_public_profile = user_cruds.get_public_profile_by_id(
+def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profile_id: int = None, full_links=False):
+    db_public_profile = UserCruds(db).get_public_profile_by_id(
         id=public_profile_id)
     if not db_public_profile:
         return
     public_profile_data = get_public_profile_data(
-        db_public_profile=db_public_profile, full_links=full_links)
+        db_public_profile=db_public_profile, full_links=full_links, db=db)
     if user_id:
-        public_profile_data['liked'] = musician_crud.musician_is_liked(
+        public_profile_data['liked'] = MusicianCrud(db).musician_is_liked(
             musician_id=db_public_profile.id, user_id=user_id)
     public_profile_data['clips'] = list(
         map(
             set_clip_data,
-            clips_cruds.get_musician_clips(
+            ClipsCruds(db).get_musician_clips(
                 musician_id=db_public_profile.id, page=1, page_size=3)
         )
     )

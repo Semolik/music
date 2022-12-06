@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
-from backend.crud.crud_file import file_cruds
-from backend.crud.crud_user import user_cruds
+from backend.crud.crud_file import FileCruds
+from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
 from backend.models.files import Image
 from backend.models.music import Album, Genre, Track
@@ -15,7 +15,7 @@ class AlbumsCruds(CRUDBase):
 
     def create_album(self, user_id: int, name: str,  date: datetime, picture: Image | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
-        musician = user_cruds.get_public_profile(user_id=user_id)
+        musician = UserCruds(self.db).get_public_profile(user_id=user_id)
         db_album = Album(musician_id=musician.id, name=name,
                          open_date=date, picture=db_image, genres=genres, uploaded=False)
         return self.create(model=db_album)
@@ -25,7 +25,8 @@ class AlbumsCruds(CRUDBase):
         album.open_date = date
         album.genres = genres
         if image:
-            file_cruds.replace_old_picture(model=album, new_picture=image)
+            FileCruds(self.db).replace_old_picture(
+                model=album, new_picture=image)
         tracks = album.tracks
         for index, track_id in enumerate(tracks_ids):
             for track in tracks:
@@ -66,6 +67,3 @@ class AlbumsCruds(CRUDBase):
 
     def get_album(self, album_id: int):
         return self.get(id=album_id, model=Album)
-
-
-album_cruds = AlbumsCruds()

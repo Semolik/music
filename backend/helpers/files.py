@@ -9,7 +9,7 @@ from backend.models.files import File
 from fastapi import UploadFile
 from backend.schemas.file import File as FileSchema
 from backend.core.config import settings
-from backend.crud.crud_file import file_cruds
+from backend.crud.crud_file import FileCruds
 from pathlib import Path
 import requests
 import shutil

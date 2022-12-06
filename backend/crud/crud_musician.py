@@ -2,8 +2,8 @@ from datetime import datetime
 import os
 from pathlib import Path
 from typing import List
-from backend.crud.crud_file import file_cruds
-from backend.crud.crud_user import user_cruds
+from backend.crud.crud_file import FileCruds
+from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.files import Image
@@ -31,6 +31,3 @@ class MusicianCrud(CRUDBase):
         else:
             self.delete(model=liked)
             return False
-
-
-musician_crud = MusicianCrud()

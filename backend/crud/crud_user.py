@@ -5,7 +5,7 @@ from backend.helpers.roles import set_status
 from backend.helpers.images import set_picture
 from backend.core.config import settings
 from backend.helpers.files import set_files_data
-from backend.crud.crud_file import file_cruds
+from backend.crud.crud_file import FileCruds
 from backend.models.files import Image
 from backend.models.music import Album
 from backend.schemas.user import ChangeRoleRequestInfo, PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
@@ -19,8 +19,8 @@ from fastapi import HTTPException, status
 
 class UserCruds(CRUDBase):
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, session) -> None:
+        self.db = session
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def create(self, model):
@@ -61,9 +61,10 @@ class UserCruds(CRUDBase):
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if remove_picture:
-            file_cruds.delete_image(user.picture)
+            FileCruds(self.db).delete_image(user.picture)
         elif userPic:
-            file_cruds.replace_old_picture(model=user, new_picture=userPic)
+            FileCruds(self.db).replace_old_picture(
+                model=user, new_picture=userPic)
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
@@ -105,9 +106,9 @@ class UserCruds(CRUDBase):
             value = data_obj.get(var)
             setattr(public_proile_links, var, value)
         if remove_picture:
-            file_cruds.delete_image(image=public_proile.picture)
+            FileCruds(self.db).delete_image(image=public_proile.picture)
         elif userPublicPicture:
-            file_cruds.replace_old_picture(
+            FileCruds(self.db).replace_old_picture(
                 model=public_proile, new_picture=userPublicPicture)
         self.db.add(public_proile)
         self.db.commit()
@@ -206,6 +207,3 @@ class UserCruds(CRUDBase):
         answer_obj['time_created'] = db_answer.time_created.strftime(
             settings.DATETIME_FORMAT)
         return answer_obj
-
-
-user_cruds = UserCruds()

@@ -1,10 +1,8 @@
 from typing import Any, List
-from backend.db.session import session
-from backend.db.base_class import Base
 
 
 class CRUDBase:
-    def __init__(self):
+    def __init__(self, session) -> None:
         self.db = session
 
     def get(self, id: Any, model):
@@ -23,6 +21,3 @@ class CRUDBase:
     def delete(self, model):
         self.db.delete(model)
         self.db.commit()
-
-
-crud_base = CRUDBase()

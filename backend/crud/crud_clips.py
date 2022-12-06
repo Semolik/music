@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 from typing import List
-from backend.crud.crud_file import file_cruds
+from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import env_config
 from backend.models.files import Image
@@ -21,7 +21,8 @@ class ClipsCruds(CRUDBase):
         db_clip.name = name
         db_clip.video_id = video_id
         if image:
-            file_cruds.replace_old_picture(model=db_clip, new_picture=image)
+            FileCruds(self.db).replace_old_picture(
+                model=db_clip, new_picture=image)
         self.db.add(db_clip)
         self.db.commit()
         self.db.refresh(db_clip)
@@ -29,6 +30,3 @@ class ClipsCruds(CRUDBase):
 
     def get_clip_by_id(self, clip_id: int) -> Clip | None:
         return self.db.query(Clip).filter(Clip.id == clip_id).first()
-
-
-clips_cruds = ClipsCruds()

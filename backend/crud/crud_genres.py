@@ -28,6 +28,3 @@ class GenresCruds(CRUDBase):
 
     def detete_genre(self, genre_id: int):
         return self.db.query(Genre).filter(Genre.id == genre_id).delete()
-
-
-genres_cruds = GenresCruds()

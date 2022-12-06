@@ -39,6 +39,3 @@ class TracksCrud(CRUDBase):
 
     def track_is_liked(self, track_id: int, user_id: int):
         return bool(self.get_liked_track_model(track_id=track_id, user_id=user_id))
-
-
-tracks_crud = TracksCrud()

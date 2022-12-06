@@ -5,7 +5,7 @@ from PIL import Image as pillow
 import logging
 import shutil
 from fastapi import UploadFile, HTTPException
-from backend.crud.crud_file import file_cruds
+from backend.crud.crud_file import FileCruds
 from pathlib import Path
 logger = logging.getLogger(__name__)
 supported_image_extensions = {
