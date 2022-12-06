@@ -1,8 +1,9 @@
 from datetime import datetime
+from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import album_cruds
-from backend.crud.crud_music import music_crud
+from backend.crud.crud_tracks import tracks_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.images import save_image
 from backend.helpers.music import save_track, set_full_track_data
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/tracks", tags=['Треки'])
 def upload_track(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPicture: UploadFile = File(default=False), track: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    db_album = music_crud.get_album(album_id=trackData.album_id)
+    db_album = album_cruds.get_album(album_id=trackData.album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -37,12 +38,12 @@ def upload_track(trackData: UploadTrackForm = Depends(UploadTrackForm), trackPic
 @router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
 def like_track(track_id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    db_track = music_crud.get_track(track_id=track_id)
+    db_track = tracks_crud.get_track(track_id=track_id)
     if not db_track:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")
     current_user_id = Authorize.get_jwt_subject()
-    liked = music_crud.toggle_like_track(
+    liked = tracks_crud.toggle_like_track(
         track_id=db_track.id, user_id=current_user_id)
     return Liked(liked=liked)
 
@@ -50,7 +51,7 @@ def like_track(track_id: int, Authorize: AuthJWT = Depends()):
 @router.get('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
 def get_track(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_optional()
-    db_track = music_crud.get_track(track_id=id)
+    db_track = tracks_crud.get_track(track_id=id)
     if not db_track:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")
@@ -61,3 +62,11 @@ def get_track(id: int, Authorize: AuthJWT = Depends()):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Трек не найден")
     return set_full_track_data(db_track, user_id=current_user_id)
+
+
+# @router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
+# def like_track(page: int, Authorize: AuthJWT = Depends()):
+#     Authorize.jwt_required()
+#     current_user_id = Authorize.get_jwt_subject()
+#     # liked = music_crud.
+#     # return Liked(liked=liked)

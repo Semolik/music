@@ -1,6 +1,7 @@
 from typing import Any
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi_jwt_auth import AuthJWT
+from backend.db.db import get_db
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.user import UserAuth, UserInfo
 from backend.crud.crud_user import user_cruds
@@ -38,7 +39,8 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 
 @router.post("/signup", response_model=UserInfo, status_code=201)
-def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends()) -> Any:
+def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends(), Session=Depends(get_db)) -> Any:
+    print(Session)
     """
     Создание пользователя без необходимости последующей авторизации
     """

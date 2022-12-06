@@ -1,8 +1,5 @@
-from pathlib import Path
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-from core.config import settings
+from backend.db.db import get_db
+from backend.core.config import settings
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from fastapi.testclient import TestClient
@@ -10,11 +7,10 @@ from fastapi import FastAPI
 import pytest
 from typing import Generator
 from typing import Any
-from models.user import User, File
-from models.user import Base
-from db.db import get_db
-from api.api_v1.api import api_v1_router
+from backend.models.user import Base
+from backend.api.api_v1.api import api_v1_router
 from sqlalchemy_utils import database_exists, create_database
+from fastapi_jwt_auth import AuthJWT
 
 
 def start_application():
@@ -22,8 +18,14 @@ def start_application():
     app.include_router(api_v1_router)
     return app
 
+
+@AuthJWT.load_config
+def get_config():
+    return settings.JWTsettings()
+
+
 engine = create_engine(
-    settings.TEST_DATABASE_URI #DATABASE_URI
+    settings.TEST_DATABASE_URI  # DATABASE_URI
 )
 if not database_exists(engine.url):
     create_database(engine.url)

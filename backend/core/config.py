@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         'http://localhost:4000', 'http://192.168.50.106:4000', 'http://192.168.1.133:4000']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
+    TEST_DATABASE_URI: Optional[str] = DATABASE_URI+"_test"
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
     IMAGES_FOLDER: str = ASSETS_FOLDER+'images'

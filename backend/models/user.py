@@ -32,7 +32,8 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     is_musician = Column(Boolean, default=False)
     is_radio_station = Column(Boolean, default=False)
-    picture_id = Column(UUID(as_uuid=True), ForeignKey("images.id", ondelete='SET NULL'))
+    picture_id = Column(UUID(as_uuid=True), ForeignKey(
+        "images.id", ondelete='SET NULL', name='users_picture_id_fkey'))
     picture = relationship("Image", foreign_keys=[picture_id])
     public_profile = relationship(
         "PublicProfile", back_populates="user", uselist=False)
@@ -52,7 +53,8 @@ class PublicProfile(Base):
         ), nullable=True)
     links = relationship("PublicProfileLinks",
                          back_populates="public_profile", uselist=False)
-    picture_id = Column(UUID(as_uuid=True), ForeignKey("images.id", ondelete='SET NULL'))
+    picture_id = Column(UUID(as_uuid=True), ForeignKey(
+        "images.id", ondelete='SET NULL'))
     picture = relationship("Image", foreign_keys=[picture_id])
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", foreign_keys=[

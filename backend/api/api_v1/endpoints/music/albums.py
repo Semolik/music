@@ -3,7 +3,6 @@ from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import album_cruds
-from backend.crud.crud_music import music_crud
 from backend.crud.crud_user import user_cruds
 from backend.helpers.albums import is_album_showed
 from backend.helpers.images import save_image
@@ -32,7 +31,7 @@ def create_album(albumData: CreateAlbumForm = Depends(CreateAlbumForm), albumPic
 @router.put('/album/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumIsCLosed)
 def close_album_uploading(album_id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    db_album = music_crud.get_album(album_id=album_id)
+    db_album = album_cruds.get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -47,7 +46,7 @@ def close_album_uploading(album_id: int, Authorize: AuthJWT = Depends()):
 @router.put('/album', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def create_album(albumData: UpdateAlbumForm = Depends(UpdateAlbumForm), albumPicture: UploadFile = File(default=False), Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    db_album = music_crud.get_album(album_id=albumData.id)
+    db_album = album_cruds.get_album(album_id=albumData.id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -71,7 +70,7 @@ def create_album(albumData: UpdateAlbumForm = Depends(UpdateAlbumForm), albumPic
 @router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_optional()
-    db_album = music_crud.get_album(album_id=id)
+    db_album = album_cruds.get_album(album_id=id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -86,7 +85,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
 @router.delete('/album', responses={**NOT_FOUND_ALBUM})
 def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    db_album = music_crud.get_album(album_id=id)
+    db_album = album_cruds.get_album(album_id=id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -94,7 +93,7 @@ def get_album_by_id(id: int, Authorize: AuthJWT = Depends()):
     if not album_cruds.album_belongs_to_user(album=db_album, user_id=current_user_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Нет прав на удаление данного альбома")
-    music_crud.delete_album(album=db_album)
+    album_cruds.delete_album(album=db_album)
     return {'detail': 'Альбом удален'}
 
 

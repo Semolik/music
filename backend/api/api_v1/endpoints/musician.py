@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from backend.crud.crud_music import music_crud
+from backend.crud.crud_musician import musician_crud
 from backend.helpers.users import get_musician_profile_as_dict
 from backend.schemas.music import Liked
 from backend.schemas.music import MusicianFullInfo
@@ -27,6 +27,6 @@ def like_musician(profile_id: int, Authorize: AuthJWT = Depends()):
     if not user_cruds.get_public_profile_by_id(id=profile_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    liked = music_crud.toggle_like_musician(
+    liked = musician_crud.toggle_like_musician(
         musician_id=profile_id, user_id=current_user_id)
     return Liked(liked=liked)

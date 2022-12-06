@@ -1,6 +1,8 @@
 
 from typing import List
-from backend.crud.crud_music import music_crud
+from backend.crud.crud_tracks import tracks_crud
+from backend.crud.crud_genres import genres_cruds
+from backend.crud.crud_albums import album_cruds
 from backend.helpers.images import set_picture
 from backend.helpers.users import get_musician_profile_as_dict
 from backend.models.files import Image
@@ -56,7 +58,7 @@ def set_album_info(db_album: Album, user_id: int | None = None):
 
 def set_album_tracks(db_album, db_album_obj, user_id: int = None):
     db_album_obj['tracks'] = [set_track_data(track=track, user_id=user_id)
-                              for track in music_crud.get_album_tracks(album_id=db_album.id)]
+                              for track in album_cruds.get_album_tracks(album_id=db_album.id)]
     return db_album_obj
 
 
@@ -64,7 +66,7 @@ def set_track_data(track: Track, user_id: int = None):
     track_obj = set_picture(track.as_dict(), track.picture)
     track_obj['url'] = get_track_url(track)
     if user_id:
-        track_obj['liked'] = music_crud.track_is_liked(
+        track_obj['liked'] = tracks_crud.track_is_liked(
             track_id=track.id, user_id=user_id)
     return track_obj
 
@@ -85,7 +87,7 @@ def validate_genres(genres_ids: List[int]):
     genres = []
     if genres_ids:
         for genre_id in genres_ids:
-            genre = music_crud.get_genre_by_id(id=genre_id)
+            genre = genres_cruds.get_genre_by_id(id=genre_id)
             if not genre:
                 not_found_genres_ids.append(genre_id)
             else:

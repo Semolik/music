@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import FileResponse
-from backend.crud.crud_music import music_crud
+from backend.crud.crud_tracks import tracks_crud
 from backend.crud.crud_file import file_cruds
 from backend.core.config import settings
 
@@ -36,7 +36,7 @@ def get_image(file_id):
 
 @router.get('/tracks/{track_id}', response_class=FileResponse)
 def get_image(track_id):
-    db_file = music_crud.get_track(track_id=track_id)
+    db_file = tracks_crud.get_track(track_id=track_id)
     if not db_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     file_path = os.path.join(settings.TRACKS_FOLDER,

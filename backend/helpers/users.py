@@ -1,5 +1,5 @@
 from backend.core.config import settings
-from backend.crud.crud_music import music_crud
+from backend.crud.crud_musician import musician_crud
 from backend.crud.crud_user import user_cruds
 from backend.crud.crud_clips import clips_cruds
 from backend.helpers.images import set_picture
@@ -35,7 +35,7 @@ def get_musician_profile_as_dict(user_id: int = None, public_profile_id: int = N
     public_profile_data = get_public_profile_data(
         db_public_profile=db_public_profile, full_links=full_links)
     if user_id:
-        public_profile_data['liked'] = music_crud.musician_is_liked(
+        public_profile_data['liked'] = musician_crud.musician_is_liked(
             musician_id=db_public_profile.id, user_id=user_id)
     public_profile_data['clips'] = list(
         map(

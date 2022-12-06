@@ -4,11 +4,15 @@ from backend.crud.crud_file import file_cruds
 from backend.crud.crud_user import user_cruds
 from backend.db.base import CRUDBase
 from backend.models.files import Image
-from backend.models.music import Album, Genre
+from backend.models.music import Album, Genre, Track
 from backend.models.user import PublicProfile
 
 
 class AlbumsCruds(CRUDBase):
+    def get_album_tracks(self, album_id: int) -> List[Track]:
+        tracks = self.db.query(Track).filter(Track.album_id == album_id).all()
+        return tracks if None in [track.track_position for track in tracks] else sorted(tracks, key=lambda track: track.track_position)
+
     def create_album(self, user_id: int, name: str,  date: datetime, picture: Image | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
         musician = user_cruds.get_public_profile(user_id=user_id)
@@ -49,6 +53,19 @@ class AlbumsCruds(CRUDBase):
         self.db.commit()
         self.db.refresh(album)
         return album
+
+    def delete_album(self, album: Album):
+        for track in album.tracks:
+            self.delete_track(track=track)
+        picture = album.picture
+        if picture:
+            album.picture = None
+            file_cruds.delete_image(image=picture)
+        self.db.delete(album)
+        self.db.commit()
+
+    def get_album(self, album_id: int):
+        return self.get(id=album_id, model=Album)
 
 
 album_cruds = AlbumsCruds()
