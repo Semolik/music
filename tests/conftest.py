@@ -1,3 +1,4 @@
+from starlette.testclient import TestClient
 from backend.db.db import get_db
 from backend.core.config import settings
 from sqlalchemy.orm import sessionmaker
