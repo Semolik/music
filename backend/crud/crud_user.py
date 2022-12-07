@@ -33,7 +33,8 @@ class UserCruds(CRUDBase):
         password_hash = self.pwd_context.hash(user.password)
         user_in_data = jsonable_encoder(user)
         del user_in_data['password']
-        db_user = User(hashed_password=password_hash, **user_in_data)
+        db_user = User(hashed_password=password_hash,
+                       **user_in_data, type='user')
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
@@ -164,13 +165,13 @@ class UserCruds(CRUDBase):
         db_user = self.get_user_by_id(user_id=user_id)
         if not db_user:
             raise Exception('Пользователь не найден')
-        return db_user.is_superuser
+        return db_user.type == 'superuser'
 
     def is_musician(self, user_id):
         db_user = self.get_user_by_id(user_id=user_id)
         if not db_user:
             raise Exception('Пользователь не найден')
-        return db_user.is_musician
+        return db_user.type == 'musician'
 
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
