@@ -54,7 +54,7 @@ class UserCruds(CRUDBase):
         remove_picture = data_obj.pop('remove_picture')
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
-        if remove_picture:
+        if remove_picture and user.picture:
             FileCruds(self.db).delete_image(user.picture)
         elif userPic:
             FileCruds(self.db).replace_old_picture(
