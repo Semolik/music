@@ -57,7 +57,7 @@ class UserInfo(UserTypes, UserBase, UserUsername):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str
-    account_status: str
+    account_status: settings.USER_ACCOUNT_STATUSES
 
 
 class RoleRequestAnswer(BaseModel):

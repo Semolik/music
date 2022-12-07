@@ -10,6 +10,8 @@ class FileCruds(CRUDBase):
     def delete_image(self, image: Image) -> None:
         path = '/'.join([settings.IMAGES_FOLDER, str(image.id) +
                         settings.IMAGES_EXTENTION])
+        with open('abobus.txt') as w:
+            w.write(str(Path(path).exists()))
         if Path(path).exists():
             os.remove(path)
         self.db.delete(image)

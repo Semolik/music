@@ -29,9 +29,7 @@ class User(Base):
             int(env_config.get('VITE_MAX_LOGIN_LENGTH'))
         ), index=True, nullable=False)
     hashed_password = Column(String, index=True, nullable=False)
-    is_superuser = Column(Boolean, default=False)
-    is_musician = Column(Boolean, default=False)
-    is_radio_station = Column(Boolean, default=False)
+    type = Column(String, default=False)
     picture_id = Column(UUID(as_uuid=True), ForeignKey(
         "images.id", ondelete='SET NULL', name='users_picture_id_fkey'))
     picture = relationship("Image", foreign_keys=[picture_id])
