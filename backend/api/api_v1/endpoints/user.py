@@ -20,7 +20,7 @@ def update_user_data(
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = UserCruds(db).get_user_by_id(current_user_id)
-    print(current_user_id)
+    print(db_user)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="неправильное имя пользователя или пароль")

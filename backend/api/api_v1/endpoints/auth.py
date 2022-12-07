@@ -51,6 +51,9 @@ def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends(), db
             detail="Такой пользователь уже существует",
         )
     db_user = UserCruds(db).create_user(user_in)
+    print(db_user)
+    print(UserCruds(db).get_user_by_id(db_user.id))
+
     access_token = Authorize.create_access_token(subject=db_user.id)
     refresh_token = Authorize.create_refresh_token(subject=db_user.id)
     Authorize.set_access_cookies(access_token)

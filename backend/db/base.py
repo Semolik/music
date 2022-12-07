@@ -1,4 +1,5 @@
 from typing import Any, List
+from backend.db.base_class import Base
 
 
 class CRUDBase:
