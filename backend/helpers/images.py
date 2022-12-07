@@ -7,6 +7,7 @@ import shutil
 from fastapi import UploadFile, HTTPException
 from backend.crud.crud_file import FileCruds
 from pathlib import Path
+from sqlalchemy.orm import Session
 logger = logging.getLogger(__name__)
 supported_image_extensions = {
     ex for ex, f in pillow.registered_extensions().items() if f in pillow.OPEN}
@@ -19,8 +20,7 @@ def set_picture(data: dict, picture: Image):
     return data
 
 
-def save_image(upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл"):
-    print(bytes_io_file)
+def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл"):
     if (not upload_file or not upload_file.filename) if not bytes_io_file else False:
         return
     if bytes_io_file:
@@ -41,7 +41,7 @@ def save_image(upload_file: UploadFile, user_id: int, resize_image_options=(400,
     try:
         image = pillow.open(buf)
         image.thumbnail(resize_image_options)
-        image_model = file_cruds.create_image(
+        image_model = FileCruds(db).create_image(
             width=image.width, height=image.height, user_id=user_id)
         image.save('/'.join([settings.IMAGES_FOLDER,
                             str(image_model.id)+settings.IMAGES_EXTENTION]))

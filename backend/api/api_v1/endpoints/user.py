@@ -23,7 +23,7 @@ def update_user_data(
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="неправильное имя пользователя или пароль")
-    db_image = save_image(upload_file=userPicture,
+    db_image = save_image(db=db, upload_file=userPicture,
                           user_id=db_user.id)
     db_user_updated = UserCruds(db).update(
         user=db_user, new_user_data=UserData, userPic=db_image)
@@ -70,7 +70,7 @@ def update_user_public_profile_data(
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
     db_public_profile = UserCruds(
         db).get_public_profile(user_id=current_user_id)
-    db_image = save_image(upload_file=userPublicPicture,
+    db_image = save_image(db=db, upload_file=userPublicPicture,
                           user_id=db_user.id)
     db_public_profile_updated = UserCruds(db).update_public_profile(
         public_proile=db_public_profile, new_public_proile_data=PublicProfileData, userPublicPicture=db_image)

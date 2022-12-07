@@ -15,8 +15,6 @@ from fastapi_jwt_auth import AuthJWT
 
 from tests.utils.users import authentication_token_from_username
 
-# from utils.users import authentication_token_from_username
-
 
 def start_application():
     app = FastAPI()

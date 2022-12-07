@@ -9,16 +9,11 @@ from backend.schemas.user import UserRegister
 
 def user_authentication_cookies(client: TestClient, username: str, password: str):
     user_data = UserRegister(username=username, password=password)
-    response = client.post("/login", data=user_data.dict())
-    print(response)
+    response = client.post("/login", json=user_data.dict())
     return response.cookies
 
 
 def authentication_token_from_username(client: TestClient, username: str, db: Session):
-    """
-    Return a valid token for the user with given email.
-    If the user doesn't exist it is created first.
-    """
     password = "random-passW0rd"
     user = UserCruds(db).get_user_by_username(username=username)
     if not user:
