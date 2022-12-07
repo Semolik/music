@@ -17,18 +17,17 @@ def test_create_user(client: TestClient):
     global cookies
     cookies = response.cookies
 
-    assert "access_token_cookie" in response.headers['set-cookie']
-
     assert response.status_code == 201
 
 
-def test_update_user_info(client: TestClient):
+def test_update_user_info(client: TestClient, normal_user_token_cookies):
 
     data = {
         "first_name": "",
         "last_name": "test_last_name",
         "remove_picture": False
     }
+    print(normal_user_token_cookies)
     response = client.put(
-        "/me", data=data, cookies={'access_token_cookie': cookies['access_token_cookie']})
+        "/me", data=data, cookies=normal_user_token_cookies)
     assert response.status_code == 200

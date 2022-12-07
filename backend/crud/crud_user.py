@@ -23,12 +23,6 @@ class UserCruds(CRUDBase):
         self.db = session
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    def create(self, model):
-        self.db.add(model)
-        self.db.commit()
-        self.db.refresh(model)
-        return model
-
     def get_user_by_id(self, user_id: int) -> User | None:
         return self.db.query(User).filter(User.id == user_id).first()
 

@@ -12,6 +12,7 @@ router = APIRouter(tags=['Авторизация'])
 
 @router.post('/login', response_model=UserInfo, responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def login(user_in: UserAuth, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+
     db_user = UserCruds(db).login(user_in)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
