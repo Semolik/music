@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from backend.crud.crud_file import file_cruds
+from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.music import Track
@@ -13,7 +13,7 @@ class TracksCrud(CRUDBase):
         picture = track.picture
         if picture:
             track.picture = None
-            file_cruds.delete_image(image=picture)
+            FileCruds(self.db).delete_image(image=picture)
         path = '/'.join([settings.TRACKS_FOLDER,
                         str(track.id)+settings.SONGS_EXTENTION])
         if Path(path).exists():

@@ -35,7 +35,9 @@ def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profil
     if not db_public_profile:
         return
     public_profile_data = get_public_profile_data(
-        db_public_profile=db_public_profile, full_links=full_links, db=db)
+        db_public_profile=db_public_profile,
+        full_links=full_links
+    )
     if user_id:
         public_profile_data['liked'] = MusicianCrud(db).musician_is_liked(
             musician_id=db_public_profile.id, user_id=user_id)

@@ -112,7 +112,7 @@ export default {
             if (this.add) {
                 return this.genreNameLimit < 0 || this.genreName.length === 0 || !this.targetPicture
             }
-            if (this.genreNameLimit !== null) return
+            if (this.genreNameLimit === null) return true
             return this.genreNameLimit < 0 || this.genreName.length === 0
         },
         dataChanged() {

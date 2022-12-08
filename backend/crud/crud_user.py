@@ -112,57 +112,6 @@ class UserCruds(CRUDBase):
         self.db.refresh(public_proile)
         return public_proile
 
-    def send_change_role_message(self, user_id, message, files, account_status):
-        db_change_role_request = ChangeRoleRequest(
-            files=files,
-            message=message,
-            user_id=user_id,
-            account_status=account_status
-        )
-        return self.create(db_change_role_request)
-
-    def get_user_change_role_messages(self, user_id):
-        records: List[ChangeRoleRequest] =\
-            self.db.query(ChangeRoleRequest)\
-            .order_by(ChangeRoleRequest.id.desc())\
-            .filter(ChangeRoleRequest.user_id == user_id)\
-            .all()
-        return self.post_processing_change_role_messages(records)
-
-    def get_all_change_role_messages(self, page: int = 1, filter: str = 'all', page_size: int = 10) -> List[ChangeRoleRequest]:
-        end = page * page_size
-        query = self.db.query(ChangeRoleRequest).order_by(
-            ChangeRoleRequest.id.desc())
-        if filter != 'all':
-            query = query.where(ChangeRoleRequest.status == filter)
-        return self.post_processing_change_role_messages(query.slice(end-page_size, end), add_user=True)
-
-    def post_processing_change_role_messages(self, records: List[ChangeRoleRequest], add_user=False) -> ChangeRoleRequestInfo:
-        result = list()
-        for record in records:
-            time_created: datetime = record.time_created
-            time_created_str = time_created.strftime(settings.DATETIME_FORMAT)
-            record_obj = jsonable_encoder(record)
-            record_obj['answer'] = jsonable_encoder(record.answer)
-            if add_user:
-                user = record.user
-                user_obj = jsonable_encoder(user)
-                user_obj_with_pic = set_picture(user_obj, user.picture)
-                record_obj['user'] = user_obj_with_pic
-            record_obj['files'] = set_files_data(files=record.files)
-            record_obj['time_created'] = time_created_str
-            result.append(record_obj)
-        return result
-
-    def is_has_change_role_messages(self, user_id):
-        return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
-
-    def is_user_have_active_change_role_messages(self, user_id: int, count: int) -> bool:
-        result = self.db.query(ChangeRoleRequest)\
-            .filter(ChangeRoleRequest.user_id == user_id, ChangeRoleRequest.status == 'in-progress')\
-            .limit(count).all()
-        return len(result) == count
-
     def is_admin(self, user_id):
         db_user = self.get_user_by_id(user_id=user_id)
         if not db_user:
@@ -174,33 +123,3 @@ class UserCruds(CRUDBase):
         if not db_user:
             raise Exception('Пользователь не найден')
         return db_user.type == 'musician'
-
-    def get_change_role_message(self, request_id):
-        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
-
-    def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: settings.ALLOWED_STATUSES, account_status: str = None):
-        if request.answer:
-            self.db.delete(request.answer)
-            self.db.commit()
-        db_answer = AnswerChangeRoleRequest(
-            message=message,
-            request_id=request.id
-        )
-        db_answer = self.create(db_answer)
-        set_status_result = True
-        if account_status:
-            set_status_result = set_status(
-                self.db, request.user, account_status)
-        elif request_status == 'successfully':
-            set_status_result = set_status(
-                self.db, request.user, request.account_status)
-        if not set_status_result:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Попытка установить неподдерживаемый статус аккаунта")
-        request.answer = db_answer
-        request.status = request_status
-        self.db.commit()
-        answer_obj = jsonable_encoder(db_answer)
-        answer_obj['time_created'] = db_answer.time_created.strftime(
-            settings.DATETIME_FORMAT)
-        return answer_obj

@@ -65,7 +65,7 @@ def update_user_public_profile_data(
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Пользователь не найден")
-    if not db_user.is_musician and not db_user.is_radio_station:
+    if not db_user.type == 'musician' and not db_user.type == 'radio_station':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
     db_public_profile = UserCruds(
@@ -93,7 +93,7 @@ def get_user_public_profile_info(Authorize: AuthJWT = Depends(),
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Пользователь не найден")
-    if not db_user.is_musician and not db_user.is_radio_station:
+    if not db_user.type == 'musician' and not db_user.type == 'radio_station':
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Аккаунт должен иметь статус музыкант или радиостанция")
-    return get_public_profile_as_dict(user_id=current_user_id)
+    return get_public_profile_as_dict(db=db, user_id=current_user_id)

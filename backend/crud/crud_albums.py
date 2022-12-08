@@ -38,9 +38,6 @@ class AlbumsCruds(CRUDBase):
         self.db.refresh(album)
         return album
 
-    def get_musician_albums(self, musician_id: int) -> List[Album]:
-        return self.db.query(Album).filter(Album.musician_id == musician_id).all()
-
     def album_belongs_to_user(self, album: Album, user_id: int):
         db_public_profile: PublicProfile = self.db.query(PublicProfile).filter(
             PublicProfile.user_id == user_id).first()
@@ -61,9 +58,9 @@ class AlbumsCruds(CRUDBase):
         picture = album.picture
         if picture:
             album.picture = None
-            file_cruds.delete_image(image=picture)
+            FileCruds(self.db).delete_image(image=picture)
         self.db.delete(album)
         self.db.commit()
 
-    def get_album(self, album_id: int):
+    def get_album(self, album_id: int) -> Album:
         return self.get(id=album_id, model=Album)

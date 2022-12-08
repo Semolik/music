@@ -9,7 +9,6 @@ from backend.core.config import settings
 from backend.models.files import Image
 from backend.models.music import Album, Genre, Track
 from backend.models.user import FavoriteMusicians
-from backend.models.music import FavoriteTracks
 
 
 class MusicianCrud(CRUDBase):
@@ -31,3 +30,6 @@ class MusicianCrud(CRUDBase):
         else:
             self.delete(model=liked)
             return False
+
+    def get_musician_albums(self, musician_id: int) -> List[Album]:
+        return self.db.query(Album).filter(Album.musician_id == musician_id).all()

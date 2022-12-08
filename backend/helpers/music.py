@@ -1,15 +1,16 @@
 
 from typing import List
-from backend.crud.crud_tracks import tracks_crud
-from backend.crud.crud_genres import genres_cruds
-from backend.crud.crud_albums import album_cruds
+from backend.crud.crud_tracks import TracksCrud
+from backend.crud.crud_genres import GenresCruds
+from backend.crud.crud_albums import AlbumsCruds
+from sqlalchemy.orm import Session
 from backend.helpers.images import set_picture
 from backend.helpers.users import get_musician_profile_as_dict
 from backend.models.files import Image
 from backend.models.music import Album,  Track
 from backend.schemas.music import UploadTrackForm
-from backend.crud.crud_user import user_cruds
-from backend.db.base import crud_base
+from backend.crud.crud_user import UserCruds
+from backend.db.base import CRUDBase
 from pydub import AudioSegment
 from fastapi import UploadFile, HTTPException, status
 import shutil
@@ -17,16 +18,16 @@ from backend.core.config import settings
 import io
 
 
-def save_track(upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
+def save_track(db: Session, upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
     buf = io.BytesIO()
     shutil.copyfileobj(upload_file.file, buf)
     buf.seek(0)
     try:
         segment = AudioSegment.from_file(buf)
-
-        artist_public_profile = user_cruds.get_public_profile(user_id=user_id)
+        artist_public_profile = UserCruds(
+            db).get_public_profile(user_id=user_id)
         db_picture = picture
-        db_track = crud_base.create(
+        db_track = CRUDBase(db).create(
             Track(
                 artist_id=artist_public_profile.id,
                 name=track.name,
@@ -44,36 +45,43 @@ def save_track(upload_file: UploadFile, picture: Image, user_id: int, track: Upl
         raise HTTPException(status_code=500, detail="поврежденный файл")
 
 
-def set_album_info(db_album: Album, user_id: int | None = None):
+def set_album_info(db: Session, db_album: Album, user_id: int | None = None):
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['date'] = db_album.open_date
     db_album_obj['musician'] = get_musician_profile_as_dict(
-        user_id=user_id, public_profile_id=db_album.musician_id)
-    db_album_obj['genres'] = [set_picture(
-        db_genre.as_dict(), db_genre.picture) for db_genre in db_album.genres]
+        db=db,
+        user_id=user_id,
+        public_profile_id=db_album.musician_id
+    )
+    db_album_obj['genres'] = [
+        set_picture(
+            db_genre.as_dict(),
+            db_genre.picture
+        )
+        for db_genre in db_album.genres]
     db_album_obj = set_picture(db_album_obj, db_album.picture)
     return db_album_obj
 
 
-def set_album_tracks(db_album, db_album_obj, user_id: int = None):
-    db_album_obj['tracks'] = [set_track_data(track=track, user_id=user_id)
-                              for track in album_cruds.get_album_tracks(album_id=db_album.id)]
+def set_album_tracks(db: Session, db_album, db_album_obj, user_id: int = None):
+    db_album_obj['tracks'] = [set_track_data(db=db, track=track, user_id=user_id)
+                              for track in AlbumsCruds(db).get_album_tracks(album_id=db_album.id)]
     return db_album_obj
 
 
-def set_track_data(track: Track, user_id: int = None):
+def set_track_data(db: Session, track: Track, user_id: int = None):
     track_obj = set_picture(track.as_dict(), track.picture)
-    track_obj['url'] = get_track_url(track)
+    track_obj['url'] = get_track_url(track=track)
     if user_id:
-        track_obj['liked'] = tracks_crud.track_is_liked(
+        track_obj['liked'] = TracksCrud(db).track_is_liked(
             track_id=track.id, user_id=user_id)
     return track_obj
 
 
-def set_full_track_data(track: Track, user_id: int = None):
-    track_obj = set_track_data(track, user_id=user_id)
-    track_obj['album'] = set_album_info(track.album)
+def set_full_track_data(db: Session, track: Track, user_id: int = None):
+    track_obj = set_track_data(track=track, db=db, user_id=user_id)
+    track_obj['album'] = set_album_info(db=db, db_album=track.album)
     return track_obj
 
 
@@ -82,12 +90,12 @@ def get_track_url(track: Track):
         [settings.SERVER_LINK, settings.API_V1_STR, settings.UPLOADS_ROUTE, '/tracks/', str(track.id)])
 
 
-def validate_genres(genres_ids: List[int]):
+def validate_genres(db: Session, genres_ids: List[int]):
     not_found_genres_ids = []
     genres = []
     if genres_ids:
         for genre_id in genres_ids:
-            genre = genres_cruds.get_genre_by_id(id=genre_id)
+            genre = GenresCruds(db).get_genre_by_id(id=genre_id)
             if not genre:
                 not_found_genres_ids.append(genre_id)
             else:
