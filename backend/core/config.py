@@ -41,7 +41,8 @@ class Settings(BaseSettings):
     }
     YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
 
-    TEST_USERNAME = 'test_user'
+    TEST_USER_USERNAME = 'test_user'
+    TEST_ADMIN_USERNAME = 'admin'
 
     class Config:
         case_sensitive = True  # 4

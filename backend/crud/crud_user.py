@@ -29,12 +29,14 @@ class UserCruds(CRUDBase):
     def get_user_by_username(self, username: str) -> User | None:
         return self.db.query(User).filter(User.username == username).first()
 
-    def create_user(self, user: UserRegister) -> User:
+    def create_user(self, user: UserRegister, admin=False) -> User:
         password_hash = self.pwd_context.hash(user.password)
         user_in_data = jsonable_encoder(user)
         del user_in_data['password']
         db_user = User(hashed_password=password_hash,
-                       **user_in_data, type='user')
+                       **user_in_data)
+        if admin:
+            db_user.type = 'superuser'
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)

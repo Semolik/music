@@ -16,10 +16,9 @@ def init_db() -> None:  # 1
             user_in = UserWithTypeRegister(
                 username=FIRST_SUPERUSER,
                 first_name=FIRST_SUPERUSER,
-                type='superuser',
                 password='abobus123'
             )
-            user_cruds.create_user(user_in)
+            user_cruds.create_user(user_in, admin=True)
             logger.info(f"Администратор {FIRST_SUPERUSER} создан")
         else:
             logger.warning(
