@@ -29,7 +29,6 @@ export const useAuthStore = defineStore({
       this.isUser = false;
       this.isRadioStation = false;
       this.isMusician = false;
-      console.log(user.type === Role.Admin);
       switch (user.type) {
         case Role.Admin:
           this.userRole = Role.Admin;

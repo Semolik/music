@@ -43,6 +43,7 @@ class Settings(BaseSettings):
 
     TEST_USER_USERNAME = 'test_user'
     TEST_ADMIN_USERNAME = 'admin'
+    PAGINATION_LIMIT = 20
 
     class Config:
         case_sensitive = True  # 4

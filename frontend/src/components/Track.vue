@@ -1,21 +1,37 @@
 <template>
-    <div class="track" @mouseover="hovered = true" @mouseleave="hovered = false" @click.self="OnClickTrack">
-        <AlbumPicture :play-icon="isPlaying || hovered" :paused="isPlaying && playing" :src="trackData.picture"
-            off-hover @click="OnClickTrack" />
+    <div
+        class="track"
+        @mouseover="hovered = true"
+        @mouseleave="hovered = false"
+        @click.self="OnClickTrack"
+    >
+        <AlbumPicture
+            :play-icon="isPlaying || hovered"
+            :paused="isPlaying && playing"
+            :src="trackData.picture"
+            off-hover
+            @click="OnClickTrack"
+        />
         <div class="track-info-wrapper" @click.self="OnClickTrack">
             <div class="track-info">
                 <div class="name">{{ trackData.name }}</div>
-                <router-link :to="`/musician/${musicianData.id}`" class="musician">{{ musicianData.name }}</router-link>
+                <router-link
+                    :to="`/musician/${musician_data.id}`"
+                    class="musician"
+                    >{{ musician_data.name }}</router-link
+                >
             </div>
         </div>
-        <div class="track-duration" @click.self="OnClickTrack">{{ duration }}</div>
+        <div class="track-duration" @click.self="OnClickTrack">
+            {{ duration }}
+        </div>
     </div>
 </template>
 <script>
-import AlbumPicture from './AlbumPicture.vue';
-import moment from 'moment';
-import { usePlayerStore } from '../stores/player';
-import { storeToRefs } from 'pinia';
+import AlbumPicture from "./AlbumPicture.vue";
+import moment from "moment";
+import { usePlayerStore } from "../stores/player";
+import { storeToRefs } from "pinia";
 export default {
     props: {
         trackData: Object,
@@ -23,7 +39,7 @@ export default {
         albumId: {
             type: Number,
             default: null,
-        }
+        },
     },
     setup() {
         const { currentTrack, playing, player } = storeToRefs(usePlayerStore());
@@ -33,19 +49,20 @@ export default {
     data() {
         return {
             hovered: false,
-        }
+            musician_data: this.musicianData || this.trackData.album.musician,
+        };
     },
     components: { AlbumPicture },
     computed: {
         duration() {
             const time = moment.utc(this.trackData.duration * 1000);
             if (time.hours() > 1) {
-                return time.format('HH:mm:ss')
+                return time.format("HH:mm:ss");
             }
-            return time.format('mm:ss')
+            return time.format("mm:ss");
         },
         isPlaying() {
-            if (!this.currentTrack) return
+            if (!this.currentTrack) return;
             return this.currentTrack.id === this.trackData.id;
         },
     },
@@ -53,8 +70,8 @@ export default {
         OnClickTrack(event) {
             this.playerStore.play(this.trackData.id, this.albumId);
         },
-    }
-}
+    },
+};
 </script>
 <style lang="scss">
 .track {
@@ -67,12 +84,11 @@ export default {
     gap: 10px;
     cursor: pointer;
 
-
     .picture {
         --picture-border-radius: 5px;
         --picture-color: var(--color-background-mute-4);
         --svg-size: 22px;
-        --svg-color: var(--vt-c-white-200)
+        --svg-color: var(--vt-c-white-200);
     }
 
     .track-info-wrapper {
@@ -80,7 +96,6 @@ export default {
         align-items: center;
 
         .track-info {
-
             .musician {
                 color: var(--color-header-text);
                 text-decoration: none;
@@ -89,7 +104,6 @@ export default {
                     color: var(--yellow);
                 }
             }
-
         }
     }
 
@@ -97,6 +111,5 @@ export default {
         color: var(--color-header-text);
         padding: 0px 10px;
     }
-
 }
 </style>

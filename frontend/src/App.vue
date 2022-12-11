@@ -37,7 +37,6 @@ export default {
   },
   data() {
     return {
-      loading: false,
       windowWidth: window.innerWidth,
       blur_content: false,
     }
@@ -45,7 +44,6 @@ export default {
 
   provide() {
     return {
-      loading: computed(() => this.loading),
       windowWidth: computed(() => this.windowWidth),
       logined: computed(() => this.logined),
       disableLoading: false,
@@ -63,9 +61,6 @@ export default {
     window.removeEventListener('resize', this.onResize);
   },
   methods: {
-    setLoading(status) {
-      this.loading = status;
-    },
     blurAppContent(value) {
       this.blur_content = value;
     },
@@ -98,7 +93,7 @@ export default {
             v-if="error" />
           <Suspense v-else>
             <div class="app-content-wrapper">
-              <component :is="Component" @loading="setLoading" @request_error="handleAppError" @error="setError" />
+              <component :is="Component" @request_error="handleAppError" @error="setError" />
             </div>
             <template #fallback>
               Loading...

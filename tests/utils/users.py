@@ -1,9 +1,6 @@
-# from db.repository.users import create_new_user
-# from db.repository.users import get_user_by_email
 from fastapi.testclient import TestClient
 from backend.crud.crud_user import UserCruds
 from sqlalchemy.orm import Session
-
 from backend.schemas.user import UserRegister
 
 

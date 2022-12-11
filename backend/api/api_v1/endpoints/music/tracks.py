@@ -8,7 +8,7 @@ from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.images import save_image
-from backend.helpers.music import save_track, set_full_track_data
+from backend.helpers.music import save_track, set_full_track_data, set_track_data
 from backend.helpers.validate_role import validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
@@ -88,9 +88,14 @@ def get_track(
     return set_full_track_data(db_track, user_id=current_user_id)
 
 
-# @router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
-# def like_track(page: int, Authorize: AuthJWT = Depends()):
-#     Authorize.jwt_required()
-#     current_user_id = Authorize.get_jwt_subject()
-#     # liked = music_crud.
-#     # return Liked(liked=liked)
+@router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
+def like_track(
+    page: int,
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db)
+):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    liked_tracks = TracksCrud(db).get_liked_tracks(
+        user_id=current_user_id, page=page)
+    return [set_full_track_data(db=db, track=track, user_id=current_user_id) for track in liked_tracks]
