@@ -13,12 +13,15 @@
                 <div class="item__value">{{ admin_count }}</div>
                 <div class="item__title">Администраторов</div>
             </div>
-            <div class="statistics-item">
+            <router-link
+                :to="{ path: '/lk/update-status-requests' }"
+                class="statistics-item"
+            >
                 <div class="item__value">{{ change_role_request_count }}</div>
                 <div class="item__title">
                     Активных заявок на смену типа аккаунта
                 </div>
-            </div>
+            </router-link>
         </div>
     </div>
 </template>
@@ -41,7 +44,9 @@ const { user_count, admin_count, musician_count, change_role_request_count } =
         grid-template-rows: min-content;
         gap: 10px;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-
+        a:hover.statistics-item {
+            background-color: var(--color-background-mute-4);
+        }
         .statistics-item {
             display: flex;
             flex-direction: column;
@@ -52,6 +57,8 @@ const { user_count, admin_count, musician_count, change_role_request_count } =
             padding: 20px;
             flex-grow: 1;
             gap: 10px;
+            text-decoration: none;
+            color: var(--color-text);
             .item__value {
                 font-size: 2.5rem;
                 font-weight: 600;
