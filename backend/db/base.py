@@ -3,8 +3,8 @@ from backend.db.base_class import Base
 
 
 class CRUDBase:
-    def __init__(self, session) -> None:
-        self.db = session
+    def __init__(self, db) -> None:
+        self.db = db
 
     def get(self, id: Any, model):
         return self.db.query(model).filter(model.id == id).first()

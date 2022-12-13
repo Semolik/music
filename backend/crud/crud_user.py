@@ -19,8 +19,8 @@ from fastapi import HTTPException, status
 
 class UserCruds(CRUDBase):
 
-    def __init__(self, session) -> None:
-        self.db = session
+    def __init__(self, db) -> None:
+        self.db = db
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def get_user_by_id(self, user_id: int) -> User | None:
@@ -67,7 +67,7 @@ class UserCruds(CRUDBase):
         self.db.refresh(user)
         return user
 
-    def get_public_profile(self, user_id):
+    def get_public_profile(self, user_id) -> PublicProfile:
         db_public_profile = self.db.query(PublicProfile).filter(
             PublicProfile.user_id == user_id).first()
         if db_public_profile:
@@ -112,14 +112,20 @@ class UserCruds(CRUDBase):
         self.db.refresh(public_proile)
         return public_proile
 
-    def is_admin(self, user_id):
+    def is_admin(self, user_id) -> bool:
         db_user = self.get_user_by_id(user_id=user_id)
         if not db_user:
             raise Exception('Пользователь не найден')
         return db_user.type == 'superuser'
 
-    def is_musician(self, user_id):
+    def is_musician(self, user_id) -> bool:
         db_user = self.get_user_by_id(user_id=user_id)
         if not db_user:
             raise Exception('Пользователь не найден')
         return db_user.type == 'musician'
+
+    def get_count(self) -> int:
+        return self.db.query(User).count()
+
+    def get_count_by_type(self, type) -> int:
+        return self.db.query(User).filter(User.type == type).count()

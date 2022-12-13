@@ -1,15 +1,45 @@
 <template>
     <div class="lk-container">
         <aside>
-            <router-link class="aside-item lk-link" to="/lk">{{ lkButtonText }}</router-link>
-            <router-link class="aside-item" to="/lk/public" v-if="isCustomProfileActive">Публичный профиль</router-link>
-            <router-link class="aside-item" to="/lk/my-music" v-if="isMusician">Кабинет музыканта</router-link>
-            <router-link class="aside-item" to="/lk/music">Моя музыка</router-link>
-            <router-link class="aside-item" to="/lk/update-status" v-if="!isAdmin">Изменение статуса аккаунта
+            <router-link class="aside-item lk-link" to="/lk">{{
+                lkButtonText
+            }}</router-link>
+            <router-link
+                class="aside-item"
+                to="/lk/public"
+                v-if="isCustomProfileActive"
+                >Публичный профиль</router-link
+            >
+            <router-link class="aside-item" to="/lk/statistics" v-if="isAdmin">
+                Статистика
             </router-link>
-            <router-link class="aside-item" to="/lk/update-status-requests" v-else>Заявки на изменение статуса
+            <template v-if="isMusician">
+                <router-link class="aside-item" to="/lk/my-music">
+                    Кабинет музыканта
+                </router-link>
+            </template>
+
+            <router-link class="aside-item" to="/lk/music">
+                Моя музыка
             </router-link>
-            <router-link class="aside-item" to="/lk/edit-musician-section" v-if="isAdmin">Музыкальный раздел
+            <router-link
+                class="aside-item"
+                to="/lk/update-status"
+                v-if="!isAdmin"
+            >
+                Изменение статуса аккаунта
+            </router-link>
+            <router-link
+                class="aside-item"
+                to="/lk/update-status-requests"
+                v-else
+                >Заявки на изменение статуса
+            </router-link>
+            <router-link
+                class="aside-item"
+                to="/lk/edit-musician-section"
+                v-if="isAdmin"
+                >Музыкальный раздел
             </router-link>
         </aside>
         <div class="active-route">
@@ -24,32 +54,37 @@
     </div>
 </template>
 <script>
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../stores/auth';
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "../stores/auth";
 export default {
     setup() {
-        const { isAdmin, isMusician, isUser, isRadioStation } = storeToRefs(useAuthStore());
+        const { isAdmin, isMusician, isUser, isRadioStation } = storeToRefs(
+            useAuthStore()
+        );
         return {
-            isAdmin, isMusician, isUser, isRadioStation
-        }
+            isAdmin,
+            isMusician,
+            isUser,
+            isRadioStation,
+        };
     },
     computed: {
         lkButtonText() {
             if (this.isCustomProfileActive) {
-                return 'Личный профиль'
+                return "Личный профиль";
             }
-            return 'Профиль'
+            return "Профиль";
         },
         isCustomProfileActive() {
-            return this.isMusician || this.isRadioStation
-        }
-    }
-}
+            return this.isMusician || this.isRadioStation;
+        },
+    },
+};
 </script>
 <style lang="scss" scoped>
-@use '@/assets/styles/breakpoints';
-@use '@/assets/styles/helpers';
-@use '@/assets/styles/animations';
+@use "@/assets/styles/breakpoints";
+@use "@/assets/styles/helpers";
+@use "@/assets/styles/animations";
 
 .lk-container {
     overflow: hidden;
@@ -93,8 +128,6 @@ export default {
 
             @include breakpoints.lg(true) {
                 @include helpers.flex-center;
-
-
             }
 
             &.lk-link.router-link-exact-active,
@@ -114,6 +147,11 @@ export default {
         padding: 10px;
         height: 100%;
         @include animations.list;
+        .transition-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
     }
 }
 </style>

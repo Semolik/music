@@ -76,3 +76,6 @@ class ChangeRolesCruds(CRUDBase):
         answer_obj['time_created'] = db_answer.time_created.strftime(
             settings.DATETIME_FORMAT)
         return answer_obj
+
+    def get_not_answered_change_role_request_count(self):
+        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.status == 'in-progress').count()

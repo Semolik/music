@@ -67,11 +67,7 @@
                         </div>
                     </div>
                 </div>
-                <Teleport
-                    :disabled="avatarIsEmpty"
-                    to="#user-info-container"
-                    v-if="mounted"
-                >
+                <Teleport :disabled="avatarIsEmpty" to="#user-info-container">
                     <ButtonsBlock
                         @save="save"
                         :active="dataChanged"
@@ -110,6 +106,7 @@ export default {
         const toast = useToast();
         const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } =
             import.meta.env;
+        getMe();
         return {
             userData,
             toast,
@@ -126,17 +123,12 @@ export default {
         return {
             firstName: this.userData?.first_name,
             lastName: this.userData?.last_name,
-            mounted: false,
             remove_picture: false,
             original_image: null,
             file_changed: false,
             fileChanged: false,
             picture: this.userData?.picture,
         };
-    },
-    mounted() {
-        this.mounted = true;
-        this.getMe();
     },
     components: {
         FontAwesomeIcon,
