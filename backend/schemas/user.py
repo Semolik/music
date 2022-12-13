@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from pydantic import BaseModel
 from fastapi import Query
 from backend.core.config import settings, env_config
@@ -27,9 +27,7 @@ class UserBase(BaseModel):
 
 
 class UserTypes(BaseModel):
-    is_superuser: bool = False
-    is_musician: bool = False
-    is_radio_station: bool = False
+    type: settings.ALL_USER_ACCOUNT_STATUSES
 
 
 class UserWithTypeRegister(UserBase, UserAuth, UserTypes):
@@ -57,7 +55,7 @@ class UserInfo(UserTypes, UserBase, UserUsername):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str
-    account_status: str
+    account_status: settings.USER_ACCOUNT_STATUSES
 
 
 class RoleRequestAnswer(BaseModel):

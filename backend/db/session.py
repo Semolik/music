@@ -16,4 +16,4 @@ if not database_exists(engine.url):
 
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)  # 4
-session: Session = SessionLocal()
+# session: Session =

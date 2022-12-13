@@ -29,7 +29,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSun, faMoon, faBars, faRightFromBracket, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { useThemeStore } from '../stores/theme';
 import { useAuthStore } from '../stores/auth';
 import { storeToRefs } from 'pinia';
 
@@ -38,14 +37,9 @@ library.add([faSun, faMoon, faBars, faRightFromBracket, faUser]);
 export default {
     setup() {
         const AuthStore = useAuthStore();
-        const themeStore = useThemeStore();
         const { logined, userData } = storeToRefs(AuthStore);
-        const { themeName } = storeToRefs(themeStore);
-        const { toggleTheme } = themeStore;
         const { logoutRequest } = AuthStore;
         return {
-            themeName,
-            toggleTheme,
             logined,
             userData,
             logoutRequest
@@ -57,7 +51,6 @@ export default {
     emits: ['blur_content', 'hide_body_overflow'],
     data() {
         return {
-            themeToggle: false,
             panelActive: false,
         }
     },

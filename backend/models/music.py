@@ -13,6 +13,14 @@ class FavoriteTracks(Base):
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
 
 
+albums_genres_table = Table(
+    "albums_genres_table",
+    Base.metadata,
+    Column("album_id", ForeignKey("albums.id"), primary_key=True),
+    Column("genre_id", ForeignKey("genres.id"), primary_key=True),
+)
+
+
 class Album(Base):
     __tablename__ = 'albums'
 
@@ -26,12 +34,7 @@ class Album(Base):
     picture_id = Column(UUID(as_uuid=True), ForeignKey("images.id"))
     picture = relationship("Image", foreign_keys=[picture_id])
     genres = relationship(
-        "Genre", secondary=Table(
-            "albums_genres_table",
-            Base.metadata,
-            Column("album_id", ForeignKey("albums.id"), primary_key=True),
-            Column("genre_id", ForeignKey("genres.id"), primary_key=True),
-        )
+        "Genre", secondary=albums_genres_table
     )
     uploaded = Column(Boolean, nullable=False)
 

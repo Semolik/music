@@ -27,10 +27,12 @@ class Settings(BaseSettings):
                                'successfully', 'rejected']
     ALLOWED_STATUSES_FILTER = Literal[ALLOWED_STATUSES, 'all']
     ALLOWED_STATUSES_LIST: Tuple[str, ...] = get_args(ALLOWED_STATUSES)
-    USER_ACCOUNT_STATUSES = Literal['is_radio_station',
-                                    'is_musician', 'is_user']
+    USER_ACCOUNT_STATUSES = Literal['radio_station',
+                                    'musician', 'user']
     USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
         USER_ACCOUNT_STATUSES)
+    ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
+        [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
     ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
@@ -38,6 +40,10 @@ class Settings(BaseSettings):
         'youtube': 'https://www.youtube.com/channel/{0}'
     }
     YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
+
+    TEST_USER_USERNAME = 'test_user'
+    TEST_ADMIN_USERNAME = 'admin'
+    PAGINATION_LIMIT = 20
 
     class Config:
         case_sensitive = True  # 4

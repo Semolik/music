@@ -1,61 +1,112 @@
 <template>
     <div class="profile-container">
-        <form class="user-info-container" @submit.prevent="formSubmited" ref="form" id="user-info-container">
-            <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPicture" ref="selectPic" />
-            <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
+        <form
+            class="user-info-container"
+            @submit.prevent="formSubmited"
+            ref="form"
+            id="user-info-container"
+        >
+            <SelectImage
+                @changed="updatePic"
+                :pictureUrl="picture"
+                name="userPicture"
+                ref="selectPic"
+            />
+            <div
+                class="button remove-picture"
+                v-if="!avatarIsEmpty"
+                @click="detelePicture"
+            >
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
             <div class="user-info">
                 <div class="fields">
-                    <FormField :borderRadius="10" name="first_name" label="Имя" placeholder="Ваше имя"
-                        v-model="firstName">
-                        <span :class="['count', { wrong: firstNameLenght < 0 }]">{{ firstNameLenght }}</span>
+                    <FormField
+                        :borderRadius="10"
+                        name="first_name"
+                        label="Имя"
+                        placeholder="Ваше имя"
+                        v-model="firstName"
+                    >
+                        <span
+                            :class="['count', { wrong: firstNameLenght < 0 }]"
+                            >{{ firstNameLenght }}</span
+                        >
                     </FormField>
-                    <FormField :borderRadius="10" name="last_name" label="Фамилия" placeholder="Ваша фамилия"
-                        v-model="lastName">
-                        <span :class="['count', { wrong: lastNameLenght < 0 }]">{{ lastNameLenght }}</span>
+                    <FormField
+                        :borderRadius="10"
+                        name="last_name"
+                        label="Фамилия"
+                        placeholder="Ваша фамилия"
+                        v-model="lastName"
+                    >
+                        <span
+                            :class="['count', { wrong: lastNameLenght < 0 }]"
+                            >{{ lastNameLenght }}</span
+                        >
                     </FormField>
                 </div>
                 <div class="user-information" v-if="userData">
                     <div class="block">username: {{ userData.username }}</div>
-                    <div class="block custom">тип аккаунта:
+                    <div class="block custom">
+                        тип аккаунта:
                         <div class="statuses">
-                            <span :class="{ active: userRole === Role.Musician }">музыкант</span>
-                            <span :class="{ active: userRole === Role.User }">пользователь</span>
-                            <span :class="{ active: userRole === Role.RadioStation }">радиостанция</span>
+                            <span
+                                :class="{ active: userRole === Role.Musician }"
+                                >музыкант</span
+                            >
+                            <span :class="{ active: userRole === Role.User }"
+                                >пользователь</span
+                            >
+                            <span
+                                :class="{
+                                    active: userRole === Role.RadioStation,
+                                }"
+                                >радиостанция</span
+                            >
                         </div>
                     </div>
                 </div>
-                <Teleport :disabled="avatarIsEmpty" to="#user-info-container" v-if="mounted">
-                    <ButtonsBlock @save="save" :active="dataChanged" :wrong="fieldsWrong" />
+                <Teleport :disabled="avatarIsEmpty" to="#user-info-container">
+                    <ButtonsBlock
+                        @save="save"
+                        :active="dataChanged"
+                        :wrong="fieldsWrong"
+                    />
                 </Teleport>
             </div>
         </form>
     </div>
 </template>
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { storeToRefs } from 'pinia';
-import { HTTP } from '/src/http-common.vue';
-import { useAuthStore } from '/src/stores/auth';
-import handleError from '/src/composables/errors';
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+    faUser,
+    faFloppyDisk,
+    faTrash,
+    faImage,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { storeToRefs } from "pinia";
+import { HTTP } from "/src/http-common.vue";
+import { useAuthStore } from "/src/stores/auth";
+import handleError from "/src/composables/errors";
 import { useToast } from "vue-toastification";
-import FormField from '/src/components/FormField.vue';
-import AnimateInteger from '/src/components/AnimateInteger.vue';
-import { Role } from '/src/helpers/roles.js';
-import SelectImage from '/src/components/SelectImage.vue';
-import ButtonsBlock from '/src/components/Settings/ButtonsBlock.vue';
+import FormField from "/src/components/FormField.vue";
+import { Role } from "/src/helpers/roles.js";
+import SelectImage from "/src/components/SelectImage.vue";
+import ButtonsBlock from "/src/components/Settings/ButtonsBlock.vue";
 
-library.add([faUser, faFloppyDisk, faTrash, faImage])
+library.add([faUser, faFloppyDisk, faTrash, faImage]);
 
 export default {
     setup() {
         const { userData, userRole } = storeToRefs(useAuthStore());
         const { setUserData, logout, getMe } = useAuthStore();
         const toast = useToast();
-        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } = import.meta.env;
+        const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } =
+            import.meta.env;
+        getMe();
         return {
             userData,
             toast,
@@ -66,39 +117,33 @@ export default {
             userRole,
             VITE_MAX_FIRSTNAME_LENGTH,
             VITE_MAX_LASTNAME_LENGTH,
-        }
+        };
     },
     data() {
         return {
             firstName: this.userData?.first_name,
             lastName: this.userData?.last_name,
-            mounted: false,
             remove_picture: false,
             original_image: null,
             file_changed: false,
             fileChanged: false,
             picture: this.userData?.picture,
-        }
-    },
-    mounted() {
-        this.mounted = true;
-        this.getMe();
+        };
     },
     components: {
         FontAwesomeIcon,
         FormField,
-        AnimateInteger,
         SelectImage,
-        ButtonsBlock
+        ButtonsBlock,
     },
     watch: {
         userData(value) {
-            if (!value) return
+            if (!value) return;
             const { first_name, last_name, picture } = value;
             this.firstName = first_name;
             this.lastName = last_name;
             this.original_image = picture;
-        }
+        },
     },
     methods: {
         detelePicture() {
@@ -108,56 +153,65 @@ export default {
         },
         updatePic(target) {
             this.file_changed = true;
-            if (!this.file_changed) return
+            if (!this.file_changed) return;
             let file = target?.files;
             this.fileChanged = file !== this.userData.picture;
         },
         save() {
             if (this.dataChanged) {
                 const form = this.$refs.form;
-                if (!form) return
+                if (!form) return;
                 let data = new FormData(form);
-                data.append('remove_picture', this.remove_picture);
-                HTTP.put('me', data)
+                data.append("remove_picture", this.remove_picture);
+                HTTP.put("me", data)
                     .then((response) => {
                         this.remove_picture = false;
                         this.file_changed = false;
                         this.setUserData(response.data);
                     })
                     .catch((error) => {
-                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
+                        this.toast.error(
+                            handleError(
+                                error,
+                                "При обновлении профиля произошла ошибка"
+                            ).message
+                        );
                     });
             }
-        }
+        },
     },
     computed: {
         avatarIsEmpty() {
-            if (!this.userData) return true
-            return !Boolean(this.userData.picture)
+            if (!this.userData) return true;
+            return !Boolean(this.userData.picture);
         },
         dataChanged() {
-            if (!this.userData) return
-            if (this.fieldsWrong) return
-            return this.userData.first_name !== this.firstName || this.userData.last_name !== this.lastName || this.file_changed
+            if (!this.userData) return;
+            if (this.fieldsWrong) return;
+            return (
+                this.userData.first_name !== this.firstName ||
+                this.userData.last_name !== this.lastName ||
+                this.file_changed
+            );
         },
         fieldsWrong() {
-            return this.lastNameLenght < 0 || this.firstNameLenght < 0
+            return this.lastNameLenght < 0 || this.firstNameLenght < 0;
         },
         lastNameLenght() {
-            if (!this.lastName) return
-            return this.VITE_MAX_LASTNAME_LENGTH - this.lastName?.length
+            if (!this.lastName) return;
+            return this.VITE_MAX_LASTNAME_LENGTH - this.lastName?.length;
         },
         firstNameLenght() {
-            if (!this.firstName) return
-            return this.VITE_MAX_FIRSTNAME_LENGTH - this.firstName?.length
+            if (!this.firstName) return;
+            return this.VITE_MAX_FIRSTNAME_LENGTH - this.firstName?.length;
         },
-    }
-}
+    },
+};
 </script>
 <style lang="scss">
-@use '@/assets/styles/helpers';
-@use '@/assets/styles/breakpoints';
-@use '@/assets/styles/components';
+@use "@/assets/styles/helpers";
+@use "@/assets/styles/breakpoints";
+@use "@/assets/styles/components";
 
 .profile-container {
     display: flex;
@@ -188,11 +242,9 @@ export default {
                 border: 2px dashed transparent;
                 border-color: var(--main-card-border);
 
-
                 svg {
                     width: 50px;
                     height: 50px;
-
                 }
 
                 .edit-area {
@@ -213,7 +265,7 @@ export default {
             }
 
             .edit-area {
-                transition: opacity .2s;
+                transition: opacity 0.2s;
                 @include helpers.flex-center;
                 flex-direction: column;
                 position: absolute;
@@ -239,10 +291,8 @@ export default {
                     }
 
                     .edit-area-text {
-
                         z-index: 2;
                     }
-
                 }
 
                 input {
@@ -254,7 +304,7 @@ export default {
                 }
 
                 &::after {
-                    content: '';
+                    content: "";
                     position: absolute;
                     inset: 0;
                     background-color: var(--color-background-mute-3);
@@ -269,7 +319,7 @@ export default {
             padding: 10px;
             background-color: var(--color-background-mute-4);
             border-radius: 10px;
-            transition: .2s scale, .2s background-color;
+            transition: 0.2s scale, 0.2s background-color;
 
             svg {
                 height: 18px;
@@ -339,7 +389,6 @@ export default {
 
                             &.active {
                                 background-color: var(--purple);
-
                             }
                         }
                     }

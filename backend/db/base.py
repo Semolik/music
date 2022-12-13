@@ -1,11 +1,10 @@
 from typing import Any, List
-from backend.db.session import session
 from backend.db.base_class import Base
 
 
 class CRUDBase:
-    def __init__(self):
-        self.db = session
+    def __init__(self, db) -> None:
+        self.db = db
 
     def get(self, id: Any, model):
         return self.db.query(model).filter(model.id == id).first()
@@ -23,6 +22,3 @@ class CRUDBase:
     def delete(self, model):
         self.db.delete(model)
         self.db.commit()
-
-
-crud_base = CRUDBase()

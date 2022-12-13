@@ -1,57 +1,87 @@
 <template>
     <div class="genres-selector">
-        <FormField id="genres-selector" :inputEvents="{ focus: onFocus }" v-on-click-outside="onBlur"
-            :class="{ active: focused }" v-model="searchText" placeholder="Поиск по жанрам" :borderRadius="borderRadius"
-            label="Жанры" :formkitInnerClass="{ focused: focused }" borderColor="transparent" off-margin offChangeColor>
+        <FormField
+            id="genres-selector"
+            :inputEvents="{ focus: onFocus }"
+            v-on-click-outside="onBlur"
+            :class="{ active: focused }"
+            v-model="searchText"
+            placeholder="Поиск по жанрам"
+            :borderRadius="borderRadius"
+            label="Жанры"
+            :formkitInnerClass="{ focused: focused }"
+            borderColor="transparent"
+            off-margin
+            offChangeColor
+        >
             <div class="search-items" v-if="focused">
-                <SearchItem :genre="genre" v-for="(genre, index) in filteredGenres" :key="index"
-                    :selectedGenres="selectedGenres" @selectGenre="selectGenre(genre)" />
+                <SearchItem
+                    :genre="genre"
+                    v-for="(genre, index) in filteredGenres"
+                    :key="index"
+                    :selectedGenres="selectedGenres"
+                    @selectGenre="selectGenre(genre)"
+                />
             </div>
         </FormField>
-        <div class="selected-genres" v-if="!focused && selectedGenres.length !== 0" v-auto-animate>
-            <SearchItem :genre="genre" v-for="(genre, index) in selectedGenres" :key="index"
-                :selectedGenres="selectedGenres" @selectGenre="selectGenre(genre)" />
+        <div
+            class="selected-genres"
+            v-if="!focused && selectedGenres.length !== 0"
+            v-auto-animate
+        >
+            <SearchItem
+                :genre="genre"
+                v-for="(genre, index) in selectedGenres"
+                :key="index"
+                :selectedGenres="selectedGenres"
+                @selectGenre="selectGenre(genre)"
+            />
         </div>
     </div>
 </template>
 <script>
-import { HTTP } from '/src/http-common.vue';
-import FormField from '/src/components/FormField.vue';
+import { HTTP } from "/src/http-common.vue";
+import FormField from "/src/components/FormField.vue";
 import { useToast } from "vue-toastification";
-import handleError from '/src/composables/errors';
-import { vOnClickOutside } from '@vueuse/components';
-import SearchItem from './SearchItem.vue';
+import handleError from "/src/composables/errors";
+import { vOnClickOutside } from "@vueuse/components";
+import SearchItem from "./SearchItem.vue";
 
 export default {
     props: {
         borderRadius: Number,
-        selectedGenresIn: Array,
+        selectedGenresIn: {
+            type: Array,
+            default: [],
+        },
         forceOpen: Boolean,
     },
     components: { FormField, SearchItem },
     setup() {
         const toast = useToast();
         return {
-            toast
+            toast,
         };
     },
     directives: {
         OnClickOutside: vOnClickOutside,
     },
-    emits: ['change-genre'],
+    emits: ["change-genre"],
     data() {
         return {
             genres: [],
             focused: this.forceOpen,
-            searchText: '',
-            selectedGenres: this.selectedGenresIn || [],
+            searchText: "",
+            selectedGenres: this.selectedGenresIn,
             interval: null,
-        }
+        };
     },
     computed: {
         filteredGenres() {
-            return this.genres.filter(genre => genre.name.includes(this.searchText))
-        }
+            return this.genres.filter((genre) =>
+                genre.name.includes(this.searchText)
+            );
+        },
     },
 
     methods: {
@@ -69,33 +99,37 @@ export default {
             }
         },
         selectGenre(genre) {
-            if (this.selectedGenres.map(genre => genre.id).includes(genre.id)) {
+            if (
+                this.selectedGenres.map((genre) => genre.id).includes(genre.id)
+            ) {
                 this.deleteGenre(genre);
             } else {
                 this.selectedGenres.push(genre);
-                this.$emit('change-genre', this.selectedGenres);
+                this.$emit("change-genre", this.selectedGenres);
             }
         },
         deleteGenre(genre) {
-            const result = this.selectedGenres.filter(selectedGenre => selectedGenre.id !== genre.id)
+            const result = this.selectedGenres.filter(
+                (selectedGenre) => selectedGenre.id !== genre.id
+            );
             this.selectedGenres = result;
-            this.$emit('change-genre', result);
-        }
+            this.$emit("change-genre", result);
+        },
     },
     mounted() {
         HTTP.get("/genres/all")
-            .then(response => {
-                this.$emit('change-genre', this.selectedGenres);
+            .then((response) => {
+                this.$emit("change-genre", this.selectedGenres);
                 this.genres = response.data;
             })
-            .catch(error => {
+            .catch((error) => {
                 this.toast.error(handleError(error).message);
             });
-    }
-}
+    },
+};
 </script>
 <style lang="scss">
-@use '@/assets/styles/breakpoints';
+@use "@/assets/styles/breakpoints";
 
 .genres-selector {
     @mixin columns {

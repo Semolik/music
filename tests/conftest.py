@@ -1,3 +1,4 @@
+from starlette.testclient import TestClient
 from backend.db.db import get_db
 from backend.core.config import settings
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,8 @@ from backend.models.user import Base
 from backend.api.api_v1.api import api_v1_router
 from sqlalchemy_utils import database_exists, create_database
 from fastapi_jwt_auth import AuthJWT
+
+from tests.utils.users import authentication_token_from_username
 
 
 def start_application():
@@ -73,3 +76,17 @@ def client(
     app.dependency_overrides[get_db] = _get_test_db
     with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_user_token_cookies(client: TestClient, db_session):
+    return authentication_token_from_username(
+        client=client, username=settings.TEST_USER_USERNAME, db=db_session
+    )
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_admin_token_cookies(client: TestClient, db_session):
+    return authentication_token_from_username(
+        client=client, username=settings.TEST_ADMIN_USERNAME, db=db_session, admin=True
+    )

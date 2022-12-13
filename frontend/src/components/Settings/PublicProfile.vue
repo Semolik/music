@@ -1,60 +1,133 @@
 <template>
     <div class="profile-container">
-        <form class="user-info-container" @submit.prevent="formSubmited" ref="form">
-            <SelectImage @changed="updatePic" :pictureUrl="picture" name="userPublicPicture" ref="selectPic" />
-            <div class="button remove-picture" v-if="!avatarIsEmpty" @click="detelePicture">
+        <form
+            class="user-info-container"
+            @submit.prevent="formSubmited"
+            ref="form"
+        >
+            <SelectImage
+                @changed="updatePic"
+                :pictureUrl="picture"
+                name="userPublicPicture"
+                ref="selectPic"
+            />
+            <div
+                class="button remove-picture"
+                v-if="!avatarIsEmpty"
+                @click="detelePicture"
+            >
                 <FontAwesomeIcon icon="fa-trash" />
             </div>
             <div class="user-info">
-                <FormField :borderRadius="10" name="name" label="Отображаемое имя" placeholder="Ваше имя" v-model="name"
-                    offMargin notEmpty>
-                    <span :class="['count', { wrong: nameLenghtLimit < 0 }]" v-if="nameLenghtLimit">
+                <FormField
+                    :borderRadius="10"
+                    name="name"
+                    label="Отображаемое имя"
+                    placeholder="Ваше имя"
+                    v-model="name"
+                    offMargin
+                    notEmpty
+                >
+                    <span
+                        :class="['count', { wrong: nameLenghtLimit < 0 }]"
+                        v-if="nameLenghtLimit"
+                    >
                         {{ nameLenghtLimit }}
                     </span>
                 </FormField>
-                <FormTextArea class="description" :borderRadius="10" label="Описание профиля"
-                    placeholder="Напишите о себе" v-model="description" :rows="5" :paddingRight="20"
-                    :maxLength="Number(VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH)">
-                    <span :class="['count', { wrong: descriptionLenghtLimit < 0 }]" v-if="descriptionLenghtLimit">
+                <FormTextArea
+                    class="description"
+                    :borderRadius="10"
+                    label="Описание профиля"
+                    placeholder="Напишите о себе"
+                    v-model="description"
+                    :rows="5"
+                    :paddingRight="20"
+                    :maxLength="
+                        Number(VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH)
+                    "
+                >
+                    <span
+                        :class="[
+                            'count',
+                            { wrong: descriptionLenghtLimit < 0 },
+                        ]"
+                        v-if="descriptionLenghtLimit"
+                    >
                         {{ descriptionLenghtLimit }}
                     </span>
                 </FormTextArea>
             </div>
             <div class="buttons">
-                <FormField placeholder="id канала" v-model="yt" :borderRadius="10" offMargin class="iconed youtube"
-                    offChangeColor>
+                <FormField
+                    placeholder="id канала"
+                    v-model="yt"
+                    :borderRadius="10"
+                    offMargin
+                    class="iconed youtube"
+                    offChangeColor
+                >
                     <template v-slot:right>
                         <div class="icon">
                             <FontAwesomeIcon :icon="['fab', 'youtube']" />
                         </div>
                     </template>
-                    <span :class="['count', { wrong: ytLenghtLimit < 0 }]" v-if="yt?.length">
+                    <span
+                        :class="['count', { wrong: ytLenghtLimit < 0 }]"
+                        v-if="yt?.length"
+                    >
                         {{ ytLenghtLimit }}
                     </span>
                 </FormField>
-                <FormField :borderRadius="10" v-model="telegram" offMargin placeholder="username"
-                    class="iconed telegram" offChangeColor>
+                <FormField
+                    :borderRadius="10"
+                    v-model="telegram"
+                    offMargin
+                    placeholder="username"
+                    class="iconed telegram"
+                    offChangeColor
+                >
                     <template v-slot:right>
                         <div class="icon">
                             <FontAwesomeIcon :icon="['fab', 'telegram']" />
                         </div>
                     </template>
-                    <span :class="['count', { wrong: telegramLenghtLimit < 0 }]" v-if="telegram?.length">
+                    <span
+                        :class="['count', { wrong: telegramLenghtLimit < 0 }]"
+                        v-if="telegram?.length"
+                    >
                         {{ telegramLenghtLimit }}
                     </span>
                 </FormField>
-                <FormField v-model="vk" :borderRadius="10" offMargin placeholder="username" class="iconed vk"
-                    offChangeColor>
+                <FormField
+                    v-model="vk"
+                    :borderRadius="10"
+                    offMargin
+                    placeholder="username"
+                    class="iconed vk"
+                    offChangeColor
+                >
                     <template v-slot:right>
                         <div class="icon">
                             <FontAwesomeIcon :icon="['fab', 'vk']" />
                         </div>
                     </template>
-                    <span :class="['count', { wrong: vkLenghtLimit < 0 }]" v-if="vk?.length">
+                    <span
+                        :class="['count', { wrong: vkLenghtLimit < 0 }]"
+                        v-if="vk?.length"
+                    >
                         {{ vkLenghtLimit }}
                     </span>
                 </FormField>
-                <div :class="['button', 'save', { active: dataChanged }, { wrong: fieldsWrong }]" @click="save">
+                <div
+                    :class="[
+                        'button',
+                        'save',
+                        { active: dataChanged },
+                        { wrong: fieldsWrong },
+                    ]"
+                    @click="save"
+                >
                     <FontAwesomeIcon icon="fa-floppy-disk" />
                 </div>
             </div>
@@ -62,65 +135,91 @@
     </div>
 </template>
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faYoutube, faTelegram, faVk } from '@fortawesome/free-brands-svg-icons';
-import { faUser, faFloppyDisk, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import handleError from '/src/composables/errors';
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+    faYoutube,
+    faTelegram,
+    faVk,
+} from "@fortawesome/free-brands-svg-icons";
+import {
+    faUser,
+    faFloppyDisk,
+    faTrash,
+    faImage,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import handleError from "/src/composables/errors";
 import { useToast } from "vue-toastification";
-import FormField from '/src/components/FormField.vue';
-import AnimateInteger from '/src/components/AnimateInteger.vue';
-import SelectImage from '/src/components/SelectImage.vue';
-import FormTextArea from '/src/components/FormTextArea.vue';
-import { HTTP } from '/src/http-common.vue';
+import FormField from "/src/components/FormField.vue";
+import SelectImage from "/src/components/SelectImage.vue";
+import FormTextArea from "/src/components/FormTextArea.vue";
+import { HTTP } from "/src/http-common.vue";
 
-library.add(faUser, faFloppyDisk, faTrash, faImage, faYoutube, faTelegram, faVk);
+library.add(
+    faUser,
+    faFloppyDisk,
+    faTrash,
+    faImage,
+    faYoutube,
+    faTelegram,
+    faVk
+);
 
 export default {
     setup() {
         const toast = useToast();
-        const { VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH, VITE_MAX_TELEGRAM_USERNAME_LENGTH, VITE_MAX_VK_USERNAME_LENGTH, VITE_MAX_YOUTUBE_ID_LENGTH, VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH } = import.meta.env;
+        const {
+            VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH,
+            VITE_MAX_TELEGRAM_USERNAME_LENGTH,
+            VITE_MAX_VK_USERNAME_LENGTH,
+            VITE_MAX_YOUTUBE_ID_LENGTH,
+            VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH,
+        } = import.meta.env;
         return {
             toast,
             VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH,
             VITE_MAX_TELEGRAM_USERNAME_LENGTH,
             VITE_MAX_VK_USERNAME_LENGTH,
             VITE_MAX_YOUTUBE_ID_LENGTH,
-            VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH
-        }
+            VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH,
+        };
     },
     data() {
         return {
             userData: null,
-            name: '',
-            description: '',
+            name: "",
+            description: "",
             mounted: false,
             remove_picture: false,
             original_image: null,
             file_changed: false,
             fileChanged: false,
             picture: null,
-            telegram: '',
-            vk: '',
-            yt: '',
-        }
+            telegram: "",
+            vk: "",
+            yt: "",
+        };
     },
     mounted() {
         this.mounted = true;
-        HTTP.get('/me/public')
-            .then(response => {
+        HTTP.get("/me/public")
+            .then((response) => {
                 this.setData(response.data);
             })
-            .catch(error => {
-                this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
-            })
+            .catch((error) => {
+                this.toast.error(
+                    handleError(
+                        error,
+                        "При обновлении профиля произошла ошибка"
+                    ).message
+                );
+            });
     },
     components: {
         FontAwesomeIcon,
         FormField,
-        AnimateInteger,
         SelectImage,
-        FormTextArea
+        FormTextArea,
     },
     methods: {
         detelePicture() {
@@ -140,100 +239,113 @@ export default {
         },
         updatePic(target) {
             this.file_changed = true;
-            if (!this.file_changed) return
+            if (!this.file_changed) return;
             let file = target?.files;
             this.fileChanged = file !== this.userData.picture;
         },
         save() {
             if (this.dataChanged) {
-                const { name, description, telegram, vk, yt, remove_picture } = this;
+                const { name, description, telegram, vk, yt, remove_picture } =
+                    this;
                 const form = this.$refs.form;
                 let data = new FormData(form);
-                data.append('name', name);
-                data.append('description', description || '');
-                data.append('telegram', telegram || '');
-                data.append('vk', vk || '');
-                data.append('youtube', yt || '');
-                data.append('remove_picture', remove_picture);
-                HTTP.put('/me/public', data)
+                data.append("name", name);
+                data.append("description", description || "");
+                data.append("telegram", telegram || "");
+                data.append("vk", vk || "");
+                data.append("youtube", yt || "");
+                data.append("remove_picture", remove_picture);
+                HTTP.put("/me/public", data)
                     .then((response) => {
                         this.remove_picture = false;
                         this.file_changed = false;
                         this.setData(response.data);
                     })
                     .catch((error) => {
-                        this.toast.error(handleError(error, 'При обновлении профиля произошла ошибка').message)
+                        this.toast.error(
+                            handleError(
+                                error,
+                                "При обновлении профиля произошла ошибка"
+                            ).message
+                        );
                     });
             }
-        }
+        },
     },
     computed: {
         avatarIsEmpty() {
-            if (!this.userData) return true
-            return !Boolean(this.userData.picture)
+            if (!this.userData) return true;
+            return !Boolean(this.userData.picture);
         },
         dataChanged() {
-            if (!this.userData) return
-            if (this.fieldsWrong) return
+            if (!this.userData) return;
+            if (this.fieldsWrong) return;
             let links = this.userData.links;
             return (
                 this.userData.name !== this.name ||
                 this.userData.description !== this.description ||
-                this.file_changed || this.vk !== links.vk ||
+                this.file_changed ||
+                this.vk !== links.vk ||
                 this.yt !== links.youtube ||
                 this.telegram !== links.telegram
-            )
+            );
         },
         fieldsWrong() {
-            return this.nameWrong || this.telegramWrong || this.vkWrong || this.ytWrong || this.descriptionWrong
+            return (
+                this.nameWrong ||
+                this.telegramWrong ||
+                this.vkWrong ||
+                this.ytWrong ||
+                this.descriptionWrong
+            );
         },
         nameWrong() {
-            return this.nameLenghtLimit < 0 || this.name?.length === 0
+            return this.nameLenghtLimit < 0 || this.name?.length === 0;
         },
         descriptionWrong() {
-            return this.descriptionLenghtLimit < 0
+            return this.descriptionLenghtLimit < 0;
         },
         telegramWrong() {
-            return this.telegramLenghtLimit < 0
+            return this.telegramLenghtLimit < 0;
         },
         vkWrong() {
-            return this.vkLenghtLimit < 0
+            return this.vkLenghtLimit < 0;
         },
         ytWrong() {
-            return this.ytLenghtLimit < 0
+            return this.ytLenghtLimit < 0;
         },
         nameLenghtLimit() {
             let lenght = this.name?.length;
-            if (!lenght) return
-            return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - lenght
+            if (!lenght) return;
+            return this.VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH - lenght;
         },
         descriptionLenghtLimit() {
             let lenght = this.description?.length;
-            if (!lenght) return
-            return this.VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH - lenght
+            if (!lenght) return;
+            return this.VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH - lenght;
         },
         telegramLenghtLimit() {
             let lenght = this.telegram?.length;
-            if (!lenght) return
-            return this.VITE_MAX_TELEGRAM_USERNAME_LENGTH - lenght
+            if (!lenght) return;
+            return this.VITE_MAX_TELEGRAM_USERNAME_LENGTH - lenght;
         },
         vkLenghtLimit() {
             let lenght = this.vk?.length;
-            if (!lenght) return
-            return this.VITE_MAX_VK_USERNAME_LENGTH - lenght
+            if (!lenght) return;
+            return this.VITE_MAX_VK_USERNAME_LENGTH - lenght;
         },
         ytLenghtLimit() {
             let lenght = this.yt?.length;
-            if (!lenght) return
-            return this.VITE_MAX_YOUTUBE_ID_LENGTH - lenght
-        }
-    }
-}
+            if (!lenght) return;
+            return this.VITE_MAX_YOUTUBE_ID_LENGTH - lenght;
+        },
+    },
+};
 </script>
 <style lang="scss" scoped>
-@use '@/assets/styles/helpers';
-@use '@/assets/styles/breakpoints';
-@use '@/assets/styles/components';
+@use "@/assets/styles/helpers";
+@use "@/assets/styles/breakpoints";
+@use "@/assets/styles/components";
 
 .profile-container {
     display: flex;
@@ -261,11 +373,9 @@ export default {
                 border: 2px dashed transparent;
                 border-color: var(--main-card-border);
 
-
                 svg {
                     width: 50px;
                     height: 50px;
-
                 }
 
                 .edit-area {
@@ -286,7 +396,7 @@ export default {
             }
 
             .edit-area {
-                transition: opacity .2s;
+                transition: opacity 0.2s;
                 @include helpers.flex-center;
                 flex-direction: column;
                 position: absolute;
@@ -315,7 +425,6 @@ export default {
                     .edit-area-text {
                         z-index: 2;
                     }
-
                 }
 
                 input {
@@ -327,7 +436,7 @@ export default {
                 }
 
                 &::after {
-                    content: '';
+                    content: "";
                     position: absolute;
                     inset: 0;
                     background-color: var(--color-background-mute-3);
@@ -342,7 +451,7 @@ export default {
             padding: 10px;
             background-color: var(--color-background-mute-4);
             border-radius: 10px;
-            transition: .2s scale, .2s background-color;
+            transition: 0.2s scale, 0.2s background-color;
 
             svg {
                 height: 18px;
@@ -383,7 +492,7 @@ export default {
                 }
 
                 &.vk {
-                    --icon-color: #0077FF;
+                    --icon-color: #0077ff;
                 }
 
                 &.telegram {
@@ -391,7 +500,7 @@ export default {
                 }
 
                 svg {
-                    transition: color .2s;
+                    transition: color 0.2s;
                 }
 
                 :focus-within {
@@ -410,13 +519,11 @@ export default {
                 min-width: 40px;
                 min-height: 40px;
 
-
                 @include breakpoints.xl(true) {
                     width: 100%;
                 }
 
                 &.save {
-
                     &.wrong {
                         background-color: var(--red-0);
                     }
@@ -483,7 +590,6 @@ export default {
 
                             &.active {
                                 background-color: var(--purple);
-
                             }
                         }
                     }

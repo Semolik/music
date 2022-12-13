@@ -1,16 +1,16 @@
-import { defineStore } from 'pinia';
-import { HTTP } from '../http-common.vue';
-import handleError from '../composables/errors'
-import { useSessionStorage } from '@vueuse/core';
-import { Role } from '../helpers/roles.js';
-import router from '../router';
+import { defineStore } from "pinia";
+import { HTTP } from "../http-common.vue";
+import handleError from "../composables/errors";
+import { useSessionStorage } from "@vueuse/core";
+import { Role } from "../helpers/roles.js";
+import router from "../router";
 export const useAuthStore = defineStore({
-  id: 'auth',
+  id: "auth",
   state: () => ({
-    message: '',
+    message: "",
     loading: false,
-    logined: useSessionStorage('logined', false),
-    userRole: useSessionStorage('user-role', null),
+    logined: useSessionStorage("logined", false),
+    userRole: useSessionStorage("user-role", null),
     userData: null,
     isAdmin: false,
     isUser: false,
@@ -19,7 +19,7 @@ export const useAuthStore = defineStore({
   }),
   actions: {
     clearMessage() {
-      this.message = '';
+      this.message = "";
     },
     setUserRole() {
       this.userRole = null;
@@ -29,28 +29,27 @@ export const useAuthStore = defineStore({
       this.isUser = false;
       this.isRadioStation = false;
       this.isMusician = false;
-
-      Object.values(Role).forEach(role_key => {
-        if (user[role_key] === true) {
-          this.userRole = role_key;
-        }
-      });
-      switch (this.userRole) {
+      switch (user.type) {
         case Role.Admin:
+          this.userRole = Role.Admin;
           this.isAdmin = true;
           break;
         case Role.User:
+          this.userRole = Role.User;
           this.isUser = true;
           break;
         case Role.Musician:
+          this.userRole = Role.Musician;
           this.isMusician = true;
           break;
         case Role.RadioStation:
+          this.userRole = Role.RadioStation;
           this.isRadioStation = true;
           break;
-      }
-      if (!this.userRole) {
-        this.userRole = Role.User;
+        default:
+          this.userRole = Role.User;
+          this.isUser = true;
+          break;
       }
     },
     setUserData(data) {
@@ -60,7 +59,7 @@ export const useAuthStore = defineStore({
       }
     },
     setMessage(error) {
-      this.message = handleError(error).message
+      this.message = handleError(error).message;
     },
     logout() {
       this.logined = false;
@@ -68,21 +67,22 @@ export const useAuthStore = defineStore({
       this.userRole = null;
     },
     refresh() {
-      HTTP.post('refresh', { withCredentials: true }).then(response => {
-
-      }).catch(error => {
-        router.push('/login');
-      });
+      HTTP.post("refresh", { withCredentials: true })
+        .then((response) => {})
+        .catch((error) => {
+          router.push("/login");
+        });
     },
     logoutRequest() {
       this.clearMessage();
-      HTTP.delete('logout')
+      HTTP.delete("logout")
         .then((response) => {
           this.logout();
         })
         .catch((error) => {
           this.setMessage(error);
-        }).finally(() => {
+        })
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -90,7 +90,7 @@ export const useAuthStore = defineStore({
       this.loading = true;
       this.logined = false;
       this.clearMessage();
-      HTTP.post('login', { username: username, password: password })
+      HTTP.post("login", { username: username, password: password })
         .then((response) => {
           this.userData = response.data;
           this.setUserRole();
@@ -99,7 +99,8 @@ export const useAuthStore = defineStore({
         .catch((error) => {
           this.setMessage(error);
           this.logined = false;
-        }).finally(() => {
+        })
+        .finally(() => {
           this.loading = false;
         });
     },
@@ -107,7 +108,12 @@ export const useAuthStore = defineStore({
       this.loading = true;
       this.logined = false;
       this.clearMessage();
-      HTTP.post('signup', { username: username, password: password, first_name, last_name })
+      HTTP.post("signup", {
+        username: username,
+        password: password,
+        first_name,
+        last_name,
+      })
         .then((response) => {
           this.userData = response.data;
           this.setUserRole();
@@ -116,14 +122,15 @@ export const useAuthStore = defineStore({
         .catch((error) => {
           this.setMessage(error);
           this.logined = false;
-        }).finally(() => {
+        })
+        .finally(() => {
           this.loading = false;
         });
     },
     getMe() {
       this.loading = true;
       this.clearMessage();
-      HTTP.get('me')
+      HTTP.get("me")
         .then((response) => {
           this.userData = response.data;
           this.setUserRole();
@@ -131,9 +138,10 @@ export const useAuthStore = defineStore({
         })
         .catch((error) => {
           this.logined = false;
-        }).finally(() => {
+        })
+        .finally(() => {
           this.loading = false;
         });
-    }
-  }
+    },
+  },
 });

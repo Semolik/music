@@ -35,6 +35,3 @@ class FileCruds(CRUDBase):
 
     def get_file_by_id(self, file_id) -> File | None:
         return self.get(model=File, id=file_id)
-
-
-file_cruds = FileCruds()
