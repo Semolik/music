@@ -19,11 +19,10 @@
             <div class="text">Клипы</div>
         </router-link>
     </div>
-    <FormField placeholder="Поиск" :borderRadius="7"></FormField>
 </template>
 <style lang="scss" scoped>
-@use '@/assets/styles/helpers';
-@use '@/assets/styles/components';
+@use "@/assets/styles/helpers";
+@use "@/assets/styles/components";
 
 .buttons {
     display: grid;
@@ -36,15 +35,13 @@
 }
 </style>
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlus, faMusic, faFilm } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import FormField from '/src/components/FormField.vue';
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faPlus, faMusic, faFilm } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(faPlus, faMusic, faFilm);
 export default {
     components: {
         FontAwesomeIcon,
-        FormField
-    }
-}
+    },
+};
 </script>

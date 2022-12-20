@@ -51,23 +51,26 @@
                     <div class="block custom">
                         тип аккаунта:
                         <div class="statuses">
-                            <span
-                                :class="{ active: userRole === Role.Musician }"
-                                >музыкант</span
-                            >
-                            <span :class="{ active: userRole === Role.User }"
-                                >пользователь</span
-                            >
-                            <span
-                                :class="{
-                                    active: userRole === Role.RadioStation,
-                                }"
-                                >радиостанция</span
-                            >
+                            <span v-if="isMusician" class="active"
+                                >музыкант
+                            </span>
+                            <span v-if="isUser" class="active">
+                                пользователь
+                            </span>
+                            <span v-if="isRadioStation" class="active"
+                                >радиостанция
+                            </span>
+                            <span v-if="isAdmin" class="active">
+                                Администратор
+                            </span>
                         </div>
                     </div>
                 </div>
-                <Teleport :disabled="avatarIsEmpty" to="#user-info-container">
+                <Teleport
+                    :disabled="avatarIsEmpty"
+                    to="#user-info-container"
+                    v-if="mounted"
+                >
                     <ButtonsBlock
                         @save="save"
                         :active="dataChanged"
@@ -96,7 +99,12 @@ import FormField from "/src/components/FormField.vue";
 import { Role } from "/src/helpers/roles.js";
 import SelectImage from "/src/components/SelectImage.vue";
 import ButtonsBlock from "/src/components/Settings/ButtonsBlock.vue";
-
+import {
+    isAdmin,
+    isUser,
+    isRadioStation,
+    isMusician,
+} from "/src/composables/roleChecker";
 library.add([faUser, faFloppyDisk, faTrash, faImage]);
 
 export default {
@@ -106,7 +114,7 @@ export default {
         const toast = useToast();
         const { VITE_MAX_FIRSTNAME_LENGTH, VITE_MAX_LASTNAME_LENGTH } =
             import.meta.env;
-        getMe();
+
         return {
             userData,
             toast,
@@ -117,6 +125,10 @@ export default {
             userRole,
             VITE_MAX_FIRSTNAME_LENGTH,
             VITE_MAX_LASTNAME_LENGTH,
+            isAdmin,
+            isUser,
+            isRadioStation,
+            isMusician,
         };
     },
     data() {
@@ -128,7 +140,12 @@ export default {
             file_changed: false,
             fileChanged: false,
             picture: this.userData?.picture,
+            mounted: false,
         };
+    },
+    mounted() {
+        this.mounted = true;
+        this.getMe();
     },
     components: {
         FontAwesomeIcon,

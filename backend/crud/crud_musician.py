@@ -1,13 +1,6 @@
-from datetime import datetime
-import os
-from pathlib import Path
 from typing import List
-from backend.crud.crud_file import FileCruds
-from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
-from backend.core.config import settings
-from backend.models.files import Image
-from backend.models.music import Album, Genre, Track
+from backend.models.music import Album
 from backend.models.user import FavoriteMusicians
 
 
@@ -31,5 +24,6 @@ class MusicianCrud(CRUDBase):
             self.delete(model=liked)
             return False
 
-    def get_musician_albums(self, musician_id: int) -> List[Album]:
-        return self.db.query(Album).filter(Album.musician_id == musician_id).all()
+    def get_musician_albums(self, musician_id: int, limit: int = None) -> List[Album]:
+        query = self.db.query(Album).filter(Album.musician_id == musician_id)
+        return query.limit(limit).all() if limit else query.all()

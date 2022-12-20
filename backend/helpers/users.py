@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.images import set_picture
 from backend.helpers.clips import set_clip_data
+from backend.helpers.music import set_album_info
 
 
 def get_public_profile_as_dict(db: Session, user_id: int = None, public_profile_id: int = None, full_links=False,):
@@ -48,4 +49,14 @@ def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profil
                 musician_id=db_public_profile.id, page=1, page_size=3)
         )
     )
+    albums = MusicianCrud(db).get_musician_albums(
+        limit=4, musician_id=db_public_profile.id)
+    public_profile_data['albums'] = [set_album_info(
+        db=db, db_album=album, user_id=user_id) for album in albums]
     return public_profile_data
+
+
+def set_musician_info(data: dict, public_profile_id: int, db: Session, user_id: int = None):
+    data['musician'] = get_public_profile_as_dict(
+        db=db, public_profile_id=public_profile_id, user_id=user_id)
+    return data

@@ -1,49 +1,67 @@
 <template>
     <div class="container">
         <div class="selector">
-            <div :class="['item', {active: current===all}]" @click="current = all">
+            <div
+                :class="['item', { active: current === all }]"
+                @click="current = all"
+            >
                 все
                 <div class="bg all"></div>
             </div>
-            <div :class="['item', {active: current===in_progress}]" @click="current = in_progress">
+            <div
+                :class="['item', { active: current === in_progress }]"
+                @click="current = in_progress"
+            >
                 на рассмотрении
                 <div class="bg in-progress"></div>
             </div>
-            <div :class="['item', {active: current===successfully}]" @click="current = successfully">
+            <div
+                :class="['item', { active: current === successfully }]"
+                @click="current = successfully"
+            >
                 одобренные
                 <div class="bg successfully"></div>
             </div>
-            <div :class="['item', {active: current===rejected}]" @click="current = rejected">
+            <div
+                :class="['item', { active: current === rejected }]"
+                @click="current = rejected"
+            >
                 отклоненные
                 <div class="bg rejected"></div>
             </div>
         </div>
         <div class="requests" v-if="!requestsEmpty">
-            <history-item :adminMode="true" :ырщц="current!==all" :request="request"
-                v-for="request in this.requests" />
+            <history-item
+                :adminMode="true"
+                :ырщц="current !== all"
+                :request="request"
+                v-for="request in this.requests"
+            />
         </div>
         <div class="empty" v-else>тут пусто</div>
         <div class="buttons" v-if="show_button && !loading">
-            <div class="button-load-more" @click="getNextPage">Загрузить еще</div>
+            <div class="button-load-more" @click="getNextPage">
+                Загрузить еще
+            </div>
         </div>
     </div>
 </template>
 <script>
-import { HTTP } from '/src/http-common.vue';
-import HistoryItem from './History/Item.vue';
+import { HTTP } from "/src/http-common.vue";
+import HistoryItem from "./History/Item.vue";
 export default {
     data() {
         return {
-            current: 'in-progress',
-            in_progress: 'in-progress',
-            successfully: 'successfully',
-            rejected: 'rejected',
-            all: 'all',
+            current: "in-progress",
+            in_progress: "in-progress",
+            successfully: "successfully",
+            rejected: "rejected",
+            all: "all",
             page: 1,
             requests: [],
             loading: false,
             show_button: true,
-        }
+        };
     },
     components: { HistoryItem },
     watch: {
@@ -52,46 +70,49 @@ export default {
             this.page = 1;
             this.show_button = true;
             this.getPage();
-        }
+        },
     },
     methods: {
         getPage() {
             this.loading = true;
-            HTTP.get('change-role-requests', { params: { page: this.page, filter: this.current } })
+            HTTP.get("change-role-requests", {
+                params: { page: this.page, filter: this.current },
+            })
                 .then((response) => {
                     if (response.data.length === 0) {
                         this.show_button = false;
                     }
-                    this.requests = [...this.requests, ...response.data]
+                    this.requests = [...this.requests, ...response.data];
                 })
-                .catch((error) => {
-                }).finally(() => {
+                .catch((error) => {})
+                .finally(() => {
                     this.loading = false;
                 });
         },
         getNextPage() {
             this.page++;
             this.getPage();
-        }
+        },
     },
     mounted() {
         this.getPage();
     },
     computed: {
         requestsEmpty() {
-            if (this.loading) return
-            return this.requests.length === 0
-        }
-    }
-}
+            if (this.loading) return;
+            return this.requests.length === 0;
+        },
+    },
+};
 </script>
 <style lang="scss" scoped>
-@use '@/assets/styles/helpers';
+@use "@/assets/styles/helpers";
 
 .container {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100%;
 
     .selector {
         display: flex;
@@ -124,7 +145,7 @@ export default {
             }
 
             .bg {
-                transition: .2s opacity;
+                transition: 0.2s opacity;
                 position: absolute;
                 inset: 0;
                 opacity: 0.3;
@@ -160,6 +181,7 @@ export default {
         border: 2px dashed var(--color-text);
         padding: 20px;
         border-radius: 15px;
+        height: 100%;
     }
 
     .buttons {

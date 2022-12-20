@@ -156,3 +156,4 @@ class MusicianClip(BaseModel):
 class MusicianFullInfo(PublicProfile):
     liked: bool | None
     clips: List[MusicianClip]
+    albums: List[AlbumInfo]
