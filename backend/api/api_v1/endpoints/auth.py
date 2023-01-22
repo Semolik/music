@@ -12,7 +12,7 @@ router = APIRouter(tags=['Авторизация'])
 
 @router.post('/login', response_model=UserInfo, responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def login(user_in: UserAuth, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
-
+    '''Авторизация пользователя'''
     db_user = UserCruds(db).login(user_in)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -26,6 +26,7 @@ def login(user_in: UserAuth, Authorize: AuthJWT = Depends(), db: Session = Depen
 
 @router.delete('/logout')
 def logout(Authorize: AuthJWT = Depends()):
+    '''Выход из системы'''
     Authorize.jwt_required()
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}
@@ -33,6 +34,7 @@ def logout(Authorize: AuthJWT = Depends()):
 
 @router.post('/refresh')
 def refresh(Authorize: AuthJWT = Depends()):
+    '''Обновление токена'''
     Authorize.jwt_refresh_token_required()
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id)

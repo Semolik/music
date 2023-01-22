@@ -37,10 +37,7 @@ class UserCruds(CRUDBase):
                        **user_in_data)
         if admin:
             db_user.type = 'superuser'
-        self.db.add(db_user)
-        self.db.commit()
-        self.db.refresh(db_user)
-        return db_user
+        return self.create(db_user)
 
     def login(self, user: UserAuth) -> User | None:
         db_user = self.get_user_by_username(username=user.username)
@@ -74,13 +71,13 @@ class UserCruds(CRUDBase):
             return db_public_profile
         db_user = self.get_user_by_id(user_id=user_id)
         links = PublicProfileLinksModel()
-        new_db_public_profile = PublicProfile(
-            name=' '.join(
-                filter(None, [db_user.first_name, db_user.last_name])) or db_user.username,
+        name = ' '.join(
+            filter(None, [db_user.first_name, db_user.last_name])) or db_user.username
+        return self.create(PublicProfile(
+            name=name,
             user_id=user_id,
             links=links
-        )
-        return self.create(new_db_public_profile)
+        ))
 
     def get_public_profile_by_id(self, id):
         return self.db.query(PublicProfile).filter(
