@@ -17,6 +17,7 @@ def update_user_data(
         Authorize: AuthJWT = Depends(),
         db: Session = Depends(get_db)
 ):
+    '''Обновление данных пользователя'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = UserCruds(db).get_user_by_id(current_user_id)
@@ -35,6 +36,7 @@ def update_user_data(
 @router.get('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
 def get_user_info(Authorize: AuthJWT = Depends(),
                   db: Session = Depends(get_db)):
+    '''Получение данных пользователя'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     user = UserCruds(db).get_user_by_id(current_user_id)
@@ -59,6 +61,7 @@ def update_user_public_profile_data(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Обновление данных публичного профиля пользователя'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = UserCruds(db).get_user_by_id(current_user_id)
@@ -87,6 +90,7 @@ def update_user_public_profile_data(
             )
 def get_user_public_profile_info(Authorize: AuthJWT = Depends(),
                                  db: Session = Depends(get_db)):
+    '''Получение данных публичного профиля пользователя'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = UserCruds(db).get_user_by_id(current_user_id)

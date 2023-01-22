@@ -26,6 +26,7 @@ def create_genre(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Создание жанра'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)
@@ -53,6 +54,7 @@ def update_genre(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Обновление жанра'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)
@@ -69,6 +71,7 @@ def update_genre(
 
 @router.get('/all',  response_model=List[Genre])
 def get_genres(db: Session = Depends(get_db)):
+    '''Получение всех жанров'''
     return [
         set_picture(genre.as_dict(), genre.picture)
         for genre in GenresCruds(db).get_genres()
@@ -77,6 +80,7 @@ def get_genres(db: Session = Depends(get_db)):
 
 @router.get('/genre', responses={**NOT_FOUND_GENRE}, response_model=Genre)
 def get_genre(id: int, db: Session = Depends(get_db)):
+    '''Получение жанра по id'''
     genre = GenresCruds(db).get_genre_by_id(id=id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -92,6 +96,7 @@ def get_genre(id: int, db: Session = Depends(get_db)):
     }
 )
 def delete_genre(id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Удаление жанра'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)

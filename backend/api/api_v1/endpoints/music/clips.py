@@ -20,6 +20,7 @@ def create_clip(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Создание клипа'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(db=db, user_id=current_user_id)
@@ -52,6 +53,7 @@ def delete_clip(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Удаление клипа'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(db=db, user_id=current_user_id)
@@ -75,6 +77,7 @@ def update_clip(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Изменение клипа'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(db=db, user_id=current_user_id)
@@ -110,6 +113,7 @@ def create_clip(
     id: int,
     db: Session = Depends(get_db)
 ):
+    '''Получение клипа'''
     clip = ClipsCruds(db).get_clip_by_id(clip_id=id)
     if not clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -123,6 +127,7 @@ def get_my_clips(
     page: int,
     db: Session = Depends(get_db)
 ):
+    '''Получение клипов музыканта'''
     db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -138,6 +143,7 @@ def get_my_clips(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Получение моих клипов'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(db=db, user_id=current_user_id)

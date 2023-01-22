@@ -24,6 +24,7 @@ def upload_track(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Создание трека'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_album = AlbumsCruds(db).get_album(album_id=trackData.album_id)
@@ -57,6 +58,7 @@ def like_track(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Лайк трека'''
     Authorize.jwt_required()
     db_track = TracksCrud(db).get_track(track_id=track_id)
     if not db_track:
@@ -74,6 +76,7 @@ def get_track(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Получение трека'''
     Authorize.jwt_optional()
     db_track = TracksCrud(db).get_track(track_id=id)
     if not db_track:
@@ -94,6 +97,7 @@ def like_track(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Получение лайкнутых треков'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     liked_tracks = TracksCrud(db).get_liked_tracks(

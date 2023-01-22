@@ -14,6 +14,7 @@ router = APIRouter(tags=['Статистика'], prefix='/statistics')
 
 @router.get('', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UsersStats)
 def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Получение статистики по пользователям'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)

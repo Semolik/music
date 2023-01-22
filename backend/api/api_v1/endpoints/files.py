@@ -6,11 +6,13 @@ from backend.crud.crud_file import FileCruds
 from backend.core.config import settings
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
+import uuid as uuid_pkg
 router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 
 
 @router.get('/images/{image_id}', response_class=FileResponse)
-def get_image(image_id, db: Session = Depends(get_db)):
+def get_image(image_id: uuid_pkg.UUID, db: Session = Depends(get_db)):
+    """Получение изображения по его id"""
     db_image = FileCruds(db).get_image_by_id(image_id=image_id)
     if not db_image:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -23,7 +25,8 @@ def get_image(image_id, db: Session = Depends(get_db)):
 
 
 @router.get('/other/{file_id}', response_class=FileResponse)
-def get_image(file_id: int, db: Session = Depends(get_db)):
+def get_image(file_id: uuid_pkg.UUID, db: Session = Depends(get_db)):
+    """Получение файла по его id"""
     db_file = FileCruds(db).get_file_by_id(file_id=file_id)
     if not db_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -36,7 +39,8 @@ def get_image(file_id: int, db: Session = Depends(get_db)):
 
 
 @router.get('/tracks/{track_id}', response_class=FileResponse)
-def get_image(track_id, db: Session = Depends(get_db)):
+def get_image(track_id: uuid_pkg.UUID, db: Session = Depends(get_db)):
+    """Получение трека по его id"""
     db_file = TracksCrud(db).get_track(track_id=track_id)
     if not db_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

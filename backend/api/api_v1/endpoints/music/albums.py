@@ -25,6 +25,7 @@ def create_album(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Создание альбома'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     db_user = validate_musician(db=db, user_id=current_user_id)
@@ -43,6 +44,7 @@ def close_album_uploading(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Закрытие альбома для загрузки треков'''
     Authorize.jwt_required()
     db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
@@ -63,6 +65,7 @@ def create_album(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Обновление альбома'''
     Authorize.jwt_required()
     db_album = AlbumsCruds(db).get_album(album_id=albumData.id)
     if not db_album:
@@ -91,6 +94,7 @@ def get_album_by_id(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Получение альбома по id'''
     Authorize.jwt_optional()
     db_album = AlbumsCruds(db).get_album(album_id=id)
     if not db_album:
@@ -112,6 +116,7 @@ def get_album_by_id(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Удаление альбома по id'''
     Authorize.jwt_required()
     db_album = AlbumsCruds(db).get_album(album_id=id)
     if not db_album:
@@ -130,6 +135,7 @@ def get_my_albums(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Получение альбомов музыканта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_musician(db=db, user_id=current_user_id)

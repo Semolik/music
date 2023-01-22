@@ -20,6 +20,7 @@ def send_update_role_request(
     files: List[UploadFile] = [],
     db: Session = Depends(get_db)
 ):
+    '''Отправка запроса на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if ChangeRolesCruds(db).is_user_have_active_change_role_messages(user_id=current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
@@ -42,6 +43,7 @@ def send_update_role_request(
 
 @router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
 def get_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Получение списка запросов на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     return ChangeRolesCruds(db).get_user_change_role_messages(user_id=current_user_id)
@@ -49,6 +51,7 @@ def get_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(ge
 
 @router.get('/has-change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Проверка наличия запросов на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     return ChangeRolesCruds(db).is_has_change_role_messages(user_id=current_user_id)
@@ -56,6 +59,7 @@ def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depen
 
 @router.get('/change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
 def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FILTER, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Получение списка запросов на смену типа аккаунта от всех пользователей'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not UserCruds(db).is_admin(user_id=current_user_id):
@@ -66,6 +70,7 @@ def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FI
 
 @router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
 def send_update_role_request_answer(data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not UserCruds(db).is_admin(user_id=current_user_id):

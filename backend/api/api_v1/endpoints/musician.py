@@ -16,6 +16,7 @@ def get_public_profile_info(
         Authorize: AuthJWT = Depends(),
         db: Session = Depends(get_db)
 ):
+    '''Получение информации о публичном профиле музыканта'''
     Authorize.jwt_optional()
     current_user_id = Authorize.get_jwt_subject()
     public_profile_obj = get_musician_profile_as_dict(
@@ -36,6 +37,7 @@ def like_musician(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
+    '''Лайк музыканта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if not UserCruds(db).get_public_profile_by_id(id=profile_id):
