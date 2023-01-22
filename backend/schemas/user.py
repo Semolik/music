@@ -84,11 +84,15 @@ class UpdateRoleRequestAnswer(RoleRequestAnswer):
     request_status: settings.ALLOWED_STATUSES
 
 
-class ChangeRoleRequestInfo(BaseModel):
+class TimeCreated(BaseModel):
+    time_created: str
+
+
+class ChangeRoleRequestInfo(TimeCreated):
     files: List[File]
     message: str
     status: settings.ALLOWED_STATUSES
-    time_created: str
+
     account_status: str
     answer: RoleRequestAnswer | None = None
 

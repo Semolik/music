@@ -3,7 +3,8 @@ from fastapi import Depends, APIRouter, status, UploadFile, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
-from backend.schemas.user import UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
+from backend.schemas.messages import Message
+from backend.schemas.user import TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.models.files import File
 from backend.db.db import get_db
@@ -13,7 +14,7 @@ from backend.crud.crud_user import UserCruds
 router = APIRouter(tags=['Роли'])
 
 
-@router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=Message)
 def send_update_role_request(
     Authorize: AuthJWT = Depends(),
     formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest),
@@ -49,7 +50,7 @@ def get_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(ge
     return ChangeRolesCruds(db).get_user_change_role_messages(user_id=current_user_id)
 
 
-@router.get('/has-change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.get('/has-change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=bool)
 def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Проверка наличия запросов на смену типа аккаунта'''
     Authorize.jwt_required()
@@ -68,7 +69,7 @@ def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FI
     return ChangeRolesCruds(db).get_all_change_role_messages(page=page, filter=filter)
 
 
-@router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.post('/change-role-answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=TimeCreated)
 def send_update_role_request_answer(data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()
