@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, APIRouter, UploadFile, File, status, HTTPException
+from fastapi import Depends, APIRouter, UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_user import UserCruds
@@ -16,7 +16,8 @@ router = APIRouter(prefix="/clips", tags=['Клипы'])
 @router.post('/clip', response_model=MusicianClip)
 def create_clip(
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
-    clipPicture: UploadFile = File(default=False),
+    clipPicture: UploadFile = File(
+        default=False, description='Картинка клипа'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -49,7 +50,7 @@ def create_clip(
 
 @router.delete('/clip')
 def delete_clip(
-    clip_id: int,
+    clip_id: int = Query(..., description='ID клипа'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -73,7 +74,8 @@ def delete_clip(
 @router.put('/clip', response_model=MusicianClip)
 def update_clip(
     clipData: UpdateMusicianClipForm = Depends(UpdateMusicianClipForm),
-    clipPicture: UploadFile = File(default=False),
+    clipPicture: UploadFile = File(
+        default=False, description='Картинка клипа'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -110,7 +112,7 @@ def update_clip(
 
 @router.get('/clip', response_model=MusicianClip)
 def create_clip(
-    id: int,
+    id: int = Query(..., description='ID клипа'),
     db: Session = Depends(get_db)
 ):
     '''Получение клипа'''
@@ -123,8 +125,8 @@ def create_clip(
 
 @router.get('/all', response_model=List[MusicianClip])
 def get_my_clips(
-    musician_id: int,
-    page: int,
+    musician_id: int = Query(..., description='ID музыканта'),
+    page: int = Query(1, description='Страница'),
     db: Session = Depends(get_db)
 ):
     '''Получение клипов музыканта'''
@@ -139,7 +141,7 @@ def get_my_clips(
 
 @router.get('/my', response_model=List[MusicianClip])
 def get_my_clips(
-    page: int,
+    page: int = Query(1, description='Страница'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):

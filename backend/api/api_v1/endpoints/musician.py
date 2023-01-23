@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi import Depends, APIRouter, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.users import get_musician_profile_as_dict
@@ -12,7 +12,7 @@ router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 @router.get('/', response_model=MusicianFullInfo)
 def get_public_profile_info(
-        profile_id: int,
+        profile_id: int = Query(..., description='ID профиля'),
         Authorize: AuthJWT = Depends(),
         db: Session = Depends(get_db)
 ):
@@ -33,7 +33,7 @@ def get_public_profile_info(
 
 @router.post('/like', response_model=Liked)
 def like_musician(
-    profile_id: int,
+    profile_id: int = Query(..., description='ID профиля'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):

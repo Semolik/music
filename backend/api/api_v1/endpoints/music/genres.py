@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
+from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_genres import GenresCruds
 from backend.db.db import get_db
@@ -12,17 +12,10 @@ from backend.schemas.music import CreateGenreForm, Genre, UpdateGenreForm
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
 
-@router.post('/genre',
-             responses={
-                 **NOT_ENOUGH_RIGHTS,
-                 status.HTTP_409_CONFLICT: {
-                     "model": GENRE_IS_NOT_UNIQUE
-                 }
-             },
-             response_model=Genre)
+@router.post('/genre', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre)
 def create_genre(
     genreData: CreateGenreForm = Depends(CreateGenreForm),
-    genrePicture: UploadFile = File(...),
+    genrePicture: UploadFile = File(..., description='Картинка жанра'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -50,7 +43,8 @@ def create_genre(
 )
 def update_genre(
     genreData: UpdateGenreForm = Depends(UpdateGenreForm),
-    genrePicture: UploadFile = File(default=False),
+    genrePicture: UploadFile = File(
+        default=False, description='Картинка жанра'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -79,7 +73,7 @@ def get_genres(db: Session = Depends(get_db)):
 
 
 @router.get('/genre', responses={**NOT_FOUND_GENRE}, response_model=Genre)
-def get_genre(id: int, db: Session = Depends(get_db)):
+def get_genre(id: int = Query(..., description="ID жанра"), db: Session = Depends(get_db)):
     '''Получение жанра по id'''
     genre = GenresCruds(db).get_genre_by_id(id=id)
     if not genre:
@@ -95,7 +89,7 @@ def get_genre(id: int, db: Session = Depends(get_db)):
         **NOT_FOUND_GENRE
     }
 )
-def delete_genre(id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def delete_genre(id: int = Query(..., description="ID жанра"), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Удаление жанра'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()

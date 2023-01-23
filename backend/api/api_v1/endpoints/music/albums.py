@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
+from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_musician import MusicianCrud
@@ -21,7 +21,8 @@ router = APIRouter(prefix="/albums", tags=['Альбомы'])
 @router.post('/album', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
 def create_album(
     albumData: CreateAlbumForm = Depends(CreateAlbumForm),
-    albumPicture: UploadFile = File(default=False),
+    albumPicture: UploadFile = File(
+        default=False, description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -40,7 +41,7 @@ def create_album(
 
 @router.put('/album/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumIsCLosed)
 def close_album_uploading(
-    album_id: int,
+    album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -61,7 +62,8 @@ def close_album_uploading(
 @router.put('/album', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def create_album(
     albumData: UpdateAlbumForm = Depends(UpdateAlbumForm),
-    albumPicture: UploadFile = File(default=False),
+    albumPicture: UploadFile = File(
+        default=False, description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -90,7 +92,7 @@ def create_album(
 
 @router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(
-    id: int,
+    id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -112,7 +114,7 @@ def get_album_by_id(
 
 @router.delete('/album', responses={**NOT_FOUND_ALBUM})
 def get_album_by_id(
-    id: int,
+    id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):

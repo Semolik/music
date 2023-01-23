@@ -13,7 +13,8 @@ router = APIRouter(tags=['Профили пользователей'])
 @router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
 def update_user_data(
         UserData: UserModifiableForm = Depends(UserModifiableForm),
-        userPicture: UploadFile = File(default=False),
+        userPicture: UploadFile = File(
+            default=False, description='Фото пользователя'),
         Authorize: AuthJWT = Depends(),
         db: Session = Depends(get_db)
 ):
@@ -57,7 +58,8 @@ def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable = Depends(
         PublicProfileModifiable
     ),
-    userPublicPicture: UploadFile = File(default=False),
+    userPublicPicture: UploadFile = File(
+        default=False, description='Фото публичного профиля'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):

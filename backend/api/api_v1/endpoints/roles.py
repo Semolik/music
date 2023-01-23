@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, UploadFile, HTTPException
+from fastapi import Depends, APIRouter, status, UploadFile, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
@@ -59,7 +59,13 @@ def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depen
 
 
 @router.get('/change-role-requests', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
-def get_all_change_role_requests(page: int, filter: settings.ALLOWED_STATUSES_FILTER, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def get_all_change_role_requests(
+    page: int = Query(1, description='Номер страницы'),
+    filter: settings.ALLOWED_STATUSES_FILTER = Query(
+        settings.ALLOWED_STATUSES_LIST[-1],
+        description='Фильтр по статусу'
+    ),
+        Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Получение списка запросов на смену типа аккаунта от всех пользователей'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()

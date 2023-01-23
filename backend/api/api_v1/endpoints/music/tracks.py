@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
+from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_tracks import TracksCrud
@@ -19,8 +19,9 @@ router = APIRouter(prefix="/tracks", tags=['Треки'])
 @router.post('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
 def upload_track(
     trackData: UploadTrackForm = Depends(UploadTrackForm),
-    trackPicture: UploadFile = File(default=False),
-    track: UploadFile = File(default=False),
+    trackPicture: UploadFile = File(
+        default=False, description="Изображение трека"),
+    track: UploadFile = File(default=False, description="Файл трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -54,7 +55,7 @@ def upload_track(
 
 @router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
 def like_track(
-    track_id: str,
+    track_id: str = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -72,7 +73,7 @@ def like_track(
 
 @router.get('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
 def get_track(
-    id: int,
+    id: int = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -93,7 +94,7 @@ def get_track(
 
 @router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
 def like_track(
-    page: int,
+    page: int = Query(1, description="Номер страницы"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
