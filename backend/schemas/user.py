@@ -37,7 +37,8 @@ class UserBase(BaseModel):
 
 
 class UserTypes(BaseModel):
-    type: settings.ALL_USER_ACCOUNT_STATUSES
+    type: settings.ALL_USER_ACCOUNT_STATUSES = Query(
+        ..., description='Тип пользователя')
 
 
 class UserWithTypeRegister(UserBase, UserAuth, UserTypes):
@@ -70,55 +71,64 @@ class UserInfo(UserTypes, UserBase, UserUsername):
 
 @form_body
 class UpdateUserRoleRequest(BaseModel):
-    message: str
-    account_status: settings.USER_ACCOUNT_STATUSES
+    message: str = Query(..., description='Сообщение пользователя')
+    account_status: settings.USER_ACCOUNT_STATUSES = Query(
+        ..., description='Запрашиваемый статус аккаунта')
 
 
 class RoleRequestAnswer(BaseModel):
-    request_id: int
-    message: str | None = None
-    status: str | None = None
+    request_id: int = Query(...,
+                            description='ID запроса на изменение типа аккаунта')
+    message: str | None = Query(..., description='Ответное сообщение')
+    status: str | None = Query(..., description='Присвоенный статус')
 
 
 class UpdateRoleRequestAnswer(RoleRequestAnswer):
-    request_status: settings.ALLOWED_STATUSES
+    request_status: settings.ALLOWED_STATUSES = Query(
+        ..., description='Статус запроса')
 
 
 class TimeCreated(BaseModel):
-    time_created: str
+    time_created: str = Query(..., description='Время создания')
 
 
 class ChangeRoleRequestInfo(TimeCreated):
-    files: List[File]
-    message: str
-    status: settings.ALLOWED_STATUSES
-
-    account_status: str
-    answer: RoleRequestAnswer | None = None
+    files: List[File] = Query(...,
+                              description='Файлы, прикрепленные к запросу')
+    message: str = Query(..., description='Сообщение пользователя')
+    status: settings.ALLOWED_STATUSES = Query(...,
+                                              description='Статус запроса')
+    account_status: str = Query(...,
+                                description='Запрашиваемый статус аккаунта')
+    answer: RoleRequestAnswer | None = Query(...,
+                                             description='Ответ на запрос')
 
 
 class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
-    id: int
-    user: UserInfo
+    id: int = Query(..., description='ID запроса на изменение типа аккаунта')
+    user: UserInfo = Query(..., description='Пользователь, сделавший запрос')
 
 
 class PublicProfileLinks(BaseModel):
-    youtube: str | None = None
-    telegram: str | None = None
-    vk: str | None = None
+    youtube: str | None = Query(..., description='Ссылка на канал YouTube')
+    telegram: str | None = Query(...,
+                                 description='Ссылка на канал/аккаунт в Telegram')
+    vk: str | None = Query(..., description='Ссылка на страницу VK')
 
 
 class PublicProfileBase(BaseModel):
-    name: str
-    description: str | None
+    name: str = Query(..., description='Оторажаемое имя')
+    description: str | None = Query(..., description='Описание профиля')
 
 
 class PublicProfile(PublicProfileBase):
-    id: int
-    links: PublicProfileLinks
-    picture: str | None
+    id: int = Query(..., description='ID публичного профиля')
+    links: PublicProfileLinks = Query(..., description='Ссылки на соц. сети')
+    picture: str | None = Query(...,
+                                description='Ссылка на аватарку публичного профиля')
 
 
 @form_body
 class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks):
-    remove_picture: bool = False
+    remove_picture: bool = Query(
+        default=False, description='Удалить аватарку публичного профиля')
