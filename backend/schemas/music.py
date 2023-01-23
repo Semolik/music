@@ -2,7 +2,7 @@ import uuid as uuid_pkg
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
-from fastapi import Query, Form
+from fastapi import Query, Form, UploadFile, File
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
 from backend.core.config import env_config
@@ -18,7 +18,7 @@ class CreateAlbum(BaseModel):
 
 
 class UpdateAlbum(CreateAlbum):
-    id: int = Query(..., description="ID альбома")
+    # id: int = Query(..., description="ID альбома")
     tracks_ids: List[uuid_pkg.UUID] = Query(...,
                                             description="Список ID треков")
 
@@ -33,7 +33,7 @@ class CreateAlbumForm(CreateAlbum):
     ...
 
 
-class CreateGenre(BaseModel):
+class GenreBase(BaseModel):
     name: str = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH')),
@@ -42,20 +42,14 @@ class CreateGenre(BaseModel):
 
 
 @form_body
-class CreateGenreForm(CreateGenre):
+class GenreBaseForm(GenreBase):
     ...
 
+# class CreateGenreForm(CreateGenreForm):
 
-class UpdateGenre(CreateGenre):
+
+class Genre(GenreBase):
     id: int = Query(..., description="ID жанра")
-
-
-@form_body
-class UpdateGenreForm(UpdateGenre):
-    ...
-
-
-class Genre(UpdateGenre):
     picture: str = Query(..., description="Ссылка на картинку жанра")
 
 
@@ -148,9 +142,9 @@ class CreateMusicianClipForm(CreateMusicianClip):
                                      description="Использовать ли картинку с YouTube")
 
 
-@form_body
-class UpdateMusicianClipForm(CreateMusicianClipForm):
-    id: int = Query(..., description="ID клипа")
+# @form_body
+# class UpdateMusicianClipForm(CreateMusicianClipForm):
+#     id: int = Query(..., description="ID клипа")
 
 
 class MusicianClip(BaseModel):

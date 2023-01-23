@@ -18,7 +18,7 @@ from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, Al
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
-@router.post('/album', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
+@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
 def create_album(
     albumData: CreateAlbumForm = Depends(CreateAlbumForm),
     albumPicture: UploadFile = File(
@@ -39,7 +39,7 @@ def create_album(
     return album_obj
 
 
-@router.put('/album/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumIsCLosed)
+@router.put('/{album_id}/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumIsCLosed)
 def close_album_uploading(
     album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
@@ -59,8 +59,9 @@ def close_album_uploading(
     return AlbumIsCLosed(closed_uploading=not db_album.uploaded)
 
 
-@router.put('/album', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def create_album(
+    album_id: int = Query(..., description='ID альбома'),
     albumData: UpdateAlbumForm = Depends(UpdateAlbumForm),
     albumPicture: UploadFile = File(
         default=False, description='Картинка альбома'),
@@ -69,7 +70,7 @@ def create_album(
 ):
     '''Обновление альбома'''
     Authorize.jwt_required()
-    db_album = AlbumsCruds(db).get_album(album_id=albumData.id)
+    db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -90,15 +91,15 @@ def create_album(
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=album_obj)
 
 
-@router.get('/album', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(
-    id: int = Query(..., description='ID альбома'),
+    album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
     '''Получение альбома по id'''
     Authorize.jwt_optional()
-    db_album = AlbumsCruds(db).get_album(album_id=id)
+    db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -112,15 +113,15 @@ def get_album_by_id(
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
 
 
-@router.delete('/album', responses={**NOT_FOUND_ALBUM})
+@router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM})
 def get_album_by_id(
-    id: int = Query(..., description='ID альбома'),
+    album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
     '''Удаление альбома по id'''
     Authorize.jwt_required()
-    db_album = AlbumsCruds(db).get_album(album_id=id)
+    db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
@@ -132,7 +133,7 @@ def get_album_by_id(
     return {'detail': 'Альбом удален'}
 
 
-@router.get('/get_my_albums', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
+@router.get('/my', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
 def get_my_albums(
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)

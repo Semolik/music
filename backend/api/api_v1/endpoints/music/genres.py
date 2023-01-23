@@ -8,13 +8,13 @@ from backend.helpers.images import save_image, set_picture
 from backend.helpers.validate_role import validate_admin
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import CreateGenreForm, Genre, UpdateGenreForm
+from backend.schemas.music import Genre, GenreBaseForm
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
 
-@router.post('/genre', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre)
+@router.post('', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre)
 def create_genre(
-    genreData: CreateGenreForm = Depends(CreateGenreForm),
+    genreData: GenreBaseForm = Depends(GenreBaseForm),
     genrePicture: UploadFile = File(..., description='Картинка жанра'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
@@ -34,7 +34,7 @@ def create_genre(
 
 
 @router.put(
-    '/genre',
+    '/{genre_id}',
     responses={
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
@@ -42,9 +42,9 @@ def create_genre(
     response_model=Genre
 )
 def update_genre(
-    genreData: UpdateGenreForm = Depends(UpdateGenreForm),
-    genrePicture: UploadFile = File(
-        default=False, description='Картинка жанра'),
+    genre_id: int = Query(..., description='ID жанра'),
+    genreData: GenreBaseForm = Depends(GenreBaseForm),
+    genrePicture: UploadFile = File(None, description='Картинка жанра'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -52,7 +52,7 @@ def update_genre(
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)
-    genre = GenresCruds(db).get_genre_by_id(id=genreData.id)
+    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
@@ -63,7 +63,7 @@ def update_genre(
     return set_picture(genre.as_dict(), genre.picture)
 
 
-@router.get('/all',  response_model=List[Genre])
+@router.get('',  response_model=List[Genre])
 def get_genres(db: Session = Depends(get_db)):
     '''Получение всех жанров'''
     return [
@@ -72,10 +72,10 @@ def get_genres(db: Session = Depends(get_db)):
     ]
 
 
-@router.get('/genre', responses={**NOT_FOUND_GENRE}, response_model=Genre)
-def get_genre(id: int = Query(..., description="ID жанра"), db: Session = Depends(get_db)):
+@router.get('/{genre_id}', responses={**NOT_FOUND_GENRE}, response_model=Genre)
+def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Session = Depends(get_db)):
     '''Получение жанра по id'''
-    genre = GenresCruds(db).get_genre_by_id(id=id)
+    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
@@ -83,20 +83,20 @@ def get_genre(id: int = Query(..., description="ID жанра"), db: Session = D
 
 
 @router.delete(
-    '/genre',
+    '/{genre_id}',
     responses={
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
     }
 )
-def delete_genre(id: int = Query(..., description="ID жанра"), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def delete_genre(genre_id: int = Query(..., description="ID жанра"), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Удаление жанра'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)
-    genre = GenresCruds(db).get_genre_by_id(id=id)
+    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    genre = GenresCruds(db).detete_genre(genre_id=id)
+    genre = GenresCruds(db).detete_genre(genre_id=genre_id)
     return {'detail': 'Жанр удален'}

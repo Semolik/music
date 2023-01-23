@@ -6,14 +6,14 @@ from backend.crud.crud_user import UserCruds
 from backend.helpers.images import save_image
 from backend.helpers.clips import set_clip_data
 from backend.helpers.validate_role import validate_musician
-from backend.schemas.music import CreateMusicianClipForm, MusicianClip, UpdateMusicianClipForm
+from backend.schemas.music import CreateMusicianClipForm, MusicianClip
 from backend.helpers.files import save_image_in_db_by_url
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 router = APIRouter(prefix="/clips", tags=['Клипы'])
 
 
-@router.post('/clip', response_model=MusicianClip)
+@router.post('', response_model=MusicianClip)
 def create_clip(
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
     clipPicture: UploadFile = File(
@@ -48,7 +48,7 @@ def create_clip(
     return set_clip_data(clip=clip)
 
 
-@router.delete('/clip')
+@router.delete('/{clip_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_clip(
     clip_id: int = Query(..., description='ID клипа'),
     Authorize: AuthJWT = Depends(),
@@ -71,9 +71,10 @@ def delete_clip(
     return {'detail': "Клип удален"}
 
 
-@router.put('/clip', response_model=MusicianClip)
+@router.put('/{clip_id}', response_model=MusicianClip)
 def update_clip(
-    clipData: UpdateMusicianClipForm = Depends(UpdateMusicianClipForm),
+    clip_id: int = Query(..., description='ID клипа'),
+    clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
     clipPicture: UploadFile = File(
         default=False, description='Картинка клипа'),
     Authorize: AuthJWT = Depends(),
@@ -85,7 +86,7 @@ def update_clip(
     validate_musician(db=db, user_id=current_user_id)
     db_public_profile = UserCruds(
         db).get_public_profile(user_id=current_user_id)
-    db_clip = ClipsCruds(db).get_clip_by_id(clip_id=clipData.id)
+    db_clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
     if not db_clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Клип не найден")
@@ -110,33 +111,17 @@ def update_clip(
     return set_clip_data(clip=clip)
 
 
-@router.get('/clip', response_model=MusicianClip)
+@router.get('/{clip_id}', response_model=MusicianClip)
 def create_clip(
-    id: int = Query(..., description='ID клипа'),
+    clip_id: int = Query(..., description='ID клипа'),
     db: Session = Depends(get_db)
 ):
     '''Получение клипа'''
-    clip = ClipsCruds(db).get_clip_by_id(clip_id=id)
+    clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
     if not clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Клип не найден")
     return set_clip_data(clip=clip)
-
-
-@router.get('/all', response_model=List[MusicianClip])
-def get_my_clips(
-    musician_id: int = Query(..., description='ID музыканта'),
-    page: int = Query(1, description='Страница'),
-    db: Session = Depends(get_db)
-):
-    '''Получение клипов музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
-    if not db_public_profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Профиль музыканта не найден")
-    clips = ClipsCruds(db).get_musician_clips(
-        musician_id=db_public_profile.id, page=page)
-    return [set_clip_data(clip=clip) for clip in clips]
 
 
 @router.get('/my', response_model=List[MusicianClip])

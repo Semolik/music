@@ -21,7 +21,7 @@ class TracksCrud(CRUDBase):
         self.db.delete(track)
         self.db.commit()
 
-    def get_track(self, track_id: int):
+    def get_track(self, track_id: int) -> Track:
         return self.get(id=track_id, model=Track)
 
     def toggle_like_track(self, track_id: int, user_id: int):

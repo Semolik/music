@@ -16,7 +16,7 @@ from backend.schemas.music import Liked,  Track, TrackAfterUpload, UploadTrackFo
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 
-@router.post('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
+@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload)
 def upload_track(
     trackData: UploadTrackForm = Depends(UploadTrackForm),
     trackPicture: UploadFile = File(
@@ -53,7 +53,7 @@ def upload_track(
     return db_track.as_dict()
 
 
-@router.post('/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
+@router.post('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
 def like_track(
     track_id: str = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
@@ -71,15 +71,15 @@ def like_track(
     return Liked(liked=liked)
 
 
-@router.get('/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
+@router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
 def get_track(
-    id: int = Query(..., description="ID трека"),
+    track_id: int = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
     '''Получение трека'''
     Authorize.jwt_optional()
-    db_track = TracksCrud(db).get_track(track_id=id)
+    db_track = TracksCrud(db).get_track(track_id=track_id)
     if not db_track:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")
@@ -93,7 +93,7 @@ def get_track(
 
 
 @router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
-def like_track(
+def get_liked_tracks(
     page: int = Query(1, description="Номер страницы"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
