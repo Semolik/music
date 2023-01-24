@@ -4,12 +4,13 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.clips import set_clip_data
-from backend.helpers.users import get_musician_profile_as_dict
-from backend.schemas.music import Liked, MusicianClip
+from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
+from backend.schemas.music import AlbumInfo, Liked, MusicianClip
 from backend.schemas.music import MusicianFullInfo
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
+from backend.helpers.music import set_album_info
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 
@@ -65,3 +66,26 @@ def get_musician_clips(
     clips = ClipsCruds(db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
     return [set_clip_data(clip=clip) for clip in clips]
+
+
+@router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
+def get_musician_albums(
+    musician_id: int = Query(..., description='ID музыканта'),
+    page: int = Query(1, description='Страница'),
+    db: Session = Depends(get_db)
+):
+    '''Получение альбомов музыканта'''
+    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
+    if not db_public_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Профиль музыканта не найден")
+    albums = MusicianCrud(db).get_musician_albums(
+        musician_id=db_public_profile.id, page=page)
+    albums_obj = []
+    musician_obj = get_public_profile_as_dict(
+        db=db, public_profile_id=musician_id)
+    for album in albums:
+        album_info = set_album_info(db_album=album)
+        album_info['musician'] = musician_obj
+        albums_obj.append(album_info)
+    return albums_obj

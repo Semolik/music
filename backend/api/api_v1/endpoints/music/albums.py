@@ -21,8 +21,7 @@ router = APIRouter(prefix="/albums", tags=['Альбомы'])
 @router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
 def create_album(
     albumData: CreateAlbumForm = Depends(CreateAlbumForm),
-    albumPicture: UploadFile = File(
-        default=False, description='Картинка альбома'),
+    albumPicture: UploadFile = File(..., description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -144,7 +143,7 @@ def get_my_albums(
     validate_musician(db=db, user_id=current_user_id)
     db_musician = UserCruds(db).get_public_profile(user_id=current_user_id)
     albums = []
-    for db_album in MusicianCrud(db).get_musician_albums(musician_id=db_musician.id):
+    for db_album in MusicianCrud(db).get_all_musician_albums(musician_id=db_musician.id):
 
         album_info = set_album_info(db_album=db_album)
         album_info['musician'] = get_public_profile_as_dict(

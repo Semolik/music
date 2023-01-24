@@ -7,7 +7,7 @@ from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-router = APIRouter(tags=['Профили пользователей'])
+router = APIRouter(tags=['Профили пользователей'], prefix='/users')
 
 
 @router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)

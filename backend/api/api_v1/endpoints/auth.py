@@ -7,7 +7,7 @@ from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.user import UserAuth, UserInfo
 from backend.crud.crud_user import UserCruds
 from backend.schemas.user import UserRegister
-router = APIRouter(tags=['Авторизация'])
+router = APIRouter(tags=['Авторизация'], prefix='/auth')
 
 
 @router.post('/login', response_model=UserInfo, responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})

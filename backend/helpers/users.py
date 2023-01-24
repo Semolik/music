@@ -51,7 +51,7 @@ def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profil
                 musician_id=db_public_profile.id, page=1, page_size=3)
         )
     )
-    albums = MusicianCrud(db).get_musician_albums(
+    albums = MusicianCrud(db).get_all_musician_albums(
         limit=4, musician_id=db_public_profile.id)
     public_profile_data['albums'] = [set_album_info(
         db_album=album) for album in albums]

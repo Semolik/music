@@ -8,17 +8,21 @@ from backend.helpers.forms import form_body
 from backend.core.config import env_config
 
 
-class CreateAlbum(BaseModel):
+class CreateAlbumBase(BaseModel):
     name: str = Query(
         default=None,
-        max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH'))
+        max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')),
+        min_length=1
     )
     date: datetime = Query(..., description="Дата создания альбома")
+
+
+class CreateAlbum(CreateAlbumBase):
+
     genres_ids: List[int] | None = Query([], description="Список ID жанров")
 
 
 class UpdateAlbum(CreateAlbum):
-    # id: int = Query(..., description="ID альбома")
     tracks_ids: List[uuid_pkg.UUID] = Query(...,
                                             description="Список ID треков")
 
@@ -37,6 +41,7 @@ class GenreBase(BaseModel):
     name: str = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH')),
+        min_length=1,
         description="Название жанра"
     )
 
@@ -51,13 +56,8 @@ class Genre(GenreBase):
     picture: str = Query(..., description="Ссылка на картинку жанра")
 
 
-class AlbumBase(BaseModel):
+class AlbumBase(CreateAlbumBase):
     id: int
-    name: str = Query(
-        default=None,
-        max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')),
-        description="Название альбома"
-    )
     year: int = Query(..., description="Год выпуска альбома")
     genres: List[Genre] = Query(..., description="Список жанров альбома")
 
@@ -103,7 +103,6 @@ class AlbumTrack(TrackAfterUpload):
 
 class AlbumInfoWithoutMusician(AlbumBase):
     picture: str | None = Query(..., description="Ссылка на картинку альбома")
-    date: datetime = Query(..., description="Дата создания альбома")
 
 
 class AlbumInfo(AlbumInfoWithoutMusician):
@@ -112,7 +111,6 @@ class AlbumInfo(AlbumInfoWithoutMusician):
 
 class AlbumWithTracks(AlbumInfo):
     tracks: List[AlbumTrack] = Query(..., description="Список треков альбома")
-    date: datetime | None = Query(..., description="Дата создания альбома")
 
 
 class Track(AlbumTrack):
@@ -156,6 +154,6 @@ class MusicianClip(MusicianClipWithoutMusician):
 class MusicianFullInfo(PublicProfile):
     liked: bool | None = Query(..., description="Лайкнут ли музыкант")
     clips: List[MusicianClipWithoutMusician] = Query(...,
-                                                     description="Список клипов музыканта")
+                                                     description="Клипы музыканта")
     albums: List[AlbumInfoWithoutMusician] = Query(...,
-                                                   description="Список альбомов музыканта")
+                                                   description="Альбомы музыканта")

@@ -55,6 +55,7 @@ class Track(Base):
     track_position = Column(Integer)
     picture_id = Column(UUID(as_uuid=True), ForeignKey("images.id"))
     picture = relationship("Image", foreign_keys=[picture_id])
+    listens = Column(Integer, nullable=False, default=0)
 
 
 class Genre(Base):

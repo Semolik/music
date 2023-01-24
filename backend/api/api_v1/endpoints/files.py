@@ -51,6 +51,9 @@ def get_image(track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     file_path = os.path.join(settings.TRACKS_FOLDER,
                              track_id+settings.SONGS_EXTENTION)
     if os.path.exists(file_path):
+        db_file.listens += 1
+        db.add(db_file)
+        db.commit()
         return FileResponse(file_path)
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         detail="Файл не существует на сервере, но запись о нем есть")

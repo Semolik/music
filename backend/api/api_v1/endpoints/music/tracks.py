@@ -53,7 +53,7 @@ def upload_track(
     return db_track.as_dict()
 
 
-@router.post('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
+@router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
 def like_track(
     track_id: str = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
