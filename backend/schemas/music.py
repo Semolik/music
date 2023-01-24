@@ -45,8 +45,6 @@ class GenreBase(BaseModel):
 class GenreBaseForm(GenreBase):
     ...
 
-# class CreateGenreForm(CreateGenreForm):
-
 
 class Genre(GenreBase):
     id: int = Query(..., description="ID жанра")
@@ -103,10 +101,13 @@ class AlbumTrack(TrackAfterUpload):
     liked: bool = Query(..., description="Лайкнут ли трек")
 
 
-class AlbumInfo(AlbumBase):
-    musician: PublicProfile = Query(..., description="Информация о музыканте")
+class AlbumInfoWithoutMusician(AlbumBase):
     picture: str | None = Query(..., description="Ссылка на картинку альбома")
     date: datetime = Query(..., description="Дата создания альбома")
+
+
+class AlbumInfo(AlbumInfoWithoutMusician):
+    musician: PublicProfile = Query(..., description="Информация о музыканте")
 
 
 class AlbumWithTracks(AlbumInfo):
@@ -142,23 +143,19 @@ class CreateMusicianClipForm(CreateMusicianClip):
                                      description="Использовать ли картинку с YouTube")
 
 
-# @form_body
-# class UpdateMusicianClipForm(CreateMusicianClipForm):
-#     id: int = Query(..., description="ID клипа")
-
-
-class MusicianClip(BaseModel):
+class MusicianClipWithoutMusician(CreateMusicianClip):
     id: int = Query(..., description="ID клипа")
-    musician_id: int = Query(..., description="ID музыканта")
-    name: str = Query(..., description="Название клипа")
     video: str = Query(..., description="Ссылка на видео на YouTube")
-    video_id: str = Query(..., description="ID видео на YouTube")
     picture: str = Query(..., description="Ссылка на картинку клипа")
+
+
+class MusicianClip(MusicianClipWithoutMusician):
+    musician_id: int = Query(..., description="ID музыканта")
 
 
 class MusicianFullInfo(PublicProfile):
     liked: bool | None = Query(..., description="Лайкнут ли музыкант")
-    clips: List[MusicianClip] = Query(...,
-                                      description="Список клипов музыканта")
-    albums: List[AlbumInfo] = Query(...,
-                                    description="Список альбомов музыканта")
+    clips: List[MusicianClipWithoutMusician] = Query(...,
+                                                     description="Список клипов музыканта")
+    albums: List[AlbumInfoWithoutMusician] = Query(...,
+                                                   description="Список альбомов музыканта")

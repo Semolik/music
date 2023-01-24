@@ -42,6 +42,8 @@ def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profil
     if user_id:
         public_profile_data['liked'] = MusicianCrud(db).musician_is_liked(
             musician_id=db_public_profile.id, user_id=user_id)
+    else:
+        public_profile_data['liked'] = None
     public_profile_data['clips'] = list(
         map(
             set_clip_data,
@@ -52,7 +54,7 @@ def get_musician_profile_as_dict(db: Session, user_id: int = None, public_profil
     albums = MusicianCrud(db).get_musician_albums(
         limit=4, musician_id=db_public_profile.id)
     public_profile_data['albums'] = [set_album_info(
-        db=db, db_album=album, user_id=user_id) for album in albums]
+        db_album=album) for album in albums]
     return public_profile_data
 
 

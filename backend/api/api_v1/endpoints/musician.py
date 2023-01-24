@@ -34,7 +34,7 @@ def get_public_profile_info(
     return public_profile_obj
 
 
-@router.post('/{profile_id}/like', response_model=Liked)
+@router.put('/{profile_id}/like', response_model=Liked)
 def like_musician(
     profile_id: int = Query(..., description='ID профиля'),
     Authorize: AuthJWT = Depends(),
