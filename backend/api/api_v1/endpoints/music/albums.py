@@ -90,6 +90,26 @@ def create_album(
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=album_obj)
 
 
+@router.get('/my', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
+def get_my_albums(
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db)
+):
+    '''Получение альбомов музыканта'''
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    validate_musician(db=db, user_id=current_user_id)
+    db_musician = UserCruds(db).get_public_profile(user_id=current_user_id)
+    albums = []
+    for db_album in MusicianCrud(db).get_all_musician_albums(musician_id=db_musician.id):
+
+        album_info = set_album_info(db_album=db_album)
+        album_info['musician'] = get_public_profile_as_dict(
+            db=db, public_profile_id=db_album.musician_id)
+        albums.append(album_info)
+    return albums
+
+
 @router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(
     album_id: int = Query(..., description='ID альбома'),
@@ -130,23 +150,3 @@ def get_album_by_id(
                             detail="Нет прав на удаление данного альбома")
     AlbumsCruds(db).delete_album(album=db_album)
     return {'detail': 'Альбом удален'}
-
-
-@router.get('/my', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
-def get_my_albums(
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
-):
-    '''Получение альбомов музыканта'''
-    Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
-    db_musician = UserCruds(db).get_public_profile(user_id=current_user_id)
-    albums = []
-    for db_album in MusicianCrud(db).get_all_musician_albums(musician_id=db_musician.id):
-
-        album_info = set_album_info(db_album=db_album)
-        album_info['musician'] = get_public_profile_as_dict(
-            db=db, public_profile_id=db_album.musician_id)
-        albums.append(album_info)
-    return albums

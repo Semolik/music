@@ -24,6 +24,9 @@ def send_update_role_request(
     '''Отправка запроса на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
+    if UserCruds(db).is_admin(user_id=current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail=f"Ошибка. Администратор не может отправить запрос на смену типа аккаунта")
     if ChangeRolesCruds(db).is_user_have_active_change_role_messages(user_id=current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта")

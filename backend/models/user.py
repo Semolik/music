@@ -1,5 +1,5 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID

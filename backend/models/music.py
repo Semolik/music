@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, T
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.sql import func
 import uuid
 
 
@@ -55,7 +56,19 @@ class Track(Base):
     track_position = Column(Integer)
     picture_id = Column(UUID(as_uuid=True), ForeignKey("images.id"))
     picture = relationship("Image", foreign_keys=[picture_id])
-    listens = Column(Integer, nullable=False, default=0)
+
+
+class ListenTrackHistoryItem(Base):
+    __tablename__ = 'listen_track_history'
+
+    id = Column(Integer, primary_key=True, index=True)
+    track_id = Column(UUID(as_uuid=True), ForeignKey(
+        "tracks.id"), nullable=False)
+    track = relationship("Track", foreign_keys=[track_id])
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", foreign_keys=[user_id])
+    listen_datetime = Column(DateTime(timezone=False),
+                             server_default=func.now())
 
 
 class Genre(Base):

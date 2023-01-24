@@ -7,7 +7,7 @@ from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.images import save_image
+from backend.helpers.images import save_image, set_picture
 from backend.helpers.music import save_track, set_full_track_data, set_track_data
 from backend.helpers.validate_role import validate_musician
 from backend.models.music import Album
@@ -50,7 +50,8 @@ def upload_track(
         track=trackData,
         picture=db_image
     )
-    return db_track.as_dict()
+    track_obj = set_picture(db_track.as_dict(), db_image)
+    return track_obj
 
 
 @router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
