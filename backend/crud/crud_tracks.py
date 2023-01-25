@@ -5,9 +5,7 @@ from typing import List
 from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
-from backend.models.music import Track
-from backend.models.user import FavoriteMusicians
-from backend.models.music import FavoriteTracks, ListenTrackHistoryItem
+from backend.models.music import FavoriteTracks, ListenTrackHistoryItem, Track
 
 
 class TracksCrud(CRUDBase):
@@ -51,7 +49,6 @@ class TracksCrud(CRUDBase):
         return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id).slice(end-page_size, end).all()
 
     def add_listened(self, track_id: int, user_id: int, time: datetime):
-        print(time)
         last_listened = self.get_last_listened_tracks(
             user_id=user_id, page=1, page_size=1)
         if last_listened:
