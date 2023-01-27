@@ -12,7 +12,7 @@ def test_create_user(client: TestClient):
         "first_name": "test_name2",
         "last_name": "test_last_name2"
     }
-    response = client.post("/signup", json.dumps(data))
+    response = client.post("/auth/signup", json.dumps(data))
 
     global cookies
     cookies = response.cookies

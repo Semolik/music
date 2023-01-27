@@ -76,14 +76,18 @@ class UpdateUserRoleRequest(BaseModel):
         ..., description='Запрашиваемый статус аккаунта')
 
 
-class RoleRequestAnswer(BaseModel):
-    request_id: int = Query(...,
-                            description='ID запроса на изменение типа аккаунта')
+class CreateRoleRequestAnswer(BaseModel):
+
     message: str | None = Query(..., description='Ответное сообщение')
     status: str | None = Query(..., description='Присвоенный статус')
 
 
-class UpdateRoleRequestAnswer(RoleRequestAnswer):
+class RoleRequestAnswer(CreateRoleRequestAnswer):
+    request_id: int = Query(...,
+                            description='ID запроса на изменение типа аккаунта')
+
+
+class UpdateRoleRequestAnswer(CreateRoleRequestAnswer):
     request_status: settings.ALLOWED_STATUSES = Query(
         ..., description='Статус запроса')
 

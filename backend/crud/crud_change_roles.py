@@ -13,7 +13,7 @@ from fastapi import HTTPException, status
 
 
 class ChangeRolesCruds(CRUDBase):
-    def send_change_role_message(self, user_id, message, files, account_status):
+    def send_change_role_message(self, user_id, message, files, account_status) -> ChangeRoleRequest:
         db_change_role_request = ChangeRoleRequest(
             files=files,
             message=message,
