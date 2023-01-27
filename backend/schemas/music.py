@@ -6,9 +6,10 @@ from fastapi import Query, Form, UploadFile, File
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
 from backend.core.config import env_config
+from backend.helpers.forms import ValidateJsonWithFormBody
 
 
-class CreateAlbumBase(BaseModel):
+class CreateAlbumBase(ValidateJsonWithFormBody):
     name: str = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')),
@@ -27,9 +28,9 @@ class UpdateAlbum(CreateAlbum):
                                             description="Список ID треков")
 
 
-@form_body
-class UpdateAlbumForm(UpdateAlbum):
-    ...
+# @form_body
+# class UpdateAlbumForm(UpdateAlbum):
+#     ...
 
 
 @form_body

@@ -13,14 +13,14 @@ from backend.helpers.music import set_album_info, set_album_tracks,  validate_ge
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
 from backend.helpers.validate_role import validate_musician
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbumForm, UpdateAlbumForm
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, UpdateAlbum
 
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
 @router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
 def create_album(
-    albumData: CreateAlbumForm = Depends(CreateAlbumForm),
+    albumData: CreateAlbum,
     albumPicture: UploadFile = File(..., description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
@@ -59,9 +59,9 @@ def close_album_uploading(
 
 
 @router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
-def create_album(
+def update_album(
+    albumData: UpdateAlbum,
     album_id: int = Query(..., description='ID альбома'),
-    albumData: UpdateAlbumForm = Depends(UpdateAlbumForm),
     albumPicture: UploadFile = File(
         default=False, description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
@@ -132,8 +132,8 @@ def get_album_by_id(
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
 
 
-@router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM})
-def get_album_by_id(
+@router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)
+def delete_album_by_id(
     album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
@@ -149,4 +149,3 @@ def get_album_by_id(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Нет прав на удаление данного альбома")
     AlbumsCruds(db).delete_album(album=db_album)
-    return {'detail': 'Альбом удален'}

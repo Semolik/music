@@ -45,23 +45,14 @@ def get_image(file_id: uuid_pkg.UUID = Query(..., description="ID файла"), 
 
 @router.get('/tracks/{track_id}', response_class=FileResponse)
 def get_image(background_tasks: BackgroundTasks, track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
-              db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+              db: Session = Depends(get_db)):
     """Получение трека по его id"""
-    Authorize.jwt_optional()
     db_file = TracksCrud(db).get_track(track_id=track_id)
     if not db_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     file_path = os.path.join(settings.TRACKS_FOLDER,
                              str(track_id)+settings.SONGS_EXTENTION)
-    current_user_id = Authorize.get_jwt_subject()
     if os.path.exists(file_path):
-        if current_user_id:
-            background_tasks.add_task(
-                TracksCrud(db).add_listened,
-                track_id=track_id,
-                user_id=current_user_id,
-                time=datetime.now()
-            )
         return FileResponse(file_path)
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         detail="Файл не существует на сервере, но запись о нем есть")

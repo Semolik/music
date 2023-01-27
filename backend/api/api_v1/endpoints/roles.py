@@ -3,6 +3,7 @@ from fastapi import Depends, APIRouter, status, UploadFile, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
+from backend.helpers.validate_role import validate_admin
 from backend.schemas.messages import Message
 from backend.schemas.user import TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
@@ -16,8 +17,8 @@ router = APIRouter(tags=['Роли'])
 
 @router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED)
 def send_update_role_request(
+    formData: UpdateUserRoleRequest = Depends(),
     Authorize: AuthJWT = Depends(),
-    formData: UpdateUserRoleRequest = Depends(UpdateUserRoleRequest),
     files: List[UploadFile] = [],
     db: Session = Depends(get_db)
 ):
@@ -25,14 +26,19 @@ def send_update_role_request(
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     if UserCruds(db).is_admin(user_id=current_user_id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"Ошибка. Администратор не может отправить запрос на смену типа аккаунта")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Ошибка. Администратор не может отправить запрос на смену типа аккаунта"
+        )
     if ChangeRolesCruds(db).is_user_have_active_change_role_messages(user_id=current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта"
+        )
     if UserCruds(db).get_user_by_id(user_id=current_user_id).type == formData.account_status:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=f"При отправке запроса небходимо выбрать сту")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"При отправке запроса небходимо выбрать статус, отличный от текущего")
     db_files: List[File] = [
         save_file(
             db=db,
@@ -78,13 +84,11 @@ def get_all_change_role_requests(
 
 
 @router.post('/change-role/{request_id}/answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=TimeCreated)
-def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer , Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    if not UserCruds(db).is_admin(user_id=current_user_id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Недостаточно прав")
+    validate_admin(db=db, user_id=current_user_id)
     db_request = ChangeRolesCruds(db).get_change_role_message(
         request_id=request_id)
     if not db_request:

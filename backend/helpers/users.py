@@ -1,7 +1,6 @@
 from backend.core.config import settings
 from backend.crud.crud_musician import MusicianCrud
 from backend.crud.crud_user import UserCruds
-from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.images import set_picture

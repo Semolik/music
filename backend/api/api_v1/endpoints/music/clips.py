@@ -68,7 +68,6 @@ def delete_clip(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Вы не можете изменять этот клип")
     ClipsCruds(db).delete(model=db_clip)
-    return {'detail': "Клип удален"}
 
 
 @router.put('/{clip_id}', response_model=MusicianClip)
@@ -112,7 +111,7 @@ def update_clip(
 
 
 @router.get('/{clip_id}', response_model=MusicianClip)
-def create_clip(
+def get_clip_by_id(
     clip_id: int = Query(..., description='ID клипа'),
     db: Session = Depends(get_db)
 ):

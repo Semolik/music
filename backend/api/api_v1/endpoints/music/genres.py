@@ -87,7 +87,8 @@ def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Sessi
     responses={
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
-    }
+    },
+    status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_genre(genre_id: int = Query(..., description="ID жанра"), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Удаление жанра'''
@@ -99,4 +100,3 @@ def delete_genre(genre_id: int = Query(..., description="ID жанра"), Author
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
     genre = GenresCruds(db).detete_genre(genre_id=genre_id)
-    return {'detail': 'Жанр удален'}

@@ -48,13 +48,25 @@ class TracksCrud(CRUDBase):
         end = page * page_size
         return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id).slice(end-page_size, end).all()
 
-    def add_listened(self, track_id: int, user_id: int, time: datetime):
-        last_listened = self.get_last_listened_tracks(
-            user_id=user_id, page=1, page_size=1)
-        if last_listened:
-            last_track: Track = last_listened[0].track
-            if time - timedelta(seconds=int(last_track.duration)) < last_listened[0].listen_datetime:
-                print('not enough time passed')
+    def get_last_track_listen(self, track_id: int, user_id: int) -> ListenTrackHistoryItem | None:
+        return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id and ListenTrackHistoryItem.track_id == track_id).first()
+
+    def track_is_listened(self, last_listened: ListenTrackHistoryItem, time: datetime) -> bool:
+        track: Track = last_listened.track
+        target_return_time = time - timedelta(seconds=int(track.duration))
+        return target_return_time > last_listened.listen_datetime if target_return_time - last_listened.listen_datetime < timedelta(minutes=3) else False
+
+    def add_track_to_history(self, track_id: int, user_id: int, time: datetime):
+        last_listened = self.get_last_track_listen(
+            user_id=user_id, track_id=track_id)
+        if last_listened and not last_listened.listened:
+            is_listened = self.track_is_listened(
+                last_listened=last_listened, time=time)
+            if not is_listened:
                 return
-        self.create(ListenTrackHistoryItem(
+            last_listened.listen_datetime = datetime.now()
+            self.db.commit()
+            self.db.refresh(last_listened)
+            return last_listened
+        return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))

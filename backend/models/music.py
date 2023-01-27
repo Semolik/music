@@ -69,6 +69,7 @@ class ListenTrackHistoryItem(Base):
     user = relationship("User", foreign_keys=[user_id])
     listen_datetime = Column(DateTime(timezone=False),
                              server_default=func.now())
+    listened = Column(Boolean, nullable=False, default=False)
 
 
 class Genre(Base):

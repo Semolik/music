@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi import Query
 from backend.core.config import settings, env_config
 from backend.schemas.file import File
-from backend.helpers.forms import form_body
+from backend.helpers.forms import ValidateJsonWithFormBody, form_body
 
 
 class UserUsername(BaseModel):
@@ -49,12 +49,7 @@ class UserRegister(UserBase, UserAuth):
     ...
 
 
-class UserModifiable(UserBase):
-    ...
-
-
-@form_body
-class UserModifiableForm(UserBase):
+class UserModifiable(UserBase, ValidateJsonWithFormBody):
     remove_picture: bool = Query(
         default=False,
         description='Удалить аватарку пользователя'
@@ -132,7 +127,6 @@ class PublicProfile(PublicProfileBase):
                                 description='Ссылка на аватарку публичного профиля')
 
 
-@form_body
-class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks):
+class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks, ValidateJsonWithFormBody):
     remove_picture: bool = Query(
         default=False, description='Удалить аватарку публичного профиля')
