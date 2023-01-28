@@ -32,11 +32,7 @@ class AlbumsCruds(CRUDBase):
             for track in tracks:
                 if track.id == track_id:
                     track.track_position = index
-
-        self.db.add(album)
-        self.db.commit()
-        self.db.refresh(album)
-        return album
+        return self.create(model=album)
 
     def album_belongs_to_user(self, album: Album, user_id: int):
         db_public_profile: PublicProfile = self.db.query(PublicProfile).filter(
@@ -47,20 +43,10 @@ class AlbumsCruds(CRUDBase):
 
     def close_uploading(self, album: Album):
         album.uploaded = True
-        self.db.add(album)
-        self.db.commit()
-        self.db.refresh(album)
-        return album
+        return self.create(model=album)
 
     def delete_album(self, album: Album):
-        for track in album.tracks:
-            self.delete_track(track=track)
-        picture = album.picture
-        if picture:
-            album.picture = None
-            FileCruds(self.db).delete_image(image=picture)
-        self.db.delete(album)
-        self.db.commit()
+        self.delete(model=album)
 
     def get_album(self, album_id: int) -> Album:
         return self.get(id=album_id, model=Album)

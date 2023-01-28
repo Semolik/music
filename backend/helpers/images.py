@@ -8,9 +8,14 @@ from fastapi import UploadFile, HTTPException
 from backend.crud.crud_file import FileCruds
 from pathlib import Path
 from sqlalchemy.orm import Session
+
 logger = logging.getLogger(__name__)
 supported_image_extensions = {
     ex for ex, f in pillow.registered_extensions().items() if f in pillow.OPEN}
+
+
+def image_id_to_path(image_id: int) -> str:
+    return '/'.join([settings.IMAGES_FOLDER, str(image_id)+settings.IMAGES_EXTENTION])
 
 
 def set_picture(data: dict, picture: Image):
@@ -18,6 +23,16 @@ def set_picture(data: dict, picture: Image):
         data['picture'] = ''.join(
             [settings.SERVER_LINK, settings.API_V1_STR,  settings.UPLOADS_ROUTE, '/images/', str(picture.id)])
     return data
+
+
+def copy_image(image: Image, db: Session, user_id: int) -> Image:
+    if image is None:
+        return
+    db_image = FileCruds(db).create_image(
+        width=image.width, height=image.height, user_id=user_id)
+    filename = image_id_to_path(image.id)
+    shutil.copy2(filename, image_id_to_path(db_image.id))
+    return db_image
 
 
 def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденный файл"):
@@ -43,8 +58,7 @@ def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_
         image.thumbnail(resize_image_options)
         image_model = FileCruds(db).create_image(
             width=image.width, height=image.height, user_id=user_id)
-        image.save('/'.join([settings.IMAGES_FOLDER,
-                            str(image_model.id)+settings.IMAGES_EXTENTION]))
+        image.save(image_id_to_path(image_model.id))
         return image_model
     except:
         raise HTTPException(status_code=500, detail=detail_error_message)

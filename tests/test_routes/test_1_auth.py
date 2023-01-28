@@ -10,12 +10,12 @@ data = {
 
 
 def test_create_user_and_user_with_same_username(client: TestClient):
-    response = client.post("/auth/signup", json.dumps(data))
+    response = client.post("/auth/signup", json=data)
     assert response.status_code == 201
     global cookies
     cookies = response.cookies
 
-    response = client.post("/auth/signup", json.dumps(data))
+    response = client.post("/auth/signup", json=data)
     assert response.status_code == 400
 
 

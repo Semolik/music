@@ -123,7 +123,7 @@ class PublicProfileBase(BaseModel):
 class PublicProfile(PublicProfileBase):
     id: int = Query(..., description='ID публичного профиля')
     links: PublicProfileLinks = Query(..., description='Ссылки на соц. сети')
-    picture: str | None = Query(...,
+    picture: str | None = Query(default=False,
                                 description='Ссылка на аватарку публичного профиля')
 
 

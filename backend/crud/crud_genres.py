@@ -1,6 +1,6 @@
 from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
-from backend.models.music import albums_genres_table
+from backend.models.music import AlbumGenre
 from backend.models.files import Image
 from backend.models.music import Genre
 
@@ -23,18 +23,15 @@ class GenresCruds(CRUDBase):
         if picture:
             FileCruds(self.db).replace_old_picture(
                 model=genre, new_picture=picture)
-        self.db.add(genre)
-        self.db.commit()
-        self.db.refresh(genre)
-        return genre
+        return self.create(genre)
 
     def detete_genre(self, genre_id: int):
         db_genre = self.get(id=genre_id, model=Genre)
         if not db_genre:
             raise Exception('Жанр не найден')
-        rows = self.db.query(albums_genres_table).filter(
-            print(albums_genres_table))
+        # rows = self.db.query(AlbumGenre).filter(
+        #     print(albums_genres_table))
 
-        for row in rows:
-            self.delete(row)
+        # for row in rows:
+        #     self.delete(row)
         return self.delete(model=db_genre)

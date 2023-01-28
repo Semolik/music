@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from backend.db.base import CRUDBase
 from backend.helpers.roles import set_status
-from backend.helpers.images import set_picture
+from backend.helpers.images import copy_image, set_picture
 from backend.core.config import settings
 from backend.helpers.files import set_files_data
 from backend.crud.crud_file import FileCruds
@@ -15,6 +15,7 @@ from backend.models.user import PublicProfileLinks as PublicProfileLinksModel
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
 
 
 class UserCruds(CRUDBase):
@@ -55,7 +56,7 @@ class UserCruds(CRUDBase):
         for var, value in data_obj.items():
             setattr(user, var, value) if value is not None else None
         if remove_picture and user.picture:
-            FileCruds(self.db).delete_image(user.picture)
+            self.delete(user.picture)
         elif userPic:
             FileCruds(self.db).replace_old_picture(
                 model=user, new_picture=userPic)
@@ -64,7 +65,7 @@ class UserCruds(CRUDBase):
         self.db.refresh(user)
         return user
 
-    def get_public_profile(self, user_id) -> PublicProfile:
+    def get_public_profile(self, user_id: int) -> PublicProfile:
         db_public_profile = self.db.query(PublicProfile).filter(
             PublicProfile.user_id == user_id).first()
         if db_public_profile:
@@ -73,10 +74,16 @@ class UserCruds(CRUDBase):
         links = PublicProfileLinksModel()
         name = ' '.join(
             filter(None, [db_user.first_name, db_user.last_name])) or db_user.username
+        picture = copy_image(
+            image=db_user.picture,
+            db=self.db,
+            user_id=user_id,
+        )
         return self.create(PublicProfile(
             name=name,
             user_id=user_id,
-            links=links
+            links=links,
+            picture=picture
         ))
 
     def get_public_profile_by_id(self, id):
@@ -100,7 +107,7 @@ class UserCruds(CRUDBase):
             value = data_obj.get(var)
             setattr(public_proile_links, var, value)
         if remove_picture:
-            FileCruds(self.db).delete_image(image=public_proile.picture)
+            self.delete(public_proile.picture)
         elif userPublicPicture:
             FileCruds(self.db).replace_old_picture(
                 model=public_proile, new_picture=userPublicPicture)

@@ -7,13 +7,6 @@ from backend.core.config import settings
 
 
 class FileCruds(CRUDBase):
-    def delete_image(self, image: Image) -> None:
-        path = '/'.join([settings.IMAGES_FOLDER, str(image.id) +
-                        settings.IMAGES_EXTENTION])
-        if Path(path).exists():
-            os.remove(path)
-        self.db.delete(image)
-        self.db.commit()
 
     def replace_old_picture(self, model, new_picture):
         picture: Image = model.picture
@@ -21,7 +14,7 @@ class FileCruds(CRUDBase):
         self.db.commit()
         self.db.refresh(model)
         if picture:
-            self.delete_image(image=picture)
+            self.delete(picture)
         return model
 
     def create_image(self, height: int, width: int, user_id: int):

@@ -35,26 +35,29 @@ if not database_exists(engine.url):
 
 SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Create the tables.
+Base.metadata.drop_all(bind=engine)
+
 
 @pytest.fixture(scope="function")
 def app() -> Generator[FastAPI, Any, None]:
     """
     Create a fresh database on each test case.
     """
-    Base.metadata.create_all(bind=engine)  # Create the tables.
+    Base.metadata.create_all(bind=engine)
     _app = start_application()
     yield _app
-    Base.metadata.drop_all(bind=engine)
+    # Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="function")
 def db_session(app: FastAPI) -> Generator[SessionTesting, Any, None]:
     connection = engine.connect()
-    transaction = connection.begin()
+    # transaction = connection.begin()
     session = SessionTesting(bind=connection)
     yield session  # use the session in tests.
     session.close()
-    transaction.rollback()
+    # transaction.rollback()
     connection.close()
 
 

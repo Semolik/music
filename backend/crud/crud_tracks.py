@@ -9,18 +9,6 @@ from backend.models.music import FavoriteTracks, ListenTrackHistoryItem, Track
 
 
 class TracksCrud(CRUDBase):
-    def delete_track(self, track: Track):
-        picture = track.picture
-        if picture:
-            track.picture = None
-            FileCruds(self.db).delete_image(image=picture)
-        path = '/'.join([settings.TRACKS_FOLDER,
-                        str(track.id)+settings.SONGS_EXTENTION])
-        if Path(path).exists():
-            os.remove(path)
-        self.db.delete(track)
-        self.db.commit()
-
     def get_track(self, track_id: int) -> Track:
         return self.get(id=track_id, model=Track)
 
