@@ -1,8 +1,7 @@
 from pydantic import AnyHttpUrl, BaseSettings, BaseModel
 from typing import List, Literal, Optional, Tuple, get_args
 from dotenv import dotenv_values
-
-
+import enum
 env_config = {**dotenv_values('.env'), **dotenv_values(".env.local"), }
 
 
@@ -27,12 +26,12 @@ class Settings(BaseSettings):
                                'successfully', 'rejected']
     ALLOWED_STATUSES_FILTER = Literal[ALLOWED_STATUSES, 'all']
     ALLOWED_STATUSES_LIST: Tuple[str, ...] = get_args(ALLOWED_STATUSES)
-    USER_ACCOUNT_STATUSES = Literal['radio_station',
-                                    'musician', 'user']
-    USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
-        USER_ACCOUNT_STATUSES)
-    ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
-        [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
+    # USER_ACCOUNT_STATUSES = Literal['radio_station',
+    #                                 'musician', 'user']
+    # USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
+    #     USER_ACCOUNT_STATUSES)
+    # ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
+    #     [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
     ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
@@ -43,6 +42,7 @@ class Settings(BaseSettings):
 
     TEST_USER_USERNAME = 'test_user'
     TEST_ADMIN_USERNAME = 'admin'
+    TEST_MUSICIAN_USERNAME = 'musician_test'
     PAGINATION_LIMIT = 20
 
     class Config:
@@ -52,6 +52,18 @@ class Settings(BaseSettings):
         authjwt_secret_key: str = "secret"
         authjwt_token_location: set = {"cookies"}
         authjwt_cookie_csrf_protect: bool = False
+
+    class UserTypeEnum(str, enum.Enum):
+        musician = "musician"
+        radiostaion = "radiostaion"
+        user = "user"
+        superuser = "superuser"
+
+    USER_ACCOUNT_STATUSES_LIST = [
+        user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']
+    USER_ACCOUNT_STATUSES = Literal[tuple(USER_ACCOUNT_STATUSES_LIST)]
+    ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
+        [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
 
 
 settings = Settings()

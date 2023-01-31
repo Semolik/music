@@ -12,7 +12,7 @@ from backend.models.user import Base
 from backend.api.api_v1.api import api_v1_router
 from sqlalchemy_utils import database_exists, create_database
 from fastapi_jwt_auth import AuthJWT
-
+from backend.core.config import settings
 from tests.utils.users import authentication_token_from_username
 
 
@@ -91,5 +91,12 @@ def normal_user_token_cookies(client: TestClient, db_session):
 @pytest.fixture(scope="function")  # new function
 def normal_admin_token_cookies(client: TestClient, db_session):
     return authentication_token_from_username(
-        client=client, username=settings.TEST_ADMIN_USERNAME, db=db_session, admin=True
+        client=client, username=settings.TEST_ADMIN_USERNAME, db=db_session, user_type=settings.UserTypeEnum.superuser
+    )
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_musician_token_cookies(client: TestClient, db_session):
+    return authentication_token_from_username(
+        client=client, username=settings.TEST_MUSICIAN_USERNAME, db=db_session, user_type=settings.UserTypeEnum.musician
     )

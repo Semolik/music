@@ -10,6 +10,7 @@ from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.helpers.validate_role import validate_admin
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
+from backend.core.config import settings
 router = APIRouter(tags=['Статистика'], prefix='/statistics')
 
 
@@ -19,9 +20,11 @@ def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
     validate_admin(db=db, user_id=current_user_id)
-    user_count = UserCruds(db=db).get_count()
-    admin_count = UserCruds(db=db).get_count_by_type('superuser')
-    musician_count = UserCruds(db=db).get_count_by_type('musician')
+    users_crud = UserCruds(db=db)
+    user_count = users_crud.get_count()
+    admin_count = users_crud.get_count_by_type(settings.UserTypeEnum.superuser)
+    musician_count = users_crud.get_count_by_type(
+        settings.UserTypeEnum.musician)
     change_role_request_count = ChangeRolesCruds(
         db=db).get_not_answered_change_role_request_count()
     return UsersStats(
@@ -37,7 +40,8 @@ def get_track_statistics(track_id: int, Authorize: AuthJWT = Depends(), db: Sess
     '''Получение статистики по треку'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    track = TracksCrud(db=db).get_track(track_id=track_id)
+    tracks_crud = TracksCrud(db=db)
+    track = tracks_crud.get_track(track_id=track_id)
     if not track:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -50,4 +54,4 @@ def get_track_statistics(track_id: int, Authorize: AuthJWT = Depends(), db: Sess
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='У вас нет доступа к этой информации'
         )
-    return TracksCrud(db=db).get_track_statistics(track_id=track_id)
+    return tracks_crud.get_track_statistics(track_id=track_id)

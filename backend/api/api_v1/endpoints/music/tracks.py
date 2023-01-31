@@ -4,7 +4,6 @@ from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_tracks import TracksCrud
-from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.images import save_image, set_picture
@@ -12,7 +11,7 @@ from backend.helpers.music import save_track, set_full_track_data, set_track_dat
 from backend.helpers.validate_role import validate_musician
 from backend.models.music import Album
 from backend.responses import NOT_FOUND_TRACK, NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.music import Liked,  Track, TrackAfterUpload, UploadTrackForm
+from backend.schemas.music import Track, TrackAfterUpload, UploadTrackForm
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 
@@ -54,7 +53,7 @@ def upload_track(
     return track_obj
 
 
-@router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Liked)
+@router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=bool)
 def like_track(
     track_id: str = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
@@ -69,7 +68,7 @@ def like_track(
     current_user_id = Authorize.get_jwt_subject()
     liked = TracksCrud(db).toggle_like_track(
         track_id=db_track.id, user_id=current_user_id)
-    return Liked(liked=liked)
+    return liked
 
 
 @router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)

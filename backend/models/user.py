@@ -1,7 +1,7 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from backend.core.config import env_config
+from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import backref
 
@@ -57,8 +57,9 @@ class User(Base):
         nullable=False
     )
     type = Column(
-        String,
-        default='user'
+        Enum(settings.UserTypeEnum),
+        nullable=False,
+        default=settings.UserTypeEnum.user
     )
     picture_id = Column(
         UUID(as_uuid=True),

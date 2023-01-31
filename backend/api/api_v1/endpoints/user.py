@@ -24,7 +24,7 @@ def update_user_data(
     db_user = validate_authorized_user(Authorize, db)
     db_image = save_image(db=db, upload_file=userPicture,
                           user_id=db_user.id)
-    db_user_updated = UserCruds(db).update(
+    db_user_updated = UserCruds(db).update_user(
         user=db_user, new_user_data=UserData, userPic=db_image)
     user_data = db_user_updated.as_dict()
     user_data = set_picture(user_data, db_user_updated.picture)

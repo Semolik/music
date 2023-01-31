@@ -99,4 +99,4 @@ def delete_genre(genre_id: int = Query(..., description="ID жанра"), Author
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    genre = GenresCruds(db).detete_genre(genre_id=genre_id)
+    genre = GenresCruds(db).detete_genre(genre=genre)

@@ -1,7 +1,8 @@
 import logging
-from backend.schemas.user import UserWithTypeRegister
+from backend.schemas.user import UserRegister
 from backend.crud.crud_user import UserCruds
 from backend.db.session import SessionLocal
+from backend.core.config import settings
 logger = logging.getLogger(__name__)
 
 FIRST_SUPERUSER = "admin"
@@ -13,13 +14,13 @@ def init_db() -> None:  # 1
         user_cruds = UserCruds(SessionLocal())
         user = user_cruds.get_user_by_username(FIRST_SUPERUSER)  # 2
         if not user:
-            user_in = UserWithTypeRegister(
+            user_in = UserRegister(
                 username=FIRST_SUPERUSER,
                 first_name=FIRST_SUPERUSER,
                 password='abobus123',
-                type='superuser'
             )
-            user_cruds.create_user(user_in, admin=True)
+            user_cruds.create_user(
+                user_in, user_type=settings.UserTypeEnum.superuser)
             logger.info(f"Администратор {FIRST_SUPERUSER} создан")
         else:
             logger.warning(

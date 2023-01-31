@@ -118,10 +118,6 @@ class Track(AlbumTrack):
     album: AlbumInfo = Query(..., description="Информация об альбоме")
 
 
-class Liked(BaseModel):
-    liked: bool
-
-
 class CreateMusicianClip(BaseModel):
 
     name: str = Query(

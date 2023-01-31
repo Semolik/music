@@ -13,10 +13,15 @@ class CRUDBase:
             self, model, skip: int = 0, limit: int = 100, ) -> List:
         return self.db.query(model).offset(skip).limit(limit).all()  # 4
 
+    def update(self, model):
+
+        self.db.commit()
+        self.db.refresh(model)
+        return model
+
     def create(self,  model):
         self.db.add(model)
-        self.db.commit()  # 5
-        self.db.refresh(model)
+        self.update(model)
         return model
 
     def delete(self, model):

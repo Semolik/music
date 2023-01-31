@@ -11,8 +11,7 @@ class FileCruds(CRUDBase):
     def replace_old_picture(self, model, new_picture):
         picture: Image = model.picture
         model.picture = new_picture
-        self.db.commit()
-        self.db.refresh(model)
+        self.update(model)
         if picture:
             self.delete(picture)
         return model

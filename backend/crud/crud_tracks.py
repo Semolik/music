@@ -54,16 +54,14 @@ class TracksCrud(CRUDBase):
             if not is_listened:
                 return
             last_listened.listen_datetime = datetime.now()
-            self.db.commit()
-            self.db.refresh(last_listened)
-            return last_listened
+
+            return self.update(model=last_listened)
         return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))
 
     def get_track_statistics(self, track: Track):
         total_count = self.db.query(ListenTrackHistoryItem).filter(
             ListenTrackHistoryItem.track_id == track.id).count()
-        # week_start = datetime.now() -
         now = datetime.now()
         days = []
         week_start = now - timedelta(days=now.weekday())

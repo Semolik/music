@@ -4,7 +4,6 @@ from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
 from backend.helpers.validate_role import validate_admin
-from backend.schemas.messages import Message
 from backend.schemas.user import TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.models.files import File
@@ -84,7 +83,7 @@ def get_all_change_role_requests(
 
 
 @router.post('/change-role/{request_id}/answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=TimeCreated)
-def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer , Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()

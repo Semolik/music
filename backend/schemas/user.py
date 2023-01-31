@@ -37,8 +37,14 @@ class UserBase(BaseModel):
 
 
 class UserTypes(BaseModel):
-    type: settings.ALL_USER_ACCOUNT_STATUSES = Query(
-        ..., description='Тип пользователя')
+    type: settings.USER_ACCOUNT_STATUSES
+
+    class Config:
+        use_enum_values = True
+
+
+class AllUserTypes(BaseModel):
+    type: settings.ALL_USER_ACCOUNT_STATUSES
 
 
 class UserWithTypeRegister(UserBase, UserAuth, UserTypes):
@@ -56,7 +62,7 @@ class UserModifiable(UserBase, ValidateJsonWithFormBody):
     )
 
 
-class UserInfo(UserTypes, UserBase, UserUsername):
+class UserInfo(AllUserTypes, UserBase, UserUsername):
     id: int
     picture: str | None = Query(
         default=None,

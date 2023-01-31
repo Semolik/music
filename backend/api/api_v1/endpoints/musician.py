@@ -5,7 +5,7 @@ from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.clips import set_clip_data
 from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
-from backend.schemas.music import AlbumInfo, Liked, MusicianClip
+from backend.schemas.music import AlbumInfo, MusicianClip
 from backend.schemas.music import MusicianFullInfo
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
@@ -35,7 +35,7 @@ def get_public_profile_info(
     return public_profile_obj
 
 
-@router.put('/{profile_id}/like', response_model=Liked)
+@router.put('/{profile_id}/like', response_model=bool)
 def like_musician(
     profile_id: int = Query(..., description='ID профиля'),
     Authorize: AuthJWT = Depends(),
@@ -49,7 +49,7 @@ def like_musician(
                             detail="Профиль музыканта не найден")
     liked = MusicianCrud(db).toggle_like_musician(
         musician_id=profile_id, user_id=current_user_id)
-    return Liked(liked=liked)
+    return liked
 
 
 @router.get('/{profile_id}/clips', response_model=List[MusicianClip])

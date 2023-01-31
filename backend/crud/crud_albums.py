@@ -11,7 +11,9 @@ from backend.models.user import PublicProfile
 class AlbumsCruds(CRUDBase):
     def get_album_tracks(self, album_id: int) -> List[Track]:
         tracks = self.db.query(Track).filter(Track.album_id == album_id).all()
-        return tracks if None in [track.track_position for track in tracks] else sorted(tracks, key=lambda track: track.track_position)
+        if None in [track.track_position for track in tracks]:
+            return tracks
+        return sorted(tracks, key=lambda track: track.track_position)
 
     def create_album(self, user_id: int, name: str,  date: datetime, picture: Image | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
@@ -35,11 +37,11 @@ class AlbumsCruds(CRUDBase):
         return self.create(model=album)
 
     def album_belongs_to_user(self, album: Album, user_id: int):
-        db_public_profile: PublicProfile = self.db.query(PublicProfile).filter(
+        public_profile = self.db.query(PublicProfile).filter(
             PublicProfile.user_id == user_id).first()
-        if not db_public_profile:
+        if not public_profile:
             return False
-        return bool(album.musician_id == db_public_profile.id)
+        return album.musician_id == public_profile.id
 
     def close_uploading(self, album: Album):
         album.uploaded = True

@@ -25,13 +25,5 @@ class GenresCruds(CRUDBase):
                 model=genre, new_picture=picture)
         return self.create(genre)
 
-    def detete_genre(self, genre_id: int):
-        db_genre = self.get(id=genre_id, model=Genre)
-        if not db_genre:
-            raise Exception('Жанр не найден')
-        # rows = self.db.query(AlbumGenre).filter(
-        #     print(albums_genres_table))
-
-        # for row in rows:
-        #     self.delete(row)
-        return self.delete(model=db_genre)
+    def detete_genre(self, genre: Genre):
+        return self.delete(model=genre)

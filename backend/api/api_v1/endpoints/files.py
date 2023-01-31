@@ -30,7 +30,7 @@ def get_image(
 
 
 @router.get('/other/{file_id}', response_class=FileResponse)
-def get_image(file_id: uuid_pkg.UUID = Query(..., description="ID файла"), db: Session = Depends(get_db)):
+def get_file(file_id: uuid_pkg.UUID = Query(..., description="ID файла"), db: Session = Depends(get_db)):
     """Получение файла по его id"""
     db_file = FileCruds(db).get_file_by_id(file_id=file_id)
     if not db_file:
@@ -44,8 +44,8 @@ def get_image(file_id: uuid_pkg.UUID = Query(..., description="ID файла"), 
 
 
 @router.get('/tracks/{track_id}', response_class=FileResponse)
-def get_image(background_tasks: BackgroundTasks, track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
-              db: Session = Depends(get_db)):
+def get_track_file(background_tasks: BackgroundTasks, track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+                   db: Session = Depends(get_db)):
     """Получение трека по его id"""
     db_file = TracksCrud(db).get_track(track_id=track_id)
     if not db_file:

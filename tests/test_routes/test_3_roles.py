@@ -39,5 +39,4 @@ def test_send_change_role_request_answer(client: TestClient, normal_admin_token_
             "request_status": "in-progress"
         }
     )
-    print(response.json())
     assert response.status_code == 200
