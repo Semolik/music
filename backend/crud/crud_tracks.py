@@ -6,6 +6,7 @@ from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.music import FavoriteTracks, ListenTrackHistoryItem, Track
+from backend.schemas.statistics import TrackStats, StatsDay
 
 
 class TracksCrud(CRUDBase):
@@ -58,3 +59,28 @@ class TracksCrud(CRUDBase):
             return last_listened
         return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))
+
+    def get_track_statistics(self, track: Track):
+        total_count = self.db.query(ListenTrackHistoryItem).filter(
+            ListenTrackHistoryItem.track_id == track.id).count()
+        # week_start = datetime.now() -
+        now = datetime.now()
+        days = []
+        week_start = now - timedelta(days=now.weekday())
+        for i in range(7):
+            day_start = week_start + timedelta(days=i)
+            day_end = day_start + timedelta(days=1)
+            count = self.db.query(ListenTrackHistoryItem).filter(
+                ListenTrackHistoryItem.listened == True and
+                ListenTrackHistoryItem.track_id == track.id and
+                ListenTrackHistoryItem.listen_datetime >= day_start and
+                ListenTrackHistoryItem.listen_datetime <= day_end
+            ).count()
+            days.append(
+                StatsDay(day=day_start, count=count)
+            )
+        return TrackStats(
+            track_id=track.id,
+            total_listens=total_count,
+            calendar=days
+        )
