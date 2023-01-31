@@ -85,7 +85,7 @@ def update_album(
                           user_id=current_user_id)
     db_album = AlbumsCruds(db).update_album(album=db_album,
                                             name=albumData.name, date=albumData.date, genres=genres, image=db_image, tracks_ids=tracks_ids)
-    album_obj = set_album_info(db=db, db_album=db_album)
+    album_obj = set_album_info(db_album=db_album)
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=album_obj)
 
 

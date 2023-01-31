@@ -6,16 +6,17 @@ from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.music import set_full_track_data
+from backend.helpers.music import album_is_available, set_full_track_data
 from backend.models.music import Album
 from backend.responses import NOT_FOUND_TRACK, UNAUTHORIZED_401
 from backend.schemas.music import Track
+import uuid as uuid_pkg
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 
 @router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=bool)
 def like_track(
-    track_id: str = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -33,7 +34,7 @@ def like_track(
 
 @router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
 def get_track(
-    track_id: int = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -45,11 +46,9 @@ def get_track(
                             detail="Трек не найден")
     db_album: Album = db_track.album
     current_user_id = Authorize.get_jwt_subject()
-    if db_album.open_date > datetime.now():
-        if current_user_id is None or not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=current_user_id):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Трек не найден")
-    return set_full_track_data(db_track, user_id=current_user_id)
+    album_is_available(album=db_album, db=db,
+                       user_id=current_user_id, message="Трек не найден")
+    return set_full_track_data(track=db_track, user_id=current_user_id, db=db)
 
 
 @router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])

@@ -65,7 +65,7 @@ def set_track_data(db: Session, track: Track, user_id: int = None):
 
 def set_full_track_data(db: Session, track: Track, user_id: int = None):
     track_obj = set_track_data(track=track, db=db, user_id=user_id)
-    track_obj['album'] = set_album_info(db=db, db_album=track.album)
+    track_obj['album'] = set_album_info(db_album=track.album)
     return track_obj
 
 
@@ -110,3 +110,20 @@ def set_album_info(db_album: Album):
         for db_genre in db_album.genres]
     db_album_obj = set_picture(db_album_obj, db_album.picture)
     return db_album_obj
+
+
+def album_is_available(db: Session, user_id: int, album_id: int = None, album: Album = None, message: str = "Альбом не найден"):
+    album_cruds = AlbumsCruds(db)
+    if album_id is not None:
+        album = album_cruds.get_album(id=album_id)
+    if album is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=message)
+    if not album.uploaded:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=message)
+    if album.open_date > datetime.now() or not album.uploaded:
+        if user_id is None or not album_cruds.album_belongs_to_user(album=album, user_id=user_id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=message)
+    return album

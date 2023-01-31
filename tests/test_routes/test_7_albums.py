@@ -1,20 +1,22 @@
-import io
 import json
 from fastapi.testclient import TestClient
 from datetime import datetime
+from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_genres import GenresCruds
 from backend.core.config import env_config
 import pytest
-
+json_data = {
+    "name": "string",
+    "date": str(datetime.now()),
+    "genres_ids": []
+}
 data = {
 
-    "albumData": json.dumps({
-        "name": "string",
-        "date": str(datetime.now()),
-        "genres_ids": []
-    })
+    "albumData": json.dumps(json_data)
 
 }
+update_json_data = json_data.copy()
+update_json_data["name"] = "new_name"
 files = {
     "albumPicture": (open("tests/assets/album_picture.jpg", "rb"))
 }
@@ -23,7 +25,7 @@ track_files = {
     "track": (open("tests/assets/track.mp3", "rb")),
     "trackPicture": (open("tests/assets/track_picture.jpg", "rb"))
 }
-# track_data =
+track_ids = []
 
 
 def test_create_album(client: TestClient, normal_musician_token_cookies, db_session):
@@ -33,10 +35,8 @@ def test_create_album(client: TestClient, normal_musician_token_cookies, db_sess
     response = client.post("/albums", data=data, files=files,
                            cookies=normal_musician_token_cookies)
     json_resp = response.json()
-    print(json_resp)
     global album_id
     assert response.status_code == 201
-    # assert json_resp.get("name") == data["albumData"]["name"]
     album_id = json_resp.get("id")
 
 
@@ -80,5 +80,100 @@ def test_upload_track(client: TestClient, normal_musician_token_cookies, expecte
     assert album_id is not None
     response = client.post(f"/albums/{album_id}/track", data=input_data, files=files,
                            cookies=normal_musician_token_cookies)
-    print(response.json())
+
     assert response.status_code == expected_status_code
+    if response.status_code == 201:
+        track_ids.append(response.json().get("id"))
+
+
+def test_upload_multiple_tracks(client: TestClient, normal_musician_token_cookies):
+    for i in range(5):
+        test_upload_track(client, normal_musician_token_cookies, 201, {
+            "name": "test_track_name",
+            "feat": "feat",
+        }, track_files)
+
+
+def test_get_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+    assert album_id is not None
+    response = client.get(
+        f"/albums/{album_id}", cookies=normal_user_token_cookies)
+
+    assert response.status_code == 404
+
+
+def test_get_album_with_not_closed_uploading_as_musician(client: TestClient, normal_musician_token_cookies):
+    assert album_id is not None
+    response = client.get(
+        f"/albums/{album_id}", cookies=normal_musician_token_cookies)
+
+    assert response.status_code == 200
+
+
+def test_get_track_from_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+    assert album_id is not None
+    assert track_ids[0] is not None
+    response = client.get(
+        f"/tracks/{track_ids[0]}", cookies=normal_user_token_cookies)
+    assert response.status_code == 404
+
+
+def test_close_uploading(client: TestClient, normal_musician_token_cookies):
+    assert album_id is not None
+    response = client.put(
+        f"/albums/{album_id}/close-uploading", cookies=normal_musician_token_cookies)
+
+    assert response.status_code == 200
+
+
+def test_get_album_with_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+    assert album_id is not None
+    response = client.get(
+        f"/albums/{album_id}", cookies=normal_user_token_cookies)
+
+    assert response.status_code == 200
+
+
+album_tracks_ids = []
+update_json_data_change_tracks_position = update_json_data.copy()
+
+
+def test_get_album_with_closed_uploading_as_musician(client: TestClient, normal_musician_token_cookies):
+    assert album_id is not None
+    response = client.get(
+        f"/albums/{album_id}", cookies=normal_musician_token_cookies)
+
+    assert response.status_code == 200
+
+
+def test_set_tracks_ids_for_update(db_session):
+    album_tracks_ids = [str(i.id) for i in
+                        AlbumsCruds(db_session).get_album(album_id).tracks
+                        ]
+
+    update_json_data["tracks_ids"] = album_tracks_ids
+
+    update_json_data_change_tracks_position["tracks_ids"] = list(
+        reversed(album_tracks_ids))
+
+
+@pytest.mark.parametrize("input_data,files,expected_status_code", [
+    (update_json_data, files, 200),
+    (update_json_data, {}, 200),
+    (update_json_data, {
+        "albumPicture": b'aboba'
+    }, 422),
+    (update_json_data, {
+        "albumPicture": (open("tests/assets/album_picture.jpg", "rb"))
+    }, 200),
+    (update_json_data_change_tracks_position, files, 200)
+])
+def test_update_album(client: TestClient, normal_musician_token_cookies, files, expected_status_code: int, input_data: dict):
+
+    assert album_id is not None
+    response = client.put(
+        f"/albums/{album_id}", cookies=normal_musician_token_cookies, data={"albumData": json.dumps(input_data)}, files=files)
+
+    assert response.status_code == expected_status_code
+    if response.status_code == 200:
+        assert response.json().get("name") == update_json_data["name"]
