@@ -100,6 +100,36 @@ class Album(Base):
     )
 
 
+class FavoriteAlbum(Base):
+    __tablename__ = 'favorite_albums'
+    album_id = Column(
+        Integer,
+        ForeignKey("albums.id"),
+        primary_key=True
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        primary_key=True
+    )
+    album = relationship(
+        "Album",
+        foreign_keys=[album_id],
+        backref=backref(
+            "favorite_albums",
+            cascade="all,delete"
+        )
+    )
+    user = relationship(
+        "User",
+        foreign_keys=[user_id],
+        backref=backref(
+            "favorite_albums",
+            cascade="all,delete"
+        )
+    )
+
+
 class Track(Base):
     __tablename__ = 'tracks'
 

@@ -91,6 +91,8 @@ def validate_genres(db: Session, genres_ids: List[int]):
 
 
 def is_album_showed(db: Session, album: Album, user_id: int):
+    if not album.uploaded:
+        return False
     if album.open_date > datetime.now() or not album.uploaded:
         if user_id is None or not AlbumsCruds(db).album_belongs_to_user(album=album, user_id=user_id):
             return False
@@ -115,7 +117,7 @@ def set_album_info(db_album: Album):
 def album_is_available(db: Session, user_id: int, album_id: int = None, album: Album = None, message: str = "Альбом не найден"):
     album_cruds = AlbumsCruds(db)
     if album_id is not None:
-        album = album_cruds.get_album(id=album_id)
+        album = album_cruds.get_album(album_id=album_id)
     if album is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=message)

@@ -86,6 +86,25 @@ def test_upload_track(client: TestClient, normal_musician_token_cookies, expecte
         track_ids.append(response.json().get("id"))
 
 
+def test_upload_track_as_another_musician(client: TestClient, another_normal_musician_token_cookies):
+    assert album_id is not None
+    response = client.post(f"/albums/{album_id}/track", data={
+        "name": "test_track_name",
+        "feat": "feat",
+    }, files=track_files, cookies=another_normal_musician_token_cookies)
+
+    assert response.status_code == 403
+
+
+def test_upload_track_without_album(client: TestClient, normal_musician_token_cookies):
+    response = client.post(f"/albums/0/track", data={
+        "name": "test_track_name",
+        "feat": "feat",
+    }, files=track_files, cookies=normal_musician_token_cookies)
+
+    assert response.status_code == 404
+
+
 def test_upload_multiple_tracks(client: TestClient, normal_musician_token_cookies):
     for i in range(5):
         test_upload_track(client, normal_musician_token_cookies, 201, {
@@ -107,7 +126,7 @@ def test_get_album_with_not_closed_uploading_as_musician(client: TestClient, nor
     response = client.get(
         f"/albums/{album_id}", cookies=normal_musician_token_cookies)
 
-    assert response.status_code == 200
+    assert response.status_code == 404
 
 
 def test_get_track_from_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
@@ -177,3 +196,36 @@ def test_update_album(client: TestClient, normal_musician_token_cookies, files, 
     assert response.status_code == expected_status_code
     if response.status_code == 200:
         assert response.json().get("name") == update_json_data["name"]
+
+
+def test_update_album_without_album(client: TestClient, normal_musician_token_cookies):
+    response = client.put(
+        f"/albums/0", cookies=normal_musician_token_cookies, data={"albumData": json.dumps(update_json_data)})
+
+    assert response.status_code == 404
+
+
+def test_update_album_as_another_musician(client: TestClient, another_normal_musician_token_cookies):
+    assert album_id is not None
+    response = client.put(
+        f"/albums/{album_id}", cookies=another_normal_musician_token_cookies, data={"albumData": json.dumps(update_json_data)})
+
+    assert response.status_code == 403
+
+
+def test_get_my_albums_as_musician(client: TestClient, normal_musician_token_cookies):
+    response = client.get("/albums/my", cookies=normal_musician_token_cookies)
+    assert response.status_code == 200
+
+
+def test_get_my_albums_as_user(client: TestClient, normal_user_2_token_cookies):
+    response = client.get("/albums/my", cookies=normal_user_2_token_cookies)
+    assert response.status_code == 403
+
+
+def test_album_like(client: TestClient, normal_user_token_cookies):
+    assert album_id is not None
+    response = client.put(
+        f"/albums/{album_id}/like", cookies=normal_user_token_cookies)
+
+    assert response.status_code == 200

@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from pathlib import Path
 import requests
 import shutil
+from fastapi import HTTPException
 logger = logging.getLogger(__name__)
 supported_image_extensions = {
     ex for ex, f in pillow.registered_extensions().items() if f in pillow.OPEN}
@@ -80,3 +81,5 @@ def save_image_in_db_by_url(db: Session, url: str, user_id: int) -> File | None:
         buf.name = url.split('/')[-1]
         buf.seek(0)
         return save_image(db=db, upload_file=None, user_id=user_id, bytes_io_file=buf, resize_image_options=(1000, 1000), detail_error_message="не удалось скачать обложку ролика")
+    else:
+        return HTTPException(status_code=400, detail="не удалось скачать обложку ролика")

@@ -4,16 +4,17 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_user import UserCruds
 from backend.helpers.images import save_image
-from backend.helpers.clips import set_clip_data
+from backend.helpers.clips import set_clip_data, video_is_exists
 from backend.helpers.validate_role import validate_musician
 from backend.schemas.music import CreateMusicianClipForm, MusicianClip
 from backend.helpers.files import save_image_in_db_by_url
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
+import requests
 router = APIRouter(prefix="/clips", tags=['Клипы'])
 
 
-@router.post('', response_model=MusicianClip)
+@router.post('', response_model=MusicianClip, status_code=status.HTTP_201_CREATED)
 def create_clip(
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
     clipPicture: UploadFile = File(
@@ -27,6 +28,8 @@ def create_clip(
     validate_musician(db=db, user_id=current_user_id)
     db_public_profile = UserCruds(
         db).get_public_profile(user_id=current_user_id)
+    if not video_is_exists(clipData.video_id):
+        raise HTTPException(status_code=404, detail="ролик не найден")
     if clipData.image_from_youtube:
         image_model = save_image_in_db_by_url(
             db=db,
@@ -92,6 +95,8 @@ def update_clip(
     if db_clip.musician_id != db_public_profile.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Вы не можете изменять этот клип")
+    if not video_is_exists(clipData.video_id):
+        raise HTTPException(status_code=404, detail="ролик не найден")
     if clipData.image_from_youtube:
         image_model = save_image_in_db_by_url(
             db=db,

@@ -100,3 +100,17 @@ def normal_musician_token_cookies(client: TestClient, db_session):
     return authentication_token_from_username(
         client=client, username=settings.TEST_MUSICIAN_USERNAME, db=db_session, user_type=settings.UserTypeEnum.musician
     )
+
+
+@pytest.fixture(scope="function")  # new function
+def another_normal_musician_token_cookies(client: TestClient, db_session):
+    return authentication_token_from_username(
+        client=client, username=settings.TEST_ANOTHER_MUSICIAN_USERNAME, db=db_session, user_type=settings.UserTypeEnum.musician
+    )
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_user_2_token_cookies(client: TestClient, db_session):
+    return authentication_token_from_username(
+        client=client, username=settings.TEST_USER_USERNAME_2, db=db_session
+    )

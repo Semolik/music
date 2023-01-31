@@ -116,12 +116,12 @@ class Track(AlbumTrack):
 class CreateMusicianClip(BaseModel):
 
     name: str = Query(
-        default=None,
+        ...,
         max_length=int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH')),
         description="Название клипа"
     )
     video_id: str = Query(
-        default=None,
+        ...,
         max_length=int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH')),
         description="ID видео на YouTube"
     )
