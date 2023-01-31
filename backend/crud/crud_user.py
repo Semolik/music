@@ -86,7 +86,7 @@ class UserCruds(CRUDBase):
             picture=picture
         ))
 
-    def get_public_profile_by_id(self, id):
+    def get_public_profile_by_id(self, id) -> PublicProfile:
         return self.db.query(PublicProfile).filter(
             PublicProfile.id == id).first()
 
