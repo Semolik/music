@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
@@ -7,18 +6,18 @@ from backend.crud.crud_musician import MusicianCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
-from backend.helpers.music import is_album_showed
+from backend.helpers.music import is_album_showed, save_track
 from backend.helpers.images import save_image
 from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
 from backend.helpers.validate_role import validate_musician
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, UpdateAlbum
-
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, TrackAfterUpload, UpdateAlbum, UploadTrackForm
+from backend.helpers.images import save_image, set_picture
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
-@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload)
+@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload, status_code=status.HTTP_201_CREATED)
 def create_album(
     albumData: CreateAlbum,
     albumPicture: UploadFile = File(..., description='Картинка альбома'),
@@ -130,6 +129,45 @@ def get_album_by_id(
     db_album_obj = set_musician_info(
         data=db_album_obj, public_profile_id=db_album.musician_id, db=db)
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
+
+
+@router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED)
+def upload_track(
+    album_id: int = Query(..., description='ID альбома'),
+    trackData: UploadTrackForm = Depends(UploadTrackForm),
+    trackPicture: UploadFile = File(..., description="Изображение трека"),
+    track: UploadFile = File(..., description="Файл трека"),
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db)
+):
+    '''Создание трека'''
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+    db_album = AlbumsCruds(db).get_album(album_id=album_id)
+    if not db_album:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    if not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Нет прав изменять этот альбом")
+    if db_album.uploaded:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Добавление треков в загруженный альбом запрещено")
+    db_image = save_image(
+        db=db,
+        upload_file=trackPicture,
+        user_id=current_user_id
+    )
+    db_track = save_track(
+        album_id=album_id,
+        db=db,
+        upload_file=track,
+        user_id=current_user_id,
+        track=trackData,
+        picture=db_image
+    )
+    track_obj = set_picture(db_track.as_dict(), db_image)
+    return track_obj
 
 
 @router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)

@@ -46,7 +46,7 @@ def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_
     suffix = originalFilePath.suffix
     if suffix.lower() not in supported_image_extensions:
         raise HTTPException(
-            status_code=500, detail="Расширение изображения не поддерживается")
+            status_code=422, detail="Расширение изображения не поддерживается")
     if bytes_io_file:
         buf = bytes_io_file
     else:
@@ -61,4 +61,4 @@ def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_
         image.save(image_id_to_path(image_model.id))
         return image_model
     except:
-        raise HTTPException(status_code=500, detail=detail_error_message)
+        raise HTTPException(status_code=422, detail=detail_error_message)

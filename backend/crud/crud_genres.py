@@ -6,7 +6,7 @@ from backend.models.music import Genre
 
 
 class GenresCruds(CRUDBase):
-    def get_genres(self):
+    def get_genres(self) -> list[Genre]:
         return self.db.query(Genre).all()
 
     def create_genre(self, name: str, picture: Image):

@@ -21,7 +21,7 @@ from datetime import datetime
 from backend.models.music import Album
 
 
-def save_track(db: Session, upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
+def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
     buf = io.BytesIO()
     shutil.copyfileobj(upload_file.file, buf)
     buf.seek(0)
@@ -36,7 +36,7 @@ def save_track(db: Session, upload_file: UploadFile, picture: Image, user_id: in
                 name=track.name,
                 feat=track.feat,
                 duration=round(segment.duration_seconds),
-                album_id=track.album_id,
+                album_id=album_id,
                 picture=db_picture,
             )
         )
@@ -45,7 +45,7 @@ def save_track(db: Session, upload_file: UploadFile, picture: Image, user_id: in
                        format=ext.replace('.', ''))
         return db_track
     except:
-        raise HTTPException(status_code=500, detail="поврежденный файл")
+        raise HTTPException(status_code=422, detail="поврежденный файл")
 
 
 def set_album_tracks(db: Session, db_album, db_album_obj, user_id: int = None):

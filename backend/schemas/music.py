@@ -28,11 +28,6 @@ class UpdateAlbum(CreateAlbum):
                                             description="Список ID треков")
 
 
-# @form_body
-# class UpdateAlbumForm(UpdateAlbum):
-#     ...
-
-
 @form_body
 class CreateAlbumForm(CreateAlbum):
     ...
@@ -74,11 +69,11 @@ class AlbumIsCLosed(BaseModel):
 
 class UploadTrackBase(BaseModel):
     name: str = Query(
-        default=None,
+        ...,
         max_length=int(env_config.get('VITE_MAX_TRACK_NAME_LENGTH')),
+        min_length=int(env_config.get('VITE_MIN_TRACK_NAME_LENGTH')),
         description="Название трека"
     )
-    album_id: int = Query(..., description="ID альбома")
     feat: str | None = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_TRACK_FEAT_LENGTH')),

@@ -26,12 +26,6 @@ class Settings(BaseSettings):
                                'successfully', 'rejected']
     ALLOWED_STATUSES_FILTER = Literal[ALLOWED_STATUSES, 'all']
     ALLOWED_STATUSES_LIST: Tuple[str, ...] = get_args(ALLOWED_STATUSES)
-    # USER_ACCOUNT_STATUSES = Literal['radio_station',
-    #                                 'musician', 'user']
-    # USER_ACCOUNT_STATUSES_LIST: Tuple[str, ...] = get_args(
-    #     USER_ACCOUNT_STATUSES)
-    # ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
-    #     [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
     ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
