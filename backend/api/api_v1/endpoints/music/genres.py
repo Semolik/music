@@ -57,7 +57,7 @@ def update_genre(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
     db_image = save_image(db=db, upload_file=genrePicture,
-                          user_id=current_user_id)
+                          user_id=current_user_id) if genrePicture else None
     genre = GenresCruds(db).update_genre(
         name=genreData.name, picture=db_image, genre=genre)
     return set_picture(genre.as_dict(), genre.picture)

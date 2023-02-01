@@ -1,8 +1,9 @@
 import io
+import random
+import string
 from fastapi.testclient import TestClient
 from backend.crud.crud_genres import GenresCruds
 from backend.helpers.images import save_image
-
 baseGenreData = {
     "data": {
 
@@ -10,9 +11,31 @@ baseGenreData = {
 
     },
     "files": {
-        "genrePicture": open("tests/assets/test-profile-avatar.jpg", "rb"),
+        "genrePicture": open("tests/test_files/test-profile-avatar.jpg", "rb"),
     }
 }
+
+
+def create_genre(client, db_session):
+    admin_id = client.get("/users/me").json()["id"]
+    genres_crud = GenresCruds(db_session)
+    img = io.BytesIO(
+        open("tests/test_files/test-profile-avatar.jpg", "rb").read())
+    img.name = "test-profile-avatar.jpg"
+
+    image = save_image(
+        db=db_session,
+        user_id=admin_id,
+        upload_file=None,
+        bytes_io_file=img
+    )
+    assert image is not None
+    assert image.id is not None
+    return genres_crud.create_genre(
+        name=''.join(random.choices(
+            string.ascii_uppercase + string.digits, k=10)),
+        picture=image
+    )
 
 
 def test_create_genre(client: TestClient, normal_admin_token_cookies):
@@ -39,36 +62,26 @@ def test_get_genres(client: TestClient):
     assert response.status_code == 200
 
 
-def test_update_genre(client: TestClient, normal_admin_token_cookies):
+def test_update_genre(client: TestClient, normal_admin_token_cookies, db_session):
+    genre = create_genre(client, db_session)
     newGenreData = {
         "name": "test_genre_name_updated"
     }
     response = client.put(
-        "/genres/1",
+        f"/genres/{genre.id}",
         data=newGenreData,
         cookies=normal_admin_token_cookies,
-        files=baseGenreData.get("files")
+        files={
+            "genrePicture": open("tests/test_files/test-profile-avatar.jpg", "rb"),
+        }
     )
+    print(response.json())
     assert response.status_code == 200
     assert response.json()["name"] == newGenreData["name"]
 
 
 def test_delete_genre(client: TestClient, normal_admin_token_cookies, db_session):
-    admin_id = client.get("/users/me").json()["id"]
-    genres_crud = GenresCruds(db_session)
-    img = io.BytesIO(open("tests/assets/test-profile-avatar.jpg", "rb").read())
-    img.name = "test-profile-avatar.jpg"
-
-    image = save_image(
-        db=db_session,
-        user_id=admin_id,
-        upload_file=None,
-        bytes_io_file=img
-    )
-    genre = genres_crud.create_genre(
-        name="test_genre_name_to_delete",
-        picture=image
-    )
+    genre = create_genre(client, db_session)
     response = client.delete(
         f"/genres/{genre.id}",
         cookies=normal_admin_token_cookies

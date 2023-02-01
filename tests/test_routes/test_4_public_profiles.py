@@ -9,7 +9,7 @@ data = {
         'telegram': 'test_telegram',
     }
 }
-picture = open('tests/assets/test-profile-avatar.jpg', 'rb')
+picture = open('tests/test_files/test-profile-avatar.jpg', 'rb')
 
 
 def test_get_my_public_profile(client: TestClient, normal_user_token_cookies):

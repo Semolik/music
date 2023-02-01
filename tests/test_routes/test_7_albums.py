@@ -18,12 +18,12 @@ data = {
 update_json_data = json_data.copy()
 update_json_data["name"] = "new_name"
 files = {
-    "albumPicture": (open("tests/assets/album_picture.jpg", "rb"))
+    "albumPicture": ("test_albums_picture.jpg", open("tests/test_files/album_picture.jpg", "rb"), "image/jpg")
 }
 
 track_files = {
-    "track": (open("tests/assets/track.mp3", "rb")),
-    "trackPicture": (open("tests/assets/track_picture.jpg", "rb"))
+    "track": open("tests/test_files/track.mp3", "rb"),
+    "trackPicture": open("tests/test_files/test_tracks_picture.jpg", "rb")
 }
 track_ids = []
 
@@ -80,7 +80,7 @@ def test_upload_track(client: TestClient, normal_musician_token_cookies, expecte
     assert album_id is not None
     response = client.post(f"/albums/{album_id}/track", data=input_data, files=files,
                            cookies=normal_musician_token_cookies)
-
+    print(response.json())
     assert response.status_code == expected_status_code
     if response.status_code == 201:
         track_ids.append(response.json().get("id"))
@@ -107,10 +107,14 @@ def test_upload_track_without_album(client: TestClient, normal_musician_token_co
 
 def test_upload_multiple_tracks(client: TestClient, normal_musician_token_cookies):
     for i in range(5):
-        test_upload_track(client, normal_musician_token_cookies, 201, {
+        test_upload_track(client=client, normal_musician_token_cookies=normal_musician_token_cookies, input_data={
             "name": "test_track_name",
-            "feat": "feat",
-        }, track_files)
+            "feat": "test_track_feat",
+        }, files={
+            "track": track_files["track"],
+            "trackPicture": open("tests/test_files/test_tracks_picture.jpg", "rb")
+        }, expected_status_code=201)
+        print(i)
 
 
 def test_get_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
@@ -182,9 +186,7 @@ def test_set_tracks_ids_for_update(db_session):
     (update_json_data, {
         "albumPicture": b'aboba'
     }, 422),
-    (update_json_data, {
-        "albumPicture": (open("tests/assets/album_picture.jpg", "rb"))
-    }, 200),
+    (update_json_data, files, 200),
     (update_json_data_change_tracks_position, files, 200)
 ])
 def test_update_album(client: TestClient, normal_musician_token_cookies, files, expected_status_code: int, input_data: dict):
@@ -192,7 +194,7 @@ def test_update_album(client: TestClient, normal_musician_token_cookies, files, 
     assert album_id is not None
     response = client.put(
         f"/albums/{album_id}", cookies=normal_musician_token_cookies, data={"albumData": json.dumps(input_data)}, files=files)
-
+    print(response.json())
     assert response.status_code == expected_status_code
     if response.status_code == 200:
         assert response.json().get("name") == update_json_data["name"]

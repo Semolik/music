@@ -16,7 +16,7 @@ def test_update_user_info_with_picture(client: TestClient, normal_user_token_coo
         "remove_picture": False
     }
     files = {'userPicture':  open(
-        'tests/assets/test-profile-avatar.jpg', 'rb')}
+        'tests/test_files/test-profile-avatar.jpg', 'rb')}
     response = client.put(
         "/users/me",
         data={"UserData": json.dumps(data)},

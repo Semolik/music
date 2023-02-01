@@ -9,7 +9,7 @@ baseClipData = {
         "image_from_youtube": False,
     },
     "files": {
-        "clipPicture": ("test_clip_picture.jpg", open("tests/assets/test_clip_picture.jpg", "rb"), "image/jpeg"),
+        "clipPicture": ("test_clip_picture.jpg", open("tests/test_files/test_clip_picture.jpg", "rb"), "image/jpeg"),
     }
 }
 tests = [

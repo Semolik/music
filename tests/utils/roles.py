@@ -6,7 +6,7 @@ def send_change_role_request(client: TestClient, cookies, message='test message'
         'message': message,
         'account_status': account_status,
     }
-    filename = 'tests/assets/test-profile-avatar.jpg'
+    filename = 'tests/test_files/test-profile-avatar.jpg'
     files = {'files': ('filename.jpg', open(filename, 'rb'), 'image/jpeg')}
 
     response = client.post(
