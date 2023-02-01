@@ -110,11 +110,7 @@ def test_upload_multiple_tracks(client: TestClient, normal_musician_token_cookie
         test_upload_track(client=client, normal_musician_token_cookies=normal_musician_token_cookies, input_data={
             "name": "test_track_name",
             "feat": "test_track_feat",
-        }, files={
-            "track": track_files["track"],
-            "trackPicture": open("tests/test_files/test_tracks_picture.jpg", "rb")
-        }, expected_status_code=201)
-        print(i)
+        }, files=track_files, expected_status_code=201)
 
 
 def test_get_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):

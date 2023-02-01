@@ -20,15 +20,17 @@ def create_genre(client, db_session):
     admin_id = client.get("/users/me").json()["id"]
     genres_crud = GenresCruds(db_session)
     img = io.BytesIO(
-        open("tests/test_files/test-profile-avatar.jpg", "rb").read())
+        open("tests/test_files/test-profile-avatar.jpg", "rb").read()
+    )
     img.name = "test-profile-avatar.jpg"
-
+    img.seek(0)
     image = save_image(
         db=db_session,
         user_id=admin_id,
         upload_file=None,
         bytes_io_file=img
     )
+
     assert image is not None
     assert image.id is not None
     return genres_crud.create_genre(

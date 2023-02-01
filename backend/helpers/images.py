@@ -36,7 +36,8 @@ def copy_image(image: Image, db: Session, user_id: int) -> Image:
 
 
 def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденное изображение"):
-    if (not upload_file or not upload_file.filename) if not bytes_io_file else False:
+    if not bytes_io_file and (not upload_file or not upload_file.filename):
+        print("no file")
         return
     if bytes_io_file:
         originalFileName = bytes_io_file.name
@@ -54,12 +55,12 @@ def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_
         shutil.copyfileobj(upload_file.file, buf)
         buf.seek(0)
 
-    # try:
+    try:
         image = pillow.open(buf)
         image.thumbnail(resize_image_options)
         image_model = FileCruds(db).create_image(
             width=image.width, height=image.height, user_id=user_id)
         image.save(image_id_to_path(image_model.id))
         return image_model
-    # except:
-    #     raise HTTPException(status_code=422, detail=detail_error_message)
+    except:
+        raise HTTPException(status_code=422, detail=detail_error_message)
