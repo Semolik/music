@@ -115,19 +115,6 @@ def update_clip(
     return set_clip_data(clip=clip)
 
 
-@router.get('/{clip_id}', response_model=MusicianClip)
-def get_clip_by_id(
-    clip_id: int = Query(..., description='ID клипа'),
-    db: Session = Depends(get_db)
-):
-    '''Получение клипа'''
-    clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
-    if not clip:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Клип не найден")
-    return set_clip_data(clip=clip)
-
-
 @router.get('/my', response_model=List[MusicianClip])
 def get_my_clips(
     page: int = Query(1, description='Страница'),
@@ -143,3 +130,16 @@ def get_my_clips(
     clips = ClipsCruds(db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
     return [set_clip_data(clip=clip) for clip in clips]
+
+
+@router.get('/{clip_id}', response_model=MusicianClip)
+def get_clip_by_id(
+    clip_id: int = Query(..., description='ID клипа'),
+    db: Session = Depends(get_db)
+):
+    '''Получение клипа'''
+    clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
+    if not clip:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Клип не найден")
+    return set_clip_data(clip=clip)

@@ -37,7 +37,6 @@ def copy_image(image: Image, db: Session, user_id: int) -> Image:
 
 def save_image(db: Session, upload_file: UploadFile, user_id: int, resize_image_options=(400, 400), bytes_io_file: io.BytesIO = None, detail_error_message="поврежденное изображение"):
     if not bytes_io_file and (not upload_file or not upload_file.filename):
-        print("no file")
         return
     if bytes_io_file:
         originalFileName = bytes_io_file.name

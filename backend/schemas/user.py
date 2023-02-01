@@ -19,6 +19,7 @@ class UserAuth(UserUsername):
     password: str = Query(
         default=None,
         min_length=int(env_config.get('VITE_MIN_PASSWORD_LENGTH')),
+        max_length=int(env_config.get('VITE_MAX_PASSWORD_LENGTH')),
         description='Пароль пользователя'
     )
 

@@ -4,6 +4,7 @@ import string
 from fastapi.testclient import TestClient
 from backend.crud.crud_genres import GenresCruds
 from backend.helpers.images import save_image
+from tests.utils.names import generate_random_name
 baseGenreData = {
     "data": {
 
@@ -34,8 +35,7 @@ def create_genre(client, db_session):
     assert image is not None
     assert image.id is not None
     return genres_crud.create_genre(
-        name=''.join(random.choices(
-            string.ascii_uppercase + string.digits, k=10)),
+        name=generate_random_name(10),
         picture=image
     )
 

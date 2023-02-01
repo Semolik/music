@@ -40,12 +40,12 @@ update_tests.append(
 def test_create_clip(client: TestClient, normal_musician_token_cookies, input_data, files, expected_status_code):
     response = client.post("/clips", data=input_data, files=files,
                            cookies=normal_musician_token_cookies)
-    print(response.json())
     json_resp = response.json()
     assert response.status_code == expected_status_code
     if response.status_code == 201:
 
         assert json_resp.get("name") == input_data.get("name")
+    return json_resp
 
 
 def test_create_clip_2(client: TestClient, normal_musician_token_cookies):
@@ -60,6 +60,9 @@ def test_create_clip_2(client: TestClient, normal_musician_token_cookies):
 
 @pytest.mark.parametrize("input_data,files,expected_status_code", update_tests)
 def test_update_clip(client: TestClient, normal_musician_token_cookies, input_data, files, expected_status_code):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
     response = client.put(f"/clips/{clip_id}", data=input_data, files=files,
                           cookies=normal_musician_token_cookies)
     json_resp = response.json()
@@ -69,37 +72,80 @@ def test_update_clip(client: TestClient, normal_musician_token_cookies, input_da
 
 
 def test_update_clip_as_another_musician(client: TestClient, normal_musician_token_cookies, another_normal_musician_token_cookies):
-    response = client.post("/clips", data=baseClipData.get("data"), files=baseClipData.get("files"),
-                           cookies=normal_musician_token_cookies)
-    json_resp = response.json()
-    assert response.status_code == 201
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
 
-    response = client.put(f"/clips/{json_resp.get('id')}", data=baseClipData.get("data"), files=baseClipData.get("files"),
+    response = client.put(f"/clips/{clip_id}", data=baseClipData.get("data"), files=baseClipData.get("files"),
                           cookies=another_normal_musician_token_cookies)
     assert response.status_code == 403
 
 
 def test_delete_clip(client: TestClient, normal_musician_token_cookies):
-    response = client.post("/clips", data=baseClipData.get("data"), files=baseClipData.get("files"),
-                           cookies=normal_musician_token_cookies)
-    json_resp = response.json()
-    assert response.status_code == 201
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
 
-    clip_id = json_resp.get("id")
-    assert json_resp.get("name") == baseClipData.get("data").get("name")
+    assert clip.get("name") == baseClipData.get("data").get("name")
     response = client.delete(f"/clips/{clip_id}",
                              cookies=normal_musician_token_cookies)
     assert response.status_code == 204
 
 
-def test_delete_clip_as_user(client: TestClient, normal_user_token_cookies, normal_musician_token_cookies):
-    response = client.post("/clips", data=baseClipData.get("data"), files=baseClipData.get("files"),
-                           cookies=normal_musician_token_cookies)
-    json_resp = response.json()
-    assert response.status_code == 201
+def test_delete_clip_as_another_musician(client: TestClient, normal_musician_token_cookies, another_normal_musician_token_cookies):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
 
-    clip_id = json_resp.get("id")
-    assert json_resp.get("name") == baseClipData.get("data").get("name")
+    assert clip.get("name") == baseClipData.get("data").get("name")
     response = client.delete(f"/clips/{clip_id}",
-                             cookies=normal_user_token_cookies)
+                             cookies=another_normal_musician_token_cookies)
+    assert response.status_code == 403
+
+
+def test_delete_clip_as_user(client: TestClient, normal_musician_token_cookies, normal_user_2_token_cookies):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
+
+    assert clip.get("name") == baseClipData.get("data").get("name")
+    response = client.delete(f"/clips/{clip_id}",
+                             cookies=normal_user_2_token_cookies)
+    assert response.status_code == 403
+
+
+def test_get_clip(client: TestClient, normal_musician_token_cookies):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
+
+    response = client.get(f"/clips/{clip_id}",
+                          cookies=normal_musician_token_cookies)
+    assert response.status_code == 200
+
+
+def test_get_clip_as_user(client: TestClient, normal_musician_token_cookies, normal_user_2_token_cookies):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+    clip_id = clip.get("id")
+
+    response = client.get(f"/clips/{clip_id}",
+                          cookies=normal_user_2_token_cookies)
+    assert response.status_code == 200
+
+
+def test_get_my_clips(client: TestClient, normal_musician_token_cookies):
+    clip = test_create_clip(client, normal_musician_token_cookies,
+                            baseClipData.get("data"), baseClipData.get("files"), 201)
+
+    response = client.get("/clips/my",
+                          cookies=normal_musician_token_cookies)
+    assert response.status_code == 200
+    assert len(response.json()) > 0
+
+
+def test_get_my_clips_as_user(client: TestClient,  normal_user_2_token_cookies):
+
+    response = client.get("/clips/my",
+                          cookies=normal_user_2_token_cookies)
     assert response.status_code == 403

@@ -113,10 +113,10 @@ def test_upload_multiple_tracks(client: TestClient, normal_musician_token_cookie
         }, files=track_files, expected_status_code=201)
 
 
-def test_get_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+def test_get_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_2_token_cookies):
     assert album_id is not None
     response = client.get(
-        f"/albums/{album_id}", cookies=normal_user_token_cookies)
+        f"/albums/{album_id}", cookies=normal_user_2_token_cookies)
 
     assert response.status_code == 404
 
@@ -129,11 +129,11 @@ def test_get_album_with_not_closed_uploading_as_musician(client: TestClient, nor
     assert response.status_code == 404
 
 
-def test_get_track_from_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+def test_get_track_from_album_with_not_closed_uploading_as_user(client: TestClient, normal_user_2_token_cookies):
     assert album_id is not None
     assert track_ids[0] is not None
     response = client.get(
-        f"/tracks/{track_ids[0]}", cookies=normal_user_token_cookies)
+        f"/tracks/{track_ids[0]}", cookies=normal_user_2_token_cookies)
     assert response.status_code == 404
 
 
@@ -145,10 +145,10 @@ def test_close_uploading(client: TestClient, normal_musician_token_cookies):
     assert response.status_code == 200
 
 
-def test_get_album_with_closed_uploading_as_user(client: TestClient, normal_user_token_cookies):
+def test_get_album_with_closed_uploading_as_user(client: TestClient, normal_user_2_token_cookies):
     assert album_id is not None
     response = client.get(
-        f"/albums/{album_id}", cookies=normal_user_token_cookies)
+        f"/albums/{album_id}", cookies=normal_user_2_token_cookies)
 
     assert response.status_code == 200
 
@@ -225,5 +225,13 @@ def test_album_like(client: TestClient, normal_user_token_cookies):
     assert album_id is not None
     response = client.put(
         f"/albums/{album_id}/like", cookies=normal_user_token_cookies)
+
+    assert response.status_code == 200
+
+
+def test_like_album_track(client: TestClient, normal_user_2_token_cookies):
+    assert track_ids[0] is not None
+    response = client.put(
+        f"/tracks/{track_ids[0]}/like", cookies=normal_user_2_token_cookies)
 
     assert response.status_code == 200

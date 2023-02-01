@@ -2,6 +2,8 @@ import json
 import pytest
 
 from fastapi.testclient import TestClient
+from backend.core.config import env_config
+from tests.utils.names import generate_random_name
 
 data = {
     "username": "testuser2",
@@ -20,18 +22,38 @@ def test_create_user(client: TestClient, input_data: dict, expected_status_code:
         cookies = response.cookies
 
 
-# def test_logout(client: TestClient):
-#     response = client.delete("/auth/logout", cookies=cookies)
-#     assert response.status_code == 200
+def test_logout(client: TestClient):
+    response = client.delete("/auth/logout", cookies=cookies)
+    assert response.status_code == 200
 
 
-# def test_get_refresh_token(client: TestClient):
-#     response = client.post("/auth/refresh", cookies=cookies)
-#     assert response.status_code == 200
+def test_get_refresh_token(client: TestClient):
+    response = client.post("/auth/refresh", cookies=cookies)
+    assert response.status_code == 200
 
 
-# def test_create_user_with_wrong_password_length(client: TestClient):
-#     local_data = data.copy()
-#     local_data["password"] = "test"
-#     response = client.post("/auth/signup", json=data)
-#     assert response.status_code == 400
+@pytest.mark.parametrize("username_length,expected_status_code", [
+    (int(env_config.get("VITE_MAX_LOGIN_LENGTH")), 201),
+    (int(env_config.get("VITE_MAX_LOGIN_LENGTH")) + 1, 422),
+    (int(env_config.get("VITE_MIN_LOGIN_LENGTH")) - 1, 422),
+    (int(env_config.get("VITE_MIN_LOGIN_LENGTH")), 201),
+])
+def test_create_user_with_wrong_username_length(client: TestClient, username_length, expected_status_code):
+    response = client.post(
+        "/auth/signup", json={**data, "username": generate_random_name(username_length)})
+
+    assert response.status_code == expected_status_code
+
+
+@pytest.mark.parametrize("password_length,expected_status_code", [
+
+    (int(env_config.get("VITE_MAX_PASSWORD_LENGTH")), 201),
+    (int(env_config.get("VITE_MAX_PASSWORD_LENGTH")) + 1, 422),
+    (int(env_config.get("VITE_MIN_PASSWORD_LENGTH")) - 1, 422),
+    (int(env_config.get("VITE_MIN_PASSWORD_LENGTH")), 201),
+])
+def test_create_user_with_wrong_password_length(client: TestClient, password_length, expected_status_code):
+    response = client.post(
+        "/auth/signup", json={**data, "password": generate_random_name(password_length), "username": generate_random_name(10)})
+    print(response.json())
+    assert response.status_code == expected_status_code
