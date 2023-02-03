@@ -2,7 +2,7 @@ import json
 import pytest
 
 from fastapi.testclient import TestClient
-from backend.core.config import env_config
+from backend.core.config import env_config, settings
 from tests.utils.names import generate_random_name
 
 data = {
@@ -55,5 +55,4 @@ def test_create_user_with_wrong_username_length(client: TestClient, username_len
 def test_create_user_with_wrong_password_length(client: TestClient, password_length, expected_status_code):
     response = client.post(
         "/auth/signup", json={**data, "password": generate_random_name(password_length), "username": generate_random_name(10)})
-    print(response.json())
     assert response.status_code == expected_status_code

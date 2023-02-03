@@ -7,6 +7,7 @@ from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInf
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
+
 from sqlalchemy.orm import Session
 router = APIRouter(tags=['Профили пользователей'], prefix='/users')
 
@@ -67,9 +68,14 @@ def update_user_public_profile_data(
         user_id=db_user.id
     )
     db_public_profile_updated = UserCruds(db).update_public_profile(
-        public_proile=db_public_profile,
-        new_public_proile_data=PublicProfileData,
-        userPublicPicture=db_image
+        public_profile=db_public_profile,
+        name=PublicProfileData.name,
+        description=PublicProfileData.description,
+        vk_username=PublicProfileData.vk,
+        youtube_channel_id=PublicProfileData.youtube,
+        telegram_username=PublicProfileData.telegram,
+        userPublicPicture=db_image,
+        remove_picture=PublicProfileData.remove_picture
     )
     return get_public_profile_data(db_public_profile=db_public_profile_updated, full_links=False)
 

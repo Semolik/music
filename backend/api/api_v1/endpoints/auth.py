@@ -3,8 +3,9 @@ from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi_jwt_auth import AuthJWT
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
+from backend.helpers.auth_helper import validate_authorized_user
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.schemas.user import UserAuth, UserInfo
+from backend.schemas.user import ChangePassword, UserAuth, UserInfo, UserPassword
 from backend.crud.crud_user import UserCruds
 from backend.schemas.user import UserRegister
 router = APIRouter(tags=['Авторизация'], prefix='/auth')
@@ -59,3 +60,25 @@ def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends(), db
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
     return db_user.as_dict()
+
+
+@router.put("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(passwords: ChangePassword, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    """
+    Изменение пароля пользователя
+    """
+    Authorize.jwt_required()
+    db_user = validate_authorized_user(Authorize, db)
+    user_cruds = UserCruds(db)
+    if not user_cruds.check_password(db_user, passwords.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверный пароль",
+        )
+    if user_cruds.get_password_hash(passwords.new_password) == db_user.hashed_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Новый пароль совпадает со старым",
+        )
+    user_cruds.change_password(user=db_user,
+                               new_password=passwords.new_password)

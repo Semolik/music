@@ -1,10 +1,13 @@
 import json
+import random
 from fastapi.testclient import TestClient
-from datetime import datetime
+from datetime import datetime, timedelta
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_genres import GenresCruds
 from backend.core.config import env_config
 import pytest
+from backend.crud.crud_tracks import TracksCrud
+from tests.test_routes.test_2_profile import test_get_user_info
 json_data = {
     "name": "string",
     "date": str(datetime.now()),
@@ -80,7 +83,6 @@ def test_upload_track(client: TestClient, normal_musician_token_cookies, expecte
     assert album_id is not None
     response = client.post(f"/albums/{album_id}/track", data=input_data, files=files,
                            cookies=normal_musician_token_cookies)
-    print(response.json())
     assert response.status_code == expected_status_code
     if response.status_code == 201:
         track_ids.append(response.json().get("id"))
@@ -190,7 +192,6 @@ def test_update_album(client: TestClient, normal_musician_token_cookies, files, 
     assert album_id is not None
     response = client.put(
         f"/albums/{album_id}", cookies=normal_musician_token_cookies, data={"albumData": json.dumps(input_data)}, files=files)
-    print(response.json())
     assert response.status_code == expected_status_code
     if response.status_code == 200:
         assert response.json().get("name") == update_json_data["name"]
@@ -229,9 +230,44 @@ def test_album_like(client: TestClient, normal_user_token_cookies):
     assert response.status_code == 200
 
 
+def test_get_album_track(client: TestClient, normal_user_2_token_cookies):
+    response = client.get(
+        f"/tracks/{track_ids[0]}", cookies=normal_user_2_token_cookies)
+
+    assert response.status_code == 200
+
+
 def test_like_album_track(client: TestClient, normal_user_2_token_cookies):
     assert track_ids[0] is not None
     response = client.put(
         f"/tracks/{track_ids[0]}/like", cookies=normal_user_2_token_cookies)
 
     assert response.status_code == 200
+
+
+def test_get_album_file(client: TestClient, normal_user_2_token_cookies):
+    assert album_id is not None
+    response = client.get(
+        f"/albums/{album_id}/file", cookies=normal_user_2_token_cookies)
+
+    assert response.status_code == 200
+
+
+def test_listen_album_tracks_stats(client: TestClient, normal_users_tokens_cookies: list, db_session):
+    tracks_cruds = TracksCrud(db_session)
+    users_data = [test_get_user_info(client, cookies)
+                  for cookies in normal_users_tokens_cookies]
+    tracks_data = [tracks_cruds.get_track(track_id=track_id)
+                   for track_id in track_ids]
+    for track in tracks_data:
+        listen_count = random.randint(1, len(normal_users_tokens_cookies))
+        now = datetime.now()-timedelta(seconds=int(track.duration+10))
+        for user_data in random.sample(users_data, listen_count):
+            tracks_cruds.create_track_listen(
+                track_id=track.id,
+                user_id=user_data.get('id'),
+                time=now
+            )
+        track_stats = tracks_cruds.get_track_statistics(track=track)
+
+        assert track_stats.total_listens == listen_count

@@ -12,8 +12,7 @@ def user_authentication_cookies(client: TestClient, username: str, password: str
     return response.cookies
 
 
-def authentication_token_from_username(client: TestClient, username: str, db: Session, admin=False, user_type=settings.UserTypeEnum.user):
-    password = "random-passW0rd"
+def authentication_token_from_username(client: TestClient, username: str, db: Session, password="random-passW0rd", user_type=settings.UserTypeEnum.user):
     user = UserCruds(db).get_user_by_username(username=username)
     if not user:
         user_data = UserRegister(username=username, password=password)

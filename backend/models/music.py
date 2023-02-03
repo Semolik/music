@@ -104,7 +104,7 @@ class FavoriteAlbum(Base):
     __tablename__ = 'favorite_albums'
     album_id = Column(
         Integer,
-        ForeignKey("albums.id"),
+        ForeignKey(Album.id),
         primary_key=True
     )
     user_id = Column(
@@ -113,7 +113,7 @@ class FavoriteAlbum(Base):
         primary_key=True
     )
     album = relationship(
-        "Album",
+        Album,
         foreign_keys=[album_id],
         backref=backref(
             "favorite_albums",

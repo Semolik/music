@@ -35,7 +35,10 @@ class Settings(BaseSettings):
     YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
 
     TEST_USER_USERNAME = 'test_user'
+    TEST_USER_PASSWORD = 'test_user_password'
     TEST_USER_USERNAME_2 = 'test_user__2'
+    TEST_USER_USERNAME_3 = 'test_user__3'
+    TEST_USER_PASSWORD_3 = 'test_user_password_2'
     TEST_ADMIN_USERNAME = 'admin'
     TEST_MUSICIAN_USERNAME = 'musician_test'
     TEST_ANOTHER_MUSICIAN_USERNAME = 'musician_another'

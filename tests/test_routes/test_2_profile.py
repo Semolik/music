@@ -18,6 +18,7 @@ def test_get_user_info(client: TestClient, normal_user_token_cookies):
     response = client.get("/users/me", cookies=normal_user_token_cookies)
 
     assert response.status_code == 200
+    return response.json()
 
 
 @pytest.mark.parametrize("data, files, status_code", [

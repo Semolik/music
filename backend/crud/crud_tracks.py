@@ -40,7 +40,20 @@ class TracksCrud(CRUDBase):
     def get_last_track_listen(self, track_id: int, user_id: int) -> ListenTrackHistoryItem | None:
         return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id and ListenTrackHistoryItem.track_id == track_id).first()
 
+    def create_track_listen(self, track_id: int, user_id: int, time: datetime):
+        return self.create(ListenTrackHistoryItem(
+            track_id=track_id, user_id=user_id, listen_datetime=time))
+
+    def track_is_started_listening(self, last_listened: ListenTrackHistoryItem, time: datetime) -> bool:
+        if not last_listened:
+            return False
+        track: Track = last_listened.track
+        target_return_time = time - timedelta(seconds=int(track.duration))
+        return (target_return_time - last_listened.listen_datetime) < timedelta(minutes=3)
+
     def track_is_listened(self, last_listened: ListenTrackHistoryItem, time: datetime) -> bool:
+        if not last_listened:
+            return False
         track: Track = last_listened.track
         target_return_time = time - timedelta(seconds=int(track.duration))
         return target_return_time > last_listened.listen_datetime if target_return_time - last_listened.listen_datetime < timedelta(minutes=3) else False
@@ -59,7 +72,7 @@ class TracksCrud(CRUDBase):
         return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))
 
-    def get_track_statistics(self, track: Track):
+    def get_track_statistics(self, track: Track) -> TrackStats:
         total_count = self.db.query(ListenTrackHistoryItem).filter(
             ListenTrackHistoryItem.track_id == track.id).count()
         now = datetime.now()
@@ -75,7 +88,7 @@ class TracksCrud(CRUDBase):
                 ListenTrackHistoryItem.listen_datetime <= day_end
             ).count()
             days.append(
-                StatsDay(day=day_start, count=count)
+                StatsDay(day=day_start, count=count, listens=count)
             )
         return TrackStats(
             track_id=track.id,

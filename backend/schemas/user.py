@@ -4,24 +4,38 @@ from fastapi import Query
 from backend.core.config import settings, env_config
 from backend.schemas.file import File
 from backend.helpers.forms import ValidateJsonWithFormBody, form_body
+from backend.schemas.links import TelegramURL, YouTubeURL, VKProfileURL
 
 
 class UserUsername(BaseModel):
     username: str = Query(
-        default=None,
+        ...,
         min_length=int(env_config.get('VITE_MIN_LOGIN_LENGTH')),
         max_length=int(env_config.get('VITE_MAX_LOGIN_LENGTH')),
         description='Логин пользователя'
     )
 
 
-class UserAuth(UserUsername):
+class UserPassword(BaseModel):
     password: str = Query(
-        default=None,
+        ...,
         min_length=int(env_config.get('VITE_MIN_PASSWORD_LENGTH')),
         max_length=int(env_config.get('VITE_MAX_PASSWORD_LENGTH')),
         description='Пароль пользователя'
     )
+
+
+class ChangePassword(UserPassword):
+    new_password: str = Query(
+        ...,
+        min_length=int(env_config.get('VITE_MIN_PASSWORD_LENGTH')),
+        max_length=int(env_config.get('VITE_MAX_PASSWORD_LENGTH')),
+        description='Новый пароль пользователя'
+    )
+
+
+class UserAuth(UserUsername, UserPassword):
+    ...
 
 
 class UserBase(BaseModel):
@@ -58,7 +72,7 @@ class UserRegister(UserBase, UserAuth):
 
 class UserModifiable(UserBase, ValidateJsonWithFormBody):
     remove_picture: bool = Query(
-        default=False,
+        ...,
         description='Удалить аватарку пользователя'
     )
 
@@ -79,7 +93,6 @@ class UpdateUserRoleRequest(BaseModel):
 
 
 class CreateRoleRequestAnswer(BaseModel):
-
     message: str | None = Query(..., description='Ответное сообщение')
     status: str | None = Query(..., description='Присвоенный статус')
 
@@ -116,15 +129,22 @@ class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
 
 
 class PublicProfileLinks(BaseModel):
-    youtube: str | None = Query(..., description='Ссылка на канал YouTube')
-    telegram: str | None = Query(...,
-                                 description='Ссылка на канал/аккаунт в Telegram')
-    vk: str | None = Query(..., description='Ссылка на страницу VK')
+
+    youtube: YouTubeURL | None = Query(default=False,
+                                       description='Ссылка на канал YouTube')
+    telegram: TelegramURL | None = Query(default=False,
+                                         description='Ссылка на канал/аккаунт в Telegram')
+    vk: VKProfileURL | None = Query(
+        default=False, description='Ссылка на страницу VK')
 
 
 class PublicProfileBase(BaseModel):
-    name: str = Query(..., description='Оторажаемое имя')
-    description: str | None = Query(..., description='Описание профиля')
+    name: str = Query(..., description='Оторажаемое имя', max_length=int(
+        env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH')
+    ))
+    description: str = Query(default=False, description='Описание профиля', max_length=int(
+        env_config.get('VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH')
+    ))
 
 
 class PublicProfile(PublicProfileBase):

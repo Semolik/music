@@ -14,6 +14,7 @@ from sqlalchemy_utils import database_exists, create_database
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from tests.utils.users import authentication_token_from_username
+from tests.utils.names import generate_random_name
 
 
 def start_application():
@@ -84,7 +85,7 @@ def client(
 @pytest.fixture(scope="function")  # new function
 def normal_user_token_cookies(client: TestClient, db_session):
     return authentication_token_from_username(
-        client=client, username=settings.TEST_USER_USERNAME, db=db_session
+        client=client, username=settings.TEST_USER_USERNAME, db=db_session, password=settings.TEST_USER_PASSWORD
     )
 
 
@@ -114,3 +115,13 @@ def normal_user_2_token_cookies(client: TestClient, db_session):
     return authentication_token_from_username(
         client=client, username=settings.TEST_USER_USERNAME_2, db=db_session
     )
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_users_tokens_cookies(client: TestClient, db_session):
+    return [
+        authentication_token_from_username(
+            client=client, username=f'test_{generate_random_name(10)}', db=db_session, password=generate_random_name(10)
+        )
+        for _ in range(20)
+    ]

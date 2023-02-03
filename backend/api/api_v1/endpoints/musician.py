@@ -5,7 +5,7 @@ from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.clips import set_clip_data
 from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
-from backend.schemas.music import AlbumInfo, MusicianClip
+from backend.schemas.music import AlbumInfo, MusicianClip, Track
 from backend.schemas.music import MusicianFullInfo
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
@@ -89,3 +89,19 @@ def get_musician_albums(
         album_info['musician'] = musician_obj
         albums_obj.append(album_info)
     return albums_obj
+
+
+@router.get('/{profile_id}/popular', response_model=List[Track])
+def get_musician_popular_tracks(
+    musician_id: int = Query(..., description='ID музыканта'),
+    page: int = Query(1, description='Страница'),
+    db: Session = Depends(get_db)
+):
+    '''Получение популярных треков музыканта'''
+    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
+    if not db_public_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Профиль музыканта не найден")
+    tracks = MusicianCrud(db).get_popular_musician_tracks(
+        musician_id=db_public_profile.id, page=page)
+    return tracks
