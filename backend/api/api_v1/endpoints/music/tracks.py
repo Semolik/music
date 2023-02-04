@@ -81,7 +81,7 @@ def get_track_file(track_id: uuid_pkg.UUID = Query(..., description="ID трек
                         detail="Файл не существует на сервере, но запись о нем есть")
 
 
-@ router.get('/{track_id}/set-listened', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)
+@router.put('/{track_id}/set-listened', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)
 def set_listened_track(
     track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Authorize: AuthJWT = Depends(),

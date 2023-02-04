@@ -74,7 +74,7 @@ class TracksCrud(CRUDBase):
 
     def get_track_statistics(self, track: Track) -> TrackStats:
         total_count = self.db.query(ListenTrackHistoryItem).filter(
-            ListenTrackHistoryItem.track_id == track.id).count()
+            ListenTrackHistoryItem.track_id == track.id, ListenTrackHistoryItem.listened == True).count()
         now = datetime.now()
         days = []
         week_start = now - timedelta(days=now.weekday())
@@ -82,9 +82,9 @@ class TracksCrud(CRUDBase):
             day_start = week_start + timedelta(days=i)
             day_end = day_start + timedelta(days=1)
             count = self.db.query(ListenTrackHistoryItem).filter(
-                ListenTrackHistoryItem.listened == True and
-                ListenTrackHistoryItem.track_id == track.id and
-                ListenTrackHistoryItem.listen_datetime >= day_start and
+                ListenTrackHistoryItem.listened == True,
+                ListenTrackHistoryItem.track_id == track.id,
+                ListenTrackHistoryItem.listen_datetime >= day_start,
                 ListenTrackHistoryItem.listen_datetime <= day_end
             ).count()
             days.append(

@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Union
 from pydantic import BaseModel
 from fastapi import Query
 from backend.core.config import settings, env_config
 from backend.schemas.file import File
 from backend.helpers.forms import ValidateJsonWithFormBody, form_body
-from backend.schemas.links import TelegramURL, YouTubeURL, VKProfileURL
+from backend.schemas.links import TelegramUsername, YoutubeChannelID, VKUsername
 
 
 class UserUsername(BaseModel):
@@ -128,21 +128,27 @@ class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
     user: UserInfo = Query(..., description='Пользователь, сделавший запрос')
 
 
-class PublicProfileLinks(BaseModel):
+class PublicProfileLinksURLS(BaseModel):
 
-    youtube: YouTubeURL | None = Query(default=False,
-                                       description='Ссылка на канал YouTube')
-    telegram: TelegramURL | None = Query(default=False,
-                                         description='Ссылка на канал/аккаунт в Telegram')
-    vk: VKProfileURL | None = Query(
+    youtube: YoutubeChannelID = Query(default=False)
+    telegram: TelegramUsername = Query(default=False)
+    vk: VKUsername = Query(default=False)
+
+
+class PublicProfileLinks(BaseModel):
+    youtube: str | None = Query(default=False,
+                                description='Ссылка на канал YouTube')
+    telegram: str | None = Query(default=False,
+                                 description='Ссылка на канал/аккаунт в Telegram')
+    vk: str | None = Query(
         default=False, description='Ссылка на страницу VK')
 
 
 class PublicProfileBase(BaseModel):
     name: str = Query(..., description='Оторажаемое имя', max_length=int(
         env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH')
-    ))
-    description: str = Query(default=False, description='Описание профиля', max_length=int(
+    ), min_length=1)
+    description: str | None = Query(default=False, description='Описание профиля', max_length=int(
         env_config.get('VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH')
     ))
 
@@ -154,6 +160,6 @@ class PublicProfile(PublicProfileBase):
                                 description='Ссылка на аватарку публичного профиля')
 
 
-class PublicProfileModifiable(PublicProfileBase, PublicProfileLinks, ValidateJsonWithFormBody):
+class PublicProfileModifiable(PublicProfileBase, PublicProfileLinksURLS, ValidateJsonWithFormBody):
     remove_picture: bool = Query(
         default=False, description='Удалить аватарку публичного профиля')

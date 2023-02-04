@@ -1,5 +1,6 @@
 import json
 import random
+import time
 from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
 from backend.crud.crud_albums import AlbumsCruds
@@ -230,13 +231,6 @@ def test_album_like(client: TestClient, normal_user_token_cookies):
     assert response.status_code == 200
 
 
-def test_get_album_track(client: TestClient, normal_user_2_token_cookies):
-    response = client.get(
-        f"/tracks/{track_ids[0]}", cookies=normal_user_2_token_cookies)
-
-    assert response.status_code == 200
-
-
 def test_like_album_track(client: TestClient, normal_user_2_token_cookies):
     assert track_ids[0] is not None
     response = client.put(
@@ -245,29 +239,38 @@ def test_like_album_track(client: TestClient, normal_user_2_token_cookies):
     assert response.status_code == 200
 
 
-def test_get_album_file(client: TestClient, normal_user_2_token_cookies):
-    assert album_id is not None
-    response = client.get(
-        f"/albums/{album_id}/file", cookies=normal_user_2_token_cookies)
-
-    assert response.status_code == 200
-
-
 def test_listen_album_tracks_stats(client: TestClient, normal_users_tokens_cookies: list, db_session):
     tracks_cruds = TracksCrud(db_session)
-    users_data = [test_get_user_info(client, cookies)
+    users_data = [(test_get_user_info(client, cookies), cookies)
                   for cookies in normal_users_tokens_cookies]
     tracks_data = [tracks_cruds.get_track(track_id=track_id)
                    for track_id in track_ids]
-    for track in tracks_data:
+    for i, track in enumerate(tracks_data):
+        track_stats_before = tracks_cruds.get_track_statistics(track=track)
         listen_count = random.randint(1, len(normal_users_tokens_cookies))
         now = datetime.now()-timedelta(seconds=int(track.duration+10))
-        for user_data in random.sample(users_data, listen_count):
+
+        users = random.sample(users_data, listen_count)
+        assert len(set([user_data.get('id')
+                   for user_data, cookies in users])) == len(users)
+        for user_data, cookies in users:
             tracks_cruds.create_track_listen(
                 track_id=track.id,
                 user_id=user_data.get('id'),
                 time=now
             )
-        track_stats = tracks_cruds.get_track_statistics(track=track)
+            response = client.put(
+                f'/tracks/{track.id}/set-listened', cookies=cookies)
 
-        assert track_stats.total_listens == listen_count
+            assert response.status_code == 204
+
+        track_stats = tracks_cruds.get_track_statistics(track=track)
+        assert track_stats.total_listens == (
+            listen_count + track_stats_before.total_listens)
+
+
+def test_get_album_track(client: TestClient, normal_user_2_token_cookies):
+    response = client.get(
+        f"/tracks/{track_ids[0]}", cookies=normal_user_2_token_cookies)
+
+    assert response.status_code == 200

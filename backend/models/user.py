@@ -143,7 +143,7 @@ class PublicProfileLinks(Base):
     youtube = Column(
         String(
             int(
-                env_config.get('VITE_MAX_YOUTUBE_ID_LENGTH')
+                env_config.get('VITE_MAX_YOUTUBE_CHANNEL_ID_LENGTH')
             )
         )
     )

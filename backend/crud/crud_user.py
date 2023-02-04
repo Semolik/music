@@ -93,47 +93,27 @@ class UserCruds(CRUDBase):
         return self.db.query(PublicProfile).filter(
             PublicProfile.id == id).first()
 
-    def update_public_profile(self, public_proile: PublicProfile, name: str, description: str, vk_username: str, telegram_username: str, youtube_channel_id: str, userPublicPicture: Image, remove_picture: bool) -> PublicProfile:
-        if public_proile is None:
+    def update_public_profile(self, public_profile: PublicProfile, name: str, description: str, vk_username: str, telegram_username: str, youtube_channel_id: str, userPublicPicture: Image, remove_picture: bool) -> PublicProfile:
+        if public_profile is None:
             raise Exception(
-                'Update public_proile failed: public_proile is None')
+                'Update public_profile failed: public_profile is None')
         if name is not None:
-            public_proile.name = name
+            public_profile.name = name
         if description is not None:
-            public_proile.description = description
+            public_profile.description = description
         if vk_username is not None:
-            public_proile.links.vk = vk_username
+            public_profile.links.vk = vk_username
         if telegram_username is not None:
-            public_proile.links.telegram = telegram_username
+            public_profile.links.telegram = telegram_username
         if youtube_channel_id is not None:
-            public_proile.links.youtube = youtube_channel_id
-        self.update(public_proile.links)
+            public_profile.links.youtube = youtube_channel_id
+        self.update(public_profile.links)
         if remove_picture:
-            self.delete(public_proile.picture)
+            self.delete(public_profile.picture)
         elif userPublicPicture:
             FileCruds(self.db).replace_old_picture(
-                model=public_proile, new_picture=userPublicPicture)
-        return self.update(public_proile)
-    # def update_public_profile(self, public_proile: PublicProfile,,  userPublicPicture: Image) -> PublicProfile:
-        # if public_proile is None:
-        #     raise Exception(
-        #         'Update public_proile failed: public_proile is None')
-        # data_obj = new_public_proile_data.dict()
-        # remove_picture = data_obj.pop('remove_picture')
-        # for var, value in data_obj.items():
-        #     if value is not None or var == 'description':
-        #         setattr(public_proile, var, value)
-        # public_proile_links: PublicProfileLinks = public_proile.links
-        # public_proile_links.vk = new_public_proile_data.vk.username
-        # public_proile_links.telegram = new_public_proile_data.telegram.username
-        # public_proile_links.youtube = new_public_proile_data.youtube.channel_id
-        # self.update(public_proile_links)
-        # if remove_picture:
-        #     self.delete(public_proile.picture)
-        # elif userPublicPicture:
-        #     FileCruds(self.db).replace_old_picture(
-        #         model=public_proile, new_picture=userPublicPicture)
-        # return self.create(public_proile)
+                model=public_profile, new_picture=userPublicPicture)
+        return self.update(public_profile)
 
     def is_admin(self, user_id) -> bool:
         db_user = self.get_user_by_id(user_id=user_id)

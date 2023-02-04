@@ -1,14 +1,12 @@
-from pydantic import BaseModel, validator, HttpUrl
+
+from dataclasses import dataclass
 import re
-from fastapi import Query
-
-from pydantic import BaseModel, validator, HttpUrl, conint, root_validator
-import re
+from backend.core.config import env_config
 
 
-class TelegramURL(HttpUrl):
-    '''Telegram URL validator.'''
-    pattern = r"https?://(t\.me|telegram\.me)/([A-Za-z0-9_]+)"
+class TelegramUsername(str):
+    '''Telegram username validator.'''
+    pattern = r"([A-Za-z0-9_]+)"
 
     @classmethod
     def __get_validators__(cls):
@@ -16,15 +14,19 @@ class TelegramURL(HttpUrl):
 
     @classmethod
     def validate(cls, v):
+        if not v:
+            return v
+        if len(v) > int(env_config.get('VITE_MAX_TELEGRAM_USERNAME_LENGTH')):
+            raise ValueError('The Telegram username is too long.')
         match = re.match(cls.pattern, v)
         if not match:
-            raise ValueError('Please enter a valid Telegram URL.')
-        return match.group(2)
+            raise ValueError('Please enter a valid Telegram username.')
+        return match.group(1)
 
 
-class YouTubeURL(HttpUrl):
-    '''YouTube URL validator.'''
-    pattern = r"(https?://www\.youtube\.com/channel/[A-Za-z0-9_\-]+|https?://www\.youtube\.com/c/[A-Za-z0-9_\-]+|https?://youtube\.com/channel/[A-Za-z0-9_\-]+|https?://youtube\.com/c/[A-Za-z0-9_\-]+)"
+class YoutubeChannelID(str):
+    '''YouTube channel ID validator.'''
+    pattern = r"([A-Za-z0-9_\-]+)"
 
     @classmethod
     def __get_validators__(cls):
@@ -32,17 +34,19 @@ class YouTubeURL(HttpUrl):
 
     @classmethod
     def validate(cls, v):
+        if not v:
+            return v
+        if len(v) > int(env_config.get('VITE_MAX_YOUTUBE_CHANNEL_ID_LENGTH')):
+            raise ValueError('The YouTube channel ID is too long.')
         match = re.match(cls.pattern, v)
         if not match:
-            raise ValueError('Please enter a valid YouTube channel URL.')
-        if match.lastindex is None or match.lastindex < 5:
-            raise ValueError('The YouTube channel URL is not valid.')
-        return match.group(2) or match.group(3) or match.group(4) or match.group(5)
+            raise ValueError('Please enter a valid YouTube channel ID.')
+        return match.group(1)
 
 
-class VKProfileURL(HttpUrl):
-    '''VKontakte URL validator.'''
-    pattern = r"https://vk\.com/([A-Za-z0-9_\.]+)"
+class VKUsername(str):
+    '''VKontakte username validator.'''
+    pattern = r"([A-Za-z0-9_\.]+)"
 
     @classmethod
     def __get_validators__(cls):
@@ -50,7 +54,11 @@ class VKProfileURL(HttpUrl):
 
     @classmethod
     def validate(cls, v):
+        if not v:
+            return v
+        if len(v) > int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')):
+            raise ValueError('The VKontakte username is too long.')
         match = re.match(cls.pattern, v)
         if not match:
-            raise ValueError('Please enter a valid VKontakte URL.')
+            raise ValueError('Please enter a valid VKontakte username.')
         return match.group(1)
