@@ -1,9 +1,17 @@
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime
+from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import backref
+import enum
+from backend.core.config import settings
+
+
+class ChangeRoleRequestStatus(str, enum.Enum):
+    in_progress = 'in-progress'
+    accepted = 'accepted'
+    rejected = 'rejected'
 
 
 class ChangeRoleRequest(Base):
@@ -26,17 +34,19 @@ class ChangeRoleRequest(Base):
         )
     )
     message = Column(String)
-    status = Column(
-        String,
-        default='in-progress'
+    request_status = Column(
+        Enum(ChangeRoleRequestStatus),
+        nullable=False,
+        default=ChangeRoleRequestStatus.in_progress,
     )
-    account_status = Column(
-        String,
+    requested_account_status = Column(
+        Enum(settings.UserTypeEnum),
         nullable=False
     )
     time_created = Column(
         DateTime(timezone=True),
-        server_default=func.now()
+        server_default=func.now(),
+        nullable=False
     )
     files = relationship(
         "File", secondary=Table(
@@ -45,6 +55,15 @@ class ChangeRoleRequest(Base):
             Column("change_role_request_id", ForeignKey(
                 "change_role_requests.id"), primary_key=True),
             Column("file_id", ForeignKey("files.id"), primary_key=True),
+        )
+    )
+    answer = relationship(
+        "AnswerChangeRoleRequest",
+        uselist=False,
+        backref=backref(
+            "request",
+            cascade="all,delete",
+            uselist=False
         )
     )
 
@@ -62,12 +81,7 @@ class AnswerChangeRoleRequest(Base):
     )
     message = Column(String)
     request_id = Column(Integer, ForeignKey("change_role_requests.id"))
-    request = relationship(
-        "ChangeRoleRequest",
-        foreign_keys=[request_id],
-        backref=backref(
-            "answer",
-            cascade="all,delete",
-            uselist=False
-        )
+    setted_account_status = Column(
+        Enum(settings.UserTypeEnum),
+        nullable=False
     )

@@ -4,6 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
 from backend.helpers.validate_role import validate_admin
+from backend.models.roles import ChangeRoleRequestStatus
 from backend.schemas.user import TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.models.files import File
@@ -70,11 +71,11 @@ def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depen
 @router.get('/change-role/all', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
 def get_all_change_role_requests(
     page: int = Query(1, description='Номер страницы'),
-    filter: settings.ALLOWED_STATUSES_FILTER = Query(
-        settings.ALLOWED_STATUSES_LIST[-1],
-        description='Фильтр по статусу'
-    ),
-        Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    filter: ChangeRoleRequestStatus = Query(default=None,
+                                            description='Фильтр по статусу'),
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db)
+):
     '''Получение списка запросов на смену типа аккаунта от всех пользователей'''
     Authorize.jwt_required()
     validate_admin(db=db, user_id=Authorize.get_jwt_subject())
@@ -93,5 +94,10 @@ def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnsw
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Запрос на смену типа аккаута по данному id не найден")
     answer_obj = ChangeRolesCruds(db).send_change_role_message_answer(
-        request=db_request, message=data.message, request_status=data.request_status, account_status=data.status)
-    return answer_obj
+        request=db_request,
+        message=data.message,
+        request_status=data.request_status,
+        account_status=data.setted_account_status
+    )
+    return TimeCreated(time_created=answer_obj.time_created.strftime(
+        settings.DATETIME_FORMAT))

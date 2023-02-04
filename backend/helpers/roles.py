@@ -27,7 +27,7 @@ def post_processing_change_role_messages(records: List[ChangeRoleRequest], add_u
         record_obj = jsonable_encoder(record)
         record_obj['answer'] = jsonable_encoder(record.answer)
         if add_user:
-            user = record.user
+            user: User = record.user
             user_obj = jsonable_encoder(user)
             user_obj_with_pic = set_picture(user_obj, user.picture)
             record_obj['user'] = user_obj_with_pic

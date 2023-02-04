@@ -22,10 +22,6 @@ class Settings(BaseSettings):
     UPLOADS_ROUTE: str = '/uploads'
     OTHER_FILES_ROUTE: str = '/other/'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
-    ALLOWED_STATUSES = Literal['in-progress',
-                               'successfully', 'rejected']
-    ALLOWED_STATUSES_FILTER = Literal[ALLOWED_STATUSES, 'all']
-    ALLOWED_STATUSES_LIST: Tuple[str, ...] = get_args(ALLOWED_STATUSES)
     ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
@@ -61,8 +57,8 @@ class Settings(BaseSettings):
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']
     USER_ACCOUNT_STATUSES = Literal[tuple(USER_ACCOUNT_STATUSES_LIST)]
-    ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
-        [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
+    # ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
+    #     [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
 
 
 settings = Settings()

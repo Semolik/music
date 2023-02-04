@@ -24,6 +24,32 @@ class TelegramUsername(str):
         return match.group(1)
 
 
+class TelegramUsernameToUrl(str):
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not v:
+            return v
+        return f"https://t.me/{v}"
+
+
+class YoutubeChannelIDToUrl(str):
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not v:
+            return v
+        return f"https://www.youtube.com/channel/{v}"
+
+
 class YoutubeChannelID(str):
     '''YouTube channel ID validator.'''
     pattern = r"([A-Za-z0-9_\-]+)"
@@ -62,3 +88,16 @@ class VKUsername(str):
         if not match:
             raise ValueError('Please enter a valid VKontakte username.')
         return match.group(1)
+
+
+class VKUsernameToUrl(str):
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not v:
+            return v
+        return f"https://vk.com/{v}"

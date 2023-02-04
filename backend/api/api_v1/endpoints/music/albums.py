@@ -178,11 +178,12 @@ def upload_track(
     '''Создание трека'''
     Authorize.jwt_required()
     db_user = validate_authorized_user(Authorize, db)
-    db_album = AlbumsCruds(db).get_album(album_id=album_id)
+    album_cruds = AlbumsCruds(db)
+    db_album = album_cruds.get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    if not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=db_user.id):
+    if not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Нет прав изменять этот альбом")
     if db_album.uploaded:
@@ -213,12 +214,14 @@ def delete_album_by_id(
 ):
     '''Удаление альбома по id'''
     Authorize.jwt_required()
-    db_album = AlbumsCruds(db).get_album(album_id=album_id)
+    album_cruds = AlbumsCruds(db)
+    db_album = album_cruds.get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
     db_user = validate_authorized_user(Authorize, db)
-    if not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=db_user.id):
+
+    if not UserCruds(db).is_admin(user_id=db_user.id) and not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Нет прав на удаление данного альбома")
-    AlbumsCruds(db).delete_album(album=db_album)
+    album_cruds.delete_album(album=db_album)

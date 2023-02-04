@@ -1,7 +1,5 @@
-from typing import List
 from fastapi import Depends, APIRouter, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
-
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
@@ -11,6 +9,7 @@ from backend.helpers.validate_role import validate_admin
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
 from backend.core.config import settings
+import uuid as uuid_pkg
 router = APIRouter(tags=['Статистика'], prefix='/statistics')
 
 
@@ -36,7 +35,7 @@ def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db
 
 
 @router.get('/track/{track_id}', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
-def get_track_statistics(track_id: int, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def get_track_statistics(track_id: uuid_pkg.UUID, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Получение статистики по треку'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
@@ -54,4 +53,5 @@ def get_track_statistics(track_id: int, Authorize: AuthJWT = Depends(), db: Sess
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='У вас нет доступа к этой информации'
         )
-    return tracks_crud.get_track_statistics(track_id=track_id)
+
+    return tracks_crud.get_track_statistics(track=track)

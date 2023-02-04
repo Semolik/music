@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 from fastapi import Query
+import uuid
 
 
 class UsersStats(BaseModel):
@@ -25,7 +26,7 @@ class StatsBase(BaseModel):
 
 
 class TrackStats(StatsBase):
-    track_id: int = Query(..., description="ID трека")
+    track_id: uuid.UUID = Query(..., description="ID трека")
 
 
 class AlbumStats(StatsBase):

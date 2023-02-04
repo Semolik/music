@@ -1,10 +1,11 @@
-from typing import List, Tuple, Optional, Union
+from typing import List
 from pydantic import BaseModel
 from fastapi import Query
 from backend.core.config import settings, env_config
+from backend.models.roles import ChangeRoleRequestStatus
 from backend.schemas.file import File
 from backend.helpers.forms import ValidateJsonWithFormBody, form_body
-from backend.schemas.links import TelegramUsername, YoutubeChannelID, VKUsername
+from backend.schemas.links import TelegramUsername, VKUsernameToUrl, YoutubeChannelID, VKUsername, TelegramUsernameToUrl, YoutubeChannelIDToUrl
 
 
 class UserUsername(BaseModel):
@@ -59,7 +60,10 @@ class UserTypes(BaseModel):
 
 
 class AllUserTypes(BaseModel):
-    type: settings.ALL_USER_ACCOUNT_STATUSES
+    type: settings.UserTypeEnum
+
+    class Config:
+        use_enum_values = True
 
 
 class UserWithTypeRegister(UserBase, UserAuth, UserTypes):
@@ -88,13 +92,14 @@ class UserInfo(AllUserTypes, UserBase, UserUsername):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str = Query(..., description='Сообщение пользователя')
-    account_status: settings.USER_ACCOUNT_STATUSES = Query(
+    setted_account_status: settings.USER_ACCOUNT_STATUSES = Query(
         ..., description='Запрашиваемый статус аккаунта')
 
 
 class CreateRoleRequestAnswer(BaseModel):
     message: str | None = Query(..., description='Ответное сообщение')
-    status: str | None = Query(..., description='Присвоенный статус')
+    setted_account_status: settings.USER_ACCOUNT_STATUSES = Query(
+        ..., description='Присвоенный статус')
 
 
 class RoleRequestAnswer(CreateRoleRequestAnswer):
@@ -103,7 +108,7 @@ class RoleRequestAnswer(CreateRoleRequestAnswer):
 
 
 class UpdateRoleRequestAnswer(CreateRoleRequestAnswer):
-    request_status: settings.ALLOWED_STATUSES = Query(
+    request_status: ChangeRoleRequestStatus = Query(
         ..., description='Статус запроса')
 
 
@@ -115,10 +120,10 @@ class ChangeRoleRequestInfo(TimeCreated):
     files: List[File] = Query(...,
                               description='Файлы, прикрепленные к запросу')
     message: str = Query(..., description='Сообщение пользователя')
-    status: settings.ALLOWED_STATUSES = Query(...,
-                                              description='Статус запроса')
-    account_status: str = Query(...,
-                                description='Запрашиваемый статус аккаунта')
+    request_status: ChangeRoleRequestStatus = Query(
+        ..., description='Статус запроса')
+    requested_account_status: settings.USER_ACCOUNT_STATUSES = Query(...,
+                                                                     description='Запрашиваемый статус аккаунта')
     answer: RoleRequestAnswer | None = Query(...,
                                              description='Ответ на запрос')
 
@@ -136,11 +141,11 @@ class PublicProfileLinksURLS(BaseModel):
 
 
 class PublicProfileLinks(BaseModel):
-    youtube: str | None = Query(default=False,
-                                description='Ссылка на канал YouTube')
-    telegram: str | None = Query(default=False,
-                                 description='Ссылка на канал/аккаунт в Telegram')
-    vk: str | None = Query(
+    youtube: YoutubeChannelIDToUrl | None = Query(default=False,
+                                                  description='Ссылка на канал YouTube')
+    telegram: TelegramUsernameToUrl | None = Query(default=False,
+                                                   description='Ссылка на канал/аккаунт в Telegram')
+    vk: VKUsernameToUrl | None = Query(
         default=False, description='Ссылка на страницу VK')
 
 
