@@ -12,7 +12,7 @@ class MusicianCrud(CRUDBase):
 
     def get_liked_musician_model(self, musician_id: int, user_id: int) -> FavoriteMusicians | None:
         return self.db.query(FavoriteMusicians).filter(
-            FavoriteMusicians.musician_id == musician_id and FavoriteMusicians.user_id == user_id).first()
+            FavoriteMusicians.musician_id == musician_id, FavoriteMusicians.user_id == user_id).first()
 
     def toggle_like_musician(self, musician_id: int, user_id: int):
         liked = self.get_liked_musician_model(

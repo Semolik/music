@@ -24,7 +24,7 @@ class TracksCrud(CRUDBase):
 
     def get_liked_track_model(self, track_id: int, user_id: int) -> FavoriteTracks | None:
         return self.db.query(FavoriteTracks).filter(
-            FavoriteTracks.track_id == track_id and FavoriteTracks.user_id == user_id).first()
+            FavoriteTracks.track_id == track_id, FavoriteTracks.user_id == user_id).first()
 
     def track_is_liked(self, track_id: int, user_id: int):
         return bool(self.get_liked_track_model(track_id=track_id, user_id=user_id))
@@ -38,7 +38,7 @@ class TracksCrud(CRUDBase):
         return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id).slice(end-page_size, end).all()
 
     def get_last_track_listen(self, track_id: int, user_id: int) -> ListenTrackHistoryItem | None:
-        return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id and ListenTrackHistoryItem.track_id == track_id).first()
+        return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id, ListenTrackHistoryItem.track_id == track_id).first()
 
     def create_track_listen(self, track_id: int, user_id: int, time: datetime):
         return self.create(ListenTrackHistoryItem(
