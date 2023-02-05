@@ -57,8 +57,6 @@ class Settings(BaseSettings):
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']
     USER_ACCOUNT_STATUSES = Literal[tuple(USER_ACCOUNT_STATUSES_LIST)]
-    # ALL_USER_ACCOUNT_STATUSES = Literal[tuple(
-    #     [*USER_ACCOUNT_STATUSES_LIST, 'superuser'])]
 
 
 settings = Settings()

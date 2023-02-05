@@ -2,7 +2,7 @@ import uuid as uuid_pkg
 from datetime import datetime
 from typing import List
 from pydantic import BaseModel
-from fastapi import Query, Form, UploadFile, File
+from fastapi import Query
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
 from backend.core.config import env_config

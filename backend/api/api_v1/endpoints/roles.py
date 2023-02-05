@@ -37,7 +37,7 @@ def send_update_role_request(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта"
         )
-    if UserCruds(db).get_user_by_id(user_id=db_user.id).type == formData.account_status:
+    if UserCruds(db).get_user_by_id(user_id=db_user.id).type == formData.requested_account_status:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"При отправке запроса небходимо выбрать статус, отличный от текущего")
@@ -49,7 +49,7 @@ def send_update_role_request(
         )
         for upload_file in files]
     return change_role_cruds.send_change_role_message(
-        user_id=db_user.id, message=formData.message, files=db_files, account_status=formData.account_status)
+        user_id=db_user.id, message=formData.message, files=db_files, account_status=formData.requested_account_status)
 
 
 @router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])

@@ -1,5 +1,4 @@
-
-from dataclasses import dataclass
+import json
 import re
 from backend.core.config import env_config
 
@@ -32,6 +31,7 @@ class TelegramUsernameToUrl(str):
 
     @classmethod
     def validate(cls, v):
+        v = parse_v(v)
         if not v:
             return v
         return f"https://t.me/{v}"
@@ -45,6 +45,7 @@ class YoutubeChannelIDToUrl(str):
 
     @classmethod
     def validate(cls, v):
+        v = parse_v(v)
         if not v:
             return v
         return f"https://www.youtube.com/channel/{v}"
@@ -60,6 +61,7 @@ class YoutubeChannelID(str):
 
     @classmethod
     def validate(cls, v):
+
         if not v:
             return v
         if len(v) > int(env_config.get('VITE_MAX_YOUTUBE_CHANNEL_ID_LENGTH')):
@@ -98,6 +100,16 @@ class VKUsernameToUrl(str):
 
     @classmethod
     def validate(cls, v):
+        v = parse_v(v)
         if not v:
             return v
         return f"https://vk.com/{v}"
+
+
+def parse_v(v):
+    if not v:
+        return v
+    try:
+        return json.loads(v)
+    except json.JSONDecodeError:
+        return v

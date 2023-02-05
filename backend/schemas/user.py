@@ -92,7 +92,7 @@ class UserInfo(AllUserTypes, UserBase, UserUsername):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str = Query(..., description='Сообщение пользователя')
-    setted_account_status: settings.USER_ACCOUNT_STATUSES = Query(
+    requested_account_status: settings.USER_ACCOUNT_STATUSES = Query(
         ..., description='Запрашиваемый статус аккаунта')
 
 
@@ -135,18 +135,18 @@ class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
 
 class PublicProfileLinksURLS(BaseModel):
 
-    youtube: YoutubeChannelID = Query(default=False)
-    telegram: TelegramUsername = Query(default=False)
-    vk: VKUsername = Query(default=False)
+    youtube: YoutubeChannelID = Query(default=None)
+    telegram: TelegramUsername = Query(default=None)
+    vk: VKUsername = Query(default=None)
 
 
 class PublicProfileLinks(BaseModel):
-    youtube: YoutubeChannelIDToUrl | None = Query(default=False,
-                                                  description='Ссылка на канал YouTube')
-    telegram: TelegramUsernameToUrl | None = Query(default=False,
+    youtube: YoutubeChannelIDToUrl = Query(default=None,
+                                           description='Ссылка на канал YouTube')
+    telegram: TelegramUsernameToUrl | None = Query(default=None,
                                                    description='Ссылка на канал/аккаунт в Telegram')
-    vk: VKUsernameToUrl | None = Query(
-        default=False, description='Ссылка на страницу VK')
+    vk: VKUsernameToUrl = Query(
+        default=None, description='Ссылка на страницу VK')
 
 
 class PublicProfileBase(BaseModel):

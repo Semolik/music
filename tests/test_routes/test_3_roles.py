@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
-
+from backend.models.roles import ChangeRoleRequestStatus
 from tests.utils.roles import send_change_role_request
+import pytest
+from backend.models.roles import ChangeRoleRequestStatus
 
 
 def test_send_change_role_request(client: TestClient, normal_user_token_cookies):
@@ -21,10 +23,17 @@ def test_change_role_requests_limit(client: TestClient, normal_user_token_cookie
 
 def test_get_all_change_role_requests(client: TestClient, normal_admin_token_cookies):
     response = client.get('change-role/all',
-                          cookies=normal_admin_token_cookies, params={'filter': 'all', 'page': 1})
+                          cookies=normal_admin_token_cookies, params={'page': 1})
     global change_role_requests
     change_role_requests = response.json()
 
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("filter", [i.value for i in ChangeRoleRequestStatus])
+def test_get_all_change_role_requests_with_filter(client: TestClient, normal_admin_token_cookies, filter):
+    response = client.get('change-role/all',
+                          cookies=normal_admin_token_cookies, params={'page': 1, 'filter': filter})
     assert response.status_code == 200
 
 
@@ -35,8 +44,8 @@ def test_send_change_role_request_answer(client: TestClient, normal_admin_token_
         cookies=normal_admin_token_cookies,
         json={
             "message": "ok i accept your request",
-            "status": change_role_requests[0].get('account_status'),
-            "request_status": "in-progress"
+            "setted_account_status": change_role_requests[0].get('requested_account_status'),
+            "request_status": ChangeRoleRequestStatus.accepted.value
         }
     )
     assert response.status_code == 200
