@@ -15,6 +15,7 @@ from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from tests.utils.users import authentication_token_from_username
 from tests.utils.names import generate_random_name
+from backend.initial_data import init
 
 
 def start_application():
@@ -28,6 +29,7 @@ def get_config():
     return settings.JWTsettings()
 
 
+init()
 engine = create_engine(
     settings.TEST_DATABASE_URI  # DATABASE_URI
 )
