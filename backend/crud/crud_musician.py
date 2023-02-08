@@ -1,7 +1,9 @@
 from typing import List
 from backend.db.base import CRUDBase
-from backend.models.music import Album, Track, FavoriteTracks, ListenTrackHistoryItem
-from backend.models.user import FavoriteMusicians
+from backend.models.tracks import Track, ListenTrackHistoryItem
+from backend.models.albums import Album
+from backend.models.user import FavoriteMusicians, PublicProfile
+
 from sqlalchemy import func
 
 
@@ -44,3 +46,9 @@ class MusicianCrud(CRUDBase):
             .order_by(func.count().desc())\
             .slice(start=(end - page_size), stop=end)\
             .all()
+
+    def get_liked_musicians(self, user_id: int, page: int = 1, page_size: int = 10) -> List[Album]:
+        end = page * page_size
+        return self.db.query(PublicProfile).join(FavoriteMusicians).filter(
+            FavoriteMusicians.user_id == user_id).order_by(PublicProfile.name.asc()).slice(
+            start=(end - page_size), stop=end).all()

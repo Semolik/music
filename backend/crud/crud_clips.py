@@ -2,7 +2,7 @@ from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import env_config
 from backend.models.files import Image
-from backend.models.music import Clip
+from backend.models.clips import Clip
 
 
 class ClipsCruds(CRUDBase):

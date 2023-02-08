@@ -8,7 +8,7 @@ from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.music import album_is_available, is_album_showed, save_track
+from backend.helpers.music import album_is_available, save_track
 from backend.helpers.images import save_image
 from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info

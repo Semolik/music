@@ -5,9 +5,8 @@ from backend.crud.crud_genres import GenresCruds
 from backend.crud.crud_albums import AlbumsCruds
 from sqlalchemy.orm import Session
 from backend.helpers.images import set_picture
-# from backend.helpers.users import set_musician_info
 from backend.models.files import Image
-from backend.models.music import Track
+from backend.models.tracks import Track
 from backend.schemas.music import UploadTrackForm
 from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
@@ -17,8 +16,7 @@ import shutil
 from backend.core.config import settings
 import io
 from datetime import datetime
-# from backend.helpers.users import get_musician_profile_as_dict
-from backend.models.music import Album
+from backend.models.albums import Album
 
 
 def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
@@ -84,9 +82,11 @@ def validate_genres(db: Session, genres_ids: List[int]):
                 not_found_genres_ids.append(genre_id)
             else:
                 genres.append(genre)
-        if len(not_found_genres_ids) > 0:
+        not_fount_geres_count = len(not_found_genres_ids)
+        if not_fount_geres_count > 0:
+            letter = 'ы' if not_fount_geres_count > 1 else ''
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Жанры с id {','.join(map(str, not_found_genres_ids))} не найдены")
+                                detail=f"Жанр{letter} с id {','.join(map(str, not_found_genres_ids))} не найден{letter}")
     return genres
 
 

@@ -10,8 +10,8 @@ from backend.crud.crud_tracks import TracksCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.music import album_is_available, set_full_track_data
-from backend.models.music import Album
+from backend.helpers.music import set_full_track_data
+from backend.models.albums import Album
 from backend.responses import NOT_FOUND_TRACK, UNAUTHORIZED_401
 from backend.schemas.music import Track
 import uuid as uuid_pkg

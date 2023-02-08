@@ -6,6 +6,7 @@ from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.images import save_image, set_picture
+from backend.helpers.music import validate_genres
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
 from backend.schemas.music import Genre, GenreBaseForm
@@ -34,6 +35,21 @@ def create_genre(
     db_genre = GenresCruds(db).create_genre(
         name=genreData.name, picture=db_image)
     return set_picture(db_genre.as_dict(), db_genre.picture)
+
+
+@router.put('/liked', status_code=status.HTTP_204_NO_CONTENT)
+def update_loved_genres(
+    genres: List[int] = Query(..., description='ID жанров'),
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db)
+):
+    '''Обновление любимых жанров'''
+    Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+    )
+    validate_genres
+    GenresCruds(db).update_loved_genres(user_id=db_user.id, genres=genres)
 
 
 @router.put(
@@ -68,15 +84,6 @@ def update_genre(
     return set_picture(genre.as_dict(), genre.picture)
 
 
-@router.get('',  response_model=List[Genre])
-def get_genres(db: Session = Depends(get_db)):
-    '''Получение всех жанров'''
-    return [
-        set_picture(genre.as_dict(), genre.picture)
-        for genre in GenresCruds(db).get_genres()
-    ]
-
-
 @router.get('/{genre_id}', responses={**NOT_FOUND_GENRE}, response_model=Genre)
 def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Session = Depends(get_db)):
     '''Получение жанра по id'''
@@ -107,3 +114,12 @@ def delete_genre(genre_id: int = Query(..., description="ID жанра"), Author
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
     genre = GenresCruds(db).detete_genre(genre=genre)
+
+
+@router.get('',  response_model=List[Genre])
+def get_genres(db: Session = Depends(get_db)):
+    '''Получение всех жанров'''
+    return [
+        set_picture(genre.as_dict(), genre.picture)
+        for genre in GenresCruds(db).get_genres()
+    ]

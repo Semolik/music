@@ -1,8 +1,7 @@
 from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
-from backend.models.music import AlbumGenre
 from backend.models.files import Image
-from backend.models.music import Genre
+from backend.models.genres import Genre
 
 
 class GenresCruds(CRUDBase):

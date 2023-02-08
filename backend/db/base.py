@@ -1,5 +1,4 @@
 from typing import Any, List
-from backend.db.base_class import Base
 
 
 class CRUDBase:
@@ -14,7 +13,6 @@ class CRUDBase:
         return self.db.query(model).offset(skip).limit(limit).all()  # 4
 
     def update(self, model):
-
         self.db.commit()
         self.db.refresh(model)
         return model

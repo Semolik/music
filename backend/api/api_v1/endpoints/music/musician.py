@@ -6,13 +6,36 @@ from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.clips import set_clip_data
 from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
-from backend.schemas.music import AlbumInfo, MusicianClip, Track
-from backend.schemas.music import MusicianFullInfo
+from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo
+from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.music import set_album_info
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
+
+
+@router.get('/liked', response_model=List[PublicProfile])
+def get_liked_musician_profiles(
+        Authorize: AuthJWT = Depends(),
+        db: Session = Depends(get_db),
+        page: int = Query(1, description='Номер страницы'),
+):
+    '''Получение списка любимых музыкантов'''
+
+    Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+    )
+    liked_musician_profiles = MusicianCrud(db).get_liked_musicians(
+        user_id=db_user.id, page=page)
+    return [
+        get_public_profile_as_dict(
+            db=db,
+            public_profile_id=profile.id,
+            full_links=True,
+            user_id=db_user.id
+        ) for profile in liked_musician_profiles]
 
 
 @router.get('/{profile_id}', response_model=MusicianFullInfo)

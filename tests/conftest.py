@@ -8,6 +8,7 @@ from fastapi import FastAPI
 import pytest
 from typing import Generator
 from typing import Any
+from backend.helpers.files import init_folders_structure
 from backend.models.user import Base
 from backend.api.api_v1.api import api_v1_router
 from sqlalchemy_utils import database_exists, create_database
@@ -15,7 +16,6 @@ from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from tests.utils.users import authentication_token_from_username
 from tests.utils.names import generate_random_name
-from backend.initial_data import init
 
 
 def start_application():
@@ -29,9 +29,8 @@ def get_config():
     return settings.JWTsettings()
 
 
-init()
 engine = create_engine(
-    settings.TEST_DATABASE_URI  # DATABASE_URI
+    settings.TEST_DATABASE_URI
 )
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -41,13 +40,15 @@ SessionTesting = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create the tables.
 Base.metadata.drop_all(bind=engine)
 
+Base.metadata.create_all(bind=engine)
+init_folders_structure()
+
 
 @pytest.fixture(scope="function")
 def app() -> Generator[FastAPI, Any, None]:
     """
     Create a fresh database on each test case.
     """
-    Base.metadata.create_all(bind=engine)
     _app = start_application()
     yield _app
     # Base.metadata.drop_all(bind=engine)
@@ -125,5 +126,15 @@ def normal_users_tokens_cookies(client: TestClient, db_session):
         authentication_token_from_username(
             client=client, username=f'test_{generate_random_name(10)}', db=db_session, password=generate_random_name(10)
         )
-        for _ in range(20)
+        for _ in range(10)
+    ]
+
+
+@pytest.fixture(scope="function")  # new function
+def normal_musicians_tokens_cookies(client: TestClient, db_session):
+    return [
+        authentication_token_from_username(
+            client=client, username=f'test_{generate_random_name(10)}', db=db_session, password=generate_random_name(10), user_type=settings.UserTypeEnum.musician
+        )
+        for _ in range(10)
     ]

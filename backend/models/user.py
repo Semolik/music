@@ -84,7 +84,8 @@ class PublicProfile(Base):
                 env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH')
             )
         ),
-        nullable=False
+        nullable=False,
+        index=True
     )
     description = Column(
         String(
@@ -94,8 +95,7 @@ class PublicProfile(Base):
         ),
         nullable=True
     )
-    # links = relationship("PublicProfileLinks",
-    #                      back_populates="public_profile", uselist=False)
+
     picture_id = Column(
         UUID(as_uuid=True),
         ForeignKey("images.id", ondelete='SET NULL'))

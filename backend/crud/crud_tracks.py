@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
-import os
-from pathlib import Path
 from typing import List
-from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.core.config import settings
-from backend.models.music import FavoriteTracks, ListenTrackHistoryItem, Track
+from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
 from backend.schemas.statistics import TrackStats, StatsDay
 
 
