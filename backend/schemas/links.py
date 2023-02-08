@@ -1,6 +1,6 @@
 import json
 import re
-from backend.core.config import env_config
+from backend.core.config import env_config, settings
 
 
 class TelegramUsername(str):
@@ -34,7 +34,8 @@ class TelegramUsernameToUrl(str):
         v = parse_v(v)
         if not v:
             return v
-        return f"https://t.me/{v}"
+        # return f"https://t.me/{v}"
+        return settings.SOCIAL_LINKS_FORMAT.get('telegram').format(v)
 
 
 class YoutubeChannelIDToUrl(str):
@@ -48,7 +49,7 @@ class YoutubeChannelIDToUrl(str):
         v = parse_v(v)
         if not v:
             return v
-        return f"https://www.youtube.com/channel/{v}"
+        return settings.SOCIAL_LINKS_FORMAT.get('youtube').format(v)
 
 
 class YoutubeChannelID(str):
@@ -103,7 +104,7 @@ class VKUsernameToUrl(str):
         v = parse_v(v)
         if not v:
             return v
-        return f"https://vk.com/{v}"
+        return settings.SOCIAL_LINKS_FORMAT.get('vk').format(v)
 
 
 def parse_v(v):
