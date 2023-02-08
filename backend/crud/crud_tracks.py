@@ -29,7 +29,7 @@ class TracksCrud(CRUDBase):
     def track_is_liked(self, track_id: int, user_id: int):
         return bool(self.get_liked_track_model(track_id=track_id, user_id=user_id))
 
-    def get_liked_tracks(self, user_id: int, page: int):
+    def get_liked_tracks(self, user_id: int, page: int) -> List[Track]:
         end = page * settings.PAGINATION_LIMIT
         return self.db.query(Track).join(FavoriteTracks).filter(FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
 

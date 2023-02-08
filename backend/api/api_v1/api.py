@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from backend.api.api_v1.endpoints import auth,  user, roles, files, musician, statistics
-from backend.api.api_v1.endpoints.music import albums, clips, genres, tracks
+from backend.api.api_v1.endpoints import auth,  user, roles, files, statistics
+from backend.api.api_v1.endpoints.music import albums, clips, genres, musician, tracks
 
 
 api_v1_router = APIRouter()

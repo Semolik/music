@@ -1,16 +1,17 @@
 from typing import List
 from fastapi import Depends, APIRouter, UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
+from backend.core.config import settings
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_user import UserCruds
+from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.images import save_image
 from backend.helpers.clips import set_clip_data, video_is_exists
-from backend.helpers.validate_role import validate_musician
 from backend.schemas.music import CreateMusicianClipForm, MusicianClip
 from backend.helpers.files import save_image_in_db_by_url
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-import requests
+
 router = APIRouter(prefix="/clips", tags=['Клипы'])
 
 
@@ -24,23 +25,25 @@ def create_clip(
 ):
     '''Создание клипа'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     db_public_profile = UserCruds(
-        db).get_public_profile(user_id=current_user_id)
+        db).get_public_profile(user_id=db_user.id)
     if not video_is_exists(clipData.video_id):
         raise HTTPException(status_code=404, detail="ролик не найден")
     if clipData.image_from_youtube:
         image_model = save_image_in_db_by_url(
             db=db,
             url=f'http://img.youtube.com/vi/{clipData.video_id}/hqdefault.jpg',
-            user_id=current_user_id
+            user_id=db_user.id
         )
     else:
         image_model = save_image(
             db=db,
             upload_file=clipPicture,
-            user_id=current_user_id,
+            user_id=db_user.id,
             resize_image_options=(1000, 1000)
         )
     if not image_model:
@@ -59,10 +62,12 @@ def delete_clip(
 ):
     '''Удаление клипа'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     db_public_profile = UserCruds(
-        db).get_public_profile(user_id=current_user_id)
+        db).get_public_profile(user_id=db_user.id)
     db_clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
     if not db_clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -84,10 +89,13 @@ def update_clip(
 ):
     '''Изменение клипа'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
+
     db_public_profile = UserCruds(
-        db).get_public_profile(user_id=current_user_id)
+        db).get_public_profile(user_id=db_user.id)
     db_clip = ClipsCruds(db).get_clip_by_id(clip_id=clip_id)
     if not db_clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -101,13 +109,13 @@ def update_clip(
         image_model = save_image_in_db_by_url(
             db=db,
             url=f'http://img.youtube.com/vi/{clipData.video_id}/hqdefault.jpg',
-            user_id=current_user_id
+            user_id=db_user.id
         )
     else:
         image_model = save_image(
             db=db,
             upload_file=clipPicture,
-            user_id=current_user_id,
+            user_id=db_user.id,
             resize_image_options=(1000, 1000)
         )
     clip = ClipsCruds(db).update_clip(
@@ -123,10 +131,12 @@ def get_my_clips(
 ):
     '''Получение моих клипов'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     db_public_profile = UserCruds(
-        db).get_public_profile(user_id=current_user_id)
+        db).get_public_profile(user_id=db_user.id)
     clips = ClipsCruds(db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
     return [set_clip_data(clip=clip) for clip in clips]

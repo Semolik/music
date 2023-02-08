@@ -96,7 +96,7 @@ def test_upload_track_as_another_musician(client: TestClient, another_normal_mus
         "feat": "feat",
     }, files=track_files, cookies=another_normal_musician_token_cookies)
 
-    assert response.status_code == 403
+    assert response.status_code == 404
 
 
 def test_upload_track_without_album(client: TestClient, normal_musician_token_cookies):
@@ -260,7 +260,7 @@ def test_listen_album_tracks_stats(client: TestClient, normal_users_tokens_cooki
                 time=now
             )
             response = client.put(
-                f'/tracks/{track.id}/set-listened', cookies=cookies)
+                f'/tracks/{track.id}/listening', cookies=cookies)
 
             assert response.status_code == 204
 

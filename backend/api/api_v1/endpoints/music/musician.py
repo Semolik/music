@@ -3,6 +3,7 @@ from fastapi import Depends, APIRouter, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
+from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.clips import set_clip_data
 from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
 from backend.schemas.music import AlbumInfo, MusicianClip, Track
@@ -43,12 +44,14 @@ def like_musician(
 ):
     '''Лайк музыканта'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db)
+
     if not UserCruds(db).get_public_profile_by_id(id=profile_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     liked = MusicianCrud(db).toggle_like_musician(
-        musician_id=profile_id, user_id=current_user_id)
+        musician_id=profile_id, user_id=db_user.id)
     return liked
 
 

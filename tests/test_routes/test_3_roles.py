@@ -24,6 +24,7 @@ def test_change_role_requests_limit(client: TestClient, normal_user_token_cookie
 def test_get_all_change_role_requests(client: TestClient, normal_admin_token_cookies):
     response = client.get('change-role/all',
                           cookies=normal_admin_token_cookies, params={'page': 1})
+    print(response.json())
     global change_role_requests
     change_role_requests = response.json()
 

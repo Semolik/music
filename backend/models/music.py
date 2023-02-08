@@ -1,3 +1,4 @@
+from datetime import datetime
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, Table, Boolean
 from sqlalchemy.orm import relationship
@@ -99,6 +100,18 @@ class Album(Base):
         default=False
     )
 
+    @property
+    def is_opened(self):
+        return self.open_date <= datetime.now()
+
+    @property
+    def is_available(self):
+        return self.is_opened and self.uploaded
+
+    @property
+    def musician_user_id(self):
+        return self.musician.user_id
+
 
 class FavoriteAlbum(Base):
     __tablename__ = 'favorite_albums'
@@ -189,6 +202,18 @@ class Track(Base):
         foreign_keys=[picture_id],
         cascade="all,delete"
     )
+
+    @property
+    def is_opened(self):
+        return self.album.is_opened
+
+    @property
+    def album_uploaded(self):
+        return self.album.uploaded
+
+    @property
+    def is_available(self):
+        return self.is_opened and self.album_uploaded
 
 
 @event.listens_for(Track, "after_delete")

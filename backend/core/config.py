@@ -53,6 +53,11 @@ class Settings(BaseSettings):
         radiostaion = "radiostaion"
         user = "user"
         superuser = "superuser"
+    user_types_names = {
+        UserTypeEnum.superuser: "Администратор",
+        UserTypeEnum.user: "Пользователь",
+        UserTypeEnum.musician: "Музыкант",
+    }
 
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']

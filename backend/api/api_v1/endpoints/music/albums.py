@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
+from backend.core.config import settings
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.db.db import get_db
@@ -11,7 +12,6 @@ from backend.helpers.music import album_is_available, is_album_showed, save_trac
 from backend.helpers.images import save_image
 from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
-from backend.helpers.validate_role import validate_musician
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, TrackAfterUpload, UpdateAlbum, UploadTrackForm
 from backend.helpers.images import save_image, set_picture
@@ -27,13 +27,15 @@ def create_album(
 ):
     '''Создание альбома'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    db_user = validate_musician(db=db, user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     genres = validate_genres(db=db, genres_ids=albumData.genres_ids)
     db_image = save_image(db=db, upload_file=albumPicture,
                           user_id=db_user.id)
     db_album = AlbumsCruds(db).create_album(
-        name=albumData.name, user_id=current_user_id, date=albumData.date, picture=db_image, genres=genres)
+        name=albumData.name, user_id=db_user.id, date=albumData.date, picture=db_image, genres=genres)
     album_obj = set_album_info(db_album=db_album)
     return album_obj
 
@@ -46,14 +48,21 @@ def close_album_uploading(
 ):
     '''Закрытие альбома для загрузки треков'''
     Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    current_user_id = Authorize.get_jwt_subject()
-    if not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=current_user_id):
+    if db_album.musician_user_id != db_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Нет прав изменять этот альбом")
+                            detail="Нет прав на закрытие альбома")
+    if db_album.is_available:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Альбом уже доступен для прослушивания")
+
     db_album = AlbumsCruds(db).close_uploading(album=db_album)
     return AlbumIsCLosed(closed_uploading=not db_album.uploaded)
 
@@ -69,12 +78,15 @@ def update_album(
 ):
     '''Обновление альбома'''
     Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     db_album = AlbumsCruds(db).get_album(album_id=album_id)
     if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    current_user_id = Authorize.get_jwt_subject()
-    if not AlbumsCruds(db).album_belongs_to_user(album=db_album, user_id=current_user_id):
+    if db_album.musician_user_id != db_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Нет прав изменять этот альбом")
     tracks_ids = albumData.tracks_ids
@@ -83,7 +95,7 @@ def update_album(
                             detail="Переданые id треков не соответствуют трекам в альбоме")
     genres = validate_genres(db=db, genres_ids=albumData.genres_ids)
     db_image = save_image(db=db, upload_file=albumPicture,
-                          user_id=current_user_id)
+                          user_id=db_user.id)
     db_album = AlbumsCruds(db).update_album(album=db_album,
                                             name=albumData.name, date=albumData.date, genres=genres, image=db_image, tracks_ids=tracks_ids)
     album_obj = set_album_info(db_album=db_album)
@@ -97,12 +109,13 @@ def get_my_albums(
 ):
     '''Получение альбомов музыканта'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_musician(db=db, user_id=current_user_id)
-    db_musician = UserCruds(db).get_public_profile(user_id=current_user_id)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
+    db_musician = UserCruds(db).get_public_profile(user_id=db_user.id)
     albums = []
     for db_album in MusicianCrud(db).get_all_musician_albums(musician_id=db_musician.id):
-
         album_info = set_album_info(db_album=db_album)
         album_info['musician'] = get_public_profile_as_dict(
             db=db, public_profile_id=db_album.musician_id)
@@ -118,7 +131,7 @@ def album_like(
 ):
     '''Лайнуть альбом'''
     Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db)
+    db_user = validate_authorized_user(Authorize=Authorize, db=db)
     db_album = album_is_available(
         album_id=album_id,
         db=db,
@@ -134,7 +147,7 @@ def get_liked_albums(
 ):
     '''Получение лайкнутых альбомов'''
     Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db)
+    db_user = validate_authorized_user(Authorize=Authorize, db=db)
     albums = []
     for db_album in AlbumsCruds(db).get_liked_albums(user_id=db_user.id):
         album_info = set_album_info(db_album=db_album)
@@ -152,18 +165,23 @@ def get_album_by_id(
 ):
     '''Получение альбома по id'''
     Authorize.jwt_optional()
-    db_album = AlbumsCruds(db).get_album(album_id=album_id)
-    if not db_album:
+    album_cruds = AlbumsCruds(db)
+    db_album = album_cruds.get_album(album_id=album_id)
+    if not db_album or not db_album.is_available:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    current_user_id = Authorize.get_jwt_subject()
-    if not is_album_showed(db=db, album=db_album, user_id=current_user_id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Альбом не найден")
+    if not db_album.is_opened:
+        db_user = validate_authorized_user(
+            Authorize=Authorize, db=db,
+            types=[settings.UserTypeEnum.musician]
+        )
+        if not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Альбом не найден")
     db_album_obj = set_album_info(db_album=db_album)
     db_album_obj = set_musician_info(
         data=db_album_obj, public_profile_id=db_album.musician_id, db=db)
-    return set_album_tracks(db=db, db_album=db_album, db_album_obj=db_album_obj, user_id=current_user_id)
+    return set_album_tracks(db=db, db_album=db_album, db_album_obj=db_album_obj, user_id=Authorize.get_jwt_subject())
 
 
 @router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED)
@@ -177,15 +195,18 @@ def upload_track(
 ):
     '''Создание трека'''
     Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db)
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician]
+    )
     album_cruds = AlbumsCruds(db)
     db_album = album_cruds.get_album(album_id=album_id)
-    if not db_album:
+    if not db_album or (not db_album.uploaded and db_album.musician_user_id != db_user.id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    if not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
+    if db_album.musician_user_id != db_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Нет прав изменять этот альбом")
+                            detail="Вы не можете добавлять треки в чужой альбом")
     if db_album.uploaded:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Добавление треков в загруженный альбом запрещено")
@@ -221,7 +242,7 @@ def delete_album_by_id(
                             detail="Альбом не найден")
     db_user = validate_authorized_user(Authorize, db)
 
-    if not UserCruds(db).is_admin(user_id=db_user.id) and not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+    if db_user.type != settings.UserTypeEnum.superuser and not album_cruds.album_belongs_to_user(album=db_album, user_id=db_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Нет прав на удаление данного альбома")
     album_cruds.delete_album(album=db_album)

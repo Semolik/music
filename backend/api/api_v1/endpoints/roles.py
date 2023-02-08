@@ -3,7 +3,6 @@ from fastapi import Depends, APIRouter, status, UploadFile, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.helpers.files import save_file
-from backend.helpers.validate_role import validate_admin
 from backend.models.roles import ChangeRoleRequestStatus
 from backend.schemas.user import TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
@@ -25,6 +24,7 @@ def send_update_role_request(
 ):
     '''Отправка запроса на смену типа аккаунта'''
     Authorize.jwt_required()
+
     db_user = validate_authorized_user(Authorize, db)
     if db_user.type == settings.UserTypeEnum.superuser:
         raise HTTPException(
@@ -78,7 +78,10 @@ def get_all_change_role_requests(
 ):
     '''Получение списка запросов на смену типа аккаунта от всех пользователей'''
     Authorize.jwt_required()
-    validate_admin(db=db, user_id=Authorize.get_jwt_subject())
+    validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.superuser]
+    )
     return ChangeRolesCruds(db).get_all_change_role_messages(page=page, filter=filter)
 
 
@@ -86,8 +89,10 @@ def get_all_change_role_requests(
 def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-    validate_admin(db=db, user_id=current_user_id)
+    validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.superuser]
+    )
     db_request = ChangeRolesCruds(db).get_change_role_message(
         request_id=request_id)
     if not db_request:

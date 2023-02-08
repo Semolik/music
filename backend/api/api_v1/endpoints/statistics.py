@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_change_roles import ChangeRolesCruds
-from backend.helpers.validate_role import validate_admin
+from backend.helpers.auth_helper import validate_authorized_user
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
 from backend.core.config import settings
@@ -18,7 +18,10 @@ def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db
     '''Получение статистики по пользователям'''
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
-    validate_admin(db=db, user_id=current_user_id)
+    validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.superuser]
+    )
     users_crud = UserCruds(db=db)
     user_count = users_crud.get_count()
     admin_count = users_crud.get_count_by_type(settings.UserTypeEnum.superuser)
@@ -38,7 +41,6 @@ def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db
 def get_track_statistics(track_id: uuid_pkg.UUID, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Получение статистики по треку'''
     Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
     tracks_crud = TracksCrud(db=db)
     track = tracks_crud.get_track(track_id=track_id)
     if not track:
@@ -47,8 +49,12 @@ def get_track_statistics(track_id: uuid_pkg.UUID, Authorize: AuthJWT = Depends()
             detail='Трек не найден'
         )
     users_cruds = UserCruds(db=db)
-    db_public_profile = users_cruds.get_public_profile_by_id(current_user_id)
-    if not users_cruds.is_admin(current_user_id) and (not db_public_profile or db_public_profile.id != track.artist_id):
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+        types=[settings.UserTypeEnum.musician, settings.UserTypeEnum.superuser]
+    )
+    db_public_profile = users_cruds.get_public_profile_by_id(db_user.id)
+    if not (db_user.type == settings.UserTypeEnum.superuser) and not (db_public_profile or db_public_profile.id != track.artist_id):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='У вас нет доступа к этой информации'
