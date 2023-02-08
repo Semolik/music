@@ -102,7 +102,7 @@ def normal_admin_token_cookies(client: TestClient, db_session):
 @pytest.fixture(scope="function")  # new function
 def normal_musician_token_cookies(client: TestClient, db_session):
     return authentication_token_from_username(
-        client=client, username=settings.TEST_MUSICIAN_USERNAME, db=db_session, user_type=settings.UserTypeEnum.musician
+        client=client, username=settings.TEST_MUSICIAN_USERNAME, db=db_session, password=settings.TEST_MUSICIAN_PASSWORD, user_type=settings.UserTypeEnum.musician
     )
 
 

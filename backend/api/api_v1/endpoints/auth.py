@@ -22,7 +22,7 @@ def login(user_in: UserAuth, Authorize: AuthJWT = Depends(), db: Session = Depen
     refresh_token = Authorize.create_refresh_token(subject=db_user.id)
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-    return db_user.as_dict()
+    return db_user
 
 
 @router.delete('/logout')
@@ -59,7 +59,7 @@ def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends(), db
     refresh_token = Authorize.create_refresh_token(subject=db_user.id)
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-    return db_user.as_dict()
+    return db_user
 
 
 @router.put("/change-password", status_code=status.HTTP_204_NO_CONTENT)

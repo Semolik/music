@@ -29,6 +29,7 @@ def get_liked_musician_profiles(
     )
     liked_musician_profiles = MusicianCrud(db).get_liked_musicians(
         user_id=db_user.id, page=page)
+    return liked_musician_profiles
     return [
         get_public_profile_as_dict(
             db=db,

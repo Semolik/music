@@ -145,7 +145,7 @@ def test_close_uploading(client: TestClient, normal_musician_token_cookies):
     response = client.put(
         f"/albums/{album_id}/close-uploading", cookies=normal_musician_token_cookies)
 
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 def test_get_album_with_closed_uploading_as_user(client: TestClient, normal_user_2_token_cookies):

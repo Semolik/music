@@ -14,7 +14,7 @@ class TelegramUsername(str):
     @classmethod
     def validate(cls, v):
         if not v:
-            return v
+            return None
         if len(v) > int(env_config.get('VITE_MAX_TELEGRAM_USERNAME_LENGTH')):
             raise ValueError('The Telegram username is too long.')
         match = re.match(cls.pattern, v)
@@ -34,7 +34,6 @@ class TelegramUsernameToUrl(str):
         v = parse_v(v)
         if not v:
             return v
-        # return f"https://t.me/{v}"
         return settings.SOCIAL_LINKS_FORMAT.get('telegram').format(v)
 
 
@@ -62,7 +61,6 @@ class YoutubeChannelID(str):
 
     @classmethod
     def validate(cls, v):
-
         if not v:
             return v
         if len(v) > int(env_config.get('VITE_MAX_YOUTUBE_CHANNEL_ID_LENGTH')):
@@ -84,7 +82,7 @@ class VKUsername(str):
     @classmethod
     def validate(cls, v):
         if not v:
-            return v
+            return None
         if len(v) > int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')):
             raise ValueError('The VKontakte username is too long.')
         match = re.match(cls.pattern, v)
@@ -109,7 +107,7 @@ class VKUsernameToUrl(str):
 
 def parse_v(v):
     if not v:
-        return v
+        return None
     try:
         return json.loads(v)
     except json.JSONDecodeError:

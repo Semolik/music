@@ -23,6 +23,6 @@ def validate_authorized_user(Authorize: AuthJWT, db: Session, types: List[settin
     if types != [settings.UserTypeEnum.user] and db_user.type not in types:
         raise HTTPException(
             status_code=403,
-            detail=f"У вас недостаточно прав для выполнения этого действия, требуемый тип пользователя: {' '.join([settings.user_types_names.get(type) for type in types])}",
+            detail=f"У вас недостаточно прав для выполнения этого действия, требуемый тип пользователя: {' '.join([settings.user_types_names.get(type) for type in types if type in settings.user_types_names])}",
         )
     return db_user

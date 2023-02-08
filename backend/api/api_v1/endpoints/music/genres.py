@@ -44,12 +44,13 @@ def update_loved_genres(
     db: Session = Depends(get_db)
 ):
     '''Обновление любимых жанров'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db,
-    )
-    validate_genres
-    GenresCruds(db).update_loved_genres(user_id=db_user.id, genres=genres)
+    # Authorize.jwt_required()
+    # db_user = validate_authorized_user(
+    #     Authorize=Authorize, db=db,
+    # )
+    # validate_genres
+    # GenresCruds(db).update_loved_genres(user_id=db_user.id, genres=genres)
+    ...
 
 
 @router.put(

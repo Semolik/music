@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 from fastapi import Query
 from backend.core.config import settings, env_config
 from backend.models.roles import ChangeRoleRequestStatus
-from backend.schemas.file import File
+from backend.schemas.file import File, ImageLink
 from backend.helpers.forms import ValidateJsonWithFormBody, form_body
 from backend.schemas.links import TelegramUsername, VKUsernameToUrl, YoutubeChannelID, VKUsername, TelegramUsernameToUrl, YoutubeChannelIDToUrl
 
@@ -83,10 +84,13 @@ class UserModifiable(UserBase, ValidateJsonWithFormBody):
 
 class UserInfo(AllUserTypes, UserBase, UserUsername):
     id: int
-    picture: str | None = Query(
+    picture: ImageLink | None = Query(
         default=None,
         description='Ccылка на аватарку пользователя',
     )
+
+    class Config:
+        orm_mode = True
 
 
 @form_body
@@ -101,6 +105,9 @@ class CreateRoleRequestAnswer(BaseModel):
     setted_account_status: settings.USER_ACCOUNT_STATUSES = Query(
         ..., description='Присвоенный статус')
 
+    class Config:
+        orm_mode = True
+
 
 class RoleRequestAnswer(CreateRoleRequestAnswer):
     request_id: int = Query(...,
@@ -113,7 +120,7 @@ class UpdateRoleRequestAnswer(CreateRoleRequestAnswer):
 
 
 class TimeCreated(BaseModel):
-    time_created: str = Query(..., description='Время создания')
+    time_created: datetime = Query(..., description='Время создания')
 
 
 class ChangeRoleRequestInfo(TimeCreated):
@@ -127,10 +134,16 @@ class ChangeRoleRequestInfo(TimeCreated):
     answer: RoleRequestAnswer | None = Query(...,
                                              description='Ответ на запрос')
 
+    class Config:
+        orm_mode = True
+
 
 class ChangeRoleRequestFullInfo(ChangeRoleRequestInfo):
     id: int = Query(..., description='ID запроса на изменение типа аккаунта')
     user: UserInfo = Query(..., description='Пользователь, сделавший запрос')
+
+    class Config:
+        orm_mode = True
 
 
 class PublicProfileLinksURLS(BaseModel):
@@ -148,6 +161,9 @@ class PublicProfileLinks(BaseModel):
     vk: VKUsernameToUrl = Query(
         default=None, description='Ссылка на страницу VK')
 
+    class Config:
+        orm_mode = True
+
 
 class PublicProfileBase(BaseModel):
     name: str = Query(..., description='Оторажаемое имя', max_length=int(
@@ -161,8 +177,10 @@ class PublicProfileBase(BaseModel):
 class PublicProfile(PublicProfileBase):
     id: int = Query(..., description='ID публичного профиля')
     links: PublicProfileLinks = Query(..., description='Ссылки на соц. сети')
-    picture: str | None = Query(default=False,
-                                description='Ссылка на аватарку публичного профиля')
+    picture: ImageLink | None
+
+    class Config:
+        orm_mode = True
 
 
 class PublicProfileModifiable(PublicProfileBase, PublicProfileLinksURLS, ValidateJsonWithFormBody):

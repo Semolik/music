@@ -40,7 +40,7 @@ def create_album(
     return album_obj
 
 
-@router.put('/{album_id}/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumIsCLosed)
+@router.put('/{album_id}/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, status_code=status.HTTP_204_NO_CONTENT)
 def close_album_uploading(
     album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
@@ -64,7 +64,6 @@ def close_album_uploading(
                             detail="Альбом уже доступен для прослушивания")
 
     db_album = AlbumsCruds(db).close_uploading(album=db_album)
-    return AlbumIsCLosed(closed_uploading=not db_album.uploaded)
 
 
 @router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)

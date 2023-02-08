@@ -1,16 +1,8 @@
-from datetime import datetime
 from typing import List
 from backend.db.base import CRUDBase
-from backend.helpers.roles import post_processing_change_role_messages, set_status
-from backend.helpers.images import set_picture
 from backend.core.config import settings
-from backend.helpers.files import set_files_data
 from backend.models.user import User
-from backend.schemas.user import ChangeRoleRequestInfo
 from backend.models.roles import AnswerChangeRoleRequest, ChangeRoleRequest, ChangeRoleRequestStatus
-
-from fastapi.encoders import jsonable_encoder
-from fastapi import HTTPException, status
 
 
 class ChangeRolesCruds(CRUDBase):
@@ -29,7 +21,7 @@ class ChangeRolesCruds(CRUDBase):
             .order_by(ChangeRoleRequest.id.desc())\
             .filter(ChangeRoleRequest.user_id == user_id)\
             .all()
-        return post_processing_change_role_messages(records)
+        return records
 
     def get_all_change_role_messages(self, page: int = 1, filter: ChangeRoleRequestStatus = None, page_size: int = 10) -> List[ChangeRoleRequest]:
         end = page * page_size
@@ -37,7 +29,7 @@ class ChangeRolesCruds(CRUDBase):
             ChangeRoleRequest.id.desc())
         if filter:
             query = query.where(ChangeRoleRequest.request_status == filter)
-        return post_processing_change_role_messages(query.slice(end-page_size, end), add_user=True)
+        return query.slice(end-page_size, end).all()
 
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
