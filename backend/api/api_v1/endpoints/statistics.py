@@ -7,7 +7,7 @@ from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.schemas.statistics import UsersStats
+from backend.schemas.statistics import TrackStats, UsersStats
 from backend.core.config import settings
 import uuid as uuid_pkg
 router = APIRouter(tags=['Статистика'], prefix='/statistics')
@@ -37,7 +37,7 @@ def get_users_count(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db
     )
 
 
-@router.get('/track/{track_id}', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}})
+@router.get('/track/{track_id}', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=TrackStats)
 def get_track_statistics(track_id: uuid_pkg.UUID, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Получение статистики по треку'''
     Authorize.jwt_required()
