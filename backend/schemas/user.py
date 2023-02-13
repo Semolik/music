@@ -14,7 +14,8 @@ class UserUsername(BaseModel):
         ...,
         min_length=int(env_config.get('VITE_MIN_LOGIN_LENGTH')),
         max_length=int(env_config.get('VITE_MAX_LOGIN_LENGTH')),
-        description='Логин пользователя'
+        description='Логин пользователя',
+        regex=env_config.get('VITE_LOGIN_REGEX')
     )
 
 

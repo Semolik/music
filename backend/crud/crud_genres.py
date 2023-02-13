@@ -1,7 +1,8 @@
 from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.models.files import Image
-from backend.models.genres import Genre
+from backend.models.genres import Genre, LovedGenre
+from backend.models.user import User
 
 
 class GenresCruds(CRUDBase):
@@ -26,3 +27,18 @@ class GenresCruds(CRUDBase):
 
     def detete_genre(self, genre: Genre):
         return self.delete(model=genre)
+
+    def get_liked_genre_model(self, genre_id: int, user_id: int) -> LovedGenre | None:
+        return self.db.query(LovedGenre).filter(
+            LovedGenre.genre_id == genre_id, LovedGenre.user_id == user_id).first()
+
+    def toggle_like_genre(self, genre_id: int, user_id: int):
+        liked = self.get_liked_genre_model(
+            genre_id=genre_id, user_id=user_id)
+        if not liked:
+            self.create(LovedGenre(
+                genre_id=genre_id, user_id=user_id))
+            return True
+        else:
+            self.delete(model=liked)
+            return False

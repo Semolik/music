@@ -20,7 +20,8 @@ def image_id_to_path(image_id: UUID) -> str:
 
 
 def image_id_to_url(image_id: UUID) -> str:
-    return ''.join([settings.SERVER_LINK, settings.API_V1_STR, settings.UPLOADS_ROUTE, '/images/', str(image_id)])
+
+    return settings.IMAGE_URL_BASE.format(str(image_id))
 
 
 def set_picture(data: dict, picture: Image):

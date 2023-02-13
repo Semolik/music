@@ -34,23 +34,25 @@ def create_genre(
                           user_id=db_user.id)
     db_genre = GenresCruds(db).create_genre(
         name=genreData.name, picture=db_image)
-    return set_picture(db_genre.as_dict(), db_genre.picture)
+    return db_genre
 
 
-@router.put('/liked', status_code=status.HTTP_204_NO_CONTENT)
-def update_loved_genres(
-    genres: List[int] = Query(..., description='ID жанров'),
+@router.put('/{genre_id}/like', response_model=bool)
+def like_genre(
+    genre_id: int = Query(..., description='ID жанра'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
 ):
-    '''Обновление любимых жанров'''
-    # Authorize.jwt_required()
-    # db_user = validate_authorized_user(
-    #     Authorize=Authorize, db=db,
-    # )
-    # validate_genres
-    # GenresCruds(db).update_loved_genres(user_id=db_user.id, genres=genres)
-    ...
+    '''Лайк жанра'''
+    Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db,
+    )
+    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
+    if not genre:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Жанр не найден")
+    return GenresCruds(db).toggle_like_genre(user_id=db_user.id, genre_id=genre.id)
 
 
 @router.put(
@@ -82,7 +84,7 @@ def update_genre(
                           user_id=db_user.id) if genrePicture else None
     genre = GenresCruds(db).update_genre(
         name=genreData.name, picture=db_image, genre=genre)
-    return set_picture(genre.as_dict(), genre.picture)
+    return genre
 
 
 @router.get('/{genre_id}', responses={**NOT_FOUND_GENRE}, response_model=Genre)
@@ -92,7 +94,7 @@ def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Sessi
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    return set_picture(genre.as_dict(), genre.picture)
+    return genre
 
 
 @router.delete(
@@ -114,13 +116,10 @@ def delete_genre(genre_id: int = Query(..., description="ID жанра"), Author
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    genre = GenresCruds(db).detete_genre(genre=genre)
+    GenresCruds(db).detete_genre(genre=genre)
 
 
 @router.get('',  response_model=List[Genre])
 def get_genres(db: Session = Depends(get_db)):
     '''Получение всех жанров'''
-    return [
-        set_picture(genre.as_dict(), genre.picture)
-        for genre in GenresCruds(db).get_genres()
-    ]
+    return GenresCruds(db).get_genres()

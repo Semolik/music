@@ -1,6 +1,6 @@
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -55,10 +55,18 @@ class LovedGenre(Base):
     genre = relationship(
         "Genre",
         foreign_keys=[genre_id],
-        cascade="all,delete"
+        backref=backref(
+            "loved_genres",
+            uselist=True,
+            cascade="all,delete"
+        )
     )
     user = relationship(
         "User",
         foreign_keys=[user_id],
-        cascade="all,delete"
+        backref=backref(
+            "loved_genres",
+            uselist=True,
+            cascade="all,delete"
+        )
     )

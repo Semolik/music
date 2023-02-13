@@ -25,7 +25,7 @@ class Clip(Base):
     musician = relationship(
         "PublicProfile",
         foreign_keys=[musician_id],
-        backref=backref("clips", cascade="all,delete")
+        backref=backref("all_clips", cascade="all,delete")
     )
     name = Column(
         String(int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))),

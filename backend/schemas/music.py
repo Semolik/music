@@ -1,8 +1,10 @@
 import uuid as uuid_pkg
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel,  validator
 from fastapi import Query
+from backend.schemas.file import ImageLink
+from backend.schemas.links import YoutubeVideoIdToUrl
 from backend.schemas.user import PublicProfile
 from backend.helpers.forms import form_body
 from backend.core.config import env_config
@@ -15,7 +17,7 @@ class CreateAlbumBase(ValidateJsonWithFormBody):
         max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')),
         min_length=1
     )
-    date: datetime = Query(..., description="Дата создания альбома")
+    open_date: datetime = Query(..., description="Дата создания альбома")
 
 
 class CreateAlbum(CreateAlbumBase):
@@ -35,7 +37,7 @@ class CreateAlbumForm(CreateAlbum):
 
 class GenreBase(BaseModel):
     name: str = Query(
-        default=None,
+        ...,
         max_length=int(env_config.get('VITE_MAX_GENRE_NAME_LENGTH')),
         min_length=1,
         description="Название жанра"
@@ -49,13 +51,19 @@ class GenreBaseForm(GenreBase):
 
 class Genre(GenreBase):
     id: int = Query(..., description="ID жанра")
-    picture: str = Query(..., description="Ссылка на картинку жанра")
+    picture: ImageLink = Query(..., description="Ссылка на картинку жанра")
+
+    class Config:
+        orm_mode = True
 
 
 class AlbumBase(CreateAlbumBase):
     id: int
-    year: int = Query(..., description="Год выпуска альбома")
+    year: int = Query(None, description="Год выпуска альбома")
     genres: List[Genre] = Query(..., description="Список жанров альбома")
+
+    class Config:
+        orm_mode = True
 
 
 class AlbumAfterUpload(AlbumBase):
@@ -98,11 +106,15 @@ class AlbumTrack(TrackAfterUpload):
 
 
 class AlbumInfoWithoutMusician(AlbumBase):
-    picture: str | None = Query(..., description="Ссылка на картинку альбома")
+    picture: ImageLink = Query(...,
+                               description="Ссылка на картинку альбома")
 
 
 class AlbumInfo(AlbumInfoWithoutMusician):
     musician: PublicProfile = Query(..., description="Информация о музыканте")
+
+    class Config:
+        orm_mode = True
 
 
 class AlbumWithTracks(AlbumInfo):
@@ -135,17 +147,41 @@ class CreateMusicianClipForm(CreateMusicianClip):
 
 class MusicianClipWithoutMusician(CreateMusicianClip):
     id: int = Query(..., description="ID клипа")
-    video: str = Query(..., description="Ссылка на видео на YouTube")
-    picture: str = Query(..., description="Ссылка на картинку клипа")
+    picture: ImageLink = Query(..., description="Ссылка на картинку клипа")
+
+    video_id: str = Query(..., description="ID видео на YouTube")
+    video: str = None
+
+    @validator("video", always=True)
+    def link_from_video_id(cls, v, values):
+
+        video_id = values.get("video_id")
+        if video_id:
+            return f"https://www.youtube.com/watch?v={video_id}"
+        else:
+            return v
+
+    class Config:
+        orm_mode = True
 
 
 class MusicianClip(MusicianClipWithoutMusician):
     musician_id: int = Query(..., description="ID музыканта")
 
+    class Config:
+        orm_mode = True
 
-class MusicianFullInfo(PublicProfile):
-    liked: bool | None = Query(..., description="Лайкнут ли музыкант")
+
+class MusicianInfo(PublicProfile):
+    liked: bool = Query(default=False, description="Лайкнут ли музыкант")
+
+
+class MusicianFullInfo(MusicianInfo):
+
     clips: List[MusicianClipWithoutMusician] = Query(...,
                                                      description="Клипы музыканта")
     albums: List[AlbumInfoWithoutMusician] = Query(...,
                                                    description="Альбомы музыканта")
+
+    class Config:
+        orm_mode = True

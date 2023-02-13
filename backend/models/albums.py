@@ -78,6 +78,10 @@ class Album(Base):
         return self.open_date <= datetime.now()
 
     @property
+    def year(self):
+        return self.open_date.year
+
+    @property
     def is_available(self):
         return self.is_opened and self.uploaded
 

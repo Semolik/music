@@ -51,6 +51,20 @@ class YoutubeChannelIDToUrl(str):
         return settings.SOCIAL_LINKS_FORMAT.get('youtube').format(v)
 
 
+class YoutubeVideoIdToUrl(str):
+
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        v = parse_v(v)
+        if not v:
+            return v
+        return settings.SOCIAL_LINKS_FORMAT.get('youtube_video').format(v)
+
+
 class YoutubeChannelID(str):
     '''YouTube channel ID validator.'''
     pattern = r"([A-Za-z0-9_\-]+)"

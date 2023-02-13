@@ -6,7 +6,7 @@ from backend.models.clips import Clip
 
 
 class ClipsCruds(CRUDBase):
-    def get_musician_clips(self, musician_id: int, page_size: int = int(env_config.get('VITE_CLIP_PAGE_COUNT')), page: int = 1):
+    def get_musician_clips(self, musician_id: int, page: int = 1, page_size: int = int(env_config.get('VITE_CLIP_PAGE_COUNT'))) -> list[Clip]:
         end = page * page_size
         return self.db.query(Clip).filter(Clip.musician_id == musician_id).slice(end-page_size, end).all()
 

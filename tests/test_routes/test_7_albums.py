@@ -11,7 +11,7 @@ from backend.crud.crud_tracks import TracksCrud
 from tests.test_routes.test_2_profile import test_get_user_info
 json_data = {
     "name": "string",
-    "date": str(datetime.now()),
+    "open_date": str(datetime.now()),
     "genres_ids": []
 }
 data = {

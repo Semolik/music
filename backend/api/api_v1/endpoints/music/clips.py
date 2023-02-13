@@ -6,7 +6,7 @@ from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.images import save_image
-from backend.helpers.clips import set_clip_data, video_is_exists
+from backend.helpers.clips import video_is_exists
 from backend.schemas.music import CreateMusicianClipForm, MusicianClip
 from backend.helpers.files import save_image_in_db_by_url
 from backend.db.db import get_db
@@ -51,7 +51,7 @@ def create_clip(
                             detail="Необходимо или передать картинку или указать image_from_youtube = true")
     clip = ClipsCruds(db).create_clip(
         musician_id=db_public_profile.id, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
-    return set_clip_data(clip=clip)
+    return clip
 
 
 @router.delete('/{clip_id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -120,7 +120,7 @@ def update_clip(
         )
     clip = ClipsCruds(db).update_clip(
         db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image=image_model)
-    return set_clip_data(clip=clip)
+    return clip
 
 
 @router.get('/my', response_model=List[MusicianClip])
@@ -139,7 +139,7 @@ def get_my_clips(
         db).get_public_profile(user_id=db_user.id)
     clips = ClipsCruds(db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
-    return [set_clip_data(clip=clip) for clip in clips]
+    return clips
 
 
 @router.get('/{clip_id}', response_model=MusicianClip)
@@ -152,4 +152,4 @@ def get_clip_by_id(
     if not clip:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Клип не найден")
-    return set_clip_data(clip=clip)
+    return clip

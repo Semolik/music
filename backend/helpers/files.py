@@ -49,29 +49,6 @@ def save_file(db: Session, upload_file: UploadFile, user_id: int) -> File | None
     return file_model
 
 
-# def set_files_data(files: List[File]):
-#     return [set_file_data(file) for file in files]
-
-
-# def set_file_data(file: File) -> FileSchema:
-#     file_obj = jsonable_encoder(file)
-#     str_file_id = str(file.id)
-#     chapters = [
-#         ''.join(
-#             [
-#                 settings.SERVER_LINK,
-#                 settings.API_V1_STR,
-#                 settings.UPLOADS_ROUTE,
-#                 settings.OTHER_FILES_ROUTE,
-#                 str_file_id
-#             ]
-#         )
-#     ]
-#     file_obj['url'] = '/'.join(chapters)
-#     file_obj['file_name'] = str_file_id + file.extension
-#     return file_obj
-
-
 def save_image_in_db_by_url(db: Session, url: str, user_id: int) -> File | None:
     r = requests.get(url, stream=True)
     if r.status_code == 200:

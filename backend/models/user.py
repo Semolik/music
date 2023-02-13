@@ -71,7 +71,6 @@ class User(Base):
     )
     picture = relationship("Image", foreign_keys=[
                            picture_id], cascade="all,delete")
-    # public_profile = relationship("PublicProfile", back_populates="user", uselist=False)
 
 
 class PublicProfile(Base):

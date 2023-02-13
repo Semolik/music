@@ -4,9 +4,8 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.clips import set_clip_data
 from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
-from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo
+from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
@@ -30,34 +29,6 @@ def get_liked_musician_profiles(
     liked_musician_profiles = MusicianCrud(db).get_liked_musicians(
         user_id=db_user.id, page=page)
     return liked_musician_profiles
-    return [
-        get_public_profile_as_dict(
-            db=db,
-            public_profile_id=profile.id,
-            full_links=True,
-            user_id=db_user.id
-        ) for profile in liked_musician_profiles]
-
-
-@router.get('/{profile_id}', response_model=MusicianFullInfo)
-def get_public_profile_info(
-        profile_id: int = Query(..., description='ID профиля'),
-        Authorize: AuthJWT = Depends(),
-        db: Session = Depends(get_db)
-):
-    '''Получение информации о публичном профиле музыканта'''
-    Authorize.jwt_optional()
-    current_user_id = Authorize.get_jwt_subject()
-    public_profile_obj = get_musician_profile_as_dict(
-        db=db,
-        public_profile_id=profile_id,
-        full_links=True,
-        user_id=current_user_id
-    )
-    if not public_profile_obj:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Профиль музыканта не найден")
-    return public_profile_obj
 
 
 @router.put('/{profile_id}/like', response_model=bool)
@@ -79,6 +50,32 @@ def like_musician(
     return liked
 
 
+@router.get('/{profile_id}', response_model=MusicianFullInfo)
+def get_public_profile_info(
+        profile_id: int = Query(..., description='ID профиля'),
+        Authorize: AuthJWT = Depends(),
+        db: Session = Depends(get_db)
+):
+    '''Получение информации о публичном профиле музыканта'''
+    Authorize.jwt_optional()
+    current_user_id = Authorize.get_jwt_subject()
+    public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
+    if not public_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Профиль музыканта не найден")
+    musician_info = MusicianInfo.from_orm(public_profile)
+    public_profile_obj = MusicianFullInfo(
+        **musician_info.dict(),
+        albums=MusicianCrud(db).get_musician_albums(musician_id=profile_id),
+        clips=ClipsCruds(db).get_musician_clips(musician_id=profile_id),
+    )
+    print(public_profile_obj.clips[0].picture)
+    if current_user_id:
+        public_profile_obj.liked = MusicianCrud(db).musician_is_liked(
+            musician_id=profile_id, user_id=current_user_id)
+    return public_profile_obj
+
+
 @router.get('/{profile_id}/clips', response_model=List[MusicianClip])
 def get_musician_clips(
     musician_id: int = Query(..., description='ID музыканта'),
@@ -92,7 +89,7 @@ def get_musician_clips(
                             detail="Профиль музыканта не найден")
     clips = ClipsCruds(db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
-    return [set_clip_data(clip=clip) for clip in clips]
+    return clips
 
 
 @router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
@@ -109,13 +106,17 @@ def get_musician_albums(
     albums = MusicianCrud(db).get_musician_albums(
         musician_id=db_public_profile.id, page=page)
     albums_obj = []
-    musician_obj = get_public_profile_as_dict(
-        db=db, public_profile_id=musician_id)
     for album in albums:
-        album_info = set_album_info(db_album=album)
-        album_info['musician'] = musician_obj
+        album_info = AlbumInfo.from_orm(album)
+        album_info.musician = MusicianInfo.from_orm(db_public_profile)
         albums_obj.append(album_info)
-    return albums_obj
+    # musician_obj = get_public_profile_as_dict(
+    #     db=db, public_profile_id=musician_id)
+    # for album in albums:
+    #     album_info = set_album_info(db_album=album)
+    #     album_info['musician'] = musician_obj
+    #     albums_obj.append(album_info)
+    return albums
 
 
 @router.get('/{profile_id}/popular', response_model=List[Track])

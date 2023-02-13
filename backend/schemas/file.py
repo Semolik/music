@@ -1,3 +1,4 @@
+import re
 from uuid import UUID
 from pydantic import BaseModel, validator, Field
 from fastapi import Query
@@ -42,6 +43,10 @@ class ImageLink(BaseModel):
     def validate(cls, v: Image):
         if not v:
             return None
+        if isinstance(v, str):  # regex test
+            if not re.match(settings.IMAGE_URL_BASE.replace('/', '\/').format(settings.UUID_REGEX), v):
+                raise TypeError('ImageLink string in wrong format')
+            return v
         if not isinstance(v, Image):
             raise TypeError('ImageLink must be Image (model)')
         return image_id_to_url(v.id)

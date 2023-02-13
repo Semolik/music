@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
         'vk': 'https://vk.com/{0}',
-        'youtube': 'https://www.youtube.com/channel/{0}'
+        'youtube': 'https://www.youtube.com/channel/{0}',
+        'youtube_video': 'https://www.youtube.com/watch?v={0}',
     }
     YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
 
@@ -40,6 +41,9 @@ class Settings(BaseSettings):
     TEST_MUSICIAN_PASSWORD = 'musician_test_password'
     TEST_ANOTHER_MUSICIAN_USERNAME = 'musician_another'
     PAGINATION_LIMIT = 20
+    IMAGE_URL_BASE = ''.join(
+        [SERVER_LINK, API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
+    UUID_REGEX = '[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}'
 
     class Config:
         case_sensitive = True  # 4

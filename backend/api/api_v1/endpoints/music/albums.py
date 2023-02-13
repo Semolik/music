@@ -35,7 +35,7 @@ def create_album(
     db_image = save_image(db=db, upload_file=albumPicture,
                           user_id=db_user.id)
     db_album = AlbumsCruds(db).create_album(
-        name=albumData.name, user_id=db_user.id, date=albumData.date, picture=db_image, genres=genres)
+        name=albumData.name, user_id=db_user.id, date=albumData.open_date, picture=db_image, genres=genres)
     album_obj = set_album_info(db_album=db_album)
     return album_obj
 
@@ -96,7 +96,7 @@ def update_album(
     db_image = save_image(db=db, upload_file=albumPicture,
                           user_id=db_user.id)
     db_album = AlbumsCruds(db).update_album(album=db_album,
-                                            name=albumData.name, date=albumData.date, genres=genres, image=db_image, tracks_ids=tracks_ids)
+                                            name=albumData.name, date=albumData.open_date, genres=genres, image=db_image, tracks_ids=tracks_ids)
     album_obj = set_album_info(db_album=db_album)
     return set_album_tracks(db=db, db_album=db_album, db_album_obj=album_obj)
 
