@@ -13,7 +13,8 @@ from backend.helpers.images import save_image
 from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, TrackAfterUpload, UpdateAlbum, UploadTrackForm
+from backend.schemas.base import LikesInfo
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, MusicianInfo, TrackAfterUpload, UpdateAlbum, UploadTrackForm
 from backend.helpers.images import save_image, set_picture
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
@@ -114,15 +115,15 @@ def get_my_albums(
     )
     db_musician = UserCruds(db).get_public_profile(user_id=db_user.id)
     albums = []
-    for db_album in MusicianCrud(db).get_all_musician_albums(musician_id=db_musician.id):
-        album_info = set_album_info(db_album=db_album)
-        album_info['musician'] = get_public_profile_as_dict(
-            db=db, public_profile_id=db_album.musician_id)
-        albums.append(album_info)
+    albums_obj = []
+    for album in albums:
+        album_info = AlbumInfo.from_orm(album)
+        album_info.musician = MusicianInfo.from_orm(db_musician)
+        albums_obj.append(album_info)
     return albums
 
 
-@router.put('/{album_id}/like', responses={**NOT_FOUND_ALBUM}, response_model=bool)
+@router.put('/{album_id}/like', responses={**NOT_FOUND_ALBUM}, response_model=LikesInfo)
 def album_like(
     album_id: int = Query(..., description='ID альбома'),
     Authorize: AuthJWT = Depends(),
@@ -136,7 +137,10 @@ def album_like(
         db=db,
         user_id=db_user.id
     )
-    return AlbumsCruds(db).toggle_album_like(album=db_album, user_id=db_user.id)
+    is_liked = AlbumsCruds(db).toggle_album_like(
+        album=db_album, user_id=db_user.id)
+    likes_count = AlbumsCruds(db).get_album_likes_count(album_id=album_id)
+    return LikesInfo(liked=is_liked, likes_count=likes_count)
 
 
 @router.get('/liked', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])

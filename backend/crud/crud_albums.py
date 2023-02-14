@@ -71,3 +71,6 @@ class AlbumsCruds(CRUDBase):
     def get_liked_albums(self, user_id: int) -> List[Album]:
         now = datetime.now()
         return self.db.query(Album).join(FavoriteAlbum).filter(Album.uploaded == True, FavoriteAlbum.user_id == user_id, Album.open_date <= now).all()
+
+    def get_album_likes_count(self, album: Album) -> int:
+        return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album.id).count()

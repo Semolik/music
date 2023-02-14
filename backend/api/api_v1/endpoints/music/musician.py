@@ -69,7 +69,6 @@ def get_public_profile_info(
         albums=MusicianCrud(db).get_musician_albums(musician_id=profile_id),
         clips=ClipsCruds(db).get_musician_clips(musician_id=profile_id),
     )
-    print(public_profile_obj.clips[0].picture)
     if current_user_id:
         public_profile_obj.liked = MusicianCrud(db).musician_is_liked(
             musician_id=profile_id, user_id=current_user_id)
@@ -110,12 +109,6 @@ def get_musician_albums(
         album_info = AlbumInfo.from_orm(album)
         album_info.musician = MusicianInfo.from_orm(db_public_profile)
         albums_obj.append(album_info)
-    # musician_obj = get_public_profile_as_dict(
-    #     db=db, public_profile_id=musician_id)
-    # for album in albums:
-    #     album_info = set_album_info(db_album=album)
-    #     album_info['musician'] = musician_obj
-    #     albums_obj.append(album_info)
     return albums
 
 
