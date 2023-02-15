@@ -139,7 +139,7 @@ def album_like(
     )
     is_liked = AlbumsCruds(db).toggle_album_like(
         album=db_album, user_id=db_user.id)
-    likes_count = AlbumsCruds(db).get_album_likes_count(album_id=album_id)
+    likes_count = AlbumsCruds(db).get_album_likes_count(album=db_album)
     return LikesInfo(liked=is_liked, likes_count=likes_count)
 
 
