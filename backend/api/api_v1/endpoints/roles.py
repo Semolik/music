@@ -12,10 +12,10 @@ from sqlalchemy.orm import Session
 from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import validate_authorized_user
-router = APIRouter(tags=['Роли'])
+router = APIRouter(tags=['Роли'], prefix='/roles')
 
 
-@router.post('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED)
+@router.post('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED)
 def send_update_role_request(
     formData: UpdateUserRoleRequest = Depends(),
     Authorize: AuthJWT = Depends(),
@@ -52,7 +52,7 @@ def send_update_role_request(
         user_id=db_user.id, message=formData.message, files=db_files, account_status=formData.requested_account_status)
 
 
-@router.get('/change-role', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
+@router.get('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
 def get_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Получение списка запросов на смену типа аккаунта'''
     Authorize.jwt_required()
@@ -60,7 +60,7 @@ def get_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(ge
     return ChangeRolesCruds(db).get_user_change_role_messages(user_id=db_user.id)
 
 
-@router.get('/change-role/has', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=bool)
+@router.get('/change/has', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=bool)
 def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Проверка наличия запросов на смену типа аккаунта'''
     Authorize.jwt_required()
@@ -68,7 +68,7 @@ def user_has_change_requests(Authorize: AuthJWT = Depends(), db: Session = Depen
     return ChangeRolesCruds(db).is_has_change_role_messages(user_id=db_user.id)
 
 
-@router.get('/change-role/all', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
+@router.get('/change/all', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
 def get_all_change_role_requests(
     page: int = Query(1, description='Номер страницы'),
     filter: ChangeRoleRequestStatus = Query(default=None,
@@ -88,7 +88,7 @@ def get_all_change_role_requests(
     return messages
 
 
-@router.post('/change-role/{request_id}/answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=RoleRequestAnswer)
+@router.post('/{request_id}/answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=RoleRequestAnswer)
 def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnswer, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     '''Ответ на запрос на смену типа аккаунта'''
     Authorize.jwt_required()

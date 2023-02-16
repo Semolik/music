@@ -170,7 +170,7 @@ class PublicProfileBase(BaseModel):
     name: str = Query(..., description='Оторажаемое имя', max_length=int(
         env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH')
     ), min_length=1)
-    description: str | None = Query(default=False, description='Описание профиля', max_length=int(
+    description: str | None = Query(default=None, description='Описание профиля', max_length=int(
         env_config.get('VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH')
     ))
 

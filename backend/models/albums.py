@@ -4,8 +4,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime,  Boolean
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 from sqlalchemy.orm import backref
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class AlbumGenre(Base):
@@ -61,7 +61,8 @@ class Album(Base):
                 env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')
             )
         ),
-        nullable=False
+        nullable=False,
+        index=True
     )
     open_date = Column(
         DateTime,
@@ -73,19 +74,23 @@ class Album(Base):
         default=False
     )
 
-    @property
+    @hybrid_property
     def is_opened(self):
         return self.open_date <= datetime.now()
 
-    @property
+    @is_opened.expression
+    def is_opened(cls):
+        return cls.open_date <= datetime.now()
+
+    @hybrid_property
     def year(self):
         return self.open_date.year
 
-    @property
+    @hybrid_property
     def is_available(self):
-        return self.is_opened and self.uploaded
+        return self.is_opened & self.uploaded
 
-    @property
+    @hybrid_property
     def musician_user_id(self):
         return self.musician.user_id
 

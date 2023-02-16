@@ -10,6 +10,9 @@ from sqlalchemy import event
 from pathlib import Path
 import os
 from backend.core.config import settings
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from backend.models.albums import Album
 
 
 class FavoriteTracks(Base):
@@ -57,7 +60,8 @@ class Track(Base):
                 env_config.get('VITE_MAX_TRACK_NAME_LENGTH')
             )
         ),
-        nullable=False
+        nullable=False,
+        index=True
     )
     feat = Column(
         String(
@@ -94,17 +98,25 @@ class Track(Base):
         cascade="all,delete"
     )
 
-    @property
+    @hybrid_property
     def is_opened(self):
         return self.album.is_opened
 
-    @property
+    @is_opened.expression
+    def is_opened(cls):
+        return Album.is_opened
+
+    @hybrid_property
     def album_uploaded(self):
         return self.album.uploaded
 
-    @property
+    @album_uploaded.expression
+    def album_uploaded(cls):
+        return Album.uploaded
+
+    @hybrid_property
     def is_available(self):
-        return self.is_opened and self.album_uploaded
+        return self.is_opened & self.album_uploaded
 
 
 @event.listens_for(Track, "after_delete")

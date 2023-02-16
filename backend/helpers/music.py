@@ -1,10 +1,12 @@
 
 from typing import List
+from uuid import UUID
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_genres import GenresCruds
 from backend.crud.crud_albums import AlbumsCruds
 from sqlalchemy.orm import Session
 from backend.helpers.images import set_picture
+from backend.helpers.urls import get_track_url_by_id
 from backend.models.files import Image
 from backend.models.tracks import Track
 from backend.schemas.music import UploadTrackForm
@@ -68,8 +70,7 @@ def set_full_track_data(db: Session, track: Track, user_id: int = None):
 
 
 def get_track_url(track: Track):
-    return ''.join(
-        [settings.SERVER_LINK, settings.API_V1_STR, settings.UPLOADS_ROUTE, '/tracks/', str(track.id)])
+    return get_track_url_by_id(track_id=track.id)
 
 
 def validate_genres(db: Session, genres_ids: List[int]):

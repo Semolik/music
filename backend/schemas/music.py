@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel,  validator
 from fastapi import Query
+from backend.helpers.urls import get_track_url_by_id
 from backend.schemas.file import ImageLink
 from backend.schemas.links import YoutubeVideoIdToUrl
 from backend.schemas.user import PublicProfile
@@ -96,18 +97,29 @@ class UploadTrackForm(UploadTrackBase):
 
 class TrackAfterUpload(UploadTrackBase):
     id: uuid_pkg.UUID = Query(..., description="ID трека")
-    picture: str | None = Query(..., description="Ссылка на картинку трека")
+    picture: ImageLink | None = Query(...,
+                                      description="Ссылка на картинку трека")
 
 
 class AlbumTrack(TrackAfterUpload):
     duration: float = Query(..., description="Длительность трека")
-    url: str = Query(..., description="Ссылка на трек")
-    liked: bool = Query(..., description="Лайкнут ли трек")
+    url: str = Query(None, description="Ссылка на трек")
+    liked: bool = Query(default=False, description="Лайкнут ли трек")
+
+    @validator("url", always=True)
+    def url_generator(cls, v, values):
+        return get_track_url_by_id(values.get('id'))
+
+    class Config:
+        orm_mode = True
 
 
 class AlbumInfoWithoutMusician(AlbumBase):
     picture: ImageLink = Query(...,
                                description="Ссылка на картинку альбома")
+
+    class Config:
+        orm_mode = True
 
 
 class AlbumInfo(AlbumInfoWithoutMusician):
@@ -165,15 +177,19 @@ class MusicianClipWithoutMusician(CreateMusicianClip):
         orm_mode = True
 
 
-class MusicianClip(MusicianClipWithoutMusician):
-    musician_id: int = Query(..., description="ID музыканта")
+class MusicianInfo(PublicProfile):
+    liked: bool = Query(default=False, description="Лайкнут ли музыкант")
 
     class Config:
         orm_mode = True
 
 
-class MusicianInfo(PublicProfile):
-    liked: bool = Query(default=False, description="Лайкнут ли музыкант")
+class MusicianClip(MusicianClipWithoutMusician):
+
+    musician: MusicianInfo
+
+    class Config:
+        orm_mode = True
 
 
 class MusicianFullInfo(MusicianInfo):

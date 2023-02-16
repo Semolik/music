@@ -29,7 +29,8 @@ class Clip(Base):
     )
     name = Column(
         String(int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH'))),
-        nullable=False
+        nullable=False,
+        index=True
     )
     video_id = Column(
         String(int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH'))),

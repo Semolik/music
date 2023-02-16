@@ -4,6 +4,7 @@ from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
 from backend.schemas.statistics import TrackStats, StatsDay
+from sqlalchemy import func
 
 
 class TracksCrud(CRUDBase):

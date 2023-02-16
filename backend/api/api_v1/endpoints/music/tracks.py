@@ -65,7 +65,11 @@ def get_track(
         current_user_id = db_user.id
     else:
         current_user_id = Authorize.get_jwt_subject()
-    return set_full_track_data(track=db_track, user_id=current_user_id, db=db)
+    track_obj = Track.from_orm(db_track)
+    if current_user_id is not None:
+        track_obj.liked = tracks_crud.track_is_liked(
+            track_id=db_track.id, user_id=current_user_id)
+    return track_obj
 
 
 @router.post('/{track_id}/listening', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)

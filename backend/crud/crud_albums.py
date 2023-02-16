@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from backend.core.config import settings
 from backend.crud.crud_file import FileCruds
 from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
@@ -8,6 +9,7 @@ from backend.models.genres import Genre
 from backend.models.tracks import Track
 from backend.models.albums import Album, FavoriteAlbum
 from backend.models.user import PublicProfile
+from sqlalchemy import func
 
 
 class AlbumsCruds(CRUDBase):

@@ -1,0 +1,8 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    ports:
+      - '8000:8000'
