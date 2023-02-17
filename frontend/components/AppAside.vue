@@ -9,13 +9,13 @@
                 <Icon name="codicon:history" />
                 <span>История прослушивания</span>
             </NuxtLink>
-            <NuxtLink to="/history" class="selection">
-                <Icon name="iconoir:heart" />
+            <NuxtLink to="/favorite/tracks" class="selection">
+                <Icon name="iconoir:music-note" />
                 <span>Любимые треки</span>
             </NuxtLink>
         </div>
         <div class="account-info">
-            <NuxtLink to="/history" class="selection">
+            <NuxtLink to="/login" class="selection">
                 <Icon name="iconoir:log-in" />
                 <span>Войти в аккаунт</span>
             </NuxtLink>
@@ -80,8 +80,8 @@ aside {
             }
         }
         svg {
-            width: 25px;
-            height: 25px;
+            width: 20px;
+            height: 20px;
             color: $primary-text;
             transition: color 0s;
         }
@@ -103,9 +103,6 @@ aside {
     .account-info {
         display: flex;
         flex-direction: column;
-        a.selection {
-            // background-color: $tertiary-bg;
-        }
     }
 }
 </style>

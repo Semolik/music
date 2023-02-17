@@ -1,6 +1,6 @@
 <template>
     <header>
-        <div class="avatar">asds</div>
+        <!-- <el-input placeholder="Please input" /> -->
     </header>
 </template>
 <style lang="scss">
