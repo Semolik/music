@@ -1,6 +1,26 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    modules: ["nuxt-icon", "@element-plus/nuxt"],
+    modules: [
+        "nuxt-icon",
+        "@element-plus/nuxt",
+        "@nuxtjs/tailwindcss",
+        "@nuxtjs/google-fonts",
+        "@pinia/nuxt",
+    ],
+    googleFonts: {
+        families: {
+            "Open+Sans": true,
+        },
+    },
+    nitro: {
+        devProxy: {
+            "/api": {
+                target: "http://localhost:8000/api",
+                changeOrigin: true,
+                prependPath: true,
+            },
+        },
+    },
     css: ["@/assets/styles/global.scss"],
     vite: {
         css: {

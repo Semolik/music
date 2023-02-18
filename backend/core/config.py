@@ -68,7 +68,11 @@ class Settings(BaseSettings):
     AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = 4
     AUTOCOMPLETE_SEARCH_TRACK_LIMIT = 8
     AUTOCOMPLETE_SEARCH_CLIP_LIMIT = 4
-    # SEARCH_ALBUM_LIMIT_PAGE = 20
+
+    SEARCH_ALBUM_LIMIT = 15
+    SEARCH_MUSICIAN_LIMIT = 15
+    SEARCH_TRACK_LIMIT = 30
+    SEARCH_CLIP_LIMIT = 15
 
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']

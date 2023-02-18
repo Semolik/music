@@ -28,9 +28,12 @@ create a .env.local file in the root folder with the following content
 
 <h4>backend</h4>
 
-    uvicorn backend.main:app --host 0.0.0.0 --port 3000
+    uvicorn backend.main:app --host localhost
 
 <h4>frontend</h4>
 
+Before running the frontend server, make sure that the backend server is running as the code generation for the API client relies on it.
+
     cd frontend
+    npm run generate-client
     npm run dev

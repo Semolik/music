@@ -2,21 +2,33 @@
     <aside>
         <div class="selections">
             <NuxtLink to="/" class="selection">
-                <Icon name="iconoir:home" />
+                <Icon name="material-symbols:home-outline-rounded" />
                 <span>Главная</span>
             </NuxtLink>
             <NuxtLink to="/history" class="selection">
-                <Icon name="codicon:history" />
+                <Icon name="material-symbols:history-rounded" />
                 <span>История прослушивания</span>
             </NuxtLink>
             <NuxtLink to="/favorite/tracks" class="selection">
-                <Icon name="iconoir:music-note" />
-                <span>Любимые треки</span>
+                <Icon name="material-symbols:music-note-rounded" />
+                <span>Треки</span>
+            </NuxtLink>
+            <NuxtLink to="/favorite/albums" class="selection">
+                <Icon name="material-symbols:album" />
+                <span>Альбомы</span>
+            </NuxtLink>
+            <NuxtLink to="/favorite/artists" class="selection">
+                <Icon name="material-symbols:person-rounded" />
+                <span>Исполнители</span>
+            </NuxtLink>
+            <NuxtLink to="/favorite/playlists" class="selection">
+                <Icon name="material-symbols:playlist-play-rounded" />
+                <span>Плейлисты</span>
             </NuxtLink>
         </div>
         <div class="account-info">
             <NuxtLink to="/login" class="selection">
-                <Icon name="iconoir:log-in" />
+                <Icon name="material-symbols:logout-rounded" />
                 <span>Войти в аккаунт</span>
             </NuxtLink>
         </div>

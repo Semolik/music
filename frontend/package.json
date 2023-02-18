@@ -5,14 +5,26 @@
         "dev": "nuxt dev --port=4000",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
-        "postinstall": "nuxt prepare"
+        "postinstall": "nuxt prepare",
+        "generate-client": "openapi --input http://localhost:8000/openapi.json --output ./client --client axios"
     },
     "devDependencies": {
         "@element-plus/nuxt": "^1.0.3",
+        "@nuxtjs/tailwindcss": "^6.4.1",
         "nuxt": "^3.2.0",
+        "openapi-typescript-codegen": "^0.23.0",
         "sass": "^1.58.1"
     },
     "dependencies": {
-        "nuxt-icon": "^0.3.2"
+        "@nuxt/types": "^2.16.0",
+        "@nuxtjs/dotenv": "^1.4.1",
+        "@nuxtjs/google-fonts": "^3.0.0-1",
+        "@pinia/nuxt": "^0.4.6",
+        "axios": "^1.3.3",
+        "nuxt-icon": "^0.3.2",
+        "pinia": "^2.0.30"
+    },
+    "overrides": {
+        "vue": "latest"
     }
 }
