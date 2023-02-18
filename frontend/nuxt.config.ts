@@ -12,6 +12,7 @@ export default defineNuxtConfig({
             "Open+Sans": true,
         },
     },
+    plugins: [{ src: "~/plugins/autoAnimatePlugin.js", mode: `client` }],
     nitro: {
         devProxy: {
             "/api": {

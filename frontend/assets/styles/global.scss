@@ -16,3 +16,15 @@ body {
         opacity 0.2s;
     font-family: "Open Sans", sans-serif;
 }
+// style scroll-bar
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: $secondary-bg;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: $quinary-bg;
+    border-radius: 10px;
+}

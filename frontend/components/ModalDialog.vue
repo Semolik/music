@@ -22,12 +22,6 @@
                         <div class="modal-content">
                             <slot name="content"></slot>
                         </div>
-                        <div class="modal-buttons">
-                            <slot
-                                name="buttons"
-                                :closeModal="closeModal"
-                            ></slot>
-                        </div>
                     </div>
                 </div>
             </Transition>
@@ -58,10 +52,7 @@ const props = defineProps({
         type: Number,
         default: 800,
     },
-    padding: {
-        type: Number,
-        default: 10,
-    },
+
     offOutsideClickClose: {
         type: Boolean,
         default: false,
@@ -73,7 +64,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["update:active"]);
+const emit = defineEmits(["update:active", "mounted", "close"]);
 const transitionString = computed(() => {
     return `${props.transition}ms`;
 });
@@ -83,9 +74,7 @@ const width = computed(() => {
 const height = computed(() => {
     return `${props.maxHeight}px`;
 });
-const paddingString = computed(() => {
-    return `${props.padding}px`;
-});
+
 const gapString = computed(() => {
     return `${props.gap}px`;
 });
@@ -93,14 +82,19 @@ const isClosing = ref(false);
 const isActive = ref(true);
 const closeModal = () => {
     isClosing.value = true;
+
     setTimeout(() => {
         emit("update:active", false);
+        emit("close");
         isActive.value = false;
         isClosing.value = false;
     }, props.transition);
 };
 const openModal = () => {
     isActive.value = true;
+    setTimeout(() => {
+        emit("mounted");
+    }, props.transition);
 };
 watch(
     () => props.active,
@@ -170,7 +164,7 @@ watch(
         border-radius: 10px;
         display: flex;
         flex-direction: column;
-        padding: v-bind(paddingString);
+
         gap: v-bind(gapString);
 
         .description {
