@@ -7,7 +7,7 @@ env_config = {**dotenv_values('.env'), **dotenv_values(".env.local"), }
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
-    SERVER_LINK: str = 'http://localhost:3000'
+    SERVER_LINK: str = 'http://localhost:8000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         'http://localhost:4000', 'http://192.168.50.106:4000', 'http://192.168.1.133:4000']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
@@ -41,8 +41,10 @@ class Settings(BaseSettings):
     TEST_MUSICIAN_PASSWORD = 'musician_test_password'
     TEST_ANOTHER_MUSICIAN_USERNAME = 'musician_another'
     PAGINATION_LIMIT = 20
+    # IMAGE_URL_BASE = ''.join(
+    #     [SERVER_LINK, API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
     IMAGE_URL_BASE = ''.join(
-        [SERVER_LINK, API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
+        [API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
     UUID_REGEX = '[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}'
 
     class Config:
@@ -64,15 +66,19 @@ class Settings(BaseSettings):
         UserTypeEnum.musician: "Музыкант",
     }
 
-    AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = 4
-    AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = 4
-    AUTOCOMPLETE_SEARCH_TRACK_LIMIT = 8
-    AUTOCOMPLETE_SEARCH_CLIP_LIMIT = 4
+    AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = int(
+        env_config.get('VITE_AUTOCOMPLETE_SEARCH_ALBUM_LIMIT'))
+    AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = int(
+        env_config.get('VITE_AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT'))
+    AUTOCOMPLETE_SEARCH_TRACK_LIMIT = int(
+        env_config.get('VITE_AUTOCOMPLETE_SEARCH_TRACK_LIMIT'))
+    AUTOCOMPLETE_SEARCH_CLIP_LIMIT = int(
+        env_config.get('VITE_AUTOCOMPLETE_SEARCH_CLIP_LIMIT'))
 
-    SEARCH_ALBUM_LIMIT = 15
-    SEARCH_MUSICIAN_LIMIT = 15
-    SEARCH_TRACK_LIMIT = 30
-    SEARCH_CLIP_LIMIT = 15
+    SEARCH_ALBUM_LIMIT = int(env_config.get('VITE_SEARCH_ALBUM_LIMIT'))
+    SEARCH_MUSICIAN_LIMIT = int(env_config.get('VITE_SEARCH_MUSICIAN_LIMIT'))
+    SEARCH_TRACK_LIMIT = int(env_config.get('VITE_SEARCH_TRACK_LIMIT'))
+    SEARCH_CLIP_LIMIT = int(env_config.get('VITE_SEARCH_CLIP_LIMIT'))
 
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']

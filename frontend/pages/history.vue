@@ -1,1 +1,3 @@
-<template>История</template>
+<template></template>
+
+<script setup></script>

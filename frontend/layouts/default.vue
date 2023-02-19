@@ -1,5 +1,3 @@
-import AppHeader from '~~/components/AppHeader.vue';
-
 <template>
     <div class="default-layout">
         <AppAside />
