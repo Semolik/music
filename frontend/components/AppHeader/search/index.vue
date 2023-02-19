@@ -27,7 +27,7 @@
             >
                 <div
                     :class="['back-button', { active: category === 'all' }]"
-                    @click="category = 'all'"
+                    @[click]="category = 'all'"
                 >
                     <Icon name="material-symbols:arrow-back-rounded" />
                     <span>Назад</span>
@@ -36,13 +36,17 @@
                     {{ categoriesNames[category] }}
                 </div>
             </div>
-
             <div class="results" v-if="hasResults">
-                <template v-if="results.musicians">
+                <template v-if="musicianInResult">
                     <div
-                        class="results-item-title"
+                        :class="[
+                            'results-item-title',
+                            { active: musicianHasMoreResults },
+                        ]"
                         v-if="category === 'all'"
-                        @click="category = 'musicians'"
+                        @[musicianHasMoreResults&&`click`]="
+                            category = 'musicians'
+                        "
                     >
                         <span>{{ categoriesNames["musicians"] }}</span>
                         <Icon name="material-symbols:arrow-forward-rounded" />
@@ -50,11 +54,40 @@
                     <div
                         v-if="['all', 'musicians'].includes(category)"
                         class="results-item musicians"
+                        :style="{
+                            '--columns': AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT,
+                        }"
                     >
                         <MusicianCard
                             v-for="artist in results.musicians"
                             :key="artist.id"
                             :musician="artist"
+                        />
+                    </div>
+                </template>
+                <template v-if="albumsInResult">
+                    <div
+                        :class="[
+                            'results-item-title',
+                            { active: albumsHasMoreResults },
+                        ]"
+                        v-if="category === 'all'"
+                        @[albumsHasMoreResults&&`click`]="category = 'albums'"
+                    >
+                        <span>{{ categoriesNames["albums"] }}</span>
+                        <Icon name="material-symbols:arrow-forward-rounded" />
+                    </div>
+                    <div
+                        v-if="['all', 'albums'].includes(category)"
+                        class="results-item albums"
+                        :style="{
+                            '--columns': AUTOCOMPLETE_SEARCH_ALBUM_LIMIT,
+                        }"
+                    >
+                        <AlbumCard
+                            v-for="album in results.albums"
+                            :album="album"
+                            :key="album.id"
                         />
                     </div>
                 </template>
@@ -73,12 +106,26 @@ const props = defineProps({
         default: false,
     },
 });
+const AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = 4;
+const AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = 4;
 const searchInput = ref(null);
 const results = reactive({
     albums: null,
     musicians: null,
     playlists: null,
     tracks: null,
+});
+const musicianInResult = computed(
+    () => results.musicians && results.musicians.length
+);
+const musicianHasMoreResults = computed(() => {
+    if (!musicianInResult) return;
+    return results.musicians.length === AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT;
+});
+const albumsInResult = computed(() => results.albums && results.albums.length);
+const albumsHasMoreResults = computed(() => {
+    if (!albumsInResult) return;
+    return results.albums.length === AUTOCOMPLETE_SEARCH_ALBUM_LIMIT;
 });
 const categoriesNames = {
     albums: "Альбомы",
@@ -204,6 +251,7 @@ const onSearchActiveUpdate = (val) => {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            overflow: auto;
             .results-item-title {
                 color: $secondary-text;
                 display: flex;
@@ -216,24 +264,31 @@ const onSearchActiveUpdate = (val) => {
                 user-select: none;
                 position: relative;
                 transition: 0.2s ease all;
-
-                &::after {
-                    position: absolute;
-                    width: 0%;
-                    content: "";
-                    bottom: -1px;
-                    border-radius: 5px;
-                    display: block;
-                    height: 1px;
-                    background-color: $tertiary-text;
-                    transition: 0.2s width;
-                }
-                &:hover {
-                    color: $primary-text;
+                &.active {
                     &::after {
-                        background-color: $primary-text;
-                        width: 100%;
+                        position: absolute;
+                        width: 0%;
+                        content: "";
+                        bottom: -1px;
+                        border-radius: 5px;
+                        display: block;
+                        height: 1px;
+                        background-color: $tertiary-text;
+                        transition: 0.2s width;
                     }
+                    &:hover {
+                        color: $primary-text;
+                        &::after {
+                            background-color: $primary-text;
+                            width: 100%;
+                        }
+                    }
+                    svg {
+                        display: block;
+                    }
+                }
+                svg {
+                    display: none;
                 }
             }
 
@@ -242,11 +297,20 @@ const onSearchActiveUpdate = (val) => {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 10px;
-
-                &.musicians {
-                    display: grid;
-                    grid-template-columns: repeat(5, 1fr);
-                }
+                display: grid;
+                grid-template-columns: repeat(var(--columns), 1fr);
+                // &.musicians {
+                //     grid-template-columns: repeat(
+                //         v-bind(AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT),
+                //         1fr
+                //     );
+                // }
+                // &.albums {
+                //     grid-template-columns: repeat(
+                //         v-bind(AUTOCOMPLETE_SEARCH_ALBUM_LIMIT),
+                //         1fr
+                //     );
+                // }
             }
         }
         .el-input {

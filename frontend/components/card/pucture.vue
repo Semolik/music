@@ -1,19 +1,23 @@
 <template>
-    <div class="musician-avatar">
-        <img :src="avatar" v-if="avatar" />
+    <div class="card-picture">
+        <img :src="picture" v-if="picture" />
         <Icon name="material-symbols:person-rounded" v-else />
     </div>
 </template>
 <script setup>
-const { avatar } = defineProps({
-    avatar: {
+const { picture, icon } = defineProps({
+    picture: {
         type: [String, null],
+        required: true,
+    },
+    icon: {
+        type: String,
         required: true,
     },
 });
 </script>
 <style lang="scss">
-.musician-avatar {
+.card-picture {
     @include flex-center;
     width: 100%;
 

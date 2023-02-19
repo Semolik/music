@@ -14,14 +14,14 @@ from backend.helpers.music import set_album_info, set_album_tracks,  validate_ge
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, MusicianInfo, TrackAfterUpload, UpdateAlbum, UploadTrackForm
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, CreateAlbumJson, MusicianInfo, TrackAfterUpload, UpdateAlbum, UpdateAlbumJson, UploadTrackForm
 from backend.helpers.images import save_image, set_picture
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
 @router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload, status_code=status.HTTP_201_CREATED)
 def create_album(
-    albumData: CreateAlbum,
+    albumData: CreateAlbumJson,
     albumPicture: UploadFile = File(..., description='Картинка альбома'),
     Authorize: AuthJWT = Depends(),
     db: Session = Depends(get_db)
@@ -69,7 +69,7 @@ def close_album_uploading(
 
 @router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def update_album(
-    albumData: UpdateAlbum,
+    albumData: UpdateAlbumJson,
     album_id: int = Query(..., description='ID альбома'),
     albumPicture: UploadFile = File(
         default=False, description='Картинка альбома'),

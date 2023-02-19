@@ -1,8 +1,9 @@
 <template>
-    <div class="musician-card">
-        <musician-avatar :avatar="musician.picture" />
-        <div class="musician-card-name">{{ musician.name }}</div>
-    </div>
+    <card
+        :text="musician.name"
+        :picture="musician.picture"
+        icon="material-symbols:person-rounded"
+    />
 </template>
 <script setup>
 const { musician } = defineProps({
@@ -12,12 +13,3 @@ const { musician } = defineProps({
     },
 });
 </script>
-<style lang="scss">
-.musician-card {
-    @include flex-center;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    gap: 5px;
-}
-</style>

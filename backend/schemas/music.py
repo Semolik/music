@@ -12,7 +12,7 @@ from backend.core.config import env_config
 from backend.helpers.forms import ValidateJsonWithFormBody
 
 
-class CreateAlbumBase(ValidateJsonWithFormBody):
+class CreateAlbumBase(BaseModel):
     name: str = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_ALBUM_NAME_LENGTH')),
@@ -26,9 +26,17 @@ class CreateAlbum(CreateAlbumBase):
     genres_ids: List[int] | None = Query([], description="Список ID жанров")
 
 
+class CreateAlbumJson(ValidateJsonWithFormBody, CreateAlbum):
+    ...
+
+
 class UpdateAlbum(CreateAlbum):
     tracks_ids: List[uuid_pkg.UUID] = Query(...,
                                             description="Список ID треков")
+
+
+class UpdateAlbumJson(UpdateAlbum, ValidateJsonWithFormBody):
+    ...
 
 
 @form_body
@@ -132,9 +140,15 @@ class AlbumInfo(AlbumInfoWithoutMusician):
 class AlbumWithTracks(AlbumInfo):
     tracks: List[AlbumTrack] = Query(..., description="Список треков альбома")
 
+    class Config:
+        orm_mode = True
+
 
 class Track(AlbumTrack):
     album: AlbumInfo = Query(..., description="Информация об альбоме")
+
+    class Config:
+        orm_mode = True
 
 
 class CreateMusicianClip(BaseModel):

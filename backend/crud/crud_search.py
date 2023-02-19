@@ -3,7 +3,7 @@
 from backend.core.config import settings
 from backend.db.base import CRUDBase
 from backend.models.albums import Album
-from sqlalchemy import func, and_
+from sqlalchemy import func
 from backend.models.user import PublicProfile
 from backend.models.tracks import Track
 from backend.models.clips import Clip
