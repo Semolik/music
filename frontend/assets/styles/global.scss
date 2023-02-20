@@ -16,7 +16,7 @@ body {
         opacity 0.2s;
     font-family: "Open Sans", sans-serif;
 }
-// style scroll-bar
+
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -27,4 +27,13 @@ body {
 ::-webkit-scrollbar-thumb {
     background: $quinary-bg;
     border-radius: 10px;
+}
+.primary-text {
+    color: $primary-text;
+}
+.secondary-text {
+    color: $secondary-text;
+}
+.tertiary-text {
+    color: $tertiary-text;
 }

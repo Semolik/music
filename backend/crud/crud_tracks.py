@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List
+from uuid import UUID
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
@@ -8,7 +9,7 @@ from sqlalchemy import func
 
 
 class TracksCrud(CRUDBase):
-    def get_track(self, track_id: int) -> Track:
+    def get_track(self, track_id: UUID) -> Track:
         return self.get(id=track_id, model=Track)
 
     def toggle_like_track(self, track_id: int, user_id: int):

@@ -7,6 +7,13 @@ export default defineNuxtConfig({
         "@nuxtjs/google-fonts",
         "@pinia/nuxt",
     ],
+    runtimeConfig: {
+        public: {
+            musicianIcon: "material-symbols:person-rounded",
+            albumIcon: "material-symbols:album",
+            trackIcon: "material-symbols:music-note-rounded",
+        },
+    },
     googleFonts: {
         families: {
             "Open+Sans": true,

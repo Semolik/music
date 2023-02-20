@@ -1,0 +1,234 @@
+<template>
+    <ModalDialog
+        :active="props.searchActive"
+        @update:active="onSearchActiveUpdate"
+        id="search-modal"
+        :max-width="650"
+        :max-height="650"
+        off-justify-content
+        @mounted="focus"
+        @close="resetSearch"
+    >
+        <template #header>
+            <span class="font-medium mb-2 p-2 text-center">
+                Поиск по трекам, альбомам, клипам, исполнителям и плейлистам
+            </span>
+        </template>
+        <template #content>
+            <el-input
+                placeholder="Введите запрос"
+                v-model="searchQuery"
+                size="large"
+                ref="searchInput"
+            />
+            <div :class="['results-categories']">
+                <div
+                    :class="[
+                        'results-categories-item',
+                        { active: category === key },
+                    ]"
+                    @click="category = key"
+                    v-for="(_, key) in results"
+                >
+                    {{ categoriesNames[key] }}
+                </div>
+            </div>
+            <div
+                :class="['results', category]"
+                :style="{ '--columns': category == 'tracks' ? 1 : 4 }"
+            >
+                <template v-if="category === 'all'">
+                    <template v-for="item in results.all">
+                        <AlbumCard
+                            v-if="item.type == 'album'"
+                            :album="item.info"
+                            min
+                        />
+                        <MusicianCard
+                            v-if="item.type == 'musician'"
+                            :musician="item.info"
+                            min
+                        />
+                        <TrackCard
+                            v-if="item.type == 'track'"
+                            :track="item.info"
+                        />
+                    </template>
+                </template>
+                <template v-if="category === 'musicians'">
+                    <MusicianCard
+                        v-for="artist in results.musicians"
+                        :musician="artist"
+                    />
+                </template>
+                <template v-if="category === 'tracks'">
+                    <TrackCard v-for="track in results.tracks" :track="track" />
+                </template>
+                <template v-if="category === 'albums'">
+                    <AlbumCard v-for="album in results.albums" :album="album" />
+                </template>
+            </div>
+        </template>
+    </ModalDialog>
+</template>
+
+<script setup>
+import { Service } from "@/client";
+
+const emit = defineEmits(["update:searchActive"]);
+const props = defineProps({
+    searchActive: {
+        type: Boolean,
+        default: false,
+    },
+});
+const searchInput = ref(null);
+const results = reactive({
+    all: [],
+    albums: [],
+    musicians: [],
+    playlists: [],
+    tracks: [],
+});
+
+const categoriesNames = {
+    all: "Топ",
+    albums: "Альбомы",
+    musicians: "Исполнители",
+    playlists: "Плейлисты",
+    tracks: "Треки",
+};
+
+const focus = () => {
+    const input = searchInput.value;
+    if (input) {
+        input.focus();
+    }
+};
+const resetSearch = () => {
+    searchQuery.value = "";
+    category.value = "all";
+    for (const key in results) {
+        results[key] = [];
+    }
+};
+const category = ref("all");
+const searchQuery = ref("");
+watch([searchQuery, category], async ([val, category]) => {
+    if (!val) {
+        for (const key in results) {
+            results[key] = [];
+        }
+        return;
+    }
+    switch (category) {
+        case "all":
+            const result_all = await Service.searchApiV1SearchAutocompleteGet(
+                val
+            );
+            results.all = result_all;
+            break;
+        case "musicians":
+            const result_musicians =
+                await Service.searchMusicianApiV1SearchMusicianGet(val);
+            results.musicians = result_musicians;
+            break;
+        case "albums":
+            const result_albums = await Service.searchAlbumApiV1SearchalbumGet(
+                val
+            );
+            results.albums = result_albums;
+            break;
+        case "tracks":
+            const result_tracks = await Service.searchTrackApiV1SearchTrackGet(
+                val
+            );
+            results.tracks = result_tracks;
+            break;
+    }
+});
+const onSearchActiveUpdate = (val) => {
+    emit("update:searchActive", val);
+};
+</script>
+
+<style lang="scss">
+#search-modal {
+    padding-top: 20vh;
+
+    .modal-content {
+        width: 100%;
+        justify-content: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        .results-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            .results-categories-item {
+                @include flex-center;
+                gap: 10px;
+                flex-grow: 1;
+                padding: 5px 20px;
+                border-radius: 10px;
+                background-color: $quinary-bg;
+                white-space: nowrap;
+                cursor: pointer;
+                user-select: none;
+                border: 1px solid transparent;
+                &:not(.active):hover {
+                    background-color: $quaternary-bg;
+                }
+                &.active {
+                    border-color: $accent;
+                    cursor: auto;
+                }
+            }
+        }
+        .results {
+            height: 100%;
+            transition: 0.3s ease all;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: auto;
+            &.all {
+                .results-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 5px;
+                    height: 70px;
+                    // height: 60px;
+                }
+            }
+            &:not(.all) {
+                display: grid;
+                grid-template-columns: repeat(var(--columns), 1fr);
+            }
+
+            //     width: 100%;
+            //     display: flex;
+            //     flex-wrap: wrap;
+            //     gap: 10px;
+            //     display: grid;
+            //     grid-template-columns: repeat(var(--columns), 1fr);
+            // }
+        }
+        .el-input {
+            --el-input-bg-color: #{$quaternary-bg};
+            --el-input-border-color: transparent;
+            --el-input-hover-border-color: transparent;
+            --el-input-focus-border-color: transparent;
+            --el-input-height: 60px;
+            --el-input-text-color: #{$primary-text};
+            .el-input__wrapper {
+                font-size: large;
+            }
+        }
+    }
+}
+</style>

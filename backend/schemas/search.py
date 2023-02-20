@@ -1,7 +1,8 @@
 from typing import List
+from typing import Union
 from pydantic import BaseModel
 
-from backend.schemas.music import AlbumInfo, AlbumTrack, MusicianClip
+from backend.schemas.music import AlbumInfo, Track, MusicianClip
 from backend.schemas.user import PublicProfile
 
 
@@ -13,7 +14,7 @@ class SearchAlbum(AlbumInfo):
     ...
 
 
-class SearchTrack(AlbumTrack):
+class SearchTrack(Track):
     ...
 
 
@@ -21,8 +22,10 @@ class SearchClip(MusicianClip):
     ...
 
 
-class AllSearch(BaseModel):
-    albums: List[SearchAlbum] = []
-    tracks: List[SearchTrack] = []
-    musicians: List[SearchMusician] = []
-    clips: List[SearchClip] = []
+class AllSearchItem(BaseModel):
+    type: str
+    info: Union[SearchMusician, AlbumInfo, SearchTrack, SearchClip]
+    likes_count: int
+
+    class Class:
+        orm_mode = True

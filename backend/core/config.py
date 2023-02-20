@@ -74,6 +74,7 @@ class Settings(BaseSettings):
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_TRACK_LIMIT'))
     AUTOCOMPLETE_SEARCH_CLIP_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_CLIP_LIMIT'))
+    AUTOCOMPLETE_SEARCH_ALL_LIMIT = 30
 
     SEARCH_ALBUM_LIMIT = int(env_config.get('VITE_SEARCH_ALBUM_LIMIT'))
     SEARCH_MUSICIAN_LIMIT = int(env_config.get('VITE_SEARCH_MUSICIAN_LIMIT'))
