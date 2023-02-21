@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from backend.helpers.images import set_picture
 from backend.helpers.urls import get_track_url_by_id
 from backend.models.files import Image
+from backend.models.playlists import Playlist
 from backend.models.tracks import Track
 from backend.schemas.music import UploadTrackForm
 from backend.crud.crud_user import UserCruds
@@ -98,6 +99,38 @@ def is_album_showed(db: Session, album: Album, user_id: int):
         if user_id is None or not AlbumsCruds(db).album_belongs_to_user(album=album, user_id=user_id):
             return False
     return True
+
+
+def is_playlist_showed(playlist: Playlist, user_id: int):
+    if playlist.private:
+        if user_id is None or not playlist.user_id == user_id:
+            return False
+    return True
+
+
+def validate_tracks(db: Session, tracks_ids: List[UUID], user_id: int) -> List[Track]:
+    not_found_tracks_ids = []
+    tracks = []
+    if tracks_ids:
+        for track_id in tracks_ids:
+            track = TracksCrud(db).get_track(track_id=track_id)
+            if not track:
+                not_found_tracks_ids.append(track_id)
+            elif not track.is_opened:
+                if AlbumsCruds(db).album_belongs_to_user(album=track.album, user_id=user_id):
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                        detail="Трек не опубликован")
+                else:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                        detail="Трек не найден")
+            else:
+                tracks.append(track)
+        not_fount_tracks_count = len(not_found_tracks_ids)
+        if not_fount_tracks_count > 0:
+            letter = 'ы' if not_fount_tracks_count > 1 else ''
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Трек{letter} с id {','.join(map(str, not_found_tracks_ids))} не найден{letter}")
+    return tracks
 
 
 def set_album_info(db_album: Album):

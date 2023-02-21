@@ -30,7 +30,7 @@ class Genre(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="delete, delete-orphan"
+        cascade="all,delete",
     )
 
 

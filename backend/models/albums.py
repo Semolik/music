@@ -52,7 +52,7 @@ class Album(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="delete, delete-orphan",
+        cascade="all,delete",
         backref="album_picture"
     )
     name = Column(

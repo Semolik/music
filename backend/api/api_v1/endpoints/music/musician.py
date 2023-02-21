@@ -4,13 +4,11 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.users import get_musician_profile_as_dict, get_public_profile_as_dict
 from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.music import set_album_info
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 

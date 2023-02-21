@@ -62,7 +62,7 @@ class ChangeRoleRequest(Base):
         uselist=False,
         backref=backref(
             "request",
-            cascade="delete, delete-orphan",
+            cascade="all,delete",
             uselist=False
         )
     )

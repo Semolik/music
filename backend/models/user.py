@@ -72,7 +72,7 @@ class User(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="delete, delete-orphan"
+        cascade="all,delete",
     )
 
 
@@ -104,7 +104,7 @@ class PublicProfile(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="delete, delete-orphan"
+        cascade="all,delete",
     )
     user_id = Column(
         Integer,
@@ -117,7 +117,7 @@ class PublicProfile(Base):
         backref=backref(
             "public_profile",
             uselist=False,
-            cascade="delete, delete-orphan"
+            cascade="all,delete",
         )
     )
 
