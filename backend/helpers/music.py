@@ -108,6 +108,21 @@ def is_playlist_showed(playlist: Playlist, user_id: int):
     return True
 
 
+def validate_track(db: Session, track_id: UUID, user_id: int) -> Track:
+    track = TracksCrud(db).get_track(track_id=track_id)
+    if not track:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Трек не найден")
+    if not track.is_opened:
+        if AlbumsCruds(db).album_belongs_to_user(album=track.album, user_id=user_id):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Трек не опубликован")
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Трек не найден")
+    return track
+
+
 def validate_tracks(db: Session, tracks_ids: List[UUID], user_id: int) -> List[Track]:
     not_found_tracks_ids = []
     tracks = []

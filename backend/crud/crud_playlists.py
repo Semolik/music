@@ -31,13 +31,11 @@ class PlaylistsCrud(CRUDBase):
     def get_tracks_by_playlist_id(self, playlist_id: UUID, user_id: int):
         return self.db.query(PlaylistTrack).filter(PlaylistTrack.track.is_avaible, PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.user_id == user_id).all()
 
-    def add_tracks_to_playlist(self, db_playlist: Playlist, db_tracks: List[Track], user_id: int):
-        for track in db_tracks:
-            playlist_track = PlaylistTrack(
-                playlist_id=db_playlist.id,
-                track_id=track.id,
+    def add_track_to_playlist(self, playlist_id: UUID, track_id: UUID, user_id: int):
+        return self.create(
+            PlaylistTrack(
+                playlist_id=playlist_id,
+                track_id=track_id,
                 user_id=user_id
             )
-            self.db.add(playlist_track)
-        self.db.commit()
-        return db_playlist
+        )
