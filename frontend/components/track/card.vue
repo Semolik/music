@@ -37,14 +37,14 @@ const props = reactive({
 .track-dots-button-container {
     @include flex-center;
     color: $secondary-text;
-    gap: 5px;
+    gap: 8px;
     padding-right: 0.5rem;
     .track-dots-button {
-        border-radius: 5px;
+        border-radius: 50%;
         @include flex-center;
 
         height: min-content;
-        padding: 10px;
+        padding: 8px;
         &:hover {
             background-color: $quaternary-bg;
         }

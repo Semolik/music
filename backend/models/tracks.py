@@ -84,7 +84,7 @@ class Track(Base):
         foreign_keys=[album_id],
         backref=backref(
             "tracks",
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     track_position = Column(Integer)
@@ -95,7 +95,7 @@ class Track(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="all,delete"
+        cascade="delete, delete-orphan"
     )
 
     @hybrid_property
@@ -145,7 +145,7 @@ class ListenTrackHistoryItem(Base):
         foreign_keys=[track_id],
         backref=backref(
             "history",
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     user_id = Column(
@@ -158,7 +158,7 @@ class ListenTrackHistoryItem(Base):
         foreign_keys=[user_id],
         backref=backref(
             "listen_track_history",
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     listen_datetime = Column(

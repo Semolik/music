@@ -44,5 +44,5 @@ class Clip(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="all,delete"
+        cascade="delete, delete-orphan"
     )

@@ -69,8 +69,11 @@ class User(Base):
             ondelete='SET NULL'
         )
     )
-    picture = relationship("Image", foreign_keys=[
-                           picture_id], cascade="all,delete")
+    picture = relationship(
+        "Image",
+        foreign_keys=[picture_id],
+        cascade="delete, delete-orphan"
+    )
 
 
 class PublicProfile(Base):
@@ -101,7 +104,7 @@ class PublicProfile(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="all,delete"
+        cascade="delete, delete-orphan"
     )
     user_id = Column(
         Integer,
@@ -114,7 +117,7 @@ class PublicProfile(Base):
         backref=backref(
             "public_profile",
             uselist=False,
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
 
@@ -129,7 +132,7 @@ class PublicProfileLinks(Base):
         backref=backref(
             "links",
             uselist=False,
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     telegram = Column(

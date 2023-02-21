@@ -5,6 +5,7 @@ from backend.models.albums import *
 from backend.models.tracks import *
 from backend.models.genres import *
 from backend.models.clips import *
+from backend.models.playlists import *
 
 
 from backend.core.config import settings

@@ -30,7 +30,7 @@ class Genre(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="all,delete"
+        cascade="delete, delete-orphan"
     )
 
 
@@ -58,7 +58,7 @@ class LovedGenre(Base):
         backref=backref(
             "loved_genres",
             uselist=True,
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     user = relationship(
@@ -67,6 +67,6 @@ class LovedGenre(Base):
         backref=backref(
             "loved_genres",
             uselist=True,
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )

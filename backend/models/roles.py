@@ -30,7 +30,7 @@ class ChangeRoleRequest(Base):
         foreign_keys=[user_id],
         backref=backref(
             "change_role_requests",
-            cascade="all,delete"
+            cascade="delete, delete-orphan"
         )
     )
     message = Column(String)
@@ -62,7 +62,7 @@ class ChangeRoleRequest(Base):
         uselist=False,
         backref=backref(
             "request",
-            cascade="all,delete",
+            cascade="delete, delete-orphan",
             uselist=False
         )
     )

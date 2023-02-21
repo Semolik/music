@@ -21,7 +21,7 @@
                 size="large"
                 ref="searchInput"
             />
-            <div :class="['results-categories']">
+            <div :class="['results-categories']" v-if="searchQuery">
                 <div
                     :class="[
                         'results-categories-item',
@@ -36,6 +36,7 @@
             <div
                 :class="['results', category]"
                 :style="{ '--columns': category == 'tracks' ? 1 : 4 }"
+                v-if="isFound || searching"
             >
                 <template v-if="category === 'all'">
                     <template v-for="item in results.all">
@@ -68,6 +69,10 @@
                     <AlbumCard v-for="album in results.albums" :album="album" />
                 </template>
             </div>
+            <div class="not-found" v-else-if="searchQuery">
+                по вашему запросу ничего не найдено
+            </div>
+            <div class="recomendations" v-else>рекомендации</div>
         </template>
     </ModalDialog>
 </template>
@@ -90,6 +95,11 @@ const results = reactive({
     playlists: [],
     tracks: [],
 });
+const category = ref("all");
+const searching = ref(false);
+const isFound = computed(
+    () => results[category.value] && results[category.value].length > 0
+);
 
 const categoriesNames = {
     all: "Топ",
@@ -112,38 +122,44 @@ const resetSearch = () => {
         results[key] = [];
     }
 };
-const category = ref("all");
+
 const searchQuery = ref("");
 watch([searchQuery, category], async ([val, category]) => {
     if (!val) {
         for (const key in results) {
             results[key] = [];
         }
+        searching.value = false;
         return;
     }
+    searching.value = true;
     switch (category) {
         case "all":
             const result_all = await Service.searchApiV1SearchAutocompleteGet(
                 val
             );
             results.all = result_all;
+            searching.value = false;
             break;
         case "musicians":
             const result_musicians =
                 await Service.searchMusicianApiV1SearchMusicianGet(val);
             results.musicians = result_musicians;
+            searching.value = false;
             break;
         case "albums":
             const result_albums = await Service.searchAlbumApiV1SearchalbumGet(
                 val
             );
             results.albums = result_albums;
+            searching.value = false;
             break;
         case "tracks":
             const result_tracks = await Service.searchTrackApiV1SearchTrackGet(
                 val
             );
             results.tracks = result_tracks;
+            searching.value = false;
             break;
     }
 });
@@ -163,6 +179,7 @@ const onSearchActiveUpdate = (val) => {
         flex-direction: column;
         gap: 10px;
         padding: 15px;
+        min-height: 250px;
         .results-categories {
             display: flex;
             flex-wrap: wrap;
@@ -217,6 +234,11 @@ const onSearchActiveUpdate = (val) => {
             //     display: grid;
             //     grid-template-columns: repeat(var(--columns), 1fr);
             // }
+        }
+        .not-found {
+            @include flex-center;
+            height: 100%;
+            color: $secondary-text;
         }
         .el-input {
             --el-input-bg-color: #{$quaternary-bg};
