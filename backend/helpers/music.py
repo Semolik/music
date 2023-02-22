@@ -12,6 +12,7 @@ from backend.models.playlists import Playlist
 from backend.models.tracks import Track
 from backend.schemas.music import UploadTrackForm
 from backend.crud.crud_user import UserCruds
+from backend.crud.crud_playlists import PlaylistsCrud
 from backend.db.base import CRUDBase
 from pydub import AudioSegment
 from fastapi import UploadFile, HTTPException, status
@@ -106,6 +107,31 @@ def is_playlist_showed(playlist: Playlist, user_id: int):
         if user_id is None or not playlist.user_id == user_id:
             return False
     return True
+
+
+def validate_playlist_owner(db: Session, playlist_id: int, user_id: int) -> Playlist:
+    playlist = PlaylistsCrud(db).get_playlist_info(playlist_id=playlist_id)
+    if not playlist:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Плейлист не найден")
+    if not is_playlist_showed(playlist=playlist, user_id=user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Плейлист не найден")
+    if playlist.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Нет доступа")
+    return playlist
+
+
+def validate_public_playlist(db: Session, playlist_id: int, user_id: int) -> Playlist:
+    playlist = PlaylistsCrud(db).get_playlist_info(playlist_id=playlist_id)
+    if not playlist:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Плейлист не найден")
+    if not is_playlist_showed(playlist=playlist, user_id=user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Плейлист не найден")
+    return playlist
 
 
 def validate_track(db: Session, track_id: UUID, user_id: int) -> Track:

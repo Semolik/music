@@ -20,7 +20,6 @@ class File(BaseModel):
 
         return ''.join(
             [
-                settings.SERVER_LINK,
                 settings.API_V1_STR,
                 settings.UPLOADS_ROUTE,
                 settings.OTHER_FILES_ROUTE,

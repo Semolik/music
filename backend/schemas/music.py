@@ -108,6 +108,9 @@ class TrackAfterUpload(UploadTrackBase):
     picture: ImageLink | None = Query(...,
                                       description="Ссылка на картинку трека")
 
+    class Config:
+        orm_mode = True
+
 
 class AlbumTrack(TrackAfterUpload):
     duration: float = Query(..., description="Длительность трека")

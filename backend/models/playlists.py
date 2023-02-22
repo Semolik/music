@@ -78,6 +78,10 @@ class PlaylistTrack(Base):
     playlist = relationship("Playlist", foreign_keys=[playlist_id], backref=backref(
         "playlists_tracks", cascade="delete, delete-orphan"))
 
+    @hybrid_property
+    def is_available(self):
+        return self.track.is_available
+
 
 class FavoritePlaylist(Base):
     __tablename__ = 'favorites_playlists'
