@@ -15,6 +15,7 @@ from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_playlists import PlaylistsCrud
 from backend.schemas.search import AllSearchItem
+from sqlalchemy import or_
 
 
 class SearchCrud(CRUDBase):
@@ -33,10 +34,10 @@ class SearchCrud(CRUDBase):
     def base_search_by_name(self, model, name: str, limit: int):
         return self.db.query(model).filter(func.lower(model.name).contains(name.lower())).limit(limit).all()
 
-    def search_playlists_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT):
-        return self.base_search_by_name(name=name, limit=limit, model=Playlist)
+    def search_playlists_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT, user_id: int = None):
+        return self.db.query(Playlist).filter(or_(Playlist.user_id == user_id, Playlist.private == False)).filter(func.lower(Playlist.name).contains(name.lower())).limit(limit).all()
 
-    def search_all_by_name_sorted_by_likes(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALL_LIMIT):
+    def search_all_by_name_sorted_by_likes(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALL_LIMIT, user_id: int = None):
         label_num_likes = "num_likes"
         label_resource_type = "resource_type"
         label_id = "id"
@@ -84,8 +85,7 @@ class SearchCrud(CRUDBase):
             literal_column("0").label(label_num_likes),
             literal_column(f"'{playlist_resource_type}'").label(
                 label_resource_type)
-        ).filter(
-            Playlist.private == False,
+        ).filter(or_(Playlist.user_id == user_id, Playlist.private == False)).filter(
             func.lower(Playlist.name).contains(name.lower())
         ).group_by(Playlist.id)
 

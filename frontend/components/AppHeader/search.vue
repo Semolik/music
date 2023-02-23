@@ -54,6 +54,11 @@
                             v-if="item.type == 'track'"
                             :track="item.info"
                         />
+                        <PlaylistCard
+                            v-if="item.type == 'playlist'"
+                            :playlist="item.info"
+                            min
+                        />
                     </template>
                 </template>
                 <template v-if="category === 'musicians'">
@@ -67,6 +72,12 @@
                 </template>
                 <template v-if="category === 'albums'">
                     <AlbumCard v-for="album in results.albums" :album="album" />
+                </template>
+                <template v-if="category === 'playlists'">
+                    <PlaylistCard
+                        v-for="playlist in results.playlists"
+                        :playlist="playlist"
+                    />
                 </template>
             </div>
             <div class="not-found" v-else-if="searchQuery">
@@ -159,6 +170,12 @@ watch([searchQuery, category], async ([val, category]) => {
                 val
             );
             results.tracks = result_tracks;
+            searching.value = false;
+            break;
+        case "playlists":
+            const result_playlists =
+                await Service.searchPlaylistApiV1SearchPlaylistGet(val);
+            results.playlists = result_playlists;
             searching.value = false;
             break;
     }

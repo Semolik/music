@@ -6,12 +6,15 @@ from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.core.config import settings
+from fastapi_jwt_auth import AuthJWT
 router = APIRouter(tags=['Поиск'], prefix='/search')
 
 
 @router.get('/autocomplete', response_model=List[AllSearchItem])
-def search(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db)):
-    return SearchCrud(db).search_all_by_name_sorted_by_likes(name=text)
+def search(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_optional()
+    current_user_id = Authorize.get_jwt_subject()
+    return SearchCrud(db).search_all_by_name_sorted_by_likes(name=text, user_id=current_user_id)
 
 
 @router.get('/musician', response_model=List[SearchMusician])
