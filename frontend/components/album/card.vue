@@ -2,7 +2,7 @@
     <card-min v-bind="props" v-if="min">
         <template #content>
             <span>{{ album.name }}</span>
-            <div class="flex gap-3px items-center secondary-text">
+            <div class="flex gap-3px items-center secondary-text text-sm">
                 <span>{{ album.musician.name }}</span>
                 <Icon name="ci:dot-02-s" />
                 <span>{{ album.year }}</span>

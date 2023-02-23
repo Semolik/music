@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import List, Literal
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from backend.schemas.music import Track
 from backend.schemas.user import UserInfo
 from fastapi import Query
 from backend.core.config import env_config
+from backend.schemas.file import ImageLink
 
 order_playlist_by = Literal['created_at', 'name']
 
@@ -32,6 +33,8 @@ class PlaylistInfoWithoutTracks(PlaylistBase):
     id: UUID = Query(..., description='id плейлиста')
     user: UserInfo = Query(..., description='Пользователь, создавший плейлист')
     created_at: datetime = Query(..., description='Дата создания плейлиста')
+    picture: ImageLink = None
+    tracks_count: int = Query(..., description='Количество треков в плейлисте')
 
     class Config:
         orm_mode = True

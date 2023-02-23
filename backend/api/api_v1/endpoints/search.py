@@ -50,8 +50,10 @@ def search_clip(text: str = Query(description="Поисковый запрос")
 
 
 @router.get('/playlist', response_model=List[SearchPlaylist])
-def search_playlist(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db)):
+def search_playlist(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    Authorize.jwt_optional()
+    current_user_id = Authorize.get_jwt_subject()
     search_crud = SearchCrud(db)
     db_playlists = search_crud.search_playlists_by_name(
-        name=text, limit=settings.SEARCH_PLAYLIST_LIMIT)
+        name=text, limit=settings.SEARCH_PLAYLIST_LIMIT, user_id=current_user_id)
     return db_playlists

@@ -37,7 +37,9 @@ const { text, picture, icon, borderRadius } = defineProps({
 .card-min {
     padding: 7px;
     display: flex;
-    height: 70px;
+    min-height: 70px;
+    // flex-grow: 1;
+    max-height: 70px;
     gap: 10px;
     background-color: $quaternary-bg;
     border-radius: 15px;

@@ -159,7 +159,7 @@ watch([searchQuery, category], async ([val, category]) => {
             searching.value = false;
             break;
         case "albums":
-            const result_albums = await Service.searchAlbumApiV1SearchalbumGet(
+            const result_albums = await Service.searchAlbumApiV1SearchAlbumGet(
                 val
             );
             results.albums = result_albums;

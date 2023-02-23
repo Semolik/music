@@ -51,6 +51,16 @@ class Playlist(Base):
         server_default=func.now()
     )
 
+    @hybrid_property
+    def picture(self):
+        tracks = self.playlists_tracks
+        if tracks:
+            return tracks.picture
+
+    @hybrid_property
+    def tracks_count(self):
+        return len(self.playlists_tracks)
+
 
 class PlaylistTrack(Base):
     __tablename__ = 'playlists_tracks'

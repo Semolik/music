@@ -12,6 +12,7 @@ export default defineNuxtConfig({
             musicianIcon: "material-symbols:person-rounded",
             albumIcon: "material-symbols:album",
             trackIcon: "material-symbols:music-note-rounded",
+            playlistIcon: "material-symbols:playlist-add",
         },
     },
     googleFonts: {

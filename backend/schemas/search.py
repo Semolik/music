@@ -3,7 +3,7 @@ from typing import Union
 from pydantic import BaseModel
 
 from backend.schemas.music import AlbumInfo, Track, MusicianClip
-from backend.schemas.playlists import PlaylistInfo
+from backend.schemas.playlists import PlaylistInfo, PlaylistInfoWithoutTracks
 from backend.schemas.user import PublicProfile
 
 
@@ -23,7 +23,7 @@ class SearchClip(MusicianClip):
     ...
 
 
-class SearchPlaylist(PlaylistInfo):
+class SearchPlaylist(PlaylistInfoWithoutTracks):
     ...
 
 

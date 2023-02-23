@@ -1,7 +1,7 @@
 <template>
     <div :class="['card-picture', { min: min }]">
         <img :src="picture" v-if="picture" />
-        <Icon name="material-symbols:person-rounded" v-else />
+        <Icon :name="icon" v-else />
     </div>
 </template>
 <script setup>

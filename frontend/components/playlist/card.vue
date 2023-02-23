@@ -2,6 +2,9 @@
     <card-min v-bind="props" v-if="min">
         <template #content>
             <span>{{ playlist.name }}</span>
+            <div class="flex gap-3px items-center secondary-text text-sm">
+                <span>Количество треков: {{ playlist.tracks_count }}</span>
+            </div>
         </template>
         <template #card-end>
             <div class="flex justify-center items-center pr-4 secondary-text">
@@ -27,6 +30,6 @@ const { playlist } = defineProps({
 const props = reactive({
     text: playlist.name,
     picture: playlist.picture,
-    icon: runtimeConfig.public.albumIcon,
+    icon: runtimeConfig.public.playlistIcon,
 });
 </script>
