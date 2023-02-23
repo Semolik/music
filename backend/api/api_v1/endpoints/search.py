@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, HTTPException, Query
 from backend.crud.crud_search import SearchCrud
-from backend.schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchTrack, SearchClip
+from backend.schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchPlaylist, SearchTrack, SearchClip
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import validate_authorized_user
@@ -22,7 +22,7 @@ def search_musician(text: str = Query(description="Поисковый запро
     return db_musicians
 
 
-@router.get('album', response_model=List[SearchAlbum])
+@router.get('/album', response_model=List[SearchAlbum])
 def search_album(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db)):
     search_crud = SearchCrud(db)
     db_albums = search_crud.search_albums_by_name(
@@ -44,3 +44,11 @@ def search_clip(text: str = Query(description="Поисковый запрос")
     db_clips = search_crud.search_clips_by_name(
         name=text, limit=settings.SEARCH_CLIP_LIMIT)
     return db_clips
+
+
+@router.get('/playlist', response_model=List[SearchPlaylist])
+def search_playlist(text: str = Query(description="Поисковый запрос"), db: Session = Depends(get_db)):
+    search_crud = SearchCrud(db)
+    db_playlists = search_crud.search_playlists_by_name(
+        name=text, limit=settings.SEARCH_PLAYLIST_LIMIT)
+    return db_playlists

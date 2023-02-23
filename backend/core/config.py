@@ -75,12 +75,14 @@ class Settings(BaseSettings):
     AUTOCOMPLETE_SEARCH_CLIP_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_CLIP_LIMIT'))
     AUTOCOMPLETE_SEARCH_ALL_LIMIT = 30
+    AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT = int(
+        env_config.get('VITE_AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT'))
 
     SEARCH_ALBUM_LIMIT = int(env_config.get('VITE_SEARCH_ALBUM_LIMIT'))
     SEARCH_MUSICIAN_LIMIT = int(env_config.get('VITE_SEARCH_MUSICIAN_LIMIT'))
     SEARCH_TRACK_LIMIT = int(env_config.get('VITE_SEARCH_TRACK_LIMIT'))
     SEARCH_CLIP_LIMIT = int(env_config.get('VITE_SEARCH_CLIP_LIMIT'))
-
+    SEARCH_PLAYLIST_LIMIT = int(env_config.get('VITE_SEARCH_PLAYLIST_LIMIT'))
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']
     USER_ACCOUNT_STATUSES = Literal[tuple(USER_ACCOUNT_STATUSES_LIST)]

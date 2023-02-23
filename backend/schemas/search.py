@@ -3,6 +3,7 @@ from typing import Union
 from pydantic import BaseModel
 
 from backend.schemas.music import AlbumInfo, Track, MusicianClip
+from backend.schemas.playlists import PlaylistInfo
 from backend.schemas.user import PublicProfile
 
 
@@ -22,9 +23,14 @@ class SearchClip(MusicianClip):
     ...
 
 
+class SearchPlaylist(PlaylistInfo):
+    ...
+
+
 class AllSearchItem(BaseModel):
     type: str
-    info: Union[SearchMusician, AlbumInfo, SearchTrack, SearchClip]
+    info: Union[SearchMusician, AlbumInfo,
+                SearchTrack, SearchClip, SearchPlaylist]
     likes_count: int
 
     class Class:

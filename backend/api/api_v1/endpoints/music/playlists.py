@@ -1,3 +1,4 @@
+from typing import List, Literal
 from uuid import UUID
 from fastapi import Depends, APIRouter, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
@@ -5,10 +6,28 @@ from backend.crud.crud_playlists import PlaylistsCrud
 from backend.crud.crud_tracks import TracksCrud
 from backend.helpers.auth_helper import validate_authorized_user
 from backend.helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
-from backend.schemas.playlists import PlaylistBase, PlaylistInfo, PlaylistCreate, PlaylistTrack, TracksIds
+from backend.schemas.playlists import PlaylistBase, PlaylistInfo, PlaylistCreate, PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 router = APIRouter(prefix='/playlists', tags=['Плейлисты'])
+
+
+@router.get('', response_model=List[PlaylistInfoWithoutTracks])
+def get_my_playlists(
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db),
+    order_by: order_playlist_by = Query(
+        default='created_at', description='Порядок сортировки', required=True),
+    order_orientation: Literal['asc', 'desc'] = Query(
+        default='asc', description='Направление сортировки', required=True),
+):
+    '''Получение списка плейлистов'''
+    Authorize.jwt_required()
+    db_user = validate_authorized_user(
+        Authorize=Authorize, db=db)
+    playlists = PlaylistsCrud(db).get_playlists_by_user_id(
+        user_id=db_user.id, owner_id=db_user.id, order_by=order_by, order_orientation=order_orientation)
+    return playlists
 
 
 @router.get('/{playlist_id}', response_model=PlaylistInfo)

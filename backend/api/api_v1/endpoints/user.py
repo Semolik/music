@@ -1,8 +1,10 @@
-from fastapi import Depends, APIRouter, status, UploadFile, File
+from typing import List, Literal
+from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
 from fastapi_jwt_auth import AuthJWT
+from backend.crud.crud_playlists import PlaylistsCrud
 from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.images import save_image, set_picture
-from backend.helpers.users import get_public_profile_as_dict, get_public_profile_data
+from backend.helpers.images import save_image
+from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
 from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserModifiable
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.crud.crud_user import UserCruds
@@ -94,3 +96,32 @@ def get_user_public_profile_info(
         ]
     )
     return UserCruds(db).get_public_profile(user_id=db_user.id)
+
+
+@router.get('/{user_id}/playlists', response_model=List[PlaylistInfoWithoutTracks])
+def get_user_playlists(
+    Authorize: AuthJWT = Depends(),
+    db: Session = Depends(get_db),
+    user_id: int = Query(
+        default=None, description='ID пользователя', required=True),
+    order_by: order_playlist_by = Query(
+        default='created_at', description='Порядок сортировки', required=True),
+    order_orientation: Literal['asc', 'desc'] = Query(
+        default='asc', description='Направление сортировки', required=True),
+):
+    '''Получение списка плейлистов'''
+    Authorize.jwt_optional()
+    db_requested_user = UserCruds(db).get_user_by_id(user_id=user_id)
+    if not db_requested_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Пользователь не найден'
+        )
+    current_user_id = Authorize.get_jwt_subject()
+    playlists = PlaylistsCrud(db).get_playlists_by_user_id(
+        user_id=current_user_id,
+        owner_id=user_id,
+        order_by=order_by,
+        order_orientation=order_orientation
+    )
+    return playlists

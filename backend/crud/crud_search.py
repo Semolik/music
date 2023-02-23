@@ -5,6 +5,7 @@ from backend.core.config import settings
 from backend.db.base import CRUDBase
 from backend.models.albums import Album, FavoriteAlbum
 from sqlalchemy import Text, cast, func, union_all
+from backend.models.playlists import Playlist
 from backend.models.user import PublicProfile, FavoriteMusicians
 from backend.models.tracks import Track, FavoriteTracks
 from backend.models.clips import Clip
@@ -12,6 +13,7 @@ from sqlalchemy import desc, func, literal_column
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
+from backend.crud.crud_playlists import PlaylistsCrud
 from backend.schemas.search import AllSearchItem
 
 
@@ -31,12 +33,16 @@ class SearchCrud(CRUDBase):
     def base_search_by_name(self, model, name: str, limit: int):
         return self.db.query(model).filter(func.lower(model.name).contains(name.lower())).limit(limit).all()
 
+    def search_playlists_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT):
+        return self.base_search_by_name(name=name, limit=limit, model=Playlist)
+
     def search_all_by_name_sorted_by_likes(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALL_LIMIT):
         label_num_likes = "num_likes"
         label_resource_type = "resource_type"
         label_id = "id"
         album_resource_type = 'album'
         track_resource_type = 'track'
+        playlist_resource_type = 'playlist'
         musician_resource_type = 'musician'
         q1 = self.db.query(
             cast(Album.id, Text).label(label_id),
@@ -72,7 +78,18 @@ class SearchCrud(CRUDBase):
             Album.is_available,
             func.lower(Track.name).contains(name.lower())
         ).group_by(Track.id)
-        query = union_all(q1, q2, q3)
+
+        q4 = self.db.query(
+            cast(Playlist.id, Text).label(label_id),
+            literal_column("0").label(label_num_likes),
+            literal_column(f"'{playlist_resource_type}'").label(
+                label_resource_type)
+        ).filter(
+            Playlist.private == False,
+            func.lower(Playlist.name).contains(name.lower())
+        ).group_by(Playlist.id)
+
+        query = union_all(q1, q2, q3, q4)
         query_result = self.db.query(
             getattr(query.c, label_id),
             getattr(query.c, label_num_likes),
@@ -93,6 +110,9 @@ class SearchCrud(CRUDBase):
             elif resource_type == musician_resource_type:
                 model = UserCruds(self.db).get_public_profile_by_id(
                     id=int(query_item.id))
+            elif resource_type == playlist_resource_type:
+                model = PlaylistsCrud(self.db).get_playlist_info(
+                    playlist_id=UUID(query_item.id))
             if model:
                 results.append(AllSearchItem(
                     type=resource_type,

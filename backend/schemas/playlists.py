@@ -1,10 +1,13 @@
-from typing import List
+from datetime import datetime
+from typing import List, Literal
 from uuid import UUID
 from pydantic import BaseModel
 from backend.schemas.music import Track
 from backend.schemas.user import UserInfo
 from fastapi import Query
 from backend.core.config import env_config
+
+order_playlist_by = Literal['created_at', 'name']
 
 
 class PlaylistBase(BaseModel):
@@ -28,6 +31,7 @@ class PlaylistCreate(PlaylistBase, TracksIds):
 class PlaylistInfoWithoutTracks(PlaylistBase):
     id: UUID = Query(..., description='id плейлиста')
     user: UserInfo = Query(..., description='Пользователь, создавший плейлист')
+    created_at: datetime = Query(..., description='Дата создания плейлиста')
 
     class Config:
         orm_mode = True

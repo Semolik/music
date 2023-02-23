@@ -4,6 +4,7 @@ from backend.db.base import CRUDBase
 from backend.models.albums import Album
 from backend.models.playlists import Playlist, PlaylistTrack, FavoritePlaylist
 from backend.models.tracks import Track
+from backend.schemas.playlists import order_playlist_by
 
 
 class PlaylistsCrud(CRUDBase):
@@ -15,6 +16,25 @@ class PlaylistsCrud(CRUDBase):
         playlist.description = description
         playlist.private = private
         return self.update(playlist)
+
+    def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str) -> List[Playlist]:
+        query = self.db.query(Playlist).filter(Playlist.user_id == owner_id)
+
+        if order_by == 'created_at':
+            order_column = Playlist.created_at
+        elif order_by == 'name':
+            order_column = Playlist.name
+        else:
+            order_column = None
+
+        if order_column is not None:
+            order_method = getattr(order_column, order_orientation)
+            query = query.order_by(order_method())
+
+        if owner_id != user_id:
+            query = query.filter(Playlist.private == False)
+
+        return query.all()
 
     def create_playlist(self, name: str, description: str, user_id: int, private: bool, tracks_ids: List[UUID]):
         playlist = self.create(

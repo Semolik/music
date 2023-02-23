@@ -46,6 +46,10 @@ class Playlist(Base):
         )
     )
     private = Column(Boolean, nullable=False, default=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
 
 
 class PlaylistTrack(Base):
