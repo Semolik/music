@@ -36,4 +36,7 @@ Before running the frontend server, make sure that the backend server is running
 
     cd frontend
     npm run generate-client
+
+Change WITH_CREDENTIALS to true in [OpenApi.ts](/frontend/client/core/OpenApi.ts)
+
     npm run dev

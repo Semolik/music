@@ -7,6 +7,7 @@ export default defineNuxtConfig({
         "@nuxtjs/google-fonts",
         "@pinia/nuxt",
     ],
+    ssr: true,
     runtimeConfig: {
         public: {
             musicianIcon: "material-symbols:person-rounded",
@@ -25,6 +26,12 @@ export default defineNuxtConfig({
         devProxy: {
             "/api": {
                 target: "http://localhost:8000/api",
+                changeOrigin: true,
+                prependPath: true,
+                cookieDomainRewrite: false,
+            },
+            "/api/docs": {
+                target: "http://localhost:8000/docs",
                 changeOrigin: true,
                 prependPath: true,
             },

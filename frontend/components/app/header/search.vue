@@ -20,6 +20,7 @@
                 v-model="searchQuery"
                 size="large"
                 ref="searchInput"
+                :suffix-icon="searching ? Loading : null"
             />
             <div :class="['results-categories']" v-if="searchQuery">
                 <div
@@ -36,7 +37,7 @@
             <div
                 :class="['results', category]"
                 :style="{ '--columns': category == 'tracks' ? 1 : 4 }"
-                v-if="isFound || searching"
+                v-if="isFound"
             >
                 <template v-if="category === 'all'">
                     <template v-for="item in results.all">
@@ -90,7 +91,7 @@
 
 <script setup>
 import { Service } from "@/client";
-
+import { Loading } from "@element-plus/icons-vue";
 const emit = defineEmits(["update:searchActive"]);
 const props = defineProps({
     searchActive: {
@@ -266,6 +267,21 @@ const onSearchActiveUpdate = (val) => {
             --el-input-text-color: #{$primary-text};
             .el-input__wrapper {
                 font-size: large;
+                .el-input__suffix {
+                    .el-icon {
+                        svg {
+                            @keyframes rotate {
+                                0% {
+                                    transform: rotate(0deg);
+                                }
+                                100% {
+                                    transform: rotate(360deg);
+                                }
+                            }
+                            animation: rotate 1s linear infinite;
+                        }
+                    }
+                }
             }
         }
     }

@@ -1,11 +1,16 @@
 <template>
-    <div class="default-layout">
-        <AppAside />
-        <div class="content-container">
-            <AppHeader />
-            <slot />
+    <NuxtErrorBoundary>
+        <div class="default-layout">
+            <AppAside />
+            <div class="content-container">
+                <AppHeader />
+                <slot />
+            </div>
         </div>
-    </div>
+        <template #error="{ error }">
+            <AppError :error="error" @clearError="fixIssue(error)" />
+        </template>
+    </NuxtErrorBoundary>
 </template>
 <style lang="scss">
 .default-layout {
@@ -18,3 +23,8 @@
     }
 }
 </style>
+<script setup>
+const fixIssue = (error) => {
+    error.value = null;
+};
+</script>
