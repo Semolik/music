@@ -20,6 +20,7 @@ export default defineNuxtConfig({
         families: {
             "Open+Sans": true,
         },
+        download: true,
     },
     plugins: [{ src: "~/plugins/autoAnimatePlugin.js", mode: `client` }],
     nitro: {

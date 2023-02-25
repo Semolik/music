@@ -18,6 +18,18 @@ export const useAuthStore = defineStore({
         isMusician: false,
         isRadioStation: false,
     }),
+    getters: {
+        fullName() {
+            let name = [this.userData.first_name, this.userData.last_name].join(
+                " "
+            );
+            if (name.trim() === "") {
+                name = this.userData.username;
+            }
+            return name;
+        },
+    },
+
     actions: {
         clearMessage() {
             this.message = "";

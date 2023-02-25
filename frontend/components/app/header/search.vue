@@ -189,96 +189,94 @@ const onSearchActiveUpdate = (val) => {
 <style lang="scss">
 #search-modal {
     padding-top: 20vh;
+    .modal {
+        border: 1px solid #{$quaternary-text};
 
-    .modal-content {
-        width: 100%;
-        justify-content: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 15px;
-        min-height: 250px;
-        .results-categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-
-            .results-categories-item {
-                @include flex-center;
-                gap: 10px;
-                flex-grow: 1;
-                padding: 5px 20px;
-                border-radius: 10px;
-                background-color: $quinary-bg;
-                white-space: nowrap;
-                cursor: pointer;
-                user-select: none;
-                border: 1px solid transparent;
-                &:not(.active):hover {
-                    background-color: $quaternary-bg;
-                }
-                &.active {
-                    border-color: $accent;
-                    cursor: auto;
-                }
-            }
-        }
-        .results {
-            height: 100%;
-            transition: 0.3s ease all;
+        .modal-content {
+            width: 100%;
+            justify-content: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            overflow: auto;
-            &.all {
-                .results-item {
-                    display: flex;
-                    align-items: center;
+            min-height: 250px;
+            padding-bottom: 10px;
+
+            .results-categories {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 0px 10px;
+
+                .results-categories-item {
+                    @include flex-center;
                     gap: 10px;
-                    padding: 5px;
-                    height: 70px;
-                    // height: 60px;
+                    flex-grow: 1;
+                    padding: 5px 20px;
+                    border-radius: 5px;
+                    background-color: $quinary-bg;
+                    white-space: nowrap;
+                    cursor: pointer;
+                    user-select: none;
+                    border: 1px solid transparent;
+                    &:not(.active):hover {
+                        background-color: $quaternary-bg;
+                    }
+                    &.active {
+                        border-color: $accent;
+                        cursor: auto;
+                    }
                 }
             }
-            &:not(.all) {
-                display: grid;
-                grid-template-columns: repeat(var(--columns), 1fr);
+            .results {
+                height: 100%;
+                transition: 0.3s ease all;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                overflow: auto;
+                padding: 0px 10px;
+                &.all {
+                    .results-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 5px;
+                        height: 70px;
+                    }
+                }
+                &:not(.all) {
+                    display: grid;
+                    grid-template-columns: repeat(var(--columns), 1fr);
+                }
             }
-
-            //     width: 100%;
-            //     display: flex;
-            //     flex-wrap: wrap;
-            //     gap: 10px;
-            //     display: grid;
-            //     grid-template-columns: repeat(var(--columns), 1fr);
-            // }
-        }
-        .not-found {
-            @include flex-center;
-            height: 100%;
-            color: $secondary-text;
-        }
-        .el-input {
-            --el-input-bg-color: #{$quaternary-bg};
-            --el-input-border-color: transparent;
-            --el-input-hover-border-color: transparent;
-            --el-input-focus-border-color: transparent;
-            --el-input-height: 60px;
-            --el-input-text-color: #{$primary-text};
-            .el-input__wrapper {
-                font-size: large;
-                .el-input__suffix {
-                    .el-icon {
-                        svg {
-                            @keyframes rotate {
-                                0% {
-                                    transform: rotate(0deg);
+            .not-found {
+                @include flex-center;
+                height: 100%;
+                color: $secondary-text;
+            }
+            .el-input {
+                --el-input-bg-color: transparent;
+                --el-input-border-color: transparent;
+                --el-input-hover-border-color: transparent;
+                --el-input-focus-border-color: transparent;
+                --el-input-height: 60px;
+                --el-input-text-color: #{$primary-text};
+                border-bottom: 1px solid #{$quaternary-text};
+                .el-input__wrapper {
+                    font-size: large;
+                    .el-input__suffix {
+                        .el-icon {
+                            svg {
+                                @keyframes rotate {
+                                    0% {
+                                        transform: rotate(0deg);
+                                    }
+                                    100% {
+                                        transform: rotate(360deg);
+                                    }
                                 }
-                                100% {
-                                    transform: rotate(360deg);
-                                }
+                                animation: rotate 1s linear infinite;
                             }
-                            animation: rotate 1s linear infinite;
                         }
                     }
                 }

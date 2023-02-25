@@ -25,7 +25,7 @@ const { text, picture, icon, borderRadius } = defineProps({
     borderRadius: {
         type: Number,
         required: false,
-        default: 10,
+        default: 4,
     },
 });
 </script>

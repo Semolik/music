@@ -27,13 +27,23 @@
             </NuxtLink>
         </div>
         <div class="account-info">
-            <NuxtLink to="/login" class="selection">
-                <Icon name="material-symbols:logout-rounded" />
+            <NuxtLink to="/profile" class="logined" v-if="logined">
+                <span>{{ authStore.fullName }}</span>
+            </NuxtLink>
+            <NuxtLink to="/login" class="selection" v-else>
+                <Icon name="material-symbols:login-rounded" />
                 <span>Войти в аккаунт</span>
             </NuxtLink>
         </div>
     </aside>
 </template>
+<script setup>
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+
+const authStore = useAuthStore();
+const { logined } = storeToRefs(authStore);
+</script>
 <style lang="scss">
 aside {
     background-color: $secondary-bg;
@@ -115,6 +125,15 @@ aside {
     .account-info {
         display: flex;
         flex-direction: column;
+        .logined {
+            background-color: $tertiary-bg;
+            text-decoration: none;
+            gap: 10px;
+            padding: 13px;
+            border-radius: 5px;
+            color: $secondary-text;
+            cursor: pointer;
+        }
     }
 }
 </style>

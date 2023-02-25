@@ -29,7 +29,7 @@ const { text, picture, icon, borderRadius } = defineProps({
     borderRadius: {
         type: Number,
         required: false,
-        default: 10,
+        default: 5,
     },
 });
 </script>
@@ -38,11 +38,10 @@ const { text, picture, icon, borderRadius } = defineProps({
     padding: 7px;
     display: flex;
     min-height: 70px;
-    // flex-grow: 1;
     max-height: 70px;
     gap: 10px;
     background-color: $quaternary-bg;
-    border-radius: 15px;
+    border-radius: 10px;
     &:hover {
         background-color: $quinary-bg;
         cursor: pointer;
