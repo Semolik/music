@@ -35,6 +35,8 @@ class PlaylistInfoWithoutTracks(PlaylistBase):
     created_at: datetime = Query(..., description='Дата создания плейлиста')
     picture: ImageLink = None
     tracks_count: int = Query(..., description='Количество треков в плейлисте')
+    liked: bool = Query(
+        default=False, description='Понравился ли плейлист пользователю')
 
     class Config:
         orm_mode = True

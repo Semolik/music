@@ -2,6 +2,7 @@
 
 from uuid import UUID
 from backend.core.config import settings
+from backend.crud.crud_musician import MusicianCrud
 from backend.db.base import CRUDBase
 from backend.models.albums import Album, FavoriteAlbum
 from sqlalchemy import Text, cast, func, union_all
@@ -14,27 +15,27 @@ from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_playlists import PlaylistsCrud
-from backend.schemas.search import AllSearchItem
+from backend.schemas.search import AllSearchItem, SearchAlbum, SearchMusician, SearchPlaylist, SearchTrack
 from sqlalchemy import or_
 
 
 class SearchCrud(CRUDBase):
-    def search_albums_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALBUM_LIMIT):
+    def search_albums_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALBUM_LIMIT) -> list[Album]:
         return self.db.query(Album).filter(Album.is_available, func.lower(Album.name).contains(name.lower())).limit(limit).all()
 
-    def search_tracks_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_TRACK_LIMIT):
+    def search_tracks_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_TRACK_LIMIT) -> list[Track]:
         return self.db.query(Track).join(Album).filter(Album.is_available, func.lower(Track.name).contains(name.lower())).limit(limit).all()
 
-    def search_musicians_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT):
+    def search_musicians_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT) -> list[PublicProfile]:
         return self.base_search_by_name(name=name, limit=limit, model=PublicProfile)
 
-    def search_clips_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_CLIP_LIMIT):
+    def search_clips_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_CLIP_LIMIT) -> list[Clip]:
         return self.base_search_by_name(name=name, limit=limit, model=Clip)
 
     def base_search_by_name(self, model, name: str, limit: int):
         return self.db.query(model).filter(func.lower(model.name).contains(name.lower())).limit(limit).all()
 
-    def search_playlists_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT, user_id: int = None):
+    def search_playlists_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT, user_id: int = None) -> list[Playlist]:
         return self.db.query(Playlist).filter(or_(Playlist.user_id == user_id, Playlist.private == False)).filter(func.lower(Playlist.name).contains(name.lower())).limit(limit).all()
 
     def search_all_by_name_sorted_by_likes(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_ALL_LIMIT, user_id: int = None):
@@ -99,24 +100,36 @@ class SearchCrud(CRUDBase):
         for query_item in query_result:
             resource_type = getattr(query_item, label_resource_type)
             likes_count = getattr(query_item, label_num_likes)
-            model = None
+            model_schema = None
             if resource_type == track_resource_type:
-                model = TracksCrud(self.db).get_track(
-                    track_id=UUID(query_item.id))
+                model_schema = SearchTrack.from_orm(TracksCrud(self.db).get_track(
+                    track_id=UUID(query_item.id)))
+                if user_id:
+                    model_schema.liked = TracksCrud(self.db).track_is_liked(
+                        track_id=UUID(query_item.id), user_id=user_id)
             elif resource_type == album_resource_type:
-                model = AlbumsCruds(self.db).get_album(
+                model_schema = SearchAlbum.from_orm(AlbumsCruds(self.db).get_album(
                     album_id=int(query_item.id)
-                )
+                ))
+                if user_id:
+                    model_schema.liked = AlbumsCruds(self.db).album_is_liked(
+                        album_id=int(query_item.id), user_id=user_id)
             elif resource_type == musician_resource_type:
-                model = UserCruds(self.db).get_public_profile_by_id(
-                    id=int(query_item.id))
+                model_schema = SearchMusician.from_orm(UserCruds(self.db).get_public_profile_by_id(
+                    id=int(query_item.id)))
+                if user_id:
+                    model_schema.liked = MusicianCrud(self.db).musician_is_liked(
+                        musician_id=int(query_item.id), user_id=user_id)
             elif resource_type == playlist_resource_type:
-                model = PlaylistsCrud(self.db).get_playlist_info(
-                    playlist_id=UUID(query_item.id))
-            if model:
+                model_schema = SearchPlaylist.from_orm(PlaylistsCrud(self.db).get_playlist_info(
+                    playlist_id=UUID(query_item.id)))
+                if user_id:
+                    model_schema.liked = PlaylistsCrud(self.db).playlist_is_liked(
+                        playlist_id=UUID(query_item.id), user_id=user_id)
+            if model_schema:
                 results.append(AllSearchItem(
                     type=resource_type,
-                    info=model,
+                    info=model_schema,
                     likes_count=likes_count
                 ))
         return results

@@ -73,6 +73,9 @@ class PlaylistsCrud(CRUDBase):
     def get_favorite_playlist(self, user_id: int, playlist_id: UUID) -> FavoritePlaylist:
         return self.db.query(FavoritePlaylist).filter(FavoritePlaylist.user_id == user_id, FavoritePlaylist.playlist_id == playlist_id).first()
 
+    def playlist_is_liked(self, user_id: int, playlist_id: UUID) -> bool:
+        return self.get_favorite_playlist(user_id, playlist_id) is not None
+
     def toggle_like_playlist(self, user_id: int, playlist_id: UUID) -> FavoritePlaylist:
         favorite_playlist = self.get_favorite_playlist(user_id, playlist_id)
         if favorite_playlist:

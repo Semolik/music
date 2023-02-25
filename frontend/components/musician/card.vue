@@ -57,7 +57,9 @@ const { musician } = defineProps({
         default: false,
     },
 });
+
 const liked = ref(musician.liked);
+
 const props = reactive({
     picture: musician.picture,
     icon: runtimeConfig.public.musicianIcon,
@@ -75,6 +77,9 @@ const onFavorite = async () => {
 </script>
 <style lang="scss" scoped>
 .musician-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     .hover-overlay {
         position: absolute;
         top: 0;
@@ -93,6 +98,7 @@ const onFavorite = async () => {
             padding: 5px;
             width: 35px;
             height: 35px;
+            transition: background-color 0.2s ease-in-out;
             svg {
                 height: 100%;
                 width: 100%;
@@ -102,7 +108,7 @@ const onFavorite = async () => {
                 width: 50px;
                 height: 50px;
                 &:hover {
-                    background-color: $accent-2;
+                    background-color: $accent-hover;
                 }
                 svg {
                     color: black;
@@ -110,7 +116,9 @@ const onFavorite = async () => {
             }
             &.favorite {
                 &:not(.disabled).active {
-                    background-color: red;
+                    svg {
+                        color: $accent-2;
+                    }
                 }
 
                 &.disabled {

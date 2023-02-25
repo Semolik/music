@@ -128,6 +128,7 @@ class AlbumTrack(TrackAfterUpload):
 class AlbumInfoWithoutMusician(AlbumBase):
     picture: ImageLink = Query(...,
                                description="Ссылка на картинку альбома")
+    liked: bool = Query(default=False, description="Лайкнут ли альбом")
 
     class Config:
         orm_mode = True

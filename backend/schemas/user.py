@@ -174,11 +174,21 @@ class PublicProfileBase(BaseModel):
         env_config.get('VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH')
     ))
 
+    class Config:
+        orm_mode = True
+
 
 class PublicProfile(PublicProfileBase):
     id: int = Query(..., description='ID публичного профиля')
     links: PublicProfileLinks = Query(..., description='Ссылки на соц. сети')
     picture: ImageLink | None
+
+    class Config:
+        orm_mode = True
+
+
+class MusicianProfile(PublicProfile):
+    liked: bool = Query(False, description='Лайкнут ли профиль')
 
     class Config:
         orm_mode = True
