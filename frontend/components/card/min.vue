@@ -14,10 +14,6 @@
 </template>
 <script setup>
 const { text, picture, icon, borderRadius } = defineProps({
-    text: {
-        type: String,
-        required: true,
-    },
     picture: {
         type: [String, null],
         required: true,
@@ -27,9 +23,9 @@ const { text, picture, icon, borderRadius } = defineProps({
         required: true,
     },
     borderRadius: {
-        type: Number,
+        type: String,
         required: false,
-        default: 5,
+        default: "5px",
     },
 });
 </script>

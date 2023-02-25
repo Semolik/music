@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
     modules: [
         "nuxt-icon",
@@ -6,6 +7,7 @@ export default defineNuxtConfig({
         "@nuxtjs/tailwindcss",
         "@nuxtjs/google-fonts",
         "@pinia/nuxt",
+        "@vueuse/nuxt",
     ],
     ssr: true,
     runtimeConfig: {
@@ -14,15 +16,25 @@ export default defineNuxtConfig({
             albumIcon: "material-symbols:album",
             trackIcon: "material-symbols:music-note-rounded",
             playlistIcon: "material-symbols:playlist-add",
+            likeIcon: "material-symbols:favorite",
+            playIcon: "material-symbols:play-arrow",
+            dotsIcon: "material-symbols:more-horiz",
+
+            AuthBusKey: "auth",
         },
     },
+
     googleFonts: {
         families: {
             "Open+Sans": true,
         },
         download: true,
     },
-    plugins: [{ src: "~/plugins/autoAnimatePlugin.js", mode: `client` }],
+    plugins: [
+        { src: "~/plugins/autoAnimatePlugin.js", mode: `client` },
+        { src: "~/plugins/refreshToken.js", mode: `client` },
+        { src: "~/plugins/events.js", mode: `client` },
+    ],
     nitro: {
         devProxy: {
             "/api": {

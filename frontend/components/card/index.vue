@@ -5,15 +5,11 @@
             :icon="icon"
             :borderRadius="borderRadius"
         />
-        <div class="card-text">{{ text }}</div>
+        <slot />
     </div>
 </template>
 <script setup>
-const { text, picture, icon, borderRadius } = defineProps({
-    text: {
-        type: String,
-        required: true,
-    },
+const { picture, icon, borderRadius } = defineProps({
     picture: {
         type: [String, null],
         required: true,
@@ -23,15 +19,15 @@ const { text, picture, icon, borderRadius } = defineProps({
         required: true,
     },
     borderRadius: {
-        type: Number,
+        type: String,
         required: false,
-        default: 4,
+        default: "5px",
     },
 });
 </script>
 <style lang="scss">
 .card {
-    @include flex-center;
+    display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;

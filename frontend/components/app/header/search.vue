@@ -199,7 +199,6 @@ const onSearchActiveUpdate = (val) => {
             flex-direction: column;
             gap: 10px;
             min-height: 250px;
-            padding-bottom: 10px;
 
             .results-categories {
                 display: flex;
@@ -212,7 +211,7 @@ const onSearchActiveUpdate = (val) => {
                     gap: 10px;
                     flex-grow: 1;
                     padding: 5px 20px;
-                    border-radius: 5px;
+                    border-radius: 10px;
                     background-color: $quinary-bg;
                     white-space: nowrap;
                     cursor: pointer;
@@ -235,6 +234,7 @@ const onSearchActiveUpdate = (val) => {
                 gap: 10px;
                 overflow: auto;
                 padding: 0px 10px;
+                margin-bottom: 10px;
                 &.all {
                     .results-item {
                         display: flex;

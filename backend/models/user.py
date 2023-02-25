@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import backref
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class FavoriteMusicians(Base):

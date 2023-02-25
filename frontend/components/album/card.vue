@@ -14,7 +14,16 @@
             </div>
         </template>
     </card-min>
-    <card v-bind="props" v-else />
+    <card v-bind="props" v-else>
+        <div class="flex flex-col grow">
+            <span class="font-medium">{{ album.name }}</span>
+            <div class="secondary-text text-sm flex-wrap flex items-center">
+                <span>{{ album.musician.name }}</span>
+                <Icon name="ci:dot-02-s" />
+                <span>{{ album.year }}</span>
+            </div>
+        </div>
+    </card>
 </template>
 <script setup>
 const runtimeConfig = useRuntimeConfig();
@@ -30,7 +39,6 @@ const { album } = defineProps({
 });
 
 const props = reactive({
-    text: album.name,
     picture: album.picture,
     icon: runtimeConfig.public.albumIcon,
 });

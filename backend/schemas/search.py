@@ -1,5 +1,6 @@
 from typing import List
 from typing import Union
+from fastapi import Query
 from pydantic import BaseModel
 
 from backend.schemas.music import AlbumInfo, Track, MusicianClip

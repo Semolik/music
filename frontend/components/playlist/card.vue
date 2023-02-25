@@ -12,7 +12,14 @@
             </div>
         </template>
     </card-min>
-    <card v-bind="props" v-else />
+    <card v-bind="props" v-else>
+        <div class="flex flex-col grow">
+            <span class="font-medium">{{ playlist.name }}</span>
+            <div class="secondary-text text-sm flex-wrap flex items-center">
+                <span> Количество треков: {{ playlist.tracks_count }}</span>
+            </div>
+        </div>
+    </card>
 </template>
 <script setup>
 const runtimeConfig = useRuntimeConfig();
@@ -28,7 +35,6 @@ const { playlist } = defineProps({
 });
 
 const props = reactive({
-    text: playlist.name,
     picture: playlist.picture,
     icon: runtimeConfig.public.playlistIcon,
 });

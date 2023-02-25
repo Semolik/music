@@ -10,26 +10,28 @@
                 <span>История прослушивания</span>
             </NuxtLink>
             <NuxtLink to="/favorite/tracks" class="selection">
-                <Icon name="material-symbols:music-note-rounded" />
+                <Icon :name="trackIcon" />
                 <span>Треки</span>
             </NuxtLink>
             <NuxtLink to="/favorite/albums" class="selection">
-                <Icon name="material-symbols:album" />
+                <Icon :name="albumIcon" />
                 <span>Альбомы</span>
             </NuxtLink>
             <NuxtLink to="/favorite/artists" class="selection">
-                <Icon name="material-symbols:person-rounded" />
+                <Icon :name="musicianIcon" />
                 <span>Исполнители</span>
             </NuxtLink>
             <NuxtLink to="/favorite/playlists" class="selection">
-                <Icon name="material-symbols:playlist-play-rounded" />
+                <Icon :name="playlistIcon" />
                 <span>Плейлисты</span>
             </NuxtLink>
         </div>
         <div class="account-info">
-            <NuxtLink to="/profile" class="logined" v-if="logined">
-                <span>{{ authStore.fullName }}</span>
-            </NuxtLink>
+            <AppAsideProfile
+                v-if="logined"
+                :fullName="authStore.fullName"
+                :picture="userData?.picture"
+            />
             <NuxtLink to="/login" class="selection" v-else>
                 <Icon name="material-symbols:login-rounded" />
                 <span>Войти в аккаунт</span>
@@ -40,14 +42,16 @@
 <script setup>
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
-
+const runtimeConfig = useRuntimeConfig();
+const { playlistIcon, albumIcon, trackIcon, musicianIcon } =
+    runtimeConfig.public;
 const authStore = useAuthStore();
-const { logined } = storeToRefs(authStore);
+const { logined, userData } = storeToRefs(authStore);
 </script>
 <style lang="scss">
 aside {
     background-color: $secondary-bg;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -74,7 +78,8 @@ aside {
             }
             span,
             svg {
-                color: $primary-text;
+                // color: $primary-text;
+                color: $accent;
             }
             svg {
                 &.default {
@@ -125,15 +130,6 @@ aside {
     .account-info {
         display: flex;
         flex-direction: column;
-        .logined {
-            background-color: $tertiary-bg;
-            text-decoration: none;
-            gap: 10px;
-            padding: 13px;
-            border-radius: 5px;
-            color: $secondary-text;
-            cursor: pointer;
-        }
     }
 }
 </style>

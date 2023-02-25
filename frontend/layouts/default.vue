@@ -4,7 +4,9 @@
             <AppAside />
             <div class="content-container">
                 <AppHeader />
-                <slot />
+                <div class="app-content">
+                    <slot />
+                </div>
             </div>
         </div>
         <template #error="{ error }">
@@ -20,6 +22,12 @@
     .content-container {
         display: flex;
         flex-direction: column;
+        height: 100%;
+        .app-content {
+            flex-grow: 1;
+            overflow: auto;
+            padding: 0px 20px;
+        }
     }
 }
 </style>

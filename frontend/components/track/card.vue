@@ -7,7 +7,7 @@
             <div class="track-dots-button-container">
                 <span>{{ duration }}</span>
                 <div class="track-dots-button">
-                    <Icon name="majesticons:dots-horizontal" />
+                    <Icon :name="dotsIcon" />
                 </div>
             </div>
         </template>
@@ -16,6 +16,7 @@
 <script setup>
 import moment from "moment";
 const runtimeConfig = useRuntimeConfig();
+const { dotsIcon } = runtimeConfig.public;
 const { track } = defineProps({
     track: {
         type: Object,
@@ -28,7 +29,6 @@ const duration = computed(() =>
         .format("mm:ss")
 );
 const props = reactive({
-    text: track.name,
     picture: track.picture,
     icon: runtimeConfig.public.trackIcon,
 });

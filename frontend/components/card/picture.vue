@@ -2,6 +2,7 @@
     <div :class="['card-picture', { min: min }]">
         <img :src="picture" v-if="picture" />
         <Icon :name="icon" v-else />
+        <slot />
     </div>
 </template>
 <script setup>
@@ -15,7 +16,7 @@ const { picture, icon, borderRadius } = defineProps({
         required: true,
     },
     borderRadius: {
-        type: Number,
+        type: String,
         required: true,
     },
     min: {
@@ -23,10 +24,10 @@ const { picture, icon, borderRadius } = defineProps({
         default: false,
     },
 });
-const borderRadiusString = computed(() => borderRadius + "px");
 </script>
 <style lang="scss">
 .card-picture {
+    position: relative;
     @include flex-center;
     &.min {
         height: 100%;
@@ -36,7 +37,7 @@ const borderRadiusString = computed(() => borderRadius + "px");
         width: 100%;
         background-color: $quaternary-bg;
     }
-    border-radius: v-bind(borderRadiusString);
+    border-radius: v-bind(borderRadius);
     overflow: hidden;
     aspect-ratio: 1;
     img {

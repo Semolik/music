@@ -19,6 +19,7 @@
                             : closeModal()
                     "
                     v-bind="$attrs"
+                    @goToLogin="onGoToLogin"
                 >
                     <slot name="header"></slot>
                     <div class="modal">
@@ -32,6 +33,7 @@
     </ClientOnly>
 </template>
 <script setup>
+import { useEventBus } from "@vueuse/core";
 const props = defineProps({
     active: Boolean,
     style: Object,
@@ -66,7 +68,7 @@ const props = defineProps({
         default: 10,
     },
 });
-
+const modalStateBus = useEventBus("modal-state");
 const emit = defineEmits(["update:active", "mounted", "close"]);
 const transitionString = computed(() => {
     return `${props.transition}ms`;
@@ -93,6 +95,7 @@ const closeModal = () => {
         isClosing.value = false;
     }, props.transition);
 };
+
 const openModal = () => {
     isActive.value = true;
     setTimeout(() => {
@@ -109,6 +112,16 @@ watch(
         }
     }
 );
+const unsubscribe = modalStateBus.on((state) => {
+    if (state) {
+        openModal();
+    } else {
+        closeModal();
+    }
+});
+onBeforeUnmount(() => {
+    unsubscribe();
+});
 </script>
 <style lang="scss">
 .modal-enter-active,
