@@ -31,4 +31,4 @@ class ValidateJsonWithFormBody(BaseModel):
     def validate_to_json(cls, value):
         if isinstance(value, str):
             return cls(**json.loads(value))
-        return value
+        yield cls.validate

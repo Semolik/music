@@ -80,7 +80,9 @@ export const useAuthStore = defineStore({
         init() {
             this.refresh();
             setInterval(() => {
-                this.refresh();
+                if (this.logined) {
+                    this.refresh();
+                }
             }, 1000 * 60 * 5);
         },
     },

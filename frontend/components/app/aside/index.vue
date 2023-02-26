@@ -43,6 +43,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 const runtimeConfig = useRuntimeConfig();
+
 const { playlistIcon, albumIcon, trackIcon, musicianIcon } =
     runtimeConfig.public;
 const authStore = useAuthStore();

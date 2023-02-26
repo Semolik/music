@@ -7,6 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         modalStateBus.emit(false);
         router.push("/login");
     });
+
     onBeforeUnmount(() => {
         unsubscribeLoginBus();
     });
