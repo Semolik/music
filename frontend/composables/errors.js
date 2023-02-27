@@ -1,4 +1,5 @@
 export const HandleAxiosError = (error, errorText) => {
+    console.log(error);
     if (error.response) {
         let status = error.response.status;
         let message = error.response.data?.detail || errorText || error.message;

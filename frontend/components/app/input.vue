@@ -1,7 +1,13 @@
 <template>
     <el-input v-bind="$attrs" v-model="value">
-        <template #suffix v-if="props.showWordLimit">
-            <span :class="['el-input__count', { disabled: !value }]">
+        <template #suffix>
+            <span
+                :class="[
+                    'el-input__count',
+                    { disabled: !showWordLimit || !value },
+                ]"
+                v-if="showWordLimit"
+            >
                 <span class="el-input__count-inner">
                     <span
                         :class="[
@@ -46,6 +52,7 @@ const props = defineProps({
 });
 const height = ref(props.height);
 const value = ref(props.modelValue);
+const showWordLimit = ref(props.showWordLimit);
 const emit = defineEmits(["update:modelValue"]);
 watch(value, (val) => {
     if (props.maxLength && val.length > props.maxLength) {

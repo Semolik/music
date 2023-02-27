@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { Service } from "@/client";
-import { Role } from "@/helpers/roles";
-
+import { UserTypeEnum } from "@/client/models/UserTypeEnum";
 export const useAuthStore = defineStore({
     id: "auth",
     state: () => ({
@@ -20,16 +19,16 @@ export const useAuthStore = defineStore({
             return name;
         },
         isAdmin() {
-            return this.userData?.type === Role.Admin;
+            return this.userData?.type === UserTypeEnum.SUPERUSER;
         },
         isUser() {
-            return this.userData?.type === Role.User;
+            return this.userData?.type === UserTypeEnum.USER;
         },
         isMusician() {
-            return this.userData?.type === Role.Musician;
+            return this.userData?.type === UserTypeEnum.MUSICIAN;
         },
         isRadioStation() {
-            return this.userData?.type === Role.RadioStation;
+            return this.userData?.type === UserTypeEnum.RADIOSTAION;
         },
     },
     actions: {

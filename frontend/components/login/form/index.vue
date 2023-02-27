@@ -16,7 +16,7 @@
             <AppInput
                 v-model="login"
                 placeholder="Юзернейм"
-                :show-word-limit="register"
+                :show-word-limit="showLoginLimit"
                 :maxLength="MAX_LOGIN_LENGTH"
                 :minLength="MIN_LOGIN_LENGTH"
                 :formatter="validateLogin"
@@ -29,6 +29,8 @@
                 :maxLength="MAX_PASSWORD_LENGTH"
                 :minLength="MIN_PASSWORD_LENGTH"
             />
+            <LoginFormPasswordStrength :password="password" />
+
             <div class="login-button" @click="loginHandler">
                 {{ register ? "Зарегистрироваться" : "Войти" }}
             </div>
@@ -62,19 +64,27 @@ const {
 const showPasswordLimit = computed(
     () => password.value.length === MAX_PASSWORD_LENGTH
 );
-
+const showLoginLimit = computed(
+    () => register || login.value.length === MAX_LOGIN_LENGTH
+);
 const message = ref("");
 const messageIsShowed = ref(false);
 const messageTimer = ref(null);
+const messageNestedTimer = ref(null);
 const isErrorMessage = ref(false);
 const showMessage = (messageText, isError) => {
-    clearTimeout(messageTimer.value);
+    if (messageTimer.value) {
+        clearTimeout(messageTimer.value);
+        if (messageNestedTimer.value) {
+            clearTimeout(messageNestedTimer.value);
+        }
+    }
     isErrorMessage.value = isError;
     message.value = messageText;
     messageIsShowed.value = true;
     messageTimer.value = setTimeout(() => {
         messageIsShowed.value = false;
-        setTimeout(() => {
+        messageNestedTimer.value = setTimeout(() => {
             message.value = "";
         }, 500);
     }, 3000 * (isError ? 2 : 1));
