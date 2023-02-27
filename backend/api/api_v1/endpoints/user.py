@@ -29,7 +29,12 @@ def update_user_data(
     db_image = save_image(db=db, upload_file=userPicture,
                           user_id=db_user.id)
     db_user_updated = UserCruds(db).update_user(
-        user=db_user, new_user_data=UserData, userPic=db_image)
+        user=db_user,
+        userPic=db_image,
+        first_name=UserData.first_name,
+        last_name=UserData.last_name,
+        remove_picture=UserData.remove_picture
+    )
     return db_user_updated
 
 

@@ -10,5 +10,5 @@ def send_change_role_request(client: TestClient, cookies, message='test message'
     files = {'files': ('filename.jpg', open(filename, 'rb'), 'image/jpeg')}
 
     response = client.post(
-        "/change-role", data=data, cookies=cookies, files=files)
+        "/roles/change", data=data, cookies=cookies, files=files)
     return response

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         'http://localhost:4000', 'http://192.168.50.106:4000', 'http://192.168.1.133:4000']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
-    TEST_DATABASE_URI: Optional[str] = DATABASE_URI + '_test'
+    TEST_DATABASE_URI: Optional[str] = DATABASE_URI + "_test"
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
     IMAGES_FOLDER: str = ASSETS_FOLDER+'images'
@@ -29,7 +29,6 @@ class Settings(BaseSettings):
         'youtube': 'https://www.youtube.com/channel/{0}',
         'youtube_video': 'https://www.youtube.com/watch?v={0}',
     }
-    YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v={0}'
 
     TEST_USER_USERNAME = 'test_user'
     TEST_USER_PASSWORD = 'test_user_password'
@@ -41,8 +40,7 @@ class Settings(BaseSettings):
     TEST_MUSICIAN_PASSWORD = 'musician_test_password'
     TEST_ANOTHER_MUSICIAN_USERNAME = 'musician_another'
     PAGINATION_LIMIT = 20
-    # IMAGE_URL_BASE = ''.join(
-    #     [SERVER_LINK, API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
+
     IMAGE_URL_BASE = ''.join(
         [API_V1_STR, UPLOADS_ROUTE, '/images/', '{0}'])
     UUID_REGEX = '[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}'

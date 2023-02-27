@@ -1,7 +1,8 @@
 <template>
     <card-min v-bind="props">
         <template #content>
-            <span>{{ track.album.musician.name }}</span>
+            <span>{{ track.name }}</span>
+            <span class="secondary-text">{{ track.album.musician.name }}</span>
         </template>
         <template #card-end>
             <div class="track-dots-button-container">

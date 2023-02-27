@@ -98,8 +98,7 @@ def update_album(
                           user_id=db_user.id)
     db_album = AlbumsCruds(db).update_album(album=db_album,
                                             name=albumData.name, date=albumData.open_date, genres=genres, image=db_image, tracks_ids=tracks_ids)
-    album_obj = set_album_info(db_album=db_album)
-    return set_album_tracks(db=db, db_album=db_album, db_album_obj=album_obj)
+    return db_album
 
 
 @router.get('/my', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])

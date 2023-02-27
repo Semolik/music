@@ -21,6 +21,7 @@
                 size="large"
                 ref="searchInput"
                 :suffix-icon="searching ? Loading : null"
+                clearable
             />
             <div :class="['results-categories']" v-if="searchQuery">
                 <div
@@ -265,7 +266,7 @@ const onSearchActiveUpdate = (val) => {
                 .el-input__wrapper {
                     font-size: large;
                     .el-input__suffix {
-                        .el-icon {
+                        .el-icon:not(.el-input__clear) {
                             svg {
                                 @keyframes rotate {
                                     0% {

@@ -22,9 +22,8 @@ def test_change_role_requests_limit(client: TestClient, normal_user_token_cookie
 
 
 def test_get_all_change_role_requests(client: TestClient, normal_admin_token_cookies):
-    response = client.get('change-role/all',
+    response = client.get('/roles/change/all',
                           cookies=normal_admin_token_cookies, params={'page': 1})
-    print(response.json())
     global change_role_requests
     change_role_requests = response.json()
 
@@ -33,7 +32,7 @@ def test_get_all_change_role_requests(client: TestClient, normal_admin_token_coo
 
 @pytest.mark.parametrize("filter", [i.value for i in ChangeRoleRequestStatus])
 def test_get_all_change_role_requests_with_filter(client: TestClient, normal_admin_token_cookies, filter):
-    response = client.get('change-role/all',
+    response = client.get('/roles/change/all',
                           cookies=normal_admin_token_cookies, params={'page': 1, 'filter': filter})
     assert response.status_code == 200
 
@@ -41,7 +40,7 @@ def test_get_all_change_role_requests_with_filter(client: TestClient, normal_adm
 def test_send_change_role_request_answer(client: TestClient, normal_admin_token_cookies):
 
     response = client.post(
-        f"change-role/{change_role_requests[0]['id']}/answer",
+        f"/roles/{change_role_requests[0]['id']}/answer",
         cookies=normal_admin_token_cookies,
         json={
             "message": "ok i accept your request",

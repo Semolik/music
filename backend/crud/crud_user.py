@@ -53,19 +53,16 @@ class UserCruds(CRUDBase):
     def check_password(self, user: User, password: str) -> bool:
         return self.pwd_context.verify(password, user.hashed_password)
 
-    def update_user(self, user: User, new_user_data: UserModifiable, userPic: Image) -> User:
+    def update_user(self, user: User, first_name: str | None, last_name: str | None, remove_picture: bool, userPic: Image) -> User:
         if user is None:
             raise Exception('Update user failed: user is None')
-        data_obj = new_user_data.dict()
-        remove_picture = data_obj.pop('remove_picture')
-        for var, value in data_obj.items():
-            setattr(user, var, value) if value is not None else None
+        user.first_name = first_name
+        user.last_name = last_name
         if remove_picture and user.picture:
             self.delete(user.picture)
         elif userPic:
             FileCruds(self.db).replace_old_picture(
                 model=user, new_picture=userPic)
-
         return self.create(user)
 
     def get_public_profile(self, user_id: int) -> PublicProfile:
@@ -85,7 +82,7 @@ class UserCruds(CRUDBase):
         return self.create(PublicProfile(
             name=name,
             user_id=user_id,
-            links=links,
+            links=self.create(links),
             picture=picture
         ))
 

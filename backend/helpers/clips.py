@@ -6,7 +6,8 @@ import requests
 
 def set_clip_data(clip: Clip):
     clip_obj = clip.as_dict()
-    clip_obj['video'] = settings.YOUTUBE_VIDEO.format(clip.video_id)
+    clip_obj['video'] = settings.SOCIAL_LINKS_FORMAT.get(
+        'youtube_video').format(clip.video_id)
     return set_picture(clip_obj, clip.picture)
 
 

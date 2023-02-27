@@ -58,24 +58,34 @@ export const useAuthStore = defineStore({
         },
         async loginRequest(username, password) {
             this.logined = false;
-
-            const userData = await Service.loginApiV1AuthLoginPost({
-                username: username,
-                password: password,
-            });
-            this.userData = userData;
-            this.logined = true;
+            try {
+                const userData = await Service.loginApiV1AuthLoginPost({
+                    username: username,
+                    password: password,
+                });
+                this.userData = userData;
+                this.logined = true;
+            } catch (error) {
+                this.logout();
+                return error;
+            }
         },
         async registerRequest(username, password, first_name, last_name) {
             this.logined = false;
-            const userData = await Service.createUserSignupApiV1AuthSignupPost({
-                username: username,
-                password: password,
-                first_name,
-                last_name,
-            });
-            this.userData = userData;
-            this.logined = true;
+            try {
+                const userData =
+                    await Service.createUserSignupApiV1AuthSignupPost({
+                        username: username,
+                        password: password,
+                        first_name,
+                        last_name,
+                    });
+                this.userData = userData;
+                this.logined = true;
+            } catch (error) {
+                this.logout();
+                return error;
+            }
         },
         init() {
             this.refresh();
