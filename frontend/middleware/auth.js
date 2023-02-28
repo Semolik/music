@@ -9,8 +9,8 @@ export default defineNuxtRouteMiddleware(async (context) => {
         const cookie = useCookie("access_token_cookie");
         if (cookie.value) {
             try {
-                const request = await axios.get(
-                    "http://localhost:8000/api/v1/users/refresh",
+                const request = await axios.post(
+                    "http://localhost:8000/api/v1/auth/refresh",
                     {
                         withCredentials: true,
                         headers: {
@@ -21,17 +21,17 @@ export default defineNuxtRouteMiddleware(async (context) => {
                 if (request.status === 200) {
                     logined.value = true;
                 }
-            } finally {
-                if (!logined.value) {
-                    logout();
-                    return navigateTo("/login");
-                }
+            } catch (error) {}
+
+            if (!logined.value) {
+                logout();
+                return navigateTo("/login");
             }
         }
     } else if (process.client) {
         await refresh();
         if (!logined.value) {
-            return navigateTo("/login", { replace: true });
+            return navigateTo("/login");
         }
     }
 });

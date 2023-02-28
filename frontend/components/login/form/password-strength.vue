@@ -53,19 +53,7 @@
                     <span>Содержит специальные символы</span>
                 </div>
             </div>
-            <div
-                :class="[
-                    'password-contain-item',
-                    {
-                        active: containsMoreThan6,
-                    },
-                ]"
-            >
-                <Icon name="material-symbols:check-circle" />
-                <div class="password-contain-item__text">
-                    <span>Содержит более 6 символов</span>
-                </div>
-            </div>
+
             <div
                 :class="[
                     'password-contain-item',
@@ -84,6 +72,7 @@
 </template>
 <script setup>
 import { passwordStrength } from "check-password-strength";
+
 const props = defineProps({
     password: {
         type: String,
@@ -131,9 +120,7 @@ const containNumber = computed(() => {
 const containsSymbols = computed(() => {
     return strength.value.contains.includes("symbol");
 });
-const containsMoreThan6 = computed(() => {
-    return strength.value.length >= 6;
-});
+
 const containsMoreThan10 = computed(() => {
     return strength.value.length >= 10;
 });

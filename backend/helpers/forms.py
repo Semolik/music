@@ -24,7 +24,7 @@ def form_body(cls):
 
 class ValidateJsonWithFormBody(BaseModel):
     @classmethod
-    def __get_validators__(cls):
+    def get_validators(cls):
         yield cls.validate_to_json
 
     @classmethod

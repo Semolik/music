@@ -13,6 +13,20 @@
             <div class="headline">
                 {{ register ? "Зарегистрироваться" : "Войти в свой аккаунт" }}
             </div>
+            <template v-if="register">
+                <AppInput
+                    placeholder="Имя"
+                    show-word-limit
+                    :maxLength="MAX_FIRSTNAME_LENGTH"
+                    v-model="firstName"
+                />
+                <AppInput
+                    placeholder="Фамилия"
+                    show-word-limit
+                    :maxLength="MAX_LASTNAME_LENGTH"
+                    v-model="lastName"
+                />
+            </template>
             <AppInput
                 v-model="login"
                 placeholder="Юзернейм"
@@ -25,7 +39,6 @@
                 v-model="password"
                 placeholder="Пароль"
                 type="password"
-                :show-word-limit="showPasswordLimit"
                 :maxLength="MAX_PASSWORD_LENGTH"
                 :minLength="MIN_PASSWORD_LENGTH"
             />
@@ -54,15 +67,17 @@ const { register } = defineProps({
 const toast = useToast();
 const login = ref("");
 const password = ref("");
+const firstName = ref("");
+const lastName = ref("");
 const {
     MIN_PASSWORD_LENGTH,
     MAX_PASSWORD_LENGTH,
     MAX_LOGIN_LENGTH,
     MIN_LOGIN_LENGTH,
+    MAX_FIRSTNAME_LENGTH,
+    MAX_LASTNAME_LENGTH,
 } = runtimeConfig.public;
-const showPasswordLimit = computed(
-    () => password.value.length === MAX_PASSWORD_LENGTH
-);
+
 const showLoginLimit = computed(
     () => register || login.value.length === MAX_LOGIN_LENGTH
 );
@@ -111,7 +126,12 @@ const loginHandler = async () => {
         return;
     }
     const error = register
-        ? await authStore.registerRequest(login.value, password.value)
+        ? await authStore.registerRequest(
+              login.value,
+              password.value,
+              firstName.value,
+              lastName.value
+          )
         : await authStore.loginRequest(login.value, password.value);
     if (error) {
         toast.error(HandleOpenApiError(error).message);
@@ -134,22 +154,23 @@ const validateLogin = (value) => {
 .login-form-container {
     @include flex-center;
     flex-direction: column;
+    gap: 10px;
     height: 100%;
 
     .login-form {
         color: $primary-text;
         width: 100%;
         max-width: 400px;
-        padding: 20px;
-        background-color: $primary-bg;
-        border-radius: 10px;
+        padding: 30px;
         display: flex;
         flex-direction: column;
         gap: 10px;
         position: relative;
+        background-color: $primary-bg-2;
+        border-radius: 10px;
         .message {
             position: absolute;
-            bottom: 100%;
+            bottom: 110%;
             left: 0;
             width: 100%;
             font-size: 14px;
@@ -168,6 +189,7 @@ const validateLogin = (value) => {
             font-weight: 500;
             text-align: center;
             color: $secondary-text;
+            margin-bottom: 10px;
         }
 
         .login-button {
@@ -175,13 +197,18 @@ const validateLogin = (value) => {
             height: 40px;
 
             border-radius: 5px;
-            color: $primary-text;
+
             font-weight: 500;
             cursor: pointer;
             user-select: none;
             background-color: $tertiary-bg;
             &:hover {
                 background-color: $quaternary-bg;
+            }
+            color: $secondary-text;
+            cursor: pointer;
+            &:hover {
+                color: $primary-text;
             }
         }
     }
