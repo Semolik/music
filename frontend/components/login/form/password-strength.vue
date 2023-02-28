@@ -90,9 +90,35 @@ const props = defineProps({
         required: true,
     },
 });
-
+const runtimeConfig = useRuntimeConfig();
+const { MIN_PASSWORD_LENGTH } = runtimeConfig.public;
 const strength = computed(() => {
-    return passwordStrength(props.password);
+    return passwordStrength(props.password, [
+        {
+            id: 0,
+            value: "Too weak",
+            minDiversity: 0,
+            minLength: 0,
+        },
+        {
+            id: 1,
+            value: "Weak",
+            minDiversity: 2,
+            minLength: MIN_PASSWORD_LENGTH,
+        },
+        {
+            id: 2,
+            value: "Medium",
+            minDiversity: 4,
+            minLength: MIN_PASSWORD_LENGTH,
+        },
+        {
+            id: 3,
+            value: "Strong",
+            minDiversity: 4,
+            minLength: 10,
+        },
+    ]);
 });
 const containLowerAndUpper = computed(() => {
     return ["lowercase", "uppercase"].every((rule) =>
@@ -116,11 +142,12 @@ const containsMoreThan10 = computed(() => {
 .password-strength {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 
     .bar {
         width: 100%;
         height: 5px;
-        background-color: $primary-bg;
+        background-color: $tertiary-bg;
         border-radius: 5px;
         overflow: hidden;
         .progress {
@@ -131,7 +158,7 @@ const containsMoreThan10 = computed(() => {
                 background-color: $accent-error;
             }
             &.id-1 {
-                background-color: $accent-red;
+                background-color: $accent-warning;
             }
             &.id-2 {
                 background-color: $accent-success;
@@ -143,7 +170,7 @@ const containsMoreThan10 = computed(() => {
         display: flex;
         flex-direction: column;
         gap: 5px;
-        margin-bottom: 10px;
+
         .password-contain-item {
             display: flex;
             align-items: center;
@@ -153,7 +180,7 @@ const containsMoreThan10 = computed(() => {
                     color: $accent-success;
                 }
                 span {
-                    color: $primary-text;
+                    color: $accent-success;
                 }
             }
             svg {

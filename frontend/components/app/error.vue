@@ -13,15 +13,13 @@
 </template>
 
 <script setup>
-import { HandleAxiosError } from "@/composables/errors";
+import { HandleAxiosError, HandleOpenApiError } from "@/composables/errors";
 const props = defineProps({
     error: Object,
 });
-const errorData = computed(() => HandleAxiosError(props.error.value));
+const errorData = computed(() => HandleOpenApiError(props.error.value));
 const emit = defineEmits(["clearError"]);
-watch(errorData, (val) => {
-    console.log(val);
-});
+
 const handleError = () => {
     emit("clearError");
 };

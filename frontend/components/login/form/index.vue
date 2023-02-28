@@ -29,8 +29,7 @@
                 :maxLength="MAX_PASSWORD_LENGTH"
                 :minLength="MIN_PASSWORD_LENGTH"
             />
-            <LoginFormPasswordStrength :password="password" />
-
+            <LoginFormPasswordStrength :password="password" v-if="register" />
             <div class="login-button" @click="loginHandler">
                 {{ register ? "Зарегистрироваться" : "Войти" }}
             </div>
@@ -42,8 +41,8 @@
 </template>
 <script setup>
 import { useAuthStore } from "~~/stores/auth";
-import { HandleAxiosError } from "~~/composables/errors";
-
+import { HandleOpenApiError } from "~~/composables/errors";
+import { useToast } from "vue-toastification";
 const authStore = useAuthStore();
 const runtimeConfig = useRuntimeConfig();
 const { register } = defineProps({
@@ -52,7 +51,7 @@ const { register } = defineProps({
         default: false,
     },
 });
-
+const toast = useToast();
 const login = ref("");
 const password = ref("");
 const {
@@ -101,12 +100,21 @@ const loginHandler = async () => {
         );
         return;
     }
-
+    if (password.value.length > MAX_PASSWORD_LENGTH) {
+        showMessage(
+            `Пароль должен быть не более ${MAX_PASSWORD_LENGTH} символов`
+        );
+        return;
+    }
+    if (login.value.length > MAX_LOGIN_LENGTH) {
+        showMessage(`Логин должен быть не более ${MAX_LOGIN_LENGTH} символов`);
+        return;
+    }
     const error = register
         ? await authStore.registerRequest(login.value, password.value)
         : await authStore.loginRequest(login.value, password.value);
     if (error) {
-        showMessage(HandleAxiosError(error).message, true);
+        toast.error(HandleOpenApiError(error).message);
         return;
     }
     const router = useRouter();
@@ -151,7 +159,7 @@ const validateLogin = (value) => {
             &.active {
                 color: $secondary-text;
                 &.error {
-                    color: $accent-red;
+                    color: $accent-error;
                 }
             }
         }
@@ -165,13 +173,13 @@ const validateLogin = (value) => {
         .login-button {
             @include flex-center;
             height: 40px;
-            background-color: $tertiary-bg;
+
             border-radius: 5px;
             color: $primary-text;
             font-weight: 500;
             cursor: pointer;
             user-select: none;
-
+            background-color: $tertiary-bg;
             &:hover {
                 background-color: $quaternary-bg;
             }
