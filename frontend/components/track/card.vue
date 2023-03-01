@@ -17,7 +17,7 @@
 <script setup>
 import moment from "moment";
 import { IconsNames } from "@/configs/icons";
-const { dotsIcon } = IconsNames.public;
+const { dotsIcon } = IconsNames;
 const { track } = defineProps({
     track: {
         type: Object,

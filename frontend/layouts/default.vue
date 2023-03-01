@@ -1,5 +1,5 @@
 <template>
-    <NuxtErrorBoundary>
+    <NuxtErrorBoundary @error="handleError">
         <div class="default-layout">
             <AppAside v-if="$viewport.isGreaterOrEquals('lg')" />
             <div class="content-container">
@@ -44,5 +44,8 @@
 <script setup>
 const fixIssue = (error) => {
     error.value = null;
+};
+const handleError = (error) => {
+    console.error(error);
 };
 </script>

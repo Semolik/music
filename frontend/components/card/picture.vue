@@ -29,6 +29,7 @@ const { picture, icon, borderRadius } = defineProps({
 .card-picture {
     position: relative;
     @include flex-center;
+    aspect-ratio: 1;
     &.min {
         height: 100%;
         background-color: $tertiary-bg;
