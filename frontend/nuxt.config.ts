@@ -14,13 +14,11 @@ export default defineNuxtConfig({
     ssr: true,
     viewport: {
         breakpoints: {
-            // desktop: 1024,
-            // desktopMedium: 1280,
-            // desktopWide: 1600,
-            // mobile: 320,
-            // mobileMedium: 375,
-            // mobileWide: 425,
-            // tablet: 768,
+            xs: 360,
+            sm: 576,
+            md: 768,
+            lg: 992,
+            xl: 1200,
         },
     },
     nuxtTypedRouter: {
@@ -76,6 +74,11 @@ export default defineNuxtConfig({
             likeIcon: "material-symbols:favorite",
             playIcon: "material-symbols:play-arrow",
             dotsIcon: "material-symbols:more-horiz",
+            homeIcon: "material-symbols:home-outline-rounded",
+            historyIcon: "material-symbols:history-rounded",
+            menuIcon: "material-symbols:menu",
+            searchIcon: "material-symbols:search",
+            loginIcon: "material-symbols:login-rounded",
 
             AuthBusKey: "auth",
 

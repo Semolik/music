@@ -1,13 +1,14 @@
 <template>
     <NuxtErrorBoundary>
         <div class="default-layout">
-            <AppAside id="aside" />
+            <AppAside v-if="$viewport.isGreaterOrEquals('lg')" />
             <div class="content-container">
-                <AppHeader />
+                <AppHeader v-if="$viewport.isGreaterOrEquals('lg')" />
                 <div class="app-content">
                     <slot />
                 </div>
             </div>
+            <AppBottomBar v-if="$viewport.isLessThan('lg')" />
         </div>
         <template #error="{ error }">
             <AppError :error="error" @clearError="fixIssue(error)" />
@@ -21,9 +22,7 @@
     height: 100%;
     @include lg(true) {
         grid-template-columns: 1fr;
-        #aside {
-            grid-row: 2;
-        }
+        grid-template-rows: 1fr;
     }
 
     .content-container {
@@ -34,6 +33,7 @@
             flex-grow: 1;
             overflow: auto;
             padding: 0px 20px;
+            height: 100%;
         }
     }
 }

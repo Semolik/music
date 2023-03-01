@@ -5,32 +5,32 @@ $screen-lg-min: 992px;
 $screen-xl-min: 1200px;
 
 @mixin xs($max: false) {
-    @media (#{if($max, max-width, min-width)} : #{$screen-xs-min}) {
+    @media (#{if($max, max-width, min-width)} : #{$screen-xs-min - 1}) {
         @content;
     }
 }
 @mixin sm($max: false) {
-    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-sm-min, $screen-sm-min + 1)}) {
+    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-sm-min - 1, $screen-sm-min)}) {
         @content;
     }
 }
 @mixin md($max: false) {
-    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-md-min, $screen-md-min + 1)}) {
+    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-md-min - 1, $screen-md-min )}) {
         @content;
     }
 }
 @mixin lg($max: false) {
-    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-lg-min, $screen-lg-min + 1)}) {
+    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-lg-min - 1 , $screen-lg-min)}) {
         @content;
     }
 }
 @mixin xl($max: false) {
-    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-xl-min, $screen-xl-min + 1)}) {
+    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-xl-min - 1, $screen-xl-min)}) {
         @content;
     }
 }
 @mixin rwd($screen, $max: false) {
-    @media (#{if($max, max-width, min-width)} : (#{if($max, $screen, $screen + 1)} + "px")) {
+    @media (#{if($max, max-width, min-width)} : (#{if($max, $screen - 1, $screen)} + "px")) {
         @content;
     }
 }
