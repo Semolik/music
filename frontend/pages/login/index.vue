@@ -3,6 +3,6 @@
 </template>
 <script setup>
 useHead({
-    title: "My App",
+    title: "Вход",
 });
 </script>

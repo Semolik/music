@@ -1,7 +1,7 @@
 <template>
     <NuxtErrorBoundary>
         <div class="default-layout">
-            <AppAside />
+            <AppAside id="aside" />
             <div class="content-container">
                 <AppHeader />
                 <div class="app-content">
@@ -19,6 +19,13 @@
     display: grid;
     grid-template-columns: min-content 1fr;
     height: 100%;
+    @include lg(true) {
+        grid-template-columns: 1fr;
+        #aside {
+            grid-row: 2;
+        }
+    }
+
     .content-container {
         display: flex;
         flex-direction: column;

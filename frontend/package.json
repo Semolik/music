@@ -14,6 +14,7 @@
         "@vueuse/core": "^9.13.0",
         "@vueuse/nuxt": "^9.13.0",
         "nuxt": "^3.2.0",
+        "nuxt-viewport": "^2.0.3",
         "openapi-typescript-codegen": "^0.23.0",
         "sass": "^1.58.1"
     },
@@ -26,6 +27,7 @@
         "check-password-strength": "^2.0.7",
         "moment": "^2.29.4",
         "nuxt-icon": "^0.3.2",
+        "nuxt-typed-router": "^3.0.2",
         "pinia": "^2.0.30",
         "vue-toastification": "^2.0.0-rc.5"
     },

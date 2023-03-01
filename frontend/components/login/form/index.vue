@@ -1,6 +1,6 @@
 <template>
     <div class="login-form-container">
-        <div class="login-form">
+        <div class="login-form shadow-2xl">
             <div
                 :class="[
                     'message',

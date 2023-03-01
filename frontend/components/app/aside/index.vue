@@ -1,5 +1,5 @@
 <template>
-    <aside>
+    <aside v-bind="$attrs">
         <div class="selections">
             <NuxtLink to="/" class="selection">
                 <Icon name="material-symbols:home-outline-rounded" />
