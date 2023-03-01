@@ -22,7 +22,8 @@
     </card>
 </template>
 <script setup>
-const runtimeConfig = useRuntimeConfig();
+import { IconsNames } from "@/configs/icons";
+
 const { playlist } = defineProps({
     playlist: {
         type: Object,
@@ -36,6 +37,6 @@ const { playlist } = defineProps({
 
 const props = reactive({
     picture: playlist.picture,
-    icon: runtimeConfig.public.playlistIcon,
+    icon: IconsNames.playlistIcon,
 });
 </script>

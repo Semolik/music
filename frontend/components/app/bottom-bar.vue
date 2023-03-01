@@ -12,8 +12,8 @@
     </div>
 </template>
 <script setup>
-const runtimeConfig = useRuntimeConfig();
-const { homeIcon, menuIcon, searchIcon } = runtimeConfig.public;
+import { IconsNames } from "@/configs/icons";
+const { homeIcon, menuIcon, searchIcon } = IconsNames;
 </script>
 <style lang="scss" scoped>
 .bottom-bar {

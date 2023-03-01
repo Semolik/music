@@ -32,7 +32,10 @@
         .app-content {
             flex-grow: 1;
             overflow: auto;
-            padding: 0px 20px;
+            padding-inline: 20px;
+            @include lg(true) {
+                padding-inline: 10px;
+            }
             height: 100%;
         }
     }

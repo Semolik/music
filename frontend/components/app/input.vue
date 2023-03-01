@@ -70,6 +70,13 @@ watch(value, (val) => {
     --el-input-focus-border-color: #{$accent};
     --el-input-text-color: #{$primary-text};
     --el-input-height: v-bind(height);
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        select:focus,
+        textarea:focus,
+        input:focus {
+            font-size: 16px;
+        }
+    }
 
     .el-input__count {
         opacity: 1;

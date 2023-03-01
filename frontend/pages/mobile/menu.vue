@@ -1,3 +1,3 @@
 <template>
-    <div class="mobile-menu"></div>
+    <Menu />
 </template>

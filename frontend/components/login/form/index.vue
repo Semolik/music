@@ -154,7 +154,7 @@ const validateLogin = (value) => {
 .login-form-container {
     @include flex-center;
     flex-direction: column;
-    gap: 10px;
+    gap: 20px;
     height: 100%;
 
     .login-form {
@@ -168,6 +168,9 @@ const validateLogin = (value) => {
         position: relative;
         background-color: $primary-bg-2;
         border-radius: 10px;
+        @include md(true) {
+            padding: 20px;
+        }
         .message {
             position: absolute;
             bottom: 110%;

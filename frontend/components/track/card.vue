@@ -16,8 +16,8 @@
 </template>
 <script setup>
 import moment from "moment";
-const runtimeConfig = useRuntimeConfig();
-const { dotsIcon } = runtimeConfig.public;
+import { IconsNames } from "@/configs/icons";
+const { dotsIcon } = IconsNames.public;
 const { track } = defineProps({
     track: {
         type: Object,
@@ -31,7 +31,7 @@ const duration = computed(() =>
 );
 const props = reactive({
     picture: track.picture,
-    icon: runtimeConfig.public.trackIcon,
+    icon: IconsNames.trackIcon,
 });
 </script>
 <style lang="scss" scoped>

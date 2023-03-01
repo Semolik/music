@@ -26,7 +26,7 @@
     </card>
 </template>
 <script setup>
-const runtimeConfig = useRuntimeConfig();
+import { IconsNames } from "@/configs/icons";
 const { album } = defineProps({
     album: {
         type: Object,
@@ -40,6 +40,6 @@ const { album } = defineProps({
 
 const props = reactive({
     picture: album.picture,
-    icon: runtimeConfig.public.albumIcon,
+    icon: IconsNames.albumIcon,
 });
 </script>

@@ -10,12 +10,12 @@
     </NuxtLink>
 </template>
 <script setup>
+import { IconsNames } from "@/configs/icons";
 const { fullName, picture } = defineProps({
     fullName: String,
     picture: String | null,
 });
-const runtimeConfig = useRuntimeConfig();
-const { musicianIcon } = runtimeConfig.public;
+const { musicianIcon } = IconsNames;
 </script>
 <style lang="scss" scoped>
 .logined-info {

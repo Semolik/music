@@ -41,11 +41,11 @@ import { Service } from "~~/client";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
-
+import { IconsNames } from "@/configs/icons";
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
-const runtimeConfig = useRuntimeConfig();
-const { likeIcon, playIcon, dotsIcon } = runtimeConfig.public;
+
+const { likeIcon, playIcon, dotsIcon } = IconsNames;
 const goToLoginBus = useEventBus("go-to-login");
 const { musician } = defineProps({
     musician: {
@@ -62,7 +62,7 @@ const liked = ref(musician.liked);
 
 const props = reactive({
     picture: musician.picture,
-    icon: runtimeConfig.public.musicianIcon,
+    icon: IconsNames.musicianIcon,
     borderRadius: "50%",
 });
 const onFavorite = async () => {
