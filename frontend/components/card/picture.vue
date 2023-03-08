@@ -28,6 +28,7 @@ const { picture, icon, borderRadius } = defineProps({
 <style lang="scss">
 .card-picture {
     position: relative;
+    overflow: hidden;
     @include flex-center;
     aspect-ratio: 1;
     &.min {

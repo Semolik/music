@@ -1,3 +1,7 @@
 <template></template>
 
-<script setup></script>
+<script setup>
+useHead({
+    title: "История",
+});
+</script>

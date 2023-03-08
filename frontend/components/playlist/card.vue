@@ -24,7 +24,7 @@
 <script setup>
 import { IconsNames } from "@/configs/icons";
 
-const { playlist } = defineProps({
+const { playlist, min } = defineProps({
     playlist: {
         type: Object,
         required: true,

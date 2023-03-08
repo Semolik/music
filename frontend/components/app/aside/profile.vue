@@ -1,5 +1,5 @@
 <template>
-    <NuxtLink to="/profile" class="logined-info">
+    <NuxtLink to="/settings/profile" class="logined-info">
         <div class="picture">
             <img :src="picture" alt="profile picture" v-if="picture" />
             <div class="picture-icon">

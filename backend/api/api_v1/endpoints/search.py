@@ -80,12 +80,12 @@ def search_clip(text: str = Query(description="Поисковый запрос")
 def search_playlist(text: str = Query(description="Поисковый запрос"), Auth: Authenticate = Depends(Authenticate(required=False))):
     search_crud = SearchCrud(Auth.db)
     db_playlists = search_crud.search_playlists_by_name(
-        name=text, limit=settings.SEARCH_PLAYLIST_LIMIT, current_user=Auth.current_user)
-    # db_playlists_objs = []
-    # for playlist in db_playlists:
-    #     playlist_obj = SearchPlaylist.from_orm(playlist)
-    #     if Auth.current_user_id:
-    #         playlist_obj.liked = PlaylistsCrud(Auth.db).playlist_is_liked(
-    #             playlist_id=playlist.id, user_id=Auth.current_user_id)
-    #     db_playlists_objs.append(playlist_obj)
+        name=text, limit=settings.SEARCH_PLAYLIST_LIMIT)
+    db_playlists_objs = []
+    for playlist in db_playlists:
+        playlist_obj = SearchPlaylist.from_orm(playlist)
+        if Auth.current_user_id:
+            playlist_obj.liked = PlaylistsCrud(Auth.db).playlist_is_liked(
+                playlist_id=playlist.id, user_id=Auth.current_user_id)
+        db_playlists_objs.append(playlist_obj)
     return db_playlists

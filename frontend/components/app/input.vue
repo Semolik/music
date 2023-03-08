@@ -1,5 +1,11 @@
 <template>
-    <el-input v-bind="$attrs" v-model="value">
+    <el-input
+        v-bind="$attrs"
+        v-model="value"
+        :class="{
+            resize: resizeOnFocus,
+        }"
+    >
         <template #suffix>
             <span
                 :class="[
@@ -49,6 +55,10 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    resizeOnFocus: {
+        type: Boolean,
+        default: true,
+    },
 });
 const height = ref(props.height);
 const value = ref(props.modelValue);
@@ -63,18 +73,24 @@ watch(value, (val) => {
 </script>
 <style lang="scss">
 .el-input {
-    --el-input-bg-color: #{$secondary-bg};
-    --el-fill-color-blank: var (--el-input-bg-color);
-    --el-input-border-color: #{$quaternary-text};
-    --el-input-hover-border-color: #{$tertiary-text};
-    --el-input-focus-border-color: #{$accent};
-    --el-input-text-color: #{$primary-text};
+    --el-input-bg-color: var(--app-input-bg, #{$secondary-bg});
+    --el-fill-color-blank: var(--app-input-bg, #{$secondary-bg});
+    --el-input-border-color: var(--app-input-border, #{$quaternary-text});
+    --el-input-hover-border-color: var(
+        --app-input-hover-border,
+        #{$tertiary-text}
+    );
+    --el-input-focus-border-color: var(--app-input-focus-border, #{$accent});
+    --el-input-text-color: var(--app-input-text, #{$primary-text});
+    --el-input-border-radius: var(--app-input-border-radius, 10px);
     --el-input-height: v-bind(height);
-    @media screen and (-webkit-min-device-pixel-ratio: 0) {
-        select:focus,
-        textarea:focus,
-        input:focus {
-            font-size: 16px;
+    &.resize {
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            select:focus,
+            textarea:focus,
+            input:focus {
+                font-size: 16px;
+            }
         }
     }
 

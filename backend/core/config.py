@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     TEST_USER_USERNAME_3 = 'test_user__3'
     TEST_USER_PASSWORD_3 = 'test_user_password_2'
     TEST_ADMIN_USERNAME = 'admin'
+    TEST_ADMIN_PASSWORD = 'admin_password'
     TEST_MUSICIAN_USERNAME = 'musician_test'
     TEST_MUSICIAN_PASSWORD = 'musician_test_password'
     TEST_ANOTHER_MUSICIAN_USERNAME = 'musician_another'
@@ -63,6 +64,7 @@ class Settings(BaseSettings):
         UserTypeEnum.musician: "Музыкант",
     }
 
+    RANDOM_GENRES_COUNT = 20
     AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_ALBUM_LIMIT'))
     AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = int(

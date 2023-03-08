@@ -29,7 +29,7 @@
             </template>
             <AppInput
                 v-model="login"
-                placeholder="Юзернейм"
+                placeholder="Имя пользователя"
                 :show-word-limit="showLoginLimit"
                 :maxLength="MAX_LOGIN_LENGTH"
                 :minLength="MIN_LOGIN_LENGTH"
@@ -56,6 +56,7 @@
 import { useAuthStore } from "~~/stores/auth";
 import { HandleOpenApiError } from "~~/composables/errors";
 import { useToast } from "vue-toastification";
+import { routesNames } from "@typed-router";
 const authStore = useAuthStore();
 const runtimeConfig = useRuntimeConfig();
 const { register } = defineProps({
@@ -138,7 +139,9 @@ const loginHandler = async () => {
         return;
     }
     const router = useRouter();
-    router.push({ name: "profile" });
+    router.push({
+        name: register ? routesNames.setupGenres : routesNames.settings.profile,
+    });
 };
 const validateLogin = (value) => {
     const regex = /[^a-zA-Z0-9_]/g;
@@ -168,6 +171,7 @@ const validateLogin = (value) => {
         position: relative;
         background-color: $primary-bg-2;
         border-radius: 10px;
+        --app-input-border-radius: 5px;
         @include md(true) {
             padding: 20px;
         }

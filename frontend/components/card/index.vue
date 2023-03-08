@@ -4,6 +4,7 @@
             :picture="picture"
             :icon="icon"
             :borderRadius="borderRadius"
+            @click="$emit('picture-click')"
         />
         <slot />
     </div>

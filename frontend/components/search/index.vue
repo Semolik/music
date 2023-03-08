@@ -213,7 +213,9 @@ onBeforeUnmount(() => {
     --el-input-text-color: #{$primary-text};
     border-bottom: 1px solid #{$quaternary-text};
     .el-input__wrapper {
-        font-size: large;
+        input {
+            font-size: large;
+        }
         .el-input__suffix {
             .el-icon:not(.el-input__clear) {
                 svg {

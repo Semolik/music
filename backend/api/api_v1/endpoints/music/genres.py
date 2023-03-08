@@ -32,6 +32,12 @@ def create_genre(
     return db_genre
 
 
+@router.get('/random',  response_model=List[Genre])
+def get_random_genres(db: Session = Depends(get_db)):
+    '''Получение случайных жанров'''
+    return GenresCruds(db).get_random_genres(count=settings.RANDOM_GENRES_COUNT)
+
+
 @router.put('/{genre_id}/like', response_model=bool)
 def like_genre(
     genre_id: int = Query(..., description='ID жанра'),

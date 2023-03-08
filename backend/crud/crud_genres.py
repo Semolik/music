@@ -2,12 +2,15 @@ from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
 from backend.models.files import Image
 from backend.models.genres import Genre, LovedGenre
-from backend.models.user import User
+from sqlalchemy import func
 
 
 class GenresCruds(CRUDBase):
     def get_genres(self) -> list[Genre]:
         return self.db.query(Genre).all()
+
+    def get_random_genres(self, count: int) -> list[Genre]:
+        return self.db.query(Genre).order_by(func.random()).limit(count).all()
 
     def create_genre(self, name: str, picture: Image):
         return self.create(Genre(name=name, picture=picture))
