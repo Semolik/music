@@ -3,7 +3,7 @@ from fastapi import Depends, APIRouter, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
 from backend.crud.crud_musician import MusicianCrud
-from backend.helpers.auth_helper import validate_authorized_user
+from backend.helpers.auth_helper import Authenticate
 from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
@@ -14,62 +14,51 @@ router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 @router.get('/liked', response_model=List[PublicProfile])
 def get_liked_musician_profiles(
-        Authorize: AuthJWT = Depends(),
-        db: Session = Depends(get_db),
-        page: int = Query(1, description='Номер страницы'),
+    Auth: Authenticate = Depends(Authenticate()),
+    page: int = Query(1, description='Номер страницы'),
 ):
     '''Получение списка любимых музыкантов'''
-
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db,
-    )
-    liked_musician_profiles = MusicianCrud(db).get_liked_musicians(
-        user_id=db_user.id, page=page)
+    liked_musician_profiles = MusicianCrud(Auth.db).get_liked_musicians(
+        user_id=Auth.current_user_id, page=page)
     return liked_musician_profiles
 
 
 @router.put('/{profile_id}/like', response_model=bool)
 def like_musician(
     profile_id: int = Query(..., description='ID профиля'),
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк музыканта'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db)
 
-    if not UserCruds(db).get_public_profile_by_id(id=profile_id):
+    if not UserCruds(Auth.db).get_public_profile_by_id(id=profile_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    liked = MusicianCrud(db).toggle_like_musician(
-        musician_id=profile_id, user_id=db_user.id)
+    liked = MusicianCrud(Auth.db).toggle_like_musician(
+        musician_id=profile_id, user_id=Auth.current_user_id)
     return liked
 
 
 @router.get('/{profile_id}', response_model=MusicianFullInfo)
 def get_public_profile_info(
-        profile_id: int = Query(..., description='ID профиля'),
-        Authorize: AuthJWT = Depends(),
-        db: Session = Depends(get_db)
+    profile_id: int = Query(..., description='ID профиля'),
+    Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение информации о публичном профиле музыканта'''
-    Authorize.jwt_optional()
-    current_user_id = Authorize.get_jwt_subject()
-    public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
+
+    public_profile = UserCruds(Auth.db).get_public_profile_by_id(id=profile_id)
     if not public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     musician_info = MusicianInfo.from_orm(public_profile)
     public_profile_obj = MusicianFullInfo(
         **musician_info.dict(),
-        albums=MusicianCrud(db).get_musician_albums(musician_id=profile_id),
-        clips=ClipsCruds(db).get_musician_clips(musician_id=profile_id),
+        albums=MusicianCrud(Auth.db).get_musician_albums(
+            musician_id=profile_id),
+        clips=ClipsCruds(Auth.db).get_musician_clips(musician_id=profile_id),
     )
-    if current_user_id:
-        public_profile_obj.liked = MusicianCrud(db).musician_is_liked(
-            musician_id=profile_id, user_id=current_user_id)
+    if Auth.current_user_id:
+        public_profile_obj.liked = MusicianCrud(Auth.db).musician_is_liked(
+            musician_id=profile_id, user_id=Auth.current_user_id)
     return public_profile_obj
 
 

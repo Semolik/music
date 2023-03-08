@@ -1,35 +1,33 @@
-from typing import List, Literal
-from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
-from fastapi_jwt_auth import AuthJWT
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.helpers.auth_helper import validate_authorized_user
-from backend.helpers.images import save_image
-from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
-from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserModifiable
-from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.crud.crud_user import UserCruds
-from backend.db.db import get_db
-from backend.core.config import settings
-
 from sqlalchemy.orm import Session
+from backend.models.user import User as UserModel
+from backend.core.config import settings
+from backend.db.db import get_db
+from backend.crud.crud_user import UserCruds
+from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserModifiable
+from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
+from backend.helpers.images import save_image
+from backend.helpers.auth_helper import Authenticate
+from backend.crud.crud_playlists import PlaylistsCrud
+from fastapi_jwt_auth import AuthJWT
+from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
+from typing import List, Literal
+
 router = APIRouter(tags=['Профили пользователей'], prefix='/users')
 
 
-@router.put('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
+@router.put('/me',  response_model=UserInfo)
 def update_user_data(
-        UserData: UserModifiable,
-        userPicture: UploadFile = File(
-            default=False, description='Фото пользователя'),
-        Authorize: AuthJWT = Depends(),
-        db: Session = Depends(get_db)
+    UserData: UserModifiable,
+    Auth: Authenticate = Depends(Authenticate()),
+    userPicture: UploadFile = File(
+        default=False, description='Фото пользователя'),
 ):
     '''Обновление данных пользователя'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db)
-    db_image = save_image(db=db, upload_file=userPicture,
-                          user_id=db_user.id)
-    db_user_updated = UserCruds(db).update_user(
-        user=db_user,
+    db_image = save_image(db=Auth.db, upload_file=userPicture,
+                          user_id=Auth.current_user.id)
+    db_user_updated = UserCruds(Auth.db).update_user(
+        user=Auth.current_user,
         userPic=db_image,
         first_name=UserData.first_name,
         last_name=UserData.last_name,
@@ -39,37 +37,28 @@ def update_user_data(
 
 
 @router.get('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
-def get_user_info(Authorize: AuthJWT = Depends(),
-                  db: Session = Depends(get_db)):
+def get_user_info(Auth: Authenticate = Depends(Authenticate())):
     '''Получение данных пользователя'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db)
-    return db_user
+    return Auth.current_user
 
 
-@router.put(
-    '/me/public',
-    responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}},
-    response_model=PublicProfile
-)
+@router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
 def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable,
     userPublicPicture: UploadFile = File(
         default=False, description='Фото публичного профиля'),
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Обновление данных публичного профиля пользователя'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(Authorize, db, types=[
-                                       settings.UserTypeEnum.musician, settings.UserTypeEnum.radiostaion])
-    db_public_profile = UserCruds(db).get_public_profile(user_id=db_user.id)
+    user_cruds = UserCruds(Auth.db)
+    db_public_profile = user_cruds.get_public_profile(
+        user_id=Auth.current_user.id)
     db_image = save_image(
-        db=db,
+        db=Auth.db,
         upload_file=userPublicPicture,
-        user_id=db_user.id
+        user_id=Auth.current_user.id
     )
-    db_public_profile_updated = UserCruds(db).update_public_profile(
+    db_public_profile_updated = user_cruds.update_public_profile(
         public_profile=db_public_profile,
         name=PublicProfileData.name,
         description=PublicProfileData.description,
@@ -82,31 +71,17 @@ def update_user_public_profile_data(
     return db_public_profile_updated
 
 
-@router.get(
-    '/me/public',
-    responses={
-        status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}
-    },
-    response_model=PublicProfile
-)
+@router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
 def get_user_public_profile_info(
-        Authorize: AuthJWT = Depends(),
-        db: Session = Depends(get_db)):
+    Auth: Authenticate = Depends(Authenticate(is_musician=True))
+):
     '''Получение данных публичного профиля пользователя'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize, db, types=[
-            settings.UserTypeEnum.musician,
-            settings.UserTypeEnum.radiostaion
-        ]
-    )
-    return UserCruds(db).get_public_profile(user_id=db_user.id)
+    return UserCruds(Auth.db).get_public_profile(user_id=Auth.current_user.id)
 
 
 @router.get('/{user_id}/playlists', response_model=List[PlaylistInfoWithoutTracks])
 def get_user_playlists(
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db),
+    Auth: Authenticate = Depends(Authenticate(required=False)),
     user_id: int = Query(
         default=None, description='ID пользователя', required=True),
     order_by: order_playlist_by = Query(
@@ -115,16 +90,15 @@ def get_user_playlists(
         default='asc', description='Направление сортировки', required=True),
 ):
     '''Получение списка плейлистов'''
-    Authorize.jwt_optional()
-    db_requested_user = UserCruds(db).get_user_by_id(user_id=user_id)
+
+    db_requested_user = UserCruds(Auth.db).get_user_by_id(user_id=user_id)
     if not db_requested_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Пользователь не найден'
         )
-    current_user_id = Authorize.get_jwt_subject()
-    playlists = PlaylistsCrud(db).get_playlists_by_user_id(
-        user_id=current_user_id,
+    playlists = PlaylistsCrud(Authenticate.db).get_playlists_by_user_id(
+        user_id=Authenticate.current_user_id,
         owner_id=user_id,
         order_by=order_by,
         order_orientation=order_orientation

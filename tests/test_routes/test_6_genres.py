@@ -77,7 +77,7 @@ def test_update_genre(client: TestClient, normal_admin_token_cookies, db_session
             "genrePicture": open("tests/test_files/test-profile-avatar.jpg", "rb"),
         }
     )
-    print(response.json())
+
     assert response.status_code == 200
     assert response.json()["name"] == newGenreData["name"]
 

@@ -4,7 +4,6 @@ import { UserTypeEnum } from "@/client/models/UserTypeEnum";
 export const useAuthStore = defineStore({
     id: "auth",
     state: () => ({
-        message: "",
         logined: false,
         userData: null,
     }),

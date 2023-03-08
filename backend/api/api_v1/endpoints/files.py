@@ -12,8 +12,8 @@ router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 
 @router.get('/images/{image_id}', response_class=FileResponse)
 def get_image(
-        image_id: uuid_pkg.UUID = Query(..., description="ID изображения"),
-        db: Session = Depends(get_db)
+    image_id: uuid_pkg.UUID = Query(..., description="ID изображения"),
+    db: Session = Depends(get_db)
 ):
     """Получение изображения по его id"""
     db_image = FileCruds(db).get_image_by_id(image_id=image_id)

@@ -1,8 +1,8 @@
 from pydantic import AnyHttpUrl, BaseSettings, BaseModel
-from typing import List, Literal, Optional, Tuple, get_args
+from typing import List, Literal, Optional
 from dotenv import dotenv_values
 import enum
-env_config = {**dotenv_values('.env'), **dotenv_values(".env.local"), }
+env_config = {**dotenv_values('.env'), **dotenv_values(".env.local")}
 
 
 class Settings(BaseSettings):
@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         'http://localhost:4000', 'http://192.168.50.106:4000', 'http://192.168.1.133:4000']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
-    TEST_DATABASE_URI: Optional[str] = DATABASE_URI + "_test"
+    TEST_DATABASE_URI: Optional[str] = DATABASE_URI + '_test'
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
     IMAGES_FOLDER: str = ASSETS_FOLDER+'images'
@@ -55,7 +55,6 @@ class Settings(BaseSettings):
 
     class UserTypeEnum(str, enum.Enum):
         musician = "musician"
-        radiostaion = "radiostaion"
         user = "user"
         superuser = "superuser"
     user_types_names = {

@@ -218,8 +218,8 @@ def test_get_my_albums_as_musician(client: TestClient, normal_musician_token_coo
     assert response.status_code == 200
 
 
-def test_get_my_albums_as_user(client: TestClient, normal_user_2_token_cookies):
-    response = client.get("/albums/my", cookies=normal_user_2_token_cookies)
+def test_get_my_albums_as_user(client: TestClient, normal_user_3_token_cookies):
+    response = client.get("/albums/my", cookies=normal_user_3_token_cookies)
     assert response.status_code == 403
 
 

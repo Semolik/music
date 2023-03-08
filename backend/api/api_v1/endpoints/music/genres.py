@@ -4,7 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_genres import GenresCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.auth_helper import validate_authorized_user
+from backend.helpers.auth_helper import Authenticate
 from backend.helpers.images import save_image, set_picture
 from backend.helpers.music import validate_genres
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
@@ -18,21 +18,16 @@ router = APIRouter(prefix="/genres", tags=['Жанры'])
 def create_genre(
     genreData: GenreBaseForm = Depends(GenreBaseForm),
     genrePicture: UploadFile = File(..., description='Картинка жанра'),
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate(is_admin=True)),
 ):
     '''Создание жанра'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db,
-        types=[settings.UserTypeEnum.superuser]
-    )
-    if GenresCruds(db).get_genre_by_name(name=genreData.name):
+
+    if GenresCruds(Auth.db).get_genre_by_name(name=genreData.name):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail="Название жанра должно быть уникальным")
-    db_image = save_image(db=db, upload_file=genrePicture,
-                          user_id=db_user.id)
-    db_genre = GenresCruds(db).create_genre(
+    db_image = save_image(db=Auth.db, upload_file=genrePicture,
+                          user_id=Auth.current_user_id, resize_image_options=(1000, 1000))
+    db_genre = GenresCruds(Auth.db).create_genre(
         name=genreData.name, picture=db_image)
     return db_genre
 
@@ -40,19 +35,15 @@ def create_genre(
 @router.put('/{genre_id}/like', response_model=bool)
 def like_genre(
     genre_id: int = Query(..., description='ID жанра'),
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк жанра'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db,
-    )
-    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
+
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    return GenresCruds(db).toggle_like_genre(user_id=db_user.id, genre_id=genre.id)
+    return GenresCruds(Auth.db).toggle_like_genre(user_id=Auth.current_user_id, genre_id=genre.id)
 
 
 @router.put(
@@ -67,22 +58,17 @@ def update_genre(
     genre_id: int = Query(..., description='ID жанра'),
     genreData: GenreBaseForm = Depends(GenreBaseForm),
     genrePicture: UploadFile = File(None, description='Картинка жанра'),
-    Authorize: AuthJWT = Depends(),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate(is_admin=True)),
 ):
     '''Обновление жанра'''
-    Authorize.jwt_required()
-    db_user = validate_authorized_user(
-        Authorize=Authorize, db=db,
-        types=[settings.UserTypeEnum.superuser]
-    )
-    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
+
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    db_image = save_image(db=db, upload_file=genrePicture,
-                          user_id=db_user.id) if genrePicture else None
-    genre = GenresCruds(db).update_genre(
+    db_image = save_image(db=Auth.db, upload_file=genrePicture,
+                          user_id=Auth.current_user_id)
+    genre = GenresCruds(Auth.db).update_genre(
         name=genreData.name, picture=db_image, genre=genre)
     return genre
 
@@ -105,18 +91,14 @@ def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Sessi
     },
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_genre(genre_id: int = Query(..., description="ID жанра"), Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def delete_genre(genre_id: int = Query(..., description="ID жанра"), Auth: Authenticate = Depends(Authenticate(is_admin=True))):
     '''Удаление жанра'''
-    Authorize.jwt_required()
-    validate_authorized_user(
-        Authorize=Authorize, db=db,
-        types=[settings.UserTypeEnum.superuser]
-    )
-    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
+
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    GenresCruds(db).detete_genre(genre=genre)
+    GenresCruds(Auth.db).detete_genre(genre=genre)
 
 
 @router.get('',  response_model=List[Genre])

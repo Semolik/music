@@ -109,7 +109,7 @@ def is_playlist_showed(playlist: Playlist, user_id: int):
     return True
 
 
-def validate_playlist_owner(db: Session, playlist_id: int, user_id: int) -> Playlist:
+def validate_playlist_owner(db: Session, playlist_id: UUID, user_id: int) -> Playlist:
     playlist = PlaylistsCrud(db).get_playlist_info(playlist_id=playlist_id)
     if not playlist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -123,7 +123,7 @@ def validate_playlist_owner(db: Session, playlist_id: int, user_id: int) -> Play
     return playlist
 
 
-def validate_public_playlist(db: Session, playlist_id: int, user_id: int) -> Playlist:
+def validate_public_playlist(db: Session, playlist_id: UUID, user_id: int) -> Playlist:
     playlist = PlaylistsCrud(db).get_playlist_info(playlist_id=playlist_id)
     if not playlist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

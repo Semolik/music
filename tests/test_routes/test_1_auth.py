@@ -29,7 +29,7 @@ def test_logout(client: TestClient):
 
 def test_get_refresh_token(client: TestClient):
     response = client.post("/auth/refresh", cookies=cookies)
-    assert response.status_code == 200
+    assert response.status_code == 204
 
 
 @pytest.mark.parametrize("username_length,expected_status_code", [

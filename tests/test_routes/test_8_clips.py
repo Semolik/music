@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 from backend.core.config import env_config
-from backend.crud.crud_clips import ClipsCruds
 import pytest
 baseClipData = {
     "data": {
@@ -144,8 +143,8 @@ def test_get_my_clips(client: TestClient, normal_musician_token_cookies):
     assert len(response.json()) > 0
 
 
-def test_get_my_clips_as_user(client: TestClient,  normal_user_2_token_cookies):
+def test_get_my_clips_as_user(client: TestClient,  normal_user_3_token_cookies):
 
     response = client.get("/clips/my",
-                          cookies=normal_user_2_token_cookies)
+                          cookies=normal_user_3_token_cookies)
     assert response.status_code == 403
