@@ -3,13 +3,40 @@ from backend.db.base import CRUDBase
 from backend.models.files import Image
 from backend.models.genres import Genre, LovedGenre
 from sqlalchemy import func
+from backend.core.config import settings
 
 
 class GenresCruds(CRUDBase):
     def get_genres(self) -> list[Genre]:
         return self.db.query(Genre).all()
 
-    def get_random_genres(self, count: int) -> list[Genre]:
+    def get_popular_genres(self, page: int, page_size: int, filter: settings.FilterGenreEnum, current_user_id: int = None) -> list[Genre]:
+        end = page * page_size
+        query = self.db.query(Genre)
+        if filter == settings.FilterGenreEnum.liked:
+            query = query.join(LovedGenre)
+        else:
+            query = query.outerjoin(LovedGenre)
+        query = query.group_by(Genre.id).order_by(
+            func.count(LovedGenre.genre_id).desc())
+        if filter != settings.FilterGenreEnum.all:
+            if not current_user_id:
+                raise Exception(
+                    "current_user_id is None in get_popular_genres")
+        if filter == settings.FilterGenreEnum.liked:
+            query = query.filter(LovedGenre.user_id == current_user_id)
+        elif filter == settings.FilterGenreEnum.not_liked:
+            query = query.filter(LovedGenre.user_id.is_(None))
+
+        return query.slice(end - page_size, end).all()
+        # return query.slice(end - page_size, end).all()
+
+        # return self.db.query(Genre).outerjoin(LovedGenre).group_by(Genre.id).order_by(func.count(LovedGenre.genre_id).desc()).slice(end - page_size, end).all()
+
+    def get_liked_genres_ordered_by_likes(self, user_id: int) -> list[Genre]:
+        return self.db.query(Genre).join(LovedGenre).filter(LovedGenre.user_id == user_id).order_by(func.count(LovedGenre.genre_id).desc()).all()
+
+    def get_random_genres(self, count: int = settings.SEARCH_GENRE_LIMIT) -> list[Genre]:
         return self.db.query(Genre).order_by(func.random()).limit(count).all()
 
     def create_genre(self, name: str, picture: Image):

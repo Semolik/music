@@ -11,6 +11,7 @@ from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
 from backend.schemas.music import Genre, GenreBaseForm
 from backend.core.config import settings
+
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
 
@@ -35,7 +36,7 @@ def create_genre(
 @router.get('/random',  response_model=List[Genre])
 def get_random_genres(db: Session = Depends(get_db)):
     '''Получение случайных жанров'''
-    return GenresCruds(db).get_random_genres(count=settings.RANDOM_GENRES_COUNT)
+    return GenresCruds(db).get_random_genres()
 
 
 @router.put('/{genre_id}/like', response_model=bool)
@@ -80,13 +81,19 @@ def update_genre(
 
 
 @router.get('/{genre_id}', responses={**NOT_FOUND_GENRE}, response_model=Genre)
-def get_genre(genre_id: int = Query(..., description="ID жанра"), db: Session = Depends(get_db)):
+def get_genre(genre_id: int = Query(..., description="ID жанра"), Auth: Authenticate = Depends(Authenticate(required=False))):
     '''Получение жанра по id'''
-    genre = GenresCruds(db).get_genre_by_id(id=genre_id)
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    return genre
+    genre_obj = Genre.from_orm(genre)
+    if Auth.current_user_id:
+        genre_obj.liked = bool(
+            GenresCruds(Auth.db).get_liked_genre_model(
+                user_id=Auth.current_user_id, genre_id=genre.id)
+        )
+    return genre_obj
 
 
 @router.delete(
@@ -108,6 +115,26 @@ def delete_genre(genre_id: int = Query(..., description="ID жанра"), Auth: 
 
 
 @router.get('',  response_model=List[Genre])
-def get_genres(db: Session = Depends(get_db)):
-    '''Получение всех жанров'''
-    return GenresCruds(db).get_genres()
+def get_genres(
+    page: int = 1,
+    page_size: int = Query(settings.SEARCH_GENRE_LIMIT, ge=1,
+                           le=settings.SEARCH_GENRE_LIMIT),
+    filter: settings.FilterGenreEnum = settings.FilterGenreEnum.all,
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение всех жанров отсортированных по популярности'''
+    if filter != settings.FilterGenreEnum.all and not Auth.current_user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Для фильтрации жанров необходимо авторизоваться")
+    genres = GenresCruds(Auth.db).get_popular_genres(
+        page=page, page_size=page_size, filter=filter, current_user_id=Auth.current_user_id)
+    genres_objs = []
+    for genre in genres:
+        genre_obj = Genre.from_orm(genre)
+        if Auth.current_user_id:
+            genre_obj.liked = bool(
+                GenresCruds(Auth.db).get_liked_genre_model(
+                    user_id=Auth.current_user_id, genre_id=genre.id)
+            )
+        genres_objs.append(genre_obj)
+    return genres_objs

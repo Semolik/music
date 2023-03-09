@@ -147,6 +147,7 @@ export default defineNuxtConfig({
             SEARCH_PLAYLIST_LIMIT: Number(
                 process.env.VITE_SEARCH_PLAYLIST_LIMIT
             ),
+            SEARCH_GENRE_LIMIT: Number(process.env.VITE_SEARCH_GENRE_LIMIT),
         },
     },
 });

@@ -64,7 +64,10 @@ class Settings(BaseSettings):
         UserTypeEnum.musician: "Музыкант",
     }
 
-    RANDOM_GENRES_COUNT = 20
+    class FilterGenreEnum(str, enum.Enum):
+        all = "all"
+        liked = "liked"
+        not_liked = "not_liked"
     AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_ALBUM_LIMIT'))
     AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = int(
@@ -77,6 +80,7 @@ class Settings(BaseSettings):
     AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_PLAYLIST_LIMIT'))
 
+    SEARCH_GENRE_LIMIT = int(env_config.get('VITE_SEARCH_GENRE_LIMIT'))
     SEARCH_ALBUM_LIMIT = int(env_config.get('VITE_SEARCH_ALBUM_LIMIT'))
     SEARCH_MUSICIAN_LIMIT = int(env_config.get('VITE_SEARCH_MUSICIAN_LIMIT'))
     SEARCH_TRACK_LIMIT = int(env_config.get('VITE_SEARCH_TRACK_LIMIT'))

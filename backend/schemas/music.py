@@ -61,6 +61,8 @@ class GenreBaseForm(GenreBase):
 class Genre(GenreBase):
     id: int = Query(..., description="ID жанра")
     picture: ImageLink = Query(..., description="Ссылка на картинку жанра")
+    liked: bool = Query(default=False, description="Лайкнут ли жанр")
+    likes: int = Query(default=0, description="Количество лайков жанра")
 
     class Config:
         orm_mode = True

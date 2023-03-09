@@ -6,6 +6,7 @@ from backend.crud.crud_musician import MusicianCrud
 from backend.db.base import CRUDBase
 from backend.models.albums import Album, FavoriteAlbum
 from sqlalchemy import Text, cast, func, union_all
+from backend.models.genres import Genre, LovedGenre
 from backend.models.playlists import Playlist
 from backend.models.user import PublicProfile, FavoriteMusicians
 from backend.models.tracks import Track, FavoriteTracks
@@ -24,13 +25,22 @@ class SearchCrud(CRUDBase):
         return self.db.query(Album).filter(Album.is_available, func.lower(Album.name).contains(name.lower())).limit(limit).all()
 
     def search_tracks_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_TRACK_LIMIT) -> list[Track]:
-        return self.db.query(Track).join(Album).filter(Album.is_available, func.lower(Track.name).contains(name.lower())).limit(limit).all()
+        return self.db.query(Track).join(Album, isouter=True).filter(Album.is_available, func.lower(Track.name).contains(name.lower())).limit(limit).all()
 
     def search_musicians_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT) -> list[PublicProfile]:
         return self.base_search_by_name(name=name, limit=limit, model=PublicProfile)
 
     def search_clips_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_CLIP_LIMIT) -> list[Clip]:
         return self.base_search_by_name(name=name, limit=limit, model=Clip)
+
+    def search_genres_by_name_sorted_by_likes(self, name: str, limit: int = settings.SEARCH_GENRE_LIMIT) -> list[Genre]:
+        return self.db.query(Genre)\
+            .outerjoin(LovedGenre)\
+            .group_by(Genre.id)\
+            .order_by(func.count(LovedGenre.genre_id).desc())\
+            .filter(func.lower(Genre.name).contains(name.lower()))\
+            .limit(limit)\
+            .all()
 
     def base_search_by_name(self, model, name: str, limit: int):
         return self.db.query(model).filter(func.lower(model.name).contains(name.lower())).limit(limit).all()

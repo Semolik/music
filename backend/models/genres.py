@@ -1,8 +1,10 @@
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, scoped_session
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
+from backend.db.session import SessionLocal
+session = scoped_session(SessionLocal)
 
 
 class Genre(Base):
@@ -32,6 +34,13 @@ class Genre(Base):
         foreign_keys=[picture_id],
         cascade="all,delete",
     )
+
+    @property
+    def likes(self):
+        if not hasattr(self, '_likes_count'):
+            self._likes_count = session.query(
+                LovedGenre).filter_by(genre_id=self.id).count()
+        return self._likes_count
 
 
 class LovedGenre(Base):

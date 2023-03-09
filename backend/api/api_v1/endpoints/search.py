@@ -1,11 +1,14 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, HTTPException, Query
+from fastapi import Depends, APIRouter,  Query
+from backend.crud.crud_genres import GenresCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_playlists import PlaylistsCrud
-from backend.crud.crud_clips import ClipsCruds
+
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_search import SearchCrud
+from backend.schemas.music import Genre
+
 from backend.schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchPlaylist, SearchTrack, SearchClip
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
@@ -54,7 +57,6 @@ def search_album(text: str = Query(description="Поисковый запрос"
 
 @router.get('/track', response_model=List[SearchTrack])
 def search_track(text: str = Query(description="Поисковый запрос"),  Auth: Authenticate = Depends(Authenticate(required=False))):
-
     search_crud = SearchCrud(Auth.db)
     db_tracks = search_crud.search_tracks_by_name(
         name=text, limit=settings.SEARCH_TRACK_LIMIT)
@@ -88,4 +90,19 @@ def search_playlist(text: str = Query(description="Поисковый запро
             playlist_obj.liked = PlaylistsCrud(Auth.db).playlist_is_liked(
                 playlist_id=playlist.id, user_id=Auth.current_user_id)
         db_playlists_objs.append(playlist_obj)
-    return db_playlists
+    return db_playlists_objs
+
+
+@router.get('/genres', response_model=List[Genre])
+def get_genres(text: str = Query(description="Поисковый запрос"), Auth: Authenticate = Depends(Authenticate(required=False))):
+    search_crud = SearchCrud(Auth.db)
+    db_genres = search_crud.search_genres_by_name_sorted_by_likes(
+        name=text, limit=settings.SEARCH_GENRE_LIMIT)
+    db_genres_objs = []
+    for genre in db_genres:
+        genre_obj = Genre.from_orm(genre)
+        if Auth.current_user_id is not None:
+            genre_obj.liked = bool(GenresCruds(Auth.db).get_liked_genre_model(
+                genre_id=genre.id, user_id=Auth.current_user_id))
+        db_genres_objs.append(genre_obj)
+    return db_genres_objs

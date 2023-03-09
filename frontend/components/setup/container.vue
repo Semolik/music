@@ -9,10 +9,13 @@
             </div>
         </div>
         <div class="buttons">
-            <div class="button">
-                <slot name="button"></slot>
+            <slot name="buttons"></slot>
+            <div class="button" @click="emit('next')" v-if="nextButton">
+                Далее
             </div>
-            <div class="button skip" v-if="skipButton">Пропустить</div>
+            <div class="button skip" v-if="skipButton" @click="emit('skip')">
+                Пропустить
+            </div>
         </div>
         <div class="content-container">
             <div class="content">
@@ -27,7 +30,12 @@ const { skipButton } = defineProps({
         type: Boolean,
         default: true,
     },
+    nextButton: {
+        type: Boolean,
+        default: true,
+    },
 });
+const emit = defineEmits(["skip", "next"]);
 </script>
 <style scoped lang="scss">
 .setup-container {

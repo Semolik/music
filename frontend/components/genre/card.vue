@@ -1,11 +1,13 @@
 <template>
     <div class="genre-card">
         <card-picture v-bind="propsBind" @click="likeGenre">
-            <div :class="['hover-overlay', { force: forceOverlay }]">
-                <div :class="['like-button', { active: liked }]">
-                    <Icon :name="IconsNames.likeIcon" />
+            <ClientOnly>
+                <div :class="['hover-overlay', { force: forceOverlay }]">
+                    <div :class="['like-button', { active: liked }]">
+                        <Icon :name="IconsNames.likeIcon" />
+                    </div>
                 </div>
-            </div>
+            </ClientOnly>
         </card-picture>
         <div class="genre-name">
             <span>{{ genre.name }}</span>
@@ -15,7 +17,7 @@
 <script setup>
 import { IconsNames } from "@/configs/icons";
 import { Service } from "~~/client";
-const emit = defineEmits(["update:genre"]);
+const emit = defineEmits(["liked"]);
 const { genre, forceOverlay } = defineProps({
     genre: {
         type: Object,
@@ -30,6 +32,7 @@ const { genre, forceOverlay } = defineProps({
 const liked = ref(genre.liked);
 const likeGenre = async () => {
     liked.value = await Service.likeGenreApiV1GenresGenreIdLikePut(genre.id);
+    emit("liked", liked.value);
 };
 
 const propsBind = reactive({
@@ -67,12 +70,10 @@ const propsBind = reactive({
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background-color: $accent;
+            background-color: $tertiary-text;
             cursor: pointer;
             transition: 0.2s;
-            &:hover {
-                background-color: $accent-hover;
-            }
+
             &.active {
                 background-color: $quaternary-bg;
                 svg {
