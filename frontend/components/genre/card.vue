@@ -2,7 +2,7 @@
     <div class="genre-card">
         <card-picture v-bind="propsBind" @click="likeGenre">
             <ClientOnly>
-                <div :class="['hover-overlay', { force: forceOverlay }]">
+                <div :class="['hover-overlay', { force: overlayActive }]">
                     <div :class="['like-button', { active: liked }]">
                         <Icon :name="IconsNames.likeIcon" />
                     </div>
@@ -18,12 +18,17 @@
 import { IconsNames } from "@/configs/icons";
 import { Service } from "~~/client";
 const emit = defineEmits(["liked"]);
-const { genre, forceOverlay } = defineProps({
+const { genre, forceOverlay, overlayOnLike } = defineProps({
     genre: {
         type: Object,
         required: true,
     },
     forceOverlay: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    overlayOnLike: {
         type: Boolean,
         required: false,
         default: false,
@@ -34,6 +39,9 @@ const likeGenre = async () => {
     liked.value = await Service.likeGenreApiV1GenresGenreIdLikePut(genre.id);
     emit("liked", liked.value);
 };
+const overlayActive = computed(() => {
+    return forceOverlay || (overlayOnLike && liked.value);
+});
 
 const propsBind = reactive({
     picture: genre.picture,

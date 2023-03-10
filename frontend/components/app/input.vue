@@ -3,7 +3,7 @@
         v-bind="$attrs"
         v-model="value"
         :class="{
-            resize: resizeOnFocus,
+            resize: resize,
         }"
     >
         <template #suffix>
@@ -64,6 +64,22 @@ const height = ref(props.height);
 const value = ref(props.modelValue);
 const showWordLimit = ref(props.showWordLimit);
 const emit = defineEmits(["update:modelValue"]);
+const resize = ref(false);
+if (props.resizeOnFocus) {
+    const viewport = useViewport();
+
+    watch(
+        viewport.breakpoint,
+        () => {
+            if (viewport.isGreaterOrEquals("lg")) {
+                resize.value = false;
+            } else {
+                resize.value = true;
+            }
+        },
+        { immediate: true }
+    );
+}
 watch(value, (val) => {
     if (props.maxLength && val.length > props.maxLength) {
         value.value = val.slice(0, props.maxLength);

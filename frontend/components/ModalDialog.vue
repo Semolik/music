@@ -1,9 +1,6 @@
 <template>
     <ClientOnly>
         <Teleport to="body" v-if="active || isClosing">
-            <Head>
-                <title>Поиск</title>
-            </Head>
             <Transition name="modal">
                 <div
                     :class="[

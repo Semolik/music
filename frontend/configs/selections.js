@@ -1,18 +1,8 @@
 import { routesNames } from "@typed-router";
 import { IconsNames } from "./icons";
-const { playlistIcon, albumIcon, trackIcon, musicianIcon, historyIcon } =
+const { playlistIcon, albumIcon, trackIcon, userIcon, historyIcon } =
     IconsNames;
 const menuSelections = [
-    {
-        name: null,
-        links: [
-            {
-                icon: historyIcon,
-                to: { name: routesNames.history },
-                text: "История",
-            },
-        ],
-    },
     {
         name: "Библиотека",
         links: [
@@ -27,7 +17,7 @@ const menuSelections = [
                 text: "Альбомы",
             },
             {
-                icon: musicianIcon,
+                icon: userIcon,
                 to: { name: routesNames.favoriteArtists },
                 text: "Исполнители",
             },
@@ -35,6 +25,11 @@ const menuSelections = [
                 icon: playlistIcon,
                 to: { name: routesNames.favoritePlaylists },
                 text: "Плейлисты",
+            },
+            {
+                icon: historyIcon,
+                to: { name: routesNames.history },
+                text: "История",
             },
         ],
     },

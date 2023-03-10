@@ -1,6 +1,20 @@
 <template>
     <div class="menu">
         <div class="menu-title">Меню</div>
+        <div class="menu-selection">
+            <MenuCard
+                v-if="!logined"
+                :to="{ name: routesNames.login }"
+                :icon="IconsNames.loginIcon"
+                text="Войти"
+            />
+            <MenuCard
+                :to="{ name: routesNames.settings.profile }"
+                :icon="IconsNames.userIcon"
+                text="Личный кабинет"
+                v-else
+            />
+        </div>
         <div class="menu-selection" v-for="selection in menuSelections">
             <div class="menu-selection-title" v-if="selection.name">
                 {{ selection.name }}
@@ -13,6 +27,11 @@
 </template>
 <script setup>
 import { menuSelections } from "@/configs/selections";
+import { useAuthStore } from "~~/stores/auth";
+import { storeToRefs } from "pinia";
+import { IconsNames } from "@/configs/icons";
+import { routesNames } from "@typed-router";
+const { logined } = storeToRefs(useAuthStore());
 </script>
 <style lang="scss" scoped>
 .menu {

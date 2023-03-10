@@ -1,59 +1,43 @@
 <template>
-    <SetupContainer class="genres-setup" @skip="skip" :next-button="false">
+    <SetupContainer
+        class="genres-setup"
+        @skip="skip"
+        :next-button="!!nextPage"
+        @next="nextPage && $router.push({ name: nextPage })"
+        v-model:search="search"
+        :placeholder="placeholder"
+        v-model:modal-active="showWarningModal"
+        modal-headline="Вы не выбрали ни одного жанра"
+        modal-description="Выберите хотя бы один жанр, чтобы получать более точные рекомендации"
+        :modal-buttons="[
+            {
+                text: 'Вернуться',
+                onClick: () => (showWarningModal = false),
+            },
+            {
+                text: 'Пропустить',
+                onClick: () => $router.push({ name: resultRouteName }),
+            },
+        ]"
+    >
         <template #headline>
-            Выберите жанры,<br />
+            Выберите жанры,<br v-if="$viewport.isGreaterOrEquals('lg')" />
             которые вам нравятся
         </template>
         <template #description>
             Это поможет получать более точные и интересные рекомендации
         </template>
         <template #content>
-            <AppInput
-                v-model="search"
-                :placeholder="placeholder"
-                class="genres-setup-input"
-                size="large"
-                :resize-on-focus="false"
-                height="50px"
-            />
             <div class="genres" v-auto-animate>
                 <GenreCard
                     v-for="(genre, index) in genres"
-                    :key="genre.id"
                     :genre="genre"
-                    @liked="(event) => (genres[index].liked = event)"
-                    :force-overlay="genres[index].liked"
+                    @liked="(liked) => onLike(liked, index)"
+                    overlay-on-like
                 />
             </div>
         </template>
     </SetupContainer>
-    <ModalDialog
-        v-model:active="showWarningModal"
-        @close="showWarningModal = false"
-    >
-        <template #content>
-            <div class="warning-modal">
-                <div class="warning-modal-headline">
-                    Вы не выбрали ни одного жанра
-                </div>
-                <div class="warning-modal-description">
-                    Выберите хотя бы один жанр, чтобы получать более точные
-                    рекомендации
-                </div>
-                <div class="warning-modal-buttons">
-                    <div class="button" @click="showWarningModal = false">
-                        Отмена
-                    </div>
-                    <div
-                        class="button"
-                        @click="$router.push({ name: resultRouteName })"
-                    >
-                        Ок
-                    </div>
-                </div>
-            </div>
-        </template>
-    </ModalDialog>
 </template>
 <script setup>
 import { Service } from "~~/client";
@@ -61,16 +45,19 @@ import { FilterGenreEnum } from "~~/client/models/FilterGenreEnum";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "~~/.nuxt/typed-router";
-const { resultRouteName } = defineProps({
+const { resultRouteName, nextPage } = defineProps({
     resultRouteName: {
         type: String,
         default: routesNames.settings.profile,
+    },
+    nextPage: {
+        type: String,
     },
 });
 const { logined } = storeToRefs(useAuthStore());
 const router = useRouter();
 if (!logined.value) {
-    router.push(routesNames.login);
+    router.push({ name: routesNames.login });
 }
 
 const runtimeConfig = useRuntimeConfig();
@@ -121,24 +108,42 @@ setTimeout(() => {
     }, placeholder.value.length * 100 + 1000);
 }, 3000);
 
-const popularGenres = await Service.getGenresApiV1GenresGet(
-    1,
-    runtimeConfig.public.SEARCH_GENRE_LIMIT,
-    FilterGenreEnum.NOT_LIKED
+const popularGenres = ref(
+    await Service.getGenresApiV1GenresGet(
+        1,
+        runtimeConfig.public.SEARCH_GENRE_LIMIT,
+        FilterGenreEnum.NOT_LIKED
+    )
+);
+const favoriteGenres = ref(
+    await Service.getGenresApiV1GenresGet(
+        1,
+        runtimeConfig.public.SEARCH_GENRE_LIMIT,
+        FilterGenreEnum.LIKED
+    )
 );
 
-const favoriteGenres = await Service.getGenresApiV1GenresGet(
-    1,
-    runtimeConfig.public.SEARCH_GENRE_LIMIT,
-    FilterGenreEnum.LIKED
-);
-const mergedGenres = [...favoriteGenres, ...popularGenres];
+const mergedGenres = [...favoriteGenres.value, ...popularGenres.value];
 const genres = ref(mergedGenres);
+const onLike = (liked, index) => {
+    genres.value[index].liked = liked;
+    if (liked) {
+        favoriteGenres.value.push(genres.value[index]);
+        popularGenres.value = popularGenres.value.filter(
+            (genre) => genre.id !== genres.value[index].id
+        );
+    } else {
+        favoriteGenres.value = favoriteGenres.value.filter(
+            (genre) => genre.id !== genres.value[index].id
+        );
+        popularGenres.value.push(genres.value[index]);
+    }
+};
 watch(
     search,
     async (value) => {
         if (!value) {
-            genres.value = mergedGenres;
+            genres.value = [...favoriteGenres.value, ...popularGenres.value];
             return;
         }
         genres.value = await Service.getGenresApiV1SearchGenresGet(value);
@@ -152,8 +157,9 @@ const resultCheck = async (routeName) => {
         runtimeConfig.public.SEARCH_GENRE_LIMIT,
         FilterGenreEnum.LIKED
     );
-    console.log(currentLikedGenres);
+
     if (currentLikedGenres.length === 0) {
+        console.log("show modal");
         showWarningModal.value = true;
         return;
     }
@@ -164,40 +170,6 @@ const skip = async () => {
 };
 </script>
 <style lang="scss" scoped>
-.warning-modal {
-    padding: 20px;
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    .warning-modal-headline {
-        font-size: 1.2rem;
-        font-weight: 600;
-        text-align: center;
-    }
-    .warning-modal-description {
-        font-size: 1rem;
-        font-weight: 400;
-    }
-    .warning-modal-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-
-        .button {
-            padding: 10px;
-            border-radius: 10px;
-            background-color: $quaternary-bg;
-            font-weight: 600;
-            flex-grow: 1;
-            cursor: pointer;
-            text-align: center;
-
-            &:hover {
-                background-color: $quinary-bg;
-            }
-        }
-    }
-}
 .genres-setup {
     .genres {
         display: grid;
@@ -205,10 +177,6 @@ const skip = async () => {
         grid-auto-rows: min-content;
         gap: 20px;
         width: 100%;
-    }
-    .genres-setup-input {
-        font-size: 1rem;
-        margin-bottom: 20px;
     }
 }
 </style>

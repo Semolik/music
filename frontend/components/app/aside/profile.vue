@@ -3,7 +3,7 @@
         <div class="picture">
             <img :src="picture" alt="profile picture" v-if="picture" />
             <div class="picture-icon">
-                <Icon :name="musicianIcon" />
+                <Icon :name="userIcon" />
             </div>
         </div>
         <span>{{ fullName }}</span>
@@ -15,7 +15,7 @@ const { fullName, picture } = defineProps({
     fullName: String,
     picture: String | null,
 });
-const { musicianIcon } = IconsNames;
+const { userIcon } = IconsNames;
 </script>
 <style lang="scss" scoped>
 .logined-info {

@@ -62,7 +62,7 @@ const liked = ref(musician.liked);
 
 const props = reactive({
     picture: musician.picture,
-    icon: IconsNames.musicianIcon,
+    icon: IconsNames.userIcon,
     borderRadius: "50%",
 });
 const onFavorite = async () => {

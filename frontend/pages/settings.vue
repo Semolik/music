@@ -3,14 +3,17 @@
         <div class="settings">
             <div class="settings-aside">
                 <nuxt-link class="settings-aside-item" to="/settings/profile">
-                    <Icon :name="IconsNames.musicianIcon" />
+                    <Icon :name="IconsNames.userIcon" />
                     <span>Профиль</span>
                 </nuxt-link>
                 <nuxt-link class="settings-aside-item" to="/settings/security">
                     <Icon :name="IconsNames.securityIcon" />
                     <span>Безопасность</span>
                 </nuxt-link>
-                <nuxt-link class="settings-aside-item" to="/setup/genres">
+                <nuxt-link
+                    class="settings-aside-item"
+                    :to="{ name: 'setup-genres', props: { nextPage: null } }"
+                >
                     <Icon :name="IconsNames.guitarIcon" />
                     <span>Жанры</span>
                 </nuxt-link>
