@@ -1,11 +1,11 @@
 <template>
     <SetupContainer
         class="genres-setup"
-        @skip="skip"
-        :next-button="!!nextPage"
-        @next="nextPage && $router.push({ name: nextPage })"
+        @skip="resultCheck(resultRouteName)"
+        :next-button="nextPage"
+        :skip-button="!nextPage"
+        @next="nextPage && $router.push({ name: resultRouteName })"
         v-model:search="search"
-        :placeholder="placeholder"
         v-model:modal-active="showWarningModal"
         modal-headline="Вы не выбрали ни одного жанра"
         modal-description="Выберите хотя бы один жанр, чтобы получать более точные рекомендации"
@@ -15,10 +15,11 @@
                 onClick: () => (showWarningModal = false),
             },
             {
-                text: 'Пропустить',
+                text: 'Далее',
                 onClick: () => $router.push({ name: resultRouteName }),
             },
         ]"
+        :placeholder="typingText"
     >
         <template #headline>
             Выберите жанры,<br v-if="$viewport.isGreaterOrEquals('lg')" />
@@ -27,15 +28,13 @@
         <template #description>
             Это поможет получать более точные и интересные рекомендации
         </template>
-        <template #content>
-            <div class="genres" v-auto-animate>
-                <GenreCard
-                    v-for="(genre, index) in genres"
-                    :genre="genre"
-                    @liked="(liked) => onLike(liked, index)"
-                    overlay-on-like
-                />
-            </div>
+        <template #items>
+            <SetupGenresCard
+                v-for="(genre, index) in genres"
+                :genre="genre"
+                @liked="(liked) => onLike(liked, index)"
+                :key="genre.id"
+            />
         </template>
     </SetupContainer>
 </template>
@@ -51,7 +50,8 @@ const { resultRouteName, nextPage } = defineProps({
         default: routesNames.settings.profile,
     },
     nextPage: {
-        type: String,
+        type: Boolean,
+        default: false,
     },
 });
 const { logined } = storeToRefs(useAuthStore());
@@ -61,53 +61,10 @@ if (!logined.value) {
 }
 
 const runtimeConfig = useRuntimeConfig();
-const placeholder = ref("Найди свой жанр");
 const search = ref("");
 const randomGenres = await Service.getRandomGenresApiV1GenresRandomGet();
-const typeGenreTimeout = 800;
-const typeGenre = (genre) => {
-    placeholder.value = "";
-    var currentIndex = 0;
-    var reverse = false;
-    var wait = false;
-    setInterval(() => {
-        if (!reverse && currentIndex < genre.length) {
-            placeholder.value += genre[currentIndex];
-            currentIndex++;
-        } else {
-            wait = true;
-            setTimeout(() => {
-                reverse = true;
-                wait = false;
-            }, 1500);
-        }
-        if (reverse && currentIndex > 0) {
-            placeholder.value = placeholder.value.slice(0, -1);
-            currentIndex--;
-        } else {
-            clearInterval();
-        }
-    }, typeGenreTimeout / genre.length);
-};
-
-setTimeout(() => {
-    const interval = setInterval(() => {
-        if (placeholder.value.length > 0) {
-            placeholder.value = placeholder.value.slice(0, -1);
-        } else {
-            clearInterval(interval);
-        }
-    }, 100);
-    setTimeout(() => {
-        typeGenre(randomGenres[0].name);
-        setInterval(() => {
-            const randomGenre =
-                randomGenres[Math.floor(Math.random() * randomGenres.length)];
-            typeGenre(randomGenre.name);
-        }, typeGenreTimeout * 2 + 1500);
-    }, placeholder.value.length * 100 + 1000);
-}, 3000);
-
+const randomGenresNames = randomGenres.map((genre) => genre.name);
+const { typingText } = useTyping(randomGenresNames, "Найди свой жанр");
 const popularGenres = ref(
     await Service.getGenresApiV1GenresGet(
         1,
@@ -127,17 +84,13 @@ const mergedGenres = [...favoriteGenres.value, ...popularGenres.value];
 const genres = ref(mergedGenres);
 const onLike = (liked, index) => {
     genres.value[index].liked = liked;
-    if (liked) {
-        favoriteGenres.value.push(genres.value[index]);
-        popularGenres.value = popularGenres.value.filter(
-            (genre) => genre.id !== genres.value[index].id
-        );
-    } else {
-        favoriteGenres.value = favoriteGenres.value.filter(
-            (genre) => genre.id !== genres.value[index].id
-        );
-        popularGenres.value.push(genres.value[index]);
-    }
+    const currentGenre = genres.value[index];
+    var removeArray = liked ? popularGenres : favoriteGenres;
+    var addArray = liked ? favoriteGenres : popularGenres;
+    removeArray.value = removeArray.value.filter(
+        (genre) => genre.id !== currentGenre.id
+    );
+    addArray.value.push(currentGenre);
 };
 watch(
     search,
@@ -159,24 +112,9 @@ const resultCheck = async (routeName) => {
     );
 
     if (currentLikedGenres.length === 0) {
-        console.log("show modal");
         showWarningModal.value = true;
         return;
     }
     router.push({ name: routeName });
 };
-const skip = async () => {
-    resultCheck(resultRouteName);
-};
 </script>
-<style lang="scss" scoped>
-.genres-setup {
-    .genres {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        grid-auto-rows: min-content;
-        gap: 20px;
-        width: 100%;
-    }
-}
-</style>

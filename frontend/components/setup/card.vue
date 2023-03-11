@@ -1,6 +1,6 @@
 <template>
-    <div class="genre-card">
-        <card-picture v-bind="propsBind" @click="likeGenre">
+    <div class="card">
+        <card-picture v-bind="propsBind" @click="emit('picture-click')">
             <ClientOnly>
                 <div :class="['hover-overlay', { force: overlayActive }]">
                     <div :class="['like-button', { active: liked }]">
@@ -9,48 +9,58 @@
                 </div>
             </ClientOnly>
         </card-picture>
-        <div class="genre-name">
-            <span>{{ genre.name }}</span>
+        <div class="card-name">
+            <span>{{ name }}</span>
         </div>
     </div>
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
-import { Service } from "~~/client";
-const emit = defineEmits(["liked"]);
-const { genre, forceOverlay, overlayOnLike } = defineProps({
-    genre: {
-        type: Object,
-        required: true,
-    },
-    forceOverlay: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
-    overlayOnLike: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
-});
-const liked = ref(genre.liked);
-const likeGenre = async () => {
-    liked.value = await Service.likeGenreApiV1GenresGenreIdLikePut(genre.id);
-    emit("liked", liked.value);
-};
+
+const emit = defineEmits(["picture-click"]);
+const { picture, name, liked, icon, forceOverlay, overlayOnLike } = defineProps(
+    {
+        picture: {
+            type: [String, null],
+            required: true,
+        },
+        liked: {
+            type: Boolean,
+            required: true,
+        },
+        name: {
+            type: String,
+            required: true,
+        },
+        icon: {
+            type: String,
+            required: false,
+        },
+        forceOverlay: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        overlayOnLike: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
+    }
+);
+
 const overlayActive = computed(() => {
-    return forceOverlay || (overlayOnLike && liked.value);
+    return forceOverlay || (overlayOnLike && liked);
 });
 
 const propsBind = reactive({
-    picture: genre.picture,
+    picture: picture,
     borderRadius: "50%",
-    icon: IconsNames.guitarIcon,
+    icon: icon,
 });
 </script>
 <style lang="scss" scoped>
-.genre-card {
+.card {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -96,7 +106,7 @@ const propsBind = reactive({
         }
     }
 
-    .genre-name {
+    .card-name {
         display: flex;
         justify-content: center;
         align-items: center;

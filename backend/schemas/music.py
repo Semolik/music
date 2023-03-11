@@ -199,6 +199,7 @@ class MusicianClipWithoutMusician(CreateMusicianClip):
 
 class MusicianInfo(PublicProfile):
     liked: bool = Query(default=False, description="Лайкнут ли музыкант")
+    likes: int = Query(default=0, description="Количество лайков музыканта")
 
     class Config:
         orm_mode = True

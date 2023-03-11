@@ -12,7 +12,9 @@
                 </nuxt-link>
                 <nuxt-link
                     class="settings-aside-item"
-                    :to="{ name: 'setup-genres', props: { nextPage: null } }"
+                    :to="{
+                        name: 'setup-genres',
+                    }"
                 >
                     <Icon :name="IconsNames.guitarIcon" />
                     <span>Жанры</span>
@@ -31,6 +33,7 @@
 <script setup>
 import { IconsNames } from "@/configs/icons";
 import { useAuthStore } from "~~/stores/auth";
+import { routesNames } from "@typed-router";
 const { logoutRequest } = useAuthStore();
 const router = useRouter();
 const logout = () => {

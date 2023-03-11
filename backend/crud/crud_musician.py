@@ -3,7 +3,7 @@ from backend.db.base import CRUDBase
 from backend.models.tracks import Track, ListenTrackHistoryItem
 from backend.models.albums import Album
 from backend.models.user import FavoriteMusicians, PublicProfile
-from backend.core.config import env_config
+from backend.core.config import env_config, settings
 from sqlalchemy import func
 
 
@@ -26,6 +26,14 @@ class MusicianCrud(CRUDBase):
         else:
             self.delete(model=liked)
             return False
+
+    def get_random_musician_profiles(self, limit: int = settings.AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT) -> List[PublicProfile]:
+        return self.db.query(PublicProfile).order_by(func.random()).limit(limit).all()
+
+    def get_popular_musician_profiles(self, page: int, page_size: int = settings.SEARCH_MUSICIAN_LIMIT) -> List[PublicProfile]:
+        end = page * page_size
+        return self.db.query(PublicProfile).outerjoin(FavoriteMusicians).group_by(PublicProfile.id).order_by(
+            func.count(FavoriteMusicians.musician_id).desc()).slice(start=(end - page_size), stop=end).all()
 
     def get_musician_albums(self, musician_id: int, page: int = 1, page_size: int = int(env_config.get('VITE_ALBUM_PAGE_COUNT'))) -> List[Album]:
         end = page * page_size

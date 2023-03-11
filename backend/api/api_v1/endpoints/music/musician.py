@@ -1,12 +1,11 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, HTTPException, Query
-from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_clips import ClipsCruds
-from backend.crud.crud_musician import MusicianCrud
 from backend.helpers.auth_helper import Authenticate
 from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
+from backend.crud.crud_musician import MusicianCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
@@ -21,6 +20,35 @@ def get_liked_musician_profiles(
     liked_musician_profiles = MusicianCrud(Auth.db).get_liked_musicians(
         user_id=Auth.current_user_id, page=page)
     return liked_musician_profiles
+
+
+@router.get('/random', response_model=List[PublicProfile])
+def get_random_musician_profiles(
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Получение списка случайных музыкантов'''
+    random_musician_profiles = MusicianCrud(
+        Auth.db).get_random_musician_profiles()
+    return random_musician_profiles
+
+
+@router.get('/popular', response_model=List[MusicianInfo])
+def get_popular_musician_profiles(
+    page: int = Query(1, description='Номер страницы'),
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Получение списка популярных музыкантов'''
+    popular_musician_profiles = MusicianCrud(
+        Auth.db).get_popular_musician_profiles(page=page)
+    if Auth.current_user_id:
+        popular_musician_profiles_objs = []
+        for profile in popular_musician_profiles:
+            musician_info = MusicianInfo.from_orm(profile)
+            musician_info.liked = MusicianCrud(Auth.db).musician_is_liked(
+                musician_id=profile.id, user_id=Auth.current_user_id)
+            popular_musician_profiles_objs.append(musician_info)
+        return popular_musician_profiles_objs
+    return popular_musician_profiles
 
 
 @router.put('/{profile_id}/like', response_model=bool)

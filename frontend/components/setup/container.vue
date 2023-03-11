@@ -37,6 +37,9 @@
                     </div>
                 </Teleport>
                 <slot name="content"></slot>
+                <div class="items" v-auto-animate>
+                    <slot name="items"></slot>
+                </div>
             </div>
         </div>
         <ModalDialog
@@ -272,6 +275,13 @@ onMounted(() => {
             .setup-input {
                 font-size: 1rem;
                 margin-bottom: 20px;
+            }
+            .items {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-auto-rows: min-content;
+                gap: 20px;
+                width: 100%;
             }
         }
     }

@@ -59,6 +59,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    typingPlaceholderValues: {
+        type: Array,
+        default: () => [],
+    },
 });
 const height = ref(props.height);
 const value = ref(props.modelValue);

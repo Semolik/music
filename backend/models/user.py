@@ -1,10 +1,10 @@
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref, scoped_session
 from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import backref
-from sqlalchemy.ext.hybrid import hybrid_property
+from backend.db.session import SessionLocal
+session = scoped_session(SessionLocal)
 
 
 class FavoriteMusicians(Base):
@@ -121,6 +121,16 @@ class PublicProfile(Base):
             cascade="all,delete",
         )
     )
+
+    @property
+    def likes(self):
+        if not hasattr(self, '_likes_count'):
+            self._likes_count = session.query(
+                FavoriteMusicians
+            ).filter(
+                FavoriteMusicians.musician_id == self.id
+            ).count()
+        return self._likes_count
 
 
 class PublicProfileLinks(Base):
