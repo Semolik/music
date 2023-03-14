@@ -1,7 +1,7 @@
 <template>
     <div class="menu">
-        <div class="menu-title">Меню</div>
-        <div class="menu-selection">
+        <div class="menu-title" v-if="!hideTitle">{{ title }}</div>
+        <div class="menu-selection" v-if="showLoginSelection">
             <MenuCard
                 v-if="!logined"
                 :to="{ name: routesNames.login }"
@@ -9,9 +9,9 @@
                 text="Войти"
             />
             <MenuCard
-                :to="{ name: routesNames.settings.profile }"
-                :icon="IconsNames.userIcon"
-                text="Личный кабинет"
+                :to="{ name: 'settings' }"
+                :icon="IconsNames.settingsIcon"
+                text="Настройки"
                 v-else
             />
         </div>
@@ -26,12 +26,31 @@
     </div>
 </template>
 <script setup>
-import { menuSelections } from "@/configs/selections";
+import { menuSelections as menuSelectionsDefault } from "@/configs/selections";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
 const { logined } = storeToRefs(useAuthStore());
+
+const { menuSelectionsshowLoginSelection, title, hideTitle } = defineProps({
+    menuSelections: {
+        type: Array,
+        default: menuSelectionsDefault,
+    },
+    showLoginSelection: {
+        type: Boolean,
+        default: false,
+    },
+    title: {
+        type: String,
+        default: "Меню",
+    },
+    hideTitle: {
+        type: Boolean,
+        default: false,
+    },
+});
 </script>
 <style lang="scss" scoped>
 .menu {

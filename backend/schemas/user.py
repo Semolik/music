@@ -76,13 +76,6 @@ class UserRegister(UserBase, UserAuth):
     ...
 
 
-class UserModifiable(UserBase, ValidateJsonWithFormBody):
-    remove_picture: bool = Query(
-        ...,
-        description='Удалить аватарку пользователя'
-    )
-
-
 class UserInfo(AllUserTypes, UserBase, UserUsername):
     id: int
     picture: ImageLink | None = Query(
@@ -194,6 +187,5 @@ class MusicianProfile(PublicProfile):
         orm_mode = True
 
 
-class PublicProfileModifiable(PublicProfileBase, PublicProfileLinksURLS, ValidateJsonWithFormBody):
-    remove_picture: bool = Query(
-        default=False, description='Удалить аватарку публичного профиля')
+class PublicProfileModifiable(PublicProfileBase, PublicProfileLinksURLS):
+    ...

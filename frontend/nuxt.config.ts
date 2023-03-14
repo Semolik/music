@@ -12,8 +12,15 @@ export default defineNuxtConfig({
         "@vueuse/nuxt",
         "nuxt-typed-router",
         "nuxt-viewport",
+        "@nuxt/devtools",
     ],
-    ssr: true,
+    devtools: {
+        // Enable devtools (default: true)
+        enabled: true,
+        // VS Code Server options
+        vscode: {},
+        // ...other options
+    },
     viewport: {
         breakpoints: {
             xs: 360,

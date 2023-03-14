@@ -1,14 +1,18 @@
 <template>
-    <NuxtLink :to="to" class="menu-card">
+    <NuxtLink :to="to" class="menu-card" v-if="to">
         <Icon :name="icon" />
         <span>{{ text }}</span>
     </NuxtLink>
+    <div class="menu-card" v-else @click="onClick">
+        <Icon :name="icon" />
+        <span>{{ text }}</span>
+    </div>
 </template>
 <script setup>
-const { to, icon, text } = defineProps({
+const { to, icon, text, onClick } = defineProps({
     to: {
         type: Object,
-        required: true,
+        required: false,
     },
     icon: {
         type: String,
@@ -17,6 +21,10 @@ const { to, icon, text } = defineProps({
     text: {
         type: String,
         required: true,
+    },
+    onClick: {
+        type: Function,
+        required: false,
     },
 });
 </script>

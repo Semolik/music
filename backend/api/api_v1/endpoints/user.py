@@ -4,7 +4,7 @@ from backend.core.config import settings
 from backend.db.db import get_db
 from backend.crud.crud_user import UserCruds
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserModifiable
+from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserBase
 from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
 from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
@@ -18,7 +18,20 @@ router = APIRouter(tags=['Профили пользователей'], prefix='/
 
 @router.put('/me',  response_model=UserInfo)
 def update_user_data(
-    UserData: UserModifiable,
+    UserData: UserBase,
+    Auth: Authenticate = Depends(Authenticate()),
+):
+    '''Обновление данных пользователя'''
+    db_user_updated = UserCruds(Auth.db).update_user(
+        user=Auth.current_user,
+        first_name=UserData.first_name,
+        last_name=UserData.last_name,
+    )
+    return db_user_updated
+
+
+@router.put('/me/avatar',  response_model=UserInfo)
+def update_user_avatar(
     Auth: Authenticate = Depends(Authenticate()),
     userPicture: UploadFile = File(
         default=False, description='Фото пользователя'),
@@ -26,12 +39,10 @@ def update_user_data(
     '''Обновление данных пользователя'''
     db_image = save_image(db=Auth.db, upload_file=userPicture,
                           user_id=Auth.current_user.id)
-    db_user_updated = UserCruds(Auth.db).update_user(
+    db_user_updated = UserCruds(Auth.db).update_user_avatar(
         user=Auth.current_user,
         userPic=db_image,
-        first_name=UserData.first_name,
-        last_name=UserData.last_name,
-        remove_picture=UserData.remove_picture
+
     )
     return db_user_updated
 
@@ -45,11 +56,32 @@ def get_user_info(Auth: Authenticate = Depends(Authenticate())):
 @router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
 def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable,
-    userPublicPicture: UploadFile = File(
-        default=False, description='Фото публичного профиля'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Обновление данных публичного профиля пользователя'''
+    user_cruds = UserCruds(Auth.db)
+    db_public_profile = user_cruds.get_public_profile(
+        user_id=Auth.current_user.id)
+
+    db_public_profile_updated = user_cruds.update_public_profile(
+        public_profile=db_public_profile,
+        name=PublicProfileData.name,
+        description=PublicProfileData.description,
+        vk_username=PublicProfileData.vk,
+        youtube_channel_id=PublicProfileData.youtube,
+        telegram_username=PublicProfileData.telegram,
+
+    )
+    return db_public_profile_updated
+
+
+@router.put('/me/public/avatar',  response_model=PublicProfile)
+def update_user_public_avatar(
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+    userPublicPicture: UploadFile = File(
+        default=False, description='Фото публичного профиля'),
+):
+    '''Обновление данных пользователя'''
     user_cruds = UserCruds(Auth.db)
     db_public_profile = user_cruds.get_public_profile(
         user_id=Auth.current_user.id)
@@ -58,15 +90,9 @@ def update_user_public_profile_data(
         upload_file=userPublicPicture,
         user_id=Auth.current_user.id
     )
-    db_public_profile_updated = user_cruds.update_public_profile(
+    db_public_profile_updated = user_cruds.update_public_profile_avatar(
         public_profile=db_public_profile,
-        name=PublicProfileData.name,
-        description=PublicProfileData.description,
-        vk_username=PublicProfileData.vk,
-        youtube_channel_id=PublicProfileData.youtube,
-        telegram_username=PublicProfileData.telegram,
         userPublicPicture=db_image,
-        remove_picture=PublicProfileData.remove_picture
     )
     return db_public_profile_updated
 

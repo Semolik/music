@@ -2,7 +2,7 @@ from backend.db.base import CRUDBase
 from backend.helpers.images import copy_image
 from backend.crud.crud_file import FileCruds
 from backend.models.files import Image
-from backend.schemas.user import PublicProfileModifiable, UserAuth, UserModifiable, UserRegister
+from backend.schemas.user import UserAuth,  UserRegister
 from backend.models.user import PublicProfile, User
 from backend.models.user import PublicProfileLinks
 from passlib.context import CryptContext
@@ -53,17 +53,25 @@ class UserCruds(CRUDBase):
     def check_password(self, user: User, password: str) -> bool:
         return self.pwd_context.verify(password, user.hashed_password)
 
-    def update_user(self, user: User, first_name: str | None, last_name: str | None, remove_picture: bool, userPic: Image) -> User:
+    def update_user(self, user: User, first_name: str | None, last_name: str | None) -> User:
         if user is None:
             raise Exception('Update user failed: user is None')
         user.first_name = first_name
         user.last_name = last_name
-        if remove_picture and user.picture:
-            self.delete(user.picture)
-        elif userPic:
+        return self.create(user)
+
+    def update_user_avatar(self, user: User,  userPic: Image) -> User:
+        if user is None:
+            raise Exception('Update user failed: user is None')
+        if userPic and user.picture:
             FileCruds(self.db).replace_old_picture(
                 model=user, new_picture=userPic)
-        return self.create(user)
+        elif userPic:
+            user.picture = userPic
+        elif user.picture:
+            self.delete(user.picture)
+
+        return self.update(user)
 
     def get_public_profile(self, user_id: int) -> PublicProfile:
         db_public_profile = self.db.query(PublicProfile).filter(
@@ -90,7 +98,7 @@ class UserCruds(CRUDBase):
         return self.db.query(PublicProfile).filter(
             PublicProfile.id == id).first()
 
-    def update_public_profile(self, public_profile: PublicProfile, name: str, description: str, vk_username: str, telegram_username: str, youtube_channel_id: str, userPublicPicture: Image, remove_picture: bool) -> PublicProfile:
+    def update_public_profile(self, public_profile: PublicProfile, name: str, description: str, vk_username: str, telegram_username: str, youtube_channel_id: str) -> PublicProfile:
         if public_profile is None:
             raise Exception(
                 'Update public_profile failed: public_profile is None')
@@ -105,11 +113,20 @@ class UserCruds(CRUDBase):
         if youtube_channel_id is not None:
             public_profile.links.youtube = youtube_channel_id
         self.update(public_profile.links)
-        if remove_picture:
-            self.delete(public_profile.picture)
-        elif userPublicPicture:
+
+        return self.update(public_profile)
+
+    def update_public_profile_avatar(self, public_profile: PublicProfile,  userPublicPicture: Image) -> PublicProfile:
+        if public_profile is None:
+            raise Exception('Update user failed: user is None')
+        if userPublicPicture and public_profile.picture:
             FileCruds(self.db).replace_old_picture(
                 model=public_profile, new_picture=userPublicPicture)
+        elif userPublicPicture:
+            public_profile.picture = userPublicPicture
+        elif public_profile.picture:
+            self.delete(public_profile.picture)
+
         return self.update(public_profile)
 
     def is_admin(self, user_id) -> bool:

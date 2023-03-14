@@ -34,7 +34,7 @@
             overflow: auto;
             padding-inline: 20px;
             @include lg(true) {
-                padding-inline: 10px;
+                padding: 10px;
             }
             height: 100%;
         }

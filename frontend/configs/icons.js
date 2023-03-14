@@ -14,4 +14,5 @@ export const IconsNames = {
     logoutIcon: "material-symbols:logout-rounded",
     securityIcon: "material-symbols:security",
     guitarIcon: "mdi:guitar-electric",
+    settingsIcon: "material-symbols:settings",
 };
