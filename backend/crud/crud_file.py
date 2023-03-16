@@ -1,9 +1,6 @@
-import os
-from uuid import UUID
+
 from backend.db.base import CRUDBase
 from backend.models.files import Image, File
-from pathlib import Path
-from backend.core.config import settings
 
 
 class FileCruds(CRUDBase):

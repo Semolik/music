@@ -6,6 +6,7 @@ from backend.models.tracks import *
 from backend.models.genres import *
 from backend.models.clips import *
 from backend.models.playlists import *
+from backend.models.slider import *
 
 
 from backend.core.config import settings
@@ -53,7 +54,7 @@ def run_migrations_online() -> None:
     )
     if not database_exists(url):
         create_database(url)
-        target_metadata.create_all(connectable)
+    target_metadata.create_all(connectable)
 
     with connectable.connect() as connection:
         context.configure(
