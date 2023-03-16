@@ -167,6 +167,7 @@ onBeforeUnmount(() => {
         cursor: pointer;
         user-select: none;
         border: 1px solid transparent;
+        color: $primary-text;
         &:not(.active):hover {
             background-color: $quaternary-bg;
         }

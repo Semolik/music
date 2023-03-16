@@ -1,7 +1,4 @@
-from sqlalchemy.orm import Session
-from backend.models.user import User as UserModel
-from backend.core.config import settings
-from backend.db.db import get_db
+from io import BytesIO
 from backend.crud.crud_user import UserCruds
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserBase
@@ -79,7 +76,8 @@ def update_user_public_profile_data(
 def update_user_public_avatar(
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
     userPublicPicture: UploadFile = File(
-        default=False, description='Фото публичного профиля'),
+        default=False, description='Фото пользователя'
+    ),
 ):
     '''Обновление данных пользователя'''
     user_cruds = UserCruds(Auth.db)
@@ -87,7 +85,7 @@ def update_user_public_avatar(
         user_id=Auth.current_user.id)
     db_image = save_image(
         db=Auth.db,
-        upload_file=userPublicPicture,
+        bytes_io_file=userPublicPicture,
         user_id=Auth.current_user.id
     )
     db_public_profile_updated = user_cruds.update_public_profile_avatar(

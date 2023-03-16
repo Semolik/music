@@ -23,6 +23,18 @@
                         <div class="modal-content">
                             <slot name="content"></slot>
                         </div>
+                        <div
+                            class="modal-buttons"
+                            v-if="props.buttons.length > 0"
+                        >
+                            <div
+                                class="button"
+                                v-for="button in props.buttons"
+                                @click="button.onClick"
+                            >
+                                {{ button.text }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </Transition>
@@ -34,9 +46,6 @@ import { useEventBus } from "@vueuse/core";
 const props = defineProps({
     active: Boolean,
     style: Object,
-    yesButton: Boolean,
-    yesLoading: Boolean,
-    noButton: Boolean,
     offJustifyContent: Boolean,
     maxWidth: {
         type: Number,
@@ -59,7 +68,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-
+    buttons: {
+        type: Array,
+        default: () => [],
+    },
     gap: {
         type: Number,
         default: 10,
@@ -177,7 +189,7 @@ onBeforeUnmount(() => {
         border-radius: 10px;
         display: flex;
         flex-direction: column;
-
+        padding: 10px;
         gap: v-bind(gapString);
 
         .description {
@@ -191,7 +203,21 @@ onBeforeUnmount(() => {
 
         .modal-buttons {
             display: flex;
-            gap: 5px;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            .button {
+                padding: 5px;
+                border-radius: 10px;
+                background-color: $quaternary-bg;
+                flex-grow: 1;
+                cursor: pointer;
+                text-align: center;
+
+                &:hover {
+                    background-color: $quinary-bg;
+                }
+            }
         }
     }
 }

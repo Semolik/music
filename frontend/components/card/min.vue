@@ -32,12 +32,14 @@ const { text, picture, icon, borderRadius } = defineProps({
 <style lang="scss">
 .card-min {
     padding: 7px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 50px 1fr min-content;
     min-height: 70px;
     max-height: 70px;
-    gap: 10px;
+    gap: 20px;
     background-color: $quaternary-bg;
     border-radius: 10px;
+    color: $secondary-text;
     &:hover {
         background-color: $quinary-bg;
         cursor: pointer;

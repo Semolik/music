@@ -15,4 +15,6 @@ export const IconsNames = {
     securityIcon: "material-symbols:security",
     guitarIcon: "mdi:guitar-electric",
     settingsIcon: "material-symbols:settings",
+    pencilIcon: "material-symbols:edit",
+    deleteIcon: "material-symbols:delete",
 };

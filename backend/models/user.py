@@ -76,6 +76,10 @@ class User(Base):
         cascade="all,delete",
     )
 
+    @property
+    def is_admin(self):
+        return self.type == settings.UserTypeEnum.superuser
+
 
 class PublicProfile(Base):
     __tablename__ = 'public_profiles'

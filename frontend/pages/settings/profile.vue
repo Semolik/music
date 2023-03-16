@@ -1,71 +1,122 @@
 <template>
-    <el-upload
-        class="avatar-uploader"
-        action="/api/v1/users/me/avatar"
-        method="PUT"
-        :show-file-list="false"
-        :on-success="handleAvatarSuccess"
-        :before-upload="beforeAvatarUpload"
-    >
-        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-    </el-upload>
+    <div class="profile">
+        <div class="avatar-contaner">
+            <Upload
+                action="/api/v1/users/me/avatar"
+                method="PUT"
+                :on-success="handleAvatarSuccess"
+                :imageUrl="userInfo.picture"
+                border-radius="50%"
+                class="avatar-uploader"
+                name="userPicture"
+            />
+            <div
+                :class="[
+                    'delete-button-contaner',
+                    { active: userInfo.picture },
+                ]"
+            >
+                <div
+                    class="delete-button"
+                    @[userInfo.picture&&`click`]="showDeleteAvatarModal = true"
+                >
+                    <Icon :name="IconsNames.deleteIcon" />
+                </div>
+            </div>
+            <ModalDialog
+                :active="showDeleteAvatarModal"
+                @close="showDeleteAvatarModal = false"
+                :buttons="[
+                    {
+                        text: 'Удалить',
+                        type: 'danger',
+                        onClick: deleteUserAvatar,
+                    },
+                    {
+                        text: 'Отмена',
+                        type: 'primary',
+                        onClick: () => {
+                            showDeleteAvatarModal = false;
+                        },
+                    },
+                ]"
+            >
+                <template #content>
+                    <div class="warning-modal">
+                        <div class="warning-modal-headline">
+                            Вы уверены, что хотите удалить аватар?
+                        </div>
+                    </div>
+                </template>
+            </ModalDialog>
+        </div>
+    </div>
 </template>
-<script lang="ts" setup>
-import { ref } from "vue";
-import { ElMessage } from "element-plus";
-import { Plus } from "@element-plus/icons-vue";
-
-import type { UploadProps } from "element-plus";
-
-const imageUrl = ref("");
-
-const handleAvatarSuccess: UploadProps["onSuccess"] = (
-    response,
-    uploadFile
-) => {
-    imageUrl.value = response.data.picture;
+<script setup>
+import { Service } from "~~/client";
+import { IconsNames } from "~~/configs/icons";
+definePageMeta({
+    middleware: ["auth"],
+});
+const showDeleteAvatarModal = ref(false);
+const userInfo = ref({});
+onMounted(async () => {
+    userInfo.value = await Service.getUserInfoApiV1UsersMeGet();
+});
+const handleAvatarSuccess = (response, uploadFile) => {
+    userInfo.value.picture = response.picture;
 };
-
-const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-    if (rawFile.type !== "image/jpeg") {
-        ElMessage.error("Avatar picture must be JPG format!");
-        return false;
-    } else if (rawFile.size / 1024 / 1024 > 2) {
-        ElMessage.error("Avatar picture size can not exceed 2MB!");
-        return false;
-    }
-    return true;
+const deleteUserAvatar = async () => {
+    userInfo.value = await Service.updateUserAvatarApiV1UsersMeAvatarPut();
+    showDeleteAvatarModal.value = false;
 };
 </script>
 
-<style scoped>
-.avatar-uploader .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-}
-</style>
+<style lang="scss" scoped>
+.profile {
+    display: flex;
+    flex-direction: column;
+    @include flex-center;
+    gap: 20px;
+    .avatar-contaner {
+        @include flex-center;
+        gap: 10px;
+        position: relative;
+        max-width: 150px;
+        aspect-ratio: 1;
+        width: 100%;
+        @include lg {
+            max-width: 200px;
+        }
+        .avatar-uploader {
+            width: 100%;
+            height: 100%;
+        }
+        .delete-button-contaner {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: calc(103%);
+            @include flex-center;
+            opacity: 0;
 
-<style>
-.avatar-uploader .el-upload {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: var(--el-transition-duration-fast);
-}
-
-.avatar-uploader .el-upload:hover {
-    border-color: var(--el-color-primary);
-}
-
-.el-icon.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    text-align: center;
+            &.active {
+                opacity: 1;
+            }
+            .delete-button {
+                @include flex-center;
+                border-radius: 50%;
+                cursor: pointer;
+                background-color: $quinary-bg;
+                padding: 10px;
+                height: min-content;
+                @include lg {
+                    &:hover {
+                        background-color: $accent-red;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

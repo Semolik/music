@@ -46,6 +46,7 @@
             :active="modalActive"
             @update:model-value="(value) => emit('update:modalActive', value)"
             @close="emit('update:modalActive', false)"
+            :buttons="modalButtons"
         >
             <template #content>
                 <div class="warning-modal">
@@ -54,15 +55,6 @@
                     </div>
                     <div class="warning-modal-description">
                         {{ modalDescription }}
-                    </div>
-                    <div class="warning-modal-buttons">
-                        <div
-                            class="button"
-                            v-for="button in modalButtons"
-                            @click="button.onClick"
-                        >
-                            {{ button.text }}
-                        </div>
                     </div>
                 </div>
             </template>
@@ -128,7 +120,6 @@ onMounted(() => {
 </script>
 <style scoped lang="scss">
 .warning-modal {
-    padding: 20px;
     display: flex;
     gap: 10px;
     flex-direction: column;
@@ -140,24 +131,6 @@ onMounted(() => {
     .warning-modal-description {
         font-size: 1rem;
         font-weight: 400;
-    }
-    .warning-modal-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-
-        .button {
-            padding: 5px;
-            border-radius: 10px;
-            background-color: $quaternary-bg;
-            flex-grow: 1;
-            cursor: pointer;
-            text-align: center;
-
-            &:hover {
-                background-color: $quinary-bg;
-            }
-        }
     }
 }
 .setup-container {
