@@ -41,7 +41,7 @@ class UserAuth(UserUsername, UserPassword):
     ...
 
 
-class UserBase(BaseModel):
+class UserBase(UserUsername):
     first_name: str | None = Query(
         default=None,
         max_length=int(env_config.get('VITE_MAX_FIRSTNAME_LENGTH')),

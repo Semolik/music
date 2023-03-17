@@ -68,6 +68,17 @@ export const useAuthStore = defineStore({
                 return error;
             }
         },
+        async getUserData() {
+            try {
+                const userData =
+                    await Service.getUserPublicProfileInfoApiV1UsersMePublicGet();
+                this.userData = userData;
+                this.logined = true;
+                return userData;
+            } catch (error) {
+                this.logout();
+            }
+        },
         async registerRequest(username, password, first_name, last_name) {
             this.logined = false;
             try {

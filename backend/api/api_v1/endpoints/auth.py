@@ -4,10 +4,10 @@ from fastapi_jwt_auth import AuthJWT
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
-
-from backend.schemas.user import ChangePassword, UserAuth, UserInfo, UserPassword
+from backend.schemas.user import ChangePassword, UserAuth, UserInfo
 from backend.crud.crud_user import UserCruds
 from backend.schemas.user import UserRegister
+from backend.core.config import settings
 router = APIRouter(tags=['Авторизация'], prefix='/auth')
 
 
@@ -48,6 +48,11 @@ def create_user_signup(user_in: UserRegister, Authorize: AuthJWT = Depends(), db
     Создание пользователя без необходимости последующей авторизации
     """
     user_exists = UserCruds(db).get_user_by_username(user_in.username)
+    if user_in.username == settings.DEFAULT_ADMIN_USERNAME:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Нельзя использовать этот логин',
+        )
     if user_exists:
         raise HTTPException(
             status_code=400,

@@ -17,4 +17,5 @@ export const IconsNames = {
     settingsIcon: "material-symbols:settings",
     pencilIcon: "material-symbols:edit",
     deleteIcon: "material-symbols:delete",
+    changeIcon: "material-symbols:change-circle-rounded",
 };

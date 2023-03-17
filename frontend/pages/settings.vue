@@ -5,30 +5,25 @@
                 class="settings-aside"
                 v-if="$viewport.isGreaterOrEquals('lg')"
             >
-                <nuxt-link class="settings-aside-item" to="/settings/profile">
-                    <Icon :name="IconsNames.userIcon" />
-                    <span>Профиль</span>
-                </nuxt-link>
-                <nuxt-link class="settings-aside-item" to="/settings/security">
-                    <Icon :name="IconsNames.securityIcon" />
-                    <span>Безопасность</span>
-                </nuxt-link>
-                <nuxt-link
-                    class="settings-aside-item"
-                    :to="{
-                        name: 'setup-genres',
-                        query: {
-                            onlyGenres: true,
-                        },
-                    }"
-                >
-                    <Icon :name="IconsNames.guitarIcon" />
-                    <span>Жанры</span>
-                </nuxt-link>
-                <div class="settings-aside-item" @click="logout">
-                    <Icon :name="IconsNames.logoutIcon" />
-                    <span>Выйти</span>
-                </div>
+                <template v-for="item in selection.links">
+                    <nuxt-link
+                        class="settings-aside-item"
+                        :key="item.text"
+                        :to="item.to"
+                        v-if="item.to"
+                    >
+                        <Icon :name="item.icon" />
+                        <span>{{ item.text }}</span>
+                    </nuxt-link>
+                    <div
+                        class="settings-aside-item"
+                        v-else
+                        @click="item.onClick"
+                    >
+                        <Icon :name="item.icon" />
+                        <span>{{ item.text }}</span>
+                    </div>
+                </template>
             </div>
             <nuxt-link
                 class="back-button"
@@ -84,23 +79,33 @@ const selection = {
         {
             text: "Профиль",
             to: {
-                name: "settings-profile",
+                name: routesNames.settings.profile,
             },
             icon: IconsNames.userIcon,
         },
         {
             text: "Безопасность",
             to: {
-                name: "settings-security",
+                name: routesNames.settings.security,
             },
             icon: IconsNames.securityIcon,
         },
         {
             text: "Жанры",
             to: {
-                name: "setup-genres",
+                name: routesNames.setupGenres,
+                query: {
+                    onlyGenres: true,
+                },
             },
             icon: IconsNames.guitarIcon,
+        },
+        {
+            text: "Стать музыкантом",
+            to: {
+                name: routesNames.settings.becomeMusician,
+            },
+            icon: IconsNames.changeIcon,
         },
         {
             text: "Выйти",

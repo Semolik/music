@@ -53,11 +53,12 @@ class UserCruds(CRUDBase):
     def check_password(self, user: User, password: str) -> bool:
         return self.pwd_context.verify(password, user.hashed_password)
 
-    def update_user(self, user: User, first_name: str | None, last_name: str | None) -> User:
+    def update_user(self, user: User, first_name: str | None, last_name: str | None, username: str | None) -> User:
         if user is None:
             raise Exception('Update user failed: user is None')
         user.first_name = first_name
         user.last_name = last_name
+        user.username = username
         return self.create(user)
 
     def update_user_avatar(self, user: User,  userPic: Image) -> User:

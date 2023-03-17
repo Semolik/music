@@ -64,6 +64,8 @@ class Settings(BaseSettings):
         UserTypeEnum.musician: "Музыкант",
     }
 
+    DEFAULT_ADMIN_USERNAME = 'admin'
+
     class FilterGenreEnum(str, enum.Enum):
         all = "all"
         liked = "liked"
