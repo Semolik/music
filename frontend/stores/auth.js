@@ -26,9 +26,6 @@ export const useAuthStore = defineStore({
         isMusician() {
             return this.userData?.type === UserTypeEnum.MUSICIAN;
         },
-        isRadioStation() {
-            return this.userData?.type === UserTypeEnum.RADIOSTAION;
-        },
     },
     actions: {
         setUserData(data) {
@@ -70,8 +67,7 @@ export const useAuthStore = defineStore({
         },
         async getUserData() {
             try {
-                const userData =
-                    await Service.getUserPublicProfileInfoApiV1UsersMePublicGet();
+                const userData = await Service.getUserInfoApiV1UsersMeGet();
                 this.userData = userData;
                 this.logined = true;
                 return userData;

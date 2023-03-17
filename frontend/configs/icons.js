@@ -18,4 +18,5 @@ export const IconsNames = {
     pencilIcon: "material-symbols:edit",
     deleteIcon: "material-symbols:delete",
     changeIcon: "material-symbols:change-circle-rounded",
+    listIcon: "material-symbols:list",
 };

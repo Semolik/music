@@ -60,6 +60,7 @@
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
 import { useAuthStore } from "~~/stores/auth";
+import { storeToRefs } from "pinia";
 useHead({
     title: "Настройки",
 });
@@ -67,53 +68,72 @@ definePageMeta({
     middleware: ["auth"],
 });
 const { logoutRequest } = useAuthStore();
+const { isMusician, isAdmin, isUser } = storeToRefs(useAuthStore());
 const router = useRouter();
 const logout = () => {
     logoutRequest();
     router.push("/");
 };
 const isIndex = computed(() => router.currentRoute.value.name === "settings");
-const selection = {
-    name: null,
-    links: [
-        {
-            text: "Профиль",
-            to: {
-                name: routesNames.settings.profile,
+const linksAll = [
+    {
+        text: "Профиль",
+        to: {
+            name: routesNames.settings.profile,
+        },
+        icon: IconsNames.userIcon,
+    },
+    {
+        text: "Безопасность",
+        to: {
+            name: routesNames.settings.security,
+        },
+        icon: IconsNames.securityIcon,
+    },
+    {
+        text: "Жанры",
+        to: {
+            name: routesNames.setupGenres,
+            query: {
+                onlyGenres: true,
             },
-            icon: IconsNames.userIcon,
         },
-        {
-            text: "Безопасность",
-            to: {
-                name: routesNames.settings.security,
-            },
-            icon: IconsNames.securityIcon,
+        icon: IconsNames.guitarIcon,
+    },
+    {
+        text: "Список жанров",
+        to: {
+            name: routesNames.settings.genres,
         },
-        {
-            text: "Жанры",
-            to: {
-                name: routesNames.setupGenres,
-                query: {
-                    onlyGenres: true,
-                },
-            },
-            icon: IconsNames.guitarIcon,
+        icon: IconsNames.listIcon,
+        admin: true,
+    },
+    {
+        text: "Стать музыкантом",
+        to: {
+            name: routesNames.settings.becomeMusician,
         },
-        {
-            text: "Стать музыкантом",
-            to: {
-                name: routesNames.settings.becomeMusician,
-            },
-            icon: IconsNames.changeIcon,
-        },
-        {
-            text: "Выйти",
-            onClick: logout,
-            icon: IconsNames.logoutIcon,
-        },
-    ],
-};
+        icon: IconsNames.changeIcon,
+        user: true,
+    },
+    {
+        text: "Выйти",
+        onClick: logout,
+        icon: IconsNames.logoutIcon,
+    },
+];
+const selection = computed(() => {
+    return {
+        name: null,
+        links: linksAll.filter(
+            (link) =>
+                (link.admin && isAdmin.value) ||
+                (link.user && isUser.value) ||
+                (link.musician && isMusician.value) ||
+                (!link.admin && !link.user && !link.musician)
+        ),
+    };
+});
 </script>
 <style lang="scss" scoped>
 .settings-container {
