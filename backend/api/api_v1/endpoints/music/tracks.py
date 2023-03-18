@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 import os
 from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import AlbumsCruds
+from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
 from backend.crud.crud_tracks import TracksCrud
 from backend.db.db import get_db
@@ -16,6 +17,7 @@ from backend.responses import NOT_FOUND_TRACK, UNAUTHORIZED_401
 from backend.schemas.music import Track
 import uuid as uuid_pkg
 from backend.core.config import settings
+from backend.schemas.statistics import TrackStats
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 
@@ -58,6 +60,28 @@ def get_track(
         track_obj.liked = tracks_crud.track_is_liked(
             track_id=db_track.id, user_id=Auth.current_user_id)
     return track_obj
+
+
+@router.get('/{track_id}/stats', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=TrackStats)
+def get_track_statistics(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate(is_admin=True, is_musician=True))):
+    '''Получение статистики по треку'''
+    tracks_crud = TracksCrud(db=Auth.db)
+    track = tracks_crud.get_track(track_id=track_id)
+    if not track:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Трек не найден'
+        )
+    users_cruds = UserCruds(db=Auth.db)
+    db_public_profile = users_cruds.get_public_profile_by_id(
+        Auth.current_user_id)
+    if not (Auth.current_user.type == settings.UserTypeEnum.superuser) and not (db_public_profile or db_public_profile.id != track.artist_id):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='У вас нет доступа к этой информации'
+        )
+
+    return tracks_crud.get_track_statistics(track=track)
 
 
 @router.post('/{track_id}/listening', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)

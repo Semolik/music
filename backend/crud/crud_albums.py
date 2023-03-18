@@ -7,7 +7,7 @@ from backend.db.base import CRUDBase
 from backend.models.files import Image
 from backend.models.genres import Genre
 from backend.models.tracks import Track
-from backend.models.albums import Album, FavoriteAlbum
+from backend.models.albums import Album, FavoriteAlbum, AlbumGenre
 from backend.models.user import PublicProfile
 from sqlalchemy import func
 
@@ -25,6 +25,9 @@ class AlbumsCruds(CRUDBase):
         db_album = Album(musician_id=musician.id, name=name,
                          open_date=date, picture=db_image, genres=genres, uploaded=False)
         return self.create(model=db_album)
+
+    def get_album_count_by_genre_id(self, genre_id: int) -> int:
+        return self.db.query(AlbumGenre).filter(AlbumGenre.genre_id == genre_id).count()
 
     def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: Image, tracks_ids: List[int]):
         album.name = name

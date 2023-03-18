@@ -29,9 +29,6 @@ class GenresCruds(CRUDBase):
             query = query.filter(LovedGenre.user_id.is_(None))
 
         return query.slice(end - page_size, end).all()
-        # return query.slice(end - page_size, end).all()
-
-        # return self.db.query(Genre).outerjoin(LovedGenre).group_by(Genre.id).order_by(func.count(LovedGenre.genre_id).desc()).slice(end - page_size, end).all()
 
     def get_liked_genres_ordered_by_likes(self, user_id: int) -> list[Genre]:
         return self.db.query(Genre).join(LovedGenre).filter(LovedGenre.user_id == user_id).order_by(func.count(LovedGenre.genre_id).desc()).all()

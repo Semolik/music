@@ -4,6 +4,7 @@
         :show-file-list="false"
         :before-upload="beforeAvatarUpload"
         v-bind="$attrs"
+        :on-success="defaultOnSuccess"
     >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
         <Icon :name="IconsNames.userIcon" class="avatar-uploader-icon" v-else />
@@ -12,34 +13,41 @@
 <script setup>
 import { ElMessage } from "element-plus";
 import { IconsNames } from "@/configs/icons";
-
-const { imageUrl, beforeAvatarUpload, handleAvatarSuccess } = defineProps({
-    imageUrl: {
-        type: String,
-        default: "",
-    },
-    borderRadius: {
-        type: String,
-        default: "50%",
-    },
-    aspectRatio: {
-        type: Number,
-        default: 1,
-    },
-    beforeAvatarUpload: {
-        type: Function,
-        default: (rawFile) => {
-            if (rawFile.type.split("/")[0] !== "image") {
-                ElMessage.error("Это не картинка!");
-                return false;
-            } else if (rawFile.size / 1024 / 1024 > 5) {
-                ElMessage.error("Картинка слишком большая!");
-                return false;
-            }
-            return true;
+const emit = defineEmits(["success"]);
+const defaultOnSuccess = (response, file) => {
+    emit("success", file.raw);
+};
+const { imageUrl, beforeAvatarUpload, handleAvatarSuccess, onSuccess } =
+    defineProps({
+        imageUrl: {
+            type: String,
+            default: "",
         },
-    },
-});
+        borderRadius: {
+            type: String,
+            default: "50%",
+        },
+        aspectRatio: {
+            type: Number,
+            default: 1,
+        },
+        beforeAvatarUpload: {
+            type: Function,
+            default: (rawFile) => {
+                if (rawFile.type.split("/")[0] !== "image") {
+                    ElMessage.error("Это не картинка!");
+                    return false;
+                } else if (rawFile.size / 1024 / 1024 > 5) {
+                    ElMessage.error("Картинка слишком большая!");
+                    return false;
+                }
+                return true;
+            },
+        },
+        onSuccess: {
+            type: Function,
+        },
+    });
 </script>
 
 <style lang="scss">

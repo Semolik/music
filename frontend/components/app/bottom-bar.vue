@@ -18,8 +18,8 @@ const { homeIcon, menuIcon, searchIcon } = IconsNames;
 <style lang="scss" scoped>
 .bottom-bar {
     background-color: $secondary-bg;
-    position: static;
-    bottom: 100vh;
+    position: fixed;
+    bottom: 0;
     padding-bottom: env(safe-area-inset-bottom);
     left: 0;
     width: 100%;

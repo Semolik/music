@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from fastapi import Query
 import uuid
 
+from backend.schemas.music import Genre, GenreWithoutLiked
+
 
 class UsersStats(BaseModel):
     user_count: int = Query(..., description="Количество пользователей")
@@ -35,3 +37,10 @@ class AlbumStats(StatsBase):
 
 class MusicianStats(StatsBase):
     musician_id: int = Query(..., description="ID музыканта")
+
+
+class GenreStats(GenreWithoutLiked):
+    album_count: int = Query(default=0, description="Количество альбомов")
+
+    class Config:
+        orm_mode = True

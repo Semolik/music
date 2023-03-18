@@ -29,12 +29,13 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        overflow-x: hidden;
         .app-content {
             flex-grow: 1;
-            overflow: auto;
             padding-inline: 20px;
             @include lg(true) {
                 padding: 10px;
+                padding-bottom: 80px;
             }
             height: 100%;
         }

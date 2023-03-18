@@ -8,6 +8,7 @@
 </template>
 <script setup>
 import { routesNames } from "@typed-router";
+useHead({ title: "Установка любимых жанров" });
 const router = useRouter();
 
 const { onlyGenres } = router.currentRoute.value.query;

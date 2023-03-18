@@ -94,6 +94,7 @@ import { IconsNames } from "~~/configs/icons";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { useToast } from "vue-toastification";
+useHead({ title: "Профиль" });
 definePageMeta({
     middleware: ["auth"],
 });

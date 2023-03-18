@@ -1,6 +1,7 @@
 from typing import List
-from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
+from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
+from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_genres import GenresCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
@@ -11,6 +12,7 @@ from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
 from backend.schemas.music import Genre, GenreBaseForm
 from backend.core.config import settings
+from backend.schemas.statistics import GenreStats
 
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
@@ -41,7 +43,7 @@ def get_random_genres(db: Session = Depends(get_db)):
 
 @router.put('/{genre_id}/like', response_model=bool)
 def like_genre(
-    genre_id: int = Query(..., description='ID жанра'),
+    genre_id: int = Path(..., description='ID жанра', ge=1),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк жанра'''
@@ -62,7 +64,7 @@ def like_genre(
     response_model=Genre
 )
 def update_genre(
-    genre_id: int = Query(..., description='ID жанра'),
+    genre_id: int = Path(..., description='ID жанра', ge=1),
     genreData: GenreBaseForm = Depends(GenreBaseForm),
     genrePicture: UploadFile = File(None, description='Картинка жанра'),
     Auth: Authenticate = Depends(Authenticate(is_admin=True)),
@@ -80,20 +82,21 @@ def update_genre(
     return genre
 
 
-@router.get('/{genre_id}', responses={**NOT_FOUND_GENRE}, response_model=Genre)
-def get_genre(genre_id: int = Query(..., description="ID жанра"), Auth: Authenticate = Depends(Authenticate(required=False))):
-    '''Получение жанра по id'''
-    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
+@router.get(
+    '/{genre_id}',
+    responses={
+        **NOT_ENOUGH_RIGHTS,
+        **NOT_FOUND_GENRE
+    },
+    response_model=GenreStats)
+def get_genre_info(genre_id: int = Path(..., ge=1), Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+    genre = GenresCruds(db=Auth.db).get_genre_by_id(genre_id)
     if not genre:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Жанр не найден")
-    genre_obj = Genre.from_orm(genre)
-    if Auth.current_user_id:
-        genre_obj.liked = bool(
-            GenresCruds(Auth.db).get_liked_genre_model(
-                user_id=Auth.current_user_id, genre_id=genre.id)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Жанр не найден'
         )
-    return genre_obj
+    return genre
 
 
 @router.delete(
@@ -104,7 +107,7 @@ def get_genre(genre_id: int = Query(..., description="ID жанра"), Auth: Aut
     },
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_genre(genre_id: int = Query(..., description="ID жанра"), Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+def delete_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth: Authenticate = Depends(Authenticate(is_admin=True))):
     '''Удаление жанра'''
 
     genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)

@@ -4,10 +4,14 @@
     </div>
 </template>
 <script setup>
-const { active } = defineProps({
+const { active, borderRadius } = defineProps({
     active: {
         type: Boolean,
         default: false,
+    },
+    borderRadius: {
+        type: String,
+        default: "10px",
     },
 });
 </script>
@@ -18,18 +22,18 @@ const { active } = defineProps({
     background-color: $quaternary-bg;
     padding: 10px;
     height: min-content;
-    border-radius: 10px;
+    border-radius: v-bind(borderRadius);
     width: 100%;
     cursor: default;
     user-select: none;
 
     &.active {
-        background-color: $accent;
+        background-color: var(--app-button-active-bg, $accent);
         color: black;
         cursor: pointer;
 
         &:hover {
-            background-color: $accent-hover;
+            background-color: var(--app-button-active-hover-bg, $accent-hover);
         }
     }
 }

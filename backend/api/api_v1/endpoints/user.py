@@ -1,5 +1,7 @@
+from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.crud.crud_user import UserCruds
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
+from backend.schemas.statistics import UsersStats
 from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserBase
 from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
 from backend.helpers.images import save_image
@@ -9,6 +11,24 @@ from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile
 from typing import List, Literal
 from backend.core.config import settings
 router = APIRouter(tags=['Профили пользователей'], prefix='/users')
+
+
+@router.get('/stats', response_model=UsersStats)
+def get_users_stats(Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+    '''Получение статистики по пользователям'''
+    users_crud = UserCruds(db=Auth.db)
+    user_count = users_crud.get_count()
+    admin_count = users_crud.get_count_by_type(settings.UserTypeEnum.superuser)
+    musician_count = users_crud.get_count_by_type(
+        settings.UserTypeEnum.musician)
+    change_role_request_count = ChangeRolesCruds(
+        db=Auth.db).get_not_answered_change_role_request_count()
+    return UsersStats(
+        user_count=user_count,
+        admin_count=admin_count,
+        change_role_request_count=change_role_request_count,
+        musician_count=musician_count
+    )
 
 
 @router.put('/me',  response_model=UserInfo)

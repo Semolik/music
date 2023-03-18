@@ -19,4 +19,5 @@ export const IconsNames = {
     deleteIcon: "material-symbols:delete",
     changeIcon: "material-symbols:change-circle-rounded",
     listIcon: "material-symbols:list",
+    plusIcon: "material-symbols:add",
 };
