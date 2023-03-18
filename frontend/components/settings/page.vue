@@ -35,6 +35,7 @@ const { title, maxWidth, padding } = defineProps({
         font-weight: 500;
         margin-bottom: 20px;
         color: $secondary-text;
+        text-align: center;
     }
     .page-container-content {
         max-width: v-bind(maxWidth);

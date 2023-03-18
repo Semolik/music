@@ -28,7 +28,8 @@
     .content-container {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        height: min-content;
+
         overflow-x: hidden;
         .app-content {
             flex-grow: 1;

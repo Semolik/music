@@ -7,7 +7,7 @@
         :on-success="defaultOnSuccess"
     >
         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-        <Icon :name="IconsNames.userIcon" class="avatar-uploader-icon" v-else />
+        <Icon :name="icon" class="avatar-uploader-icon" v-else />
     </el-upload>
 </template>
 <script setup>
@@ -17,7 +17,7 @@ const emit = defineEmits(["success"]);
 const defaultOnSuccess = (response, file) => {
     emit("success", file.raw);
 };
-const { imageUrl, beforeAvatarUpload, handleAvatarSuccess, onSuccess } =
+const { imageUrl, beforeAvatarUpload, handleAvatarSuccess, onSuccess, icon } =
     defineProps({
         imageUrl: {
             type: String,
@@ -46,6 +46,10 @@ const { imageUrl, beforeAvatarUpload, handleAvatarSuccess, onSuccess } =
         },
         onSuccess: {
             type: Function,
+        },
+        icon: {
+            type: String,
+            default: IconsNames.userIcon,
         },
     });
 </script>

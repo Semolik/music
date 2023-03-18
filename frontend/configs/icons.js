@@ -20,4 +20,5 @@ export const IconsNames = {
     changeIcon: "material-symbols:change-circle-rounded",
     listIcon: "material-symbols:list",
     plusIcon: "material-symbols:add",
+    imageIcon: "material-symbols:image",
 };

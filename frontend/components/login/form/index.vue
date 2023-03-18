@@ -159,6 +159,7 @@ const validateLogin = (value) => {
     flex-direction: column;
     gap: 20px;
     height: 100%;
+    padding-top: 20vh;
 
     .login-form {
         color: $primary-text;
