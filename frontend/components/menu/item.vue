@@ -1,26 +1,32 @@
 <template>
-    <NuxtLink :to="to" class="menu-link">
-        <Icon :name="icon" />
+    <NuxtLink
+        :to="to"
+        :class="['menu-link', { active: active, center: !icon }]"
+    >
+        <Icon :name="icon" v-if="icon" />
         <span>{{ text }}</span>
     </NuxtLink>
 </template>
 <script setup>
-const { to, icon, text } = defineProps({
+const { to, icon, text, active } = defineProps({
     to: {
         type: Object,
         required: true,
     },
     icon: {
         type: String,
-        required: true,
     },
     text: {
         type: String,
         required: true,
     },
+    active: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .menu-link {
     @include flex-center;
     text-decoration: none;
@@ -29,7 +35,9 @@ const { to, icon, text } = defineProps({
     border-radius: 5px;
     color: $secondary-text;
     cursor: pointer;
-
+    &.active {
+        background-color: $tertiary-bg;
+    }
     &.router-link-active {
         background-color: $tertiary-bg;
         span,
@@ -57,7 +65,14 @@ const { to, icon, text } = defineProps({
         color: $primary-text;
         transition: color 0s;
     }
-
+    &.center {
+        span {
+            text-align: center;
+            width: 100%;
+            @include flex-center;
+            margin: 0;
+        }
+    }
     span {
         flex-grow: 1;
         display: flex;

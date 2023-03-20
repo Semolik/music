@@ -90,8 +90,6 @@ class UserInfo(AllUserTypes, UserBase, UserUsername):
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str = Query(..., description='Сообщение пользователя')
-    requested_account_status: settings.USER_ACCOUNT_STATUSES = Query(
-        ..., description='Запрашиваемый статус аккаунта')
 
 
 class CreateRoleRequestAnswer(BaseModel):

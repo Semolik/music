@@ -6,12 +6,11 @@ from backend.models.roles import AnswerChangeRoleRequest, ChangeRoleRequest, Cha
 
 
 class ChangeRolesCruds(CRUDBase):
-    def send_change_role_message(self, user_id, message, files, account_status: settings.UserTypeEnum) -> ChangeRoleRequest:
+    def send_change_role_message(self, user_id, message, files) -> ChangeRoleRequest:
         db_change_role_request = ChangeRoleRequest(
             files=files,
             message=message,
-            user_id=user_id,
-            requested_account_status=account_status
+            user_id=user_id
         )
         return self.create(db_change_role_request)
 

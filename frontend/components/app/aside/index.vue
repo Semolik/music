@@ -11,6 +11,18 @@
         </div>
 
         <div class="account-info">
+            <MenuItem
+                :to="{ name: 'login' }"
+                text="Кабинет музыканта"
+                active
+                v-if="isMusician"
+            />
+            <MenuItem
+                :to="{ name: 'admin-cabinet' }"
+                text="Кабинет администратора"
+                active
+                v-if="isAdmin"
+            />
             <AppAsideProfile
                 v-if="logined"
                 :fullName="authStore.fullName"
@@ -32,7 +44,7 @@ import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
 const { homeIcon, loginIcon } = IconsNames;
 const authStore = useAuthStore();
-const { logined, userData } = storeToRefs(authStore);
+const { logined, userData, isMusician, isAdmin } = storeToRefs(authStore);
 </script>
 <style lang="scss">
 aside {
@@ -54,6 +66,11 @@ aside {
             font-weight: bold;
             color: $secondary-text;
         }
+    }
+    .account-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
 }
 </style>

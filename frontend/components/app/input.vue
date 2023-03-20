@@ -121,7 +121,7 @@ watch(value, (val) => {
         --app-input-hover-border: var(--app-input-error-border, #{$accent-red});
         --app-input-focus-border: var(--app-input-error-border, #{$accent-red});
     }
-
+    .el-textarea,
     .el-input {
         flex-grow: 1;
         --el-input-bg-color: var(--app-input-bg, #{$secondary-bg});

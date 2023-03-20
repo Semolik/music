@@ -5,6 +5,6 @@
 definePageMeta({
     middleware: ["admin"],
 });
-const router = useRouter();
-const { id } = router.currentRoute.value.params;
+const route = useRoute();
+const { id } = route.params;
 </script>

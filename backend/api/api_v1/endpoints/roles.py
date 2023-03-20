@@ -35,10 +35,11 @@ def send_update_role_request(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта"
         )
-    if Auth.current_user.type == formData.requested_account_status:
+    if Auth.current_user.type == settings.UserTypeEnum.musician:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"При отправке запроса небходимо выбрать статус, отличный от текущего")
+            detail=f"Вы уже имеете статус музыканта"
+        )
     db_files: List[File] = [
         save_file(
             db=Auth.db,
@@ -49,8 +50,8 @@ def send_update_role_request(
     return change_role_cruds.send_change_role_message(
         user_id=Auth.current_user_id,
         message=formData.message,
-        files=db_files,
-        account_status=formData.requested_account_status
+        files=db_files
+
     )
 
 

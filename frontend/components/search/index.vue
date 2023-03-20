@@ -6,6 +6,7 @@
         :suffix-icon="searching ? Loading : null"
         clearable
         autofocus
+        id="search-input"
     />
     <div :class="['results-categories']" v-if="searchQuery">
         <div
@@ -149,7 +150,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .results-categories {
     display: flex;
     flex-wrap: wrap;
@@ -204,8 +205,9 @@ onBeforeUnmount(() => {
     @include flex-center;
     height: 100%;
     color: $secondary-text;
+    flex-grow: 1;
 }
-.el-input {
+#search-input {
     --el-input-bg-color: transparent;
     --el-input-border-color: transparent;
     --el-input-hover-border-color: transparent;
@@ -213,10 +215,12 @@ onBeforeUnmount(() => {
     --el-input-height: 60px;
     --el-input-text-color: #{$primary-text};
     border-bottom: 1px solid #{$quaternary-text};
-    .el-input__wrapper {
-        input {
+    &.el-input--large {
+        .el-input__inner {
             font-size: large;
         }
+    }
+    .el-input__wrapper {
         .el-input__suffix {
             .el-icon:not(.el-input__clear) {
                 svg {

@@ -109,7 +109,7 @@ const getGenre = async (id) => {
     try {
         return await Service.getGenreInfoApiV1GenresGenreIdGet(id);
     } catch (e) {
-        router.push({ name: routesNames.settings.genres });
+        router.push({ name: routesNames.adminCabinet.cabinetGenres });
     }
 };
 const picture = ref("");
@@ -121,7 +121,7 @@ const handleAvatarSuccess = (raw) => {
 const deleteGenre = async () => {
     try {
         await Service.deleteGenreApiV1GenresGenreIdDelete(id);
-        router.push({ name: routesNames.settings.genres });
+        router.push({ name: routesNames.adminCabinet.cabinetGenres });
     } catch (e) {
         toast.error("Не удалось удалить жанр");
     }
@@ -166,7 +166,7 @@ const createGenre = async () => {
             genrePicture: pictureBlob.value,
         });
         router.push({
-            name: routesNames.settings.genresId,
+            name: routesNames.adminCabinet.cabinetGenresId,
             params: { id: genreData.id },
         });
     } catch (e) {

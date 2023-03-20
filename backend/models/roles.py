@@ -1,7 +1,7 @@
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime, Enum
+from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import backref
 import enum
@@ -38,10 +38,6 @@ class ChangeRoleRequest(Base):
         Enum(ChangeRoleRequestStatus),
         nullable=False,
         default=ChangeRoleRequestStatus.in_progress,
-    )
-    requested_account_status = Column(
-        Enum(settings.UserTypeEnum),
-        nullable=False
     )
     time_created = Column(
         DateTime(timezone=True),
@@ -80,8 +76,5 @@ class AnswerChangeRoleRequest(Base):
         server_default=func.now()
     )
     message = Column(String)
-    request_id = Column(Integer, ForeignKey("change_role_requests.id"))
-    setted_account_status = Column(
-        Enum(settings.UserTypeEnum),
-        nullable=False
-    )
+    request_id = Column(Integer, ForeignKey(ChangeRoleRequest.id))
+    accepted = Column(Boolean, default=False)

@@ -1,26 +1,44 @@
 <template>
     <div class="page-container">
-        <div class="page-container-title">{{ title }}</div>
+        <div class="page-container-title">
+            <span>{{ title }}</span>
+            <router-link
+                class="link"
+                v-if="titleButtonText"
+                :to="{ name: titleButtonToName }"
+            >
+                {{ titleButtonText }}
+            </router-link>
+        </div>
         <div class="page-container-content">
             <slot />
         </div>
     </div>
 </template>
 <script setup>
-const { title, maxWidth, padding } = defineProps({
-    title: {
-        type: String,
-        required: true,
-    },
-    maxWidth: {
-        type: String,
-        default: "400px",
-    },
-    padding: {
-        type: String,
-        default: "2rem",
-    },
-});
+const { title, maxWidth, padding, titleButtonText, titleButtonToName } =
+    defineProps({
+        title: {
+            type: String,
+            required: true,
+        },
+        maxWidth: {
+            type: String,
+            default: "400px",
+        },
+        padding: {
+            type: String,
+            default: "2rem",
+        },
+        titleButtonText: {
+            type: String,
+            default: "",
+        },
+        titleButtonToName: {
+            type: String,
+            default: "",
+        },
+    });
 </script>
 <style lang="scss" scoped>
 .page-container {
@@ -36,6 +54,7 @@ const { title, maxWidth, padding } = defineProps({
         margin-bottom: 20px;
         color: $secondary-text;
         text-align: center;
+        @include flex-center;
     }
     .page-container-content {
         max-width: v-bind(maxWidth);

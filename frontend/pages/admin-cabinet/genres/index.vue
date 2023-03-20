@@ -7,7 +7,10 @@
                 v-model="search"
                 clearable
             />
-            <nuxt-link class="add" to="/settings/genres/new">
+            <nuxt-link
+                class="add"
+                :to="{ name: routesNames.adminCabinet.cabinetGenresNew }"
+            >
                 <Icon :name="IconsNames.plusIcon" />
             </nuxt-link>
         </div>
@@ -18,7 +21,7 @@
                     v-for="genre in genres"
                     :key="genre.id"
                     :to="{
-                        name: 'settings-genres-id',
+                        name: routesNames.adminCabinet.cabinetGenresId,
                         params: { id: genre.id },
                     }"
                 >
@@ -41,6 +44,7 @@
 <script setup>
 import { Service } from "@/client";
 import { IconsNames } from "~~/configs/icons";
+import { routesNames } from "@typed-router";
 definePageMeta({
     middleware: ["admin"],
 });
