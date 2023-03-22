@@ -8,14 +8,15 @@ from backend.helpers.auth_helper import Authenticate
 from backend.helpers.images import save_image
 from backend.helpers.clips import video_is_exists
 from backend.schemas.music import CreateMusicianClipForm, MusicianClip
-from backend.helpers.files import save_image_in_db_by_url
+from backend.helpers.files import save_image_in_db_by_url, valid_content_length
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/clips", tags=['Клипы'])
 
 
-@router.post('', response_model=MusicianClip, status_code=status.HTTP_201_CREATED)
+@router.post('', response_model=MusicianClip, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
+    settings.MAX_IMAGE_FILE_SIZE_MB))])
 def create_clip(
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
     clipPicture: UploadFile = File(
@@ -68,7 +69,8 @@ def delete_clip(
     ClipsCruds(Auth.db).delete(model=db_clip)
 
 
-@router.put('/{clip_id}', response_model=MusicianClip)
+@router.put('/{clip_id}', response_model=MusicianClip, dependencies=[Depends(valid_content_length(
+    settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_clip(
     clip_id: int = Path(..., description='ID клипа'),
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),

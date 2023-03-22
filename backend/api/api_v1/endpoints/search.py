@@ -4,17 +4,15 @@ from backend.crud.crud_genres import GenresCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_playlists import PlaylistsCrud
-
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_search import SearchCrud
 from backend.schemas.music import Genre
-
 from backend.schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchPlaylist, SearchTrack, SearchClip
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
 from backend.core.config import settings
-from fastapi_jwt_auth import AuthJWT
+
 router = APIRouter(tags=['Поиск'], prefix='/search')
 
 

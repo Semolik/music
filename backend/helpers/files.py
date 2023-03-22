@@ -6,7 +6,7 @@ import shutil
 from fastapi.encoders import jsonable_encoder
 from backend.helpers.images import save_image
 from backend.models.files import File
-from fastapi import UploadFile
+from fastapi import Header, UploadFile
 from backend.schemas.file import File as FileSchema
 from backend.core.config import settings
 from backend.crud.crud_file import FileCruds
@@ -60,3 +60,9 @@ def save_image_in_db_by_url(db: Session, url: str, user_id: int) -> File | None:
         return save_image(db=db, upload_file=None, user_id=user_id, bytes_io_file=buf, resize_image_options=(1000, 1000), detail_error_message="не удалось скачать обложку ролика")
     else:
         return HTTPException(status_code=400, detail="не удалось скачать обложку ролика")
+
+
+def valid_content_length(mb_size: int):
+    def validate(content_length: int = Header(..., lt=mb_size * 1024 * 1024, include_in_schema=False)):
+        return content_length
+    return validate

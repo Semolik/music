@@ -1,5 +1,6 @@
 from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.crud.crud_user import UserCruds
+from backend.helpers.files import valid_content_length
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
 from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserBase
@@ -8,7 +9,7 @@ from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
 from backend.crud.crud_playlists import PlaylistsCrud
 from fastapi import Depends, APIRouter, HTTPException, Path, Query, status, UploadFile, File
-from typing import List, Literal
+from typing import List
 from backend.core.config import settings
 router = APIRouter(tags=['Профили пользователей'], prefix='/users')
 
@@ -75,7 +76,7 @@ def check_username_exists(
     return UserCruds(Auth.db).get_user_by_username(username=username) is not None
 
 
-@router.put('/me/avatar',  response_model=UserInfo)
+@router.put('/me/avatar',  response_model=UserInfo, dependencies=[Depends(valid_content_length(settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_user_avatar(
     Auth: Authenticate = Depends(Authenticate()),
     userPicture: UploadFile = File(
@@ -120,7 +121,7 @@ def update_user_public_profile_data(
     return db_public_profile_updated
 
 
-@router.put('/me/public/avatar',  response_model=PublicProfile)
+@router.put('/me/public/avatar',  response_model=PublicProfile, dependencies=[Depends(valid_content_length(settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_user_public_avatar(
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
     userPublicPicture: UploadFile = File(

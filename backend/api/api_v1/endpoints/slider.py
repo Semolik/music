@@ -1,15 +1,17 @@
 from uuid import UUID
 from backend.crud.crud_slider import SliderCrud
+from backend.helpers.files import valid_content_length
 from backend.schemas.slider import Slide, CreateSlide
 from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
 from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
+from backend.core.config import settings
 
 
 router = APIRouter(tags=['Слайдер'], prefix='/slider')
 
 
-@router.post('', response_model=Slide)
+@router.post('', response_model=Slide, dependencies=[Depends(valid_content_length(settings.MAX_SLIDE_FILE_SIZE_MB))])
 def create_slide(
     slide: CreateSlide,
     slide_image: UploadFile = File(...),
@@ -66,7 +68,7 @@ def get_slide_by_id(
     return slide
 
 
-@router.put('/{slide_id}', response_model=Slide)
+@router.put('/{slide_id}', response_model=Slide, dependencies=[Depends(valid_content_length(settings.MAX_SLIDE_FILE_SIZE_MB))])
 def update_slide(
     slide_id: UUID,
     slide: CreateSlide,

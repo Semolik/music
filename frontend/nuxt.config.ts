@@ -156,6 +156,12 @@ export default defineNuxtConfig({
                 process.env.VITE_SEARCH_PLAYLIST_LIMIT
             ),
             SEARCH_GENRE_LIMIT: Number(process.env.VITE_SEARCH_GENRE_LIMIT),
+            MAX_IMAGE_FILE_SIZE_MB: Number(process.env.MAX_IMAGE_FILE_SIZE_MB),
+            MAX_TRACK_FILE_SIZE_MB: Number(process.env.MAX_TRACK_FILE_SIZE_MB),
+            MAX_SLIDE_FILE_SIZE_MB: Number(process.env.MAX_SLIDE_FILE_SIZE_MB),
+            MAX_CHANGE_ROLE_FILES_SIZE_MB: Number(
+                process.env.MAX_CHANGE_ROLE_FILES_SIZE_MB
+            ),
         },
     },
 });

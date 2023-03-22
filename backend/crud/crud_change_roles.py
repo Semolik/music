@@ -33,11 +33,11 @@ class ChangeRolesCruds(CRUDBase):
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
 
-    def is_user_have_active_change_role_messages(self, user_id: int, count: int) -> bool:
+    def user_have_active_change_role_request(self, user_id: int) -> bool:
         result = self.db.query(ChangeRoleRequest)\
             .filter(ChangeRoleRequest.user_id == user_id, ChangeRoleRequest.request_status == ChangeRoleRequestStatus.in_progress)\
-            .limit(count).all()
-        return len(result) == count
+            .first()
+        return result is not None
 
     def get_change_role_message(self, request_id):
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
@@ -45,23 +45,20 @@ class ChangeRolesCruds(CRUDBase):
     def get_change_role_request_answer(self, request_id):
         return self.db.query(AnswerChangeRoleRequest).filter(AnswerChangeRoleRequest.request_id == request_id).first()
 
-    def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: ChangeRoleRequestStatus, account_status: settings.UserTypeEnum):
+    def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: ChangeRoleRequestStatus):
         answer: AnswerChangeRoleRequest = request.answer
         user: User = request.user
-        result_account_status = account_status if request_status == request_status.accepted else user.type
-        user.type = result_account_status
+        if request_status == ChangeRoleRequestStatus.accepted:
+            user.type = settings.UserTypeEnum.musician
         self.update(user)
         if not answer:
             answer = self.create(AnswerChangeRoleRequest(
                 request_id=request.id,
-                setted_account_status=result_account_status,
                 message=message
             ))
         else:
             answer.message = message
-            answer.setted_account_status = result_account_status
             self.update(answer)
-        request.requested_account_status = account_status
         request.request_status = request_status
         self.update(request)
         return answer

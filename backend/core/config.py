@@ -22,7 +22,6 @@ class Settings(BaseSettings):
     UPLOADS_ROUTE: str = '/uploads'
     OTHER_FILES_ROUTE: str = '/other/'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
-    ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 1
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
         'vk': 'https://vk.com/{0}',
@@ -95,6 +94,14 @@ class Settings(BaseSettings):
     USER_ACCOUNT_STATUSES_LIST = [
         user_type for user_type in UserTypeEnum.__members__.keys() if user_type != 'superuser']
     USER_ACCOUNT_STATUSES = Literal[tuple(USER_ACCOUNT_STATUSES_LIST)]
+    MAX_IMAGE_FILE_SIZE_MB = int(
+        env_config.get('MAX_IMAGE_FILE_SIZE_MB'))
+    MAX_TRACK_FILE_SIZE_MB = int(
+        env_config.get('MAX_TRACK_FILE_SIZE_MB'))
+    MAX_SLIDE_FILE_SIZE_MB = int(
+        env_config.get('MAX_SLIDE_FILE_SIZE_MB'))
+    MAX_CHANGE_ROLE_FILES_SIZE_MB = int(
+        env_config.get('MAX_CHANGE_ROLE_FILES_SIZE_MB'))
 
 
 settings = Settings()

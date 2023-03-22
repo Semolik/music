@@ -1,21 +1,17 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, UploadFile, HTTPException, Query
-from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
-from backend.helpers.files import save_file
+from backend.helpers.files import save_file, valid_content_length
 from backend.models.roles import ChangeRoleRequestStatus
-from backend.schemas.user import RoleRequestAnswer, TimeCreated, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
+from backend.schemas.user import RoleRequestAnswer, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo, ChangeRoleRequestInfo
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.models.files import File
-from backend.db.db import get_db
-from sqlalchemy.orm import Session
 from backend.crud.crud_change_roles import ChangeRolesCruds
-from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import Authenticate
 router = APIRouter(tags=['Роли'], prefix='/roles')
 
 
-@router.post('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED)
+@router.post('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(settings.MAX_CHANGE_ROLE_FILES_SIZE_MB))])
 def send_update_role_request(
     formData: UpdateUserRoleRequest = Depends(),
     Auth: Authenticate = Depends(Authenticate()),
@@ -30,10 +26,10 @@ def send_update_role_request(
             detail=f"Ошибка. Администратор не может отправить запрос на смену типа аккаунта"
         )
     change_role_cruds = ChangeRolesCruds(db=Auth.db)
-    if change_role_cruds.is_user_have_active_change_role_messages(user_id=Auth.current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
+    if change_role_cruds.user_have_active_change_role_request(user_id=Auth.current_user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запрос(а) на смену типа аккаунта"
+            detail=f"Ошибка. Одновременно возможно иметь только один активный запрос на смену типа аккаунта"
         )
     if Auth.current_user.type == settings.UserTypeEnum.musician:
         raise HTTPException(
@@ -96,7 +92,6 @@ def send_update_role_request_answer(request_id: int, data: UpdateRoleRequestAnsw
     answer = ChangeRolesCruds(Auth.db).send_change_role_message_answer(
         request=db_request,
         message=data.message,
-        request_status=data.request_status,
-        account_status=data.setted_account_status
+        request_status=data.request_status
     )
     return answer

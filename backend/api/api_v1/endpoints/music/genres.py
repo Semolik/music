@@ -1,13 +1,11 @@
 from typing import List
 from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException, Query
-from fastapi_jwt_auth import AuthJWT
-from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_genres import GenresCruds
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.images import save_image, set_picture
-from backend.helpers.music import validate_genres
+from backend.helpers.files import valid_content_length
+from backend.helpers.images import save_image
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
 from backend.schemas.music import Genre, GenreBaseForm
@@ -17,7 +15,8 @@ from backend.schemas.statistics import GenreStats
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
 
-@router.post('', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre)
+@router.post('', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre, dependencies=[Depends(valid_content_length(
+    settings.MAX_IMAGE_FILE_SIZE_MB))])
 def create_genre(
     genreData: GenreBaseForm = Depends(GenreBaseForm),
     genrePicture: UploadFile = File(..., description='Картинка жанра'),
@@ -61,7 +60,9 @@ def like_genre(
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
     },
-    response_model=Genre
+    response_model=Genre,
+    dependencies=[Depends(valid_content_length(
+        settings.MAX_IMAGE_FILE_SIZE_MB))]
 )
 def update_genre(
     genre_id: int = Path(..., description='ID жанра', ge=1),

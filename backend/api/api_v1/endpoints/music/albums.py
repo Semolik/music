@@ -8,6 +8,7 @@ from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import Authenticate
+from backend.helpers.files import valid_content_length
 from backend.helpers.music import album_is_available, save_track
 from backend.helpers.images import save_image
 from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
@@ -19,7 +20,8 @@ from backend.helpers.images import save_image, set_picture
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
-@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload, status_code=status.HTTP_201_CREATED)
+@router.post('', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=AlbumAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
+    settings.MAX_IMAGE_FILE_SIZE_MB))])
 def create_album(
     albumData: CreateAlbumJson,
     albumPicture: UploadFile = File(..., description='Картинка альбома'),
@@ -64,7 +66,8 @@ def close_album_uploading(
     AlbumsCruds(Auth.db).close_uploading(album=db_album)
 
 
-@router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks, dependencies=[Depends(valid_content_length(
+    settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_album(
     albumData: UpdateAlbumJson,
     album_id: int = Query(..., description='ID альбома'),
@@ -163,7 +166,8 @@ def get_album_by_id(
     return set_album_tracks(db=Auth.db, db_album=db_album, db_album_obj=db_album_obj, user_id=Auth.current_user_id)
 
 
-@router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED)
+@router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
+    settings.MAX_TRACK_FILE_SIZE_MB))])
 def upload_track(
     album_id: int = Query(..., description='ID альбома'),
     trackData: UploadTrackForm = Depends(UploadTrackForm),

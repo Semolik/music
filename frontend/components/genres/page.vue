@@ -6,7 +6,7 @@
                 class="avatar-uploader"
                 name="genrePicture"
                 border-radius="5px"
-                @success="handleAvatarSuccess"
+                @file="handleAvatarSuccess"
                 :icon="IconsNames.imageIcon"
             />
             <div class="right">
@@ -54,7 +54,10 @@
                     </AppButton>
                     <AppButton
                         :active="buttonActive"
-                        @click="id ? updateGenre() : createGenre()"
+                        @click="
+                            (event) =>
+                                id ? updateGenre(event) : createGenre(event)
+                        "
                         border-radius="5px"
                     >
                         {{ id ? "Сохранить" : "Создать" }}
