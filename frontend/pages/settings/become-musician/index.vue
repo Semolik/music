@@ -38,11 +38,9 @@ definePageMeta({
 });
 const toast = useToast();
 const message = ref("");
-const hasRequests = ref(false);
-onMounted(async () => {
-    hasRequests.value =
-        await Service.userHasChangeRequestsApiV1RolesChangeHasGet();
-});
+const hasRequests = ref(
+    await Service.userHasChangeRequestsApiV1RolesChangeHasGet()
+);
 
 const send = async () => {
     try {
