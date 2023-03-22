@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, APIRouter, UploadFile, File, status, HTTPException, Query
+from fastapi import Depends, APIRouter, Path, UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.crud.crud_clips import ClipsCruds
@@ -51,7 +51,7 @@ def create_clip(
 
 @router.delete('/{clip_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_clip(
-    clip_id: int = Query(..., description='ID клипа'),
+    clip_id: int = Path(..., description='ID клипа'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Удаление клипа'''
@@ -70,7 +70,7 @@ def delete_clip(
 
 @router.put('/{clip_id}', response_model=MusicianClip)
 def update_clip(
-    clip_id: int = Query(..., description='ID клипа'),
+    clip_id: int = Path(..., description='ID клипа'),
     clipData: CreateMusicianClipForm = Depends(CreateMusicianClipForm),
     clipPicture: UploadFile = File(
         default=False, description='Картинка клипа'),
@@ -123,7 +123,7 @@ def get_my_clips(
 
 @router.get('/{clip_id}', response_model=MusicianClip)
 def get_clip_by_id(
-    clip_id: int = Query(..., description='ID клипа'),
+    clip_id: int = Path(..., description='ID клипа'),
     db: Session = Depends(get_db)
 ):
     '''Получение клипа'''

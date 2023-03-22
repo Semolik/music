@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import List, Literal
 from uuid import UUID
 from pydantic import BaseModel, validator
@@ -8,7 +9,12 @@ from fastapi import Query
 from backend.core.config import env_config
 from backend.schemas.file import ImageLink
 
-order_playlist_by = Literal['created_at', 'name']
+# order_playlist_by = Literal['created_at', 'name']
+
+
+class order_playlist_by(str, Enum):
+    created_at = 'created_at'
+    name = 'name'
 
 
 class PlaylistBase(BaseModel):

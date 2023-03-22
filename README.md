@@ -37,6 +37,6 @@ Before running the frontend server, make sure that the backend server is running
     cd frontend
     npm run generate-client
 
-Change WITH_CREDENTIALS to true and BASE to api server url in [OpenApi.ts](/frontend/client/core/OpenApi.ts)
+Set BASE api url in [api plugin](/frontend/plugins/api-client.js) default is http://localhost:8000
 
     npm run dev

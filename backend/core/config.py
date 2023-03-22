@@ -70,6 +70,10 @@ class Settings(BaseSettings):
         all = "all"
         liked = "liked"
         not_liked = "not_liked"
+
+    class Order(str, enum.Enum):
+        asc = "asc"
+        desc = "desc"
     AUTOCOMPLETE_SEARCH_ALBUM_LIMIT = int(
         env_config.get('VITE_AUTOCOMPLETE_SEARCH_ALBUM_LIMIT'))
     AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT = int(

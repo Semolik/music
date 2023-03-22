@@ -1,27 +1,27 @@
-from typing import List, Literal
+from typing import List
 from uuid import UUID
-from fastapi import Depends, APIRouter, status, HTTPException, Query
-from fastapi_jwt_auth import AuthJWT
+from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_playlists import PlaylistsCrud
-from backend.crud.crud_tracks import TracksCrud
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
 from backend.schemas.playlists import PlaylistBase, PlaylistInfo, PlaylistCreate, PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
-from backend.db.db import get_db
-from sqlalchemy.orm import Session
+from backend.core.config import settings
 router = APIRouter(prefix='/playlists', tags=['Плейлисты'])
 
 
 @router.get('', response_model=List[PlaylistInfoWithoutTracks])
 def get_my_playlists(
-    Auth: Authenticate = Depends(Authenticate()),
     order_by: order_playlist_by = Query(
-        default='created_at', description='Порядок сортировки', required=True),
-    order_orientation: Literal['asc', 'desc'] = Query(
-        default='asc', description='Направление сортировки', required=True),
+        default=order_playlist_by.created_at, description='Порядок сортировки'),
+    order_orientation: settings.Order = Query(
+        default=settings.Order.asc, description='Направление сортировки'),
+    Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Получение списка плейлистов'''
-
+    if not order_orientation:
+        order_orientation = settings.Order.asc
+    if not order_by:
+        order_by = order_playlist_by.created_at
     playlists = PlaylistsCrud(Auth.db).get_playlists_by_user_id(
         user_id=Auth.current_user_id,
         owner_id=Auth.current_user_id,
@@ -33,7 +33,7 @@ def get_my_playlists(
 
 @router.get('/{playlist_id}', response_model=PlaylistInfo)
 def get_playlist_info(
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение информации о плейлисте'''
@@ -79,7 +79,7 @@ def create_playlist(
 @router.put('/{playlist_id}', response_model=PlaylistInfo)
 def update_playlist(
     playlist: PlaylistBase,
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Обновление плейлиста'''
@@ -99,10 +99,10 @@ def update_playlist(
     return playlist_obj
 
 
-@router.post('/{playlist_id}/track', response_model=PlaylistTrack)
+@router.post('/{playlist_id}/track/{track_id}', response_model=PlaylistTrack)
 def add_track_to_playlist(
-    track_id: UUID = Query(..., description='ID трека'),
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    track_id: UUID = Path(..., description='ID трека'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Добавление трека в плейлист'''
@@ -121,10 +121,10 @@ def add_track_to_playlist(
     )
 
 
-@router.delete('/{playlist_id}/track', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{playlist_id}/track/{track_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_track_from_playlist(
-    track_id: UUID = Query(..., description='ID трека'),
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    track_id: UUID = Path(..., description='ID трека'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Удаление трека из плейлиста'''
@@ -143,7 +143,7 @@ def delete_track_from_playlist(
 
 @router.delete('/{playlist_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_playlist(
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Удаление плейлиста'''
@@ -154,7 +154,7 @@ def delete_playlist(
 
 @router.put('/{playlist_id}/like', response_model=bool)
 def like_playlist(
-    playlist_id: UUID = Query(..., description='ID плейлиста'),
+    playlist_id: UUID = Path(..., description='ID плейлиста'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк плейлиста'''

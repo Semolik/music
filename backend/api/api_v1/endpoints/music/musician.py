@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import Depends, APIRouter, status, HTTPException, Query
+from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.auth_helper import Authenticate
 from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
@@ -53,7 +53,7 @@ def get_popular_musician_profiles(
 
 @router.put('/{profile_id}/like', response_model=bool)
 def like_musician(
-    profile_id: int = Query(..., description='ID профиля'),
+    profile_id: int = Path(..., description='ID профиля', ge=1),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк музыканта'''
@@ -68,7 +68,7 @@ def like_musician(
 
 @router.get('/{profile_id}', response_model=MusicianFullInfo)
 def get_public_profile_info(
-    profile_id: int = Query(..., description='ID профиля'),
+    profile_id: int = Path(..., description='ID профиля'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение информации о публичном профиле музыканта'''
@@ -92,12 +92,12 @@ def get_public_profile_info(
 
 @router.get('/{profile_id}/clips', response_model=List[MusicianClip])
 def get_musician_clips(
-    musician_id: int = Query(..., description='ID музыканта'),
+    profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
     db: Session = Depends(get_db)
 ):
     '''Получение клипов музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
+    db_public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
@@ -108,12 +108,12 @@ def get_musician_clips(
 
 @router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
 def get_musician_albums(
-    musician_id: int = Query(..., description='ID музыканта'),
+    profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
     db: Session = Depends(get_db)
 ):
     '''Получение альбомов музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
+    db_public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
@@ -129,12 +129,12 @@ def get_musician_albums(
 
 @router.get('/{profile_id}/popular', response_model=List[Track])
 def get_musician_popular_tracks(
-    musician_id: int = Query(..., description='ID музыканта'),
+    profile_id: int = Query(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
     db: Session = Depends(get_db)
 ):
     '''Получение популярных треков музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=musician_id)
+    db_public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")

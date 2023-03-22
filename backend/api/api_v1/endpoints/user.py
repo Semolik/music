@@ -7,7 +7,7 @@ from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_
 from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
 from backend.crud.crud_playlists import PlaylistsCrud
-from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
+from fastapi import Depends, APIRouter, HTTPException, Path, Query, status, UploadFile, File
 from typing import List, Literal
 from backend.core.config import settings
 router = APIRouter(tags=['Профили пользователей'], prefix='/users')
@@ -75,7 +75,7 @@ def check_username_exists(
     return UserCruds(Auth.db).get_user_by_username(username=username) is not None
 
 
-@ router.put('/me/avatar',  response_model=UserInfo)
+@router.put('/me/avatar',  response_model=UserInfo)
 def update_user_avatar(
     Auth: Authenticate = Depends(Authenticate()),
     userPicture: UploadFile = File(
@@ -92,13 +92,13 @@ def update_user_avatar(
     return db_user_updated
 
 
-@ router.get('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
+@router.get('/me', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=UserInfo)
 def get_user_info(Auth: Authenticate = Depends(Authenticate())):
     '''Получение данных пользователя'''
     return Auth.current_user
 
 
-@ router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
+@router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
 def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable,
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
@@ -120,7 +120,7 @@ def update_user_public_profile_data(
     return db_public_profile_updated
 
 
-@ router.put('/me/public/avatar',  response_model=PublicProfile)
+@router.put('/me/public/avatar',  response_model=PublicProfile)
 def update_user_public_avatar(
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
     userPublicPicture: UploadFile = File(
@@ -143,7 +143,7 @@ def update_user_public_avatar(
     return db_public_profile_updated
 
 
-@ router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
+@router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
 def get_user_public_profile_info(
     Auth: Authenticate = Depends(Authenticate(is_musician=True))
 ):
@@ -151,18 +151,21 @@ def get_user_public_profile_info(
     return UserCruds(Auth.db).get_public_profile(user_id=Auth.current_user.id)
 
 
-@ router.get('/{user_id}/playlists', response_model=List[PlaylistInfoWithoutTracks])
+@router.get('/{user_id}/playlists', response_model=List[PlaylistInfoWithoutTracks])
 def get_user_playlists(
     Auth: Authenticate = Depends(Authenticate(required=False)),
-    user_id: int = Query(
-        default=None, description='ID пользователя', required=True),
+    user_id: int = Path(
+        ..., description='ID пользователя', ge=1),
     order_by: order_playlist_by = Query(
-        default='created_at', description='Порядок сортировки', required=True),
-    order_orientation: Literal['asc', 'desc'] = Query(
-        default='asc', description='Направление сортировки', required=True),
+        default=order_playlist_by.created_at, description='Порядок сортировки'),
+    order_orientation: settings.Order = Query(
+        default=settings.Order.asc, description='Направление сортировки'),
 ):
     '''Получение списка плейлистов'''
-
+    if not order_by:
+        order_by = order_playlist_by.created_at
+    if not order_orientation:
+        order_orientation = settings.Order.asc
     db_requested_user = UserCruds(Auth.db).get_user_by_id(user_id=user_id)
     if not db_requested_user:
         raise HTTPException(
