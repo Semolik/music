@@ -58,7 +58,7 @@
 </template>
 <script setup lang="ts">
 import { RoutePathByName, routesNames } from "@typed-router";
-import { RoutesNamedLocations } from "@typed-router";
+
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { UserTypeEnum } from "@/client/models/UserTypeEnum";
@@ -76,13 +76,9 @@ const { links, indexRouteName } = defineProps<{
     links: menuLink[];
     indexRouteName: RoutePathByName;
 }>();
-
 const { isMusician, isAdmin, isUser } = storeToRefs(useAuthStore());
-const router = useRouter();
-
-const isIndex = computed(
-    () => router.currentRoute.value.name === indexRouteName
-);
+const route = useRoute();
+const isIndex = computed(() => route.name === indexRouteName);
 
 const selection = computed(() => {
     return {

@@ -1,5 +1,5 @@
 <template>
-    <SettingsMenu :links="linksAll" indexRouteName="musician-cabinet">
+    <SettingsMenu :links="linksAll" indexRouteName="admin-cabinet">
         <NuxtPage />
     </SettingsMenu>
 </template>
@@ -21,6 +21,13 @@ const linksAll = [
             name: routesNames.adminCabinet.cabinetGenres,
         },
         icon: IconsNames.listIcon,
+    },
+    {
+        text: "Запросы стать музыкантом",
+        to: {
+            name: routesNames.adminCabinet.cabinetRequests,
+        },
+        icon: IconsNames.changeIcon,
     },
 ];
 </script>

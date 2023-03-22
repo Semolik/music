@@ -33,7 +33,7 @@ def send_update_role_request(
     if change_role_cruds.is_user_have_active_change_role_messages(user_id=Auth.current_user_id, count=settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запроса на смену типа аккаунта"
+            detail=f"Ошибка. Одновременно возможно иметь только {settings.ACTIVE_CHANGE_ROLE_REQUESTS_COUNT} активных запрос(а) на смену типа аккаунта"
         )
     if Auth.current_user.type == settings.UserTypeEnum.musician:
         raise HTTPException(
@@ -51,7 +51,6 @@ def send_update_role_request(
         user_id=Auth.current_user_id,
         message=formData.message,
         files=db_files
-
     )
 
 

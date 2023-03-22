@@ -7,13 +7,13 @@ export const useAuthMiddleware = async (context, userType) => {
     const { logined, userData } = storeToRefs(authStore);
     if (process.server) {
         await authStore.getUserData();
-        if ((userType && userData?.type !== userType) || !logined.value) {
+        if (!logined.value || (userType && userData.value?.type !== userType)) {
             logout();
             return navigateTo({ name: routesNames.login });
         }
     } else if (process.client) {
         await refresh();
-        if (!logined.value || (userType && userData.value.type !== userType)) {
+        if (!logined.value || (userType && userData.value?.type !== userType)) {
             return navigateTo({ name: routesNames.login });
         }
     }

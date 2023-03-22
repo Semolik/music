@@ -8,5 +8,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         };
     }
     OpenAPI.BASE = "http://localhost:8000";
+    // OpenAPI.BASE = "http://192.168.50.106:4000";
     OpenAPI.WITH_CREDENTIALS = true;
 });

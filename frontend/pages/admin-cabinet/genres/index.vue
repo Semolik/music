@@ -39,6 +39,15 @@
                 Ничего не найдено
             </div>
         </ClientOnly>
+
+        <AppButton
+            class="show-more-button"
+            :disabled="disabled"
+            @click="showMore"
+            v-if="showMoreButton"
+        >
+            Показать еще
+        </AppButton>
     </div>
 </template>
 <script setup>
@@ -49,6 +58,7 @@ definePageMeta({
     middleware: ["admin"],
 });
 useHead({ title: "Жанры" });
+const runtimeConfig = useRuntimeConfig();
 const genresContainer = ref(null);
 const getGenres = async (page) => {
     return await Service.getGenresApiV1GenresGet(page);
@@ -56,7 +66,18 @@ const getGenres = async (page) => {
 const page = ref(1);
 const genres = ref(await getGenres(page.value));
 const disabled = ref(false);
-
+const showMoreButton = ref(
+    genres.length === runtimeConfig.public.SEARCH_GENRE_LIMIT
+);
+const showMore = async () => {
+    page.value++;
+    const newGenres = await getGenres(page.value);
+    if (newGenres.length === 0) {
+        showMoreButton.value = false;
+        return;
+    }
+    genres.value = [...genres.value, ...newGenres];
+};
 const search = ref("");
 watch(search, async (value) => {
     page.value = 1;
@@ -108,9 +129,6 @@ watch(search, async (value) => {
         gap: 5px;
         overflow: hidden;
 
-        @include lg {
-            max-height: 600px;
-        }
         .genre {
             display: flex;
             align-items: center;

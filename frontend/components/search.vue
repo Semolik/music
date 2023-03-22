@@ -1,5 +1,5 @@
 <template>
-    <el-input
+    <AppInput
         placeholder="Введите запрос"
         v-model="searchQuery"
         size="large"
@@ -8,7 +8,7 @@
         autofocus
         id="search-input"
     />
-    <div :class="['results-categories']" v-if="searchQuery">
+    <div class="results-categories" v-if="searchQuery">
         <div
             :class="['results-categories-item', { active: category === key }]"
             @click="category = key"
@@ -155,14 +155,13 @@ onBeforeUnmount(() => {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 0px 10px;
 
     .results-categories-item {
         @include flex-center;
         gap: 10px;
         flex-grow: 1;
         padding: 5px 20px;
-        border-radius: 10px;
+        border-radius: 5px;
         background-color: $quinary-bg;
         white-space: nowrap;
         cursor: pointer;
@@ -185,8 +184,7 @@ onBeforeUnmount(() => {
     flex-direction: column;
     gap: 10px;
     overflow: auto;
-    padding: 0px 10px;
-    margin-bottom: 10px;
+
     &.all {
         .results-item {
             display: flex;
@@ -208,13 +206,8 @@ onBeforeUnmount(() => {
     flex-grow: 1;
 }
 #search-input {
-    --el-input-bg-color: transparent;
-    --el-input-border-color: transparent;
-    --el-input-hover-border-color: transparent;
-    --el-input-focus-border-color: transparent;
-    --el-input-height: 60px;
-    --el-input-text-color: #{$primary-text};
-    border-bottom: 1px solid #{$quaternary-text};
+    --app-input-bg: transparent;
+    --app-input-border-radius: 5px;
     &.el-input--large {
         .el-input__inner {
             font-size: large;

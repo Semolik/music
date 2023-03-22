@@ -9,13 +9,7 @@ export const useAuthStore = defineStore({
     }),
     getters: {
         fullName() {
-            let name = [this.userData.first_name, this.userData.last_name].join(
-                " "
-            );
-            if (name.trim() === "") {
-                name = this.userData.username;
-            }
-            return name;
+            return useFullName(this.userData);
         },
         isAdmin() {
             return this.userData?.type === UserTypeEnum.SUPERUSER;

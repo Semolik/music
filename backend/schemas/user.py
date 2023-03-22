@@ -94,8 +94,6 @@ class UpdateUserRoleRequest(BaseModel):
 
 class CreateRoleRequestAnswer(BaseModel):
     message: str | None = Query(..., description='Ответное сообщение')
-    setted_account_status: settings.USER_ACCOUNT_STATUSES = Query(
-        ..., description='Присвоенный статус')
 
     class Config:
         orm_mode = True
@@ -121,8 +119,6 @@ class ChangeRoleRequestInfo(TimeCreated):
     message: str = Query(..., description='Сообщение пользователя')
     request_status: ChangeRoleRequestStatus = Query(
         ..., description='Статус запроса')
-    requested_account_status: settings.USER_ACCOUNT_STATUSES = Query(...,
-                                                                     description='Запрашиваемый статус аккаунта')
     answer: RoleRequestAnswer | None = Query(...,
                                              description='Ответ на запрос')
 

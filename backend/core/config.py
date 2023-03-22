@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     UPLOADS_ROUTE: str = '/uploads'
     OTHER_FILES_ROUTE: str = '/other/'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
-    ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 3
+    ACTIVE_CHANGE_ROLE_REQUESTS_COUNT: int = 1
     SOCIAL_LINKS_FORMAT = {
         'telegram': 'https://t.me/{0}',
         'vk': 'https://vk.com/{0}',

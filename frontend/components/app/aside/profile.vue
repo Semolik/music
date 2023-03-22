@@ -1,11 +1,6 @@
 <template>
     <NuxtLink to="/settings/profile" class="logined-info">
-        <div class="picture">
-            <img :src="picture" alt="profile picture" v-if="picture" />
-            <div class="picture-icon">
-                <Icon :name="userIcon" />
-            </div>
-        </div>
+        <UserAvatar :picture="picture" />
         <span>{{ fullName }}</span>
     </NuxtLink>
 </template>
@@ -30,28 +25,6 @@ const { userIcon } = IconsNames;
     cursor: pointer;
     &:hover {
         background-color: $quaternary-bg;
-    }
-    .picture {
-        width: 50px;
-        height: 50px;
-        border-radius: 5px;
-        overflow: hidden;
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .picture-icon {
-            @include flex-center;
-            width: 100%;
-            height: 100%;
-            background-color: $secondary-bg;
-            svg {
-                width: 30px;
-                height: 30px;
-                fill: $secondary-text;
-            }
-        }
     }
 }
 </style>

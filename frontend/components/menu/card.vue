@@ -41,5 +41,8 @@ const { to, icon, text, onClick } = defineProps({
         width: 50px;
         height: 50px;
     }
+    span {
+        text-align: center;
+    }
 }
 </style>

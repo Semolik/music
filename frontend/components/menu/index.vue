@@ -14,6 +14,18 @@
                 text="Настройки"
                 v-else
             />
+            <MenuItem
+                :to="{ name: 'login' }"
+                text="Кабинет музыканта"
+                active
+                v-if="isMusician"
+            />
+            <MenuItem
+                :to="{ name: 'admin-cabinet' }"
+                text="Кабинет администратора"
+                active
+                v-if="isAdmin"
+            />
         </div>
         <div class="menu-selection" v-for="selection in menuSelections">
             <div class="menu-selection-title" v-if="selection.name">
@@ -31,9 +43,9 @@ import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
-const { logined } = storeToRefs(useAuthStore());
+const { logined, isMusician, isAdmin } = storeToRefs(useAuthStore());
 
-const { menuSelectionsshowLoginSelection, title, hideTitle } = defineProps({
+const { menuSelections, title, hideTitle } = defineProps({
     menuSelections: {
         type: Array,
         default: menuSelectionsDefault,
