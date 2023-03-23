@@ -81,11 +81,11 @@ const onChangeFilter = async (filter) => {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 10px;
+    gap: 5px;
     .filters-panel {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 5px;
         width: 100%;
         .filter {
             background-color: $quinary-bg;

@@ -19,7 +19,7 @@ const { active, borderRadius } = defineProps({
 .app-button {
     @include flex-center;
     cursor: pointer;
-    background-color: $quaternary-bg;
+    background-color: var(--app-button-bg, $quaternary-bg);
     padding: 10px;
     height: min-content;
     border-radius: v-bind(borderRadius);

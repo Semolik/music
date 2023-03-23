@@ -39,11 +39,8 @@ class ChangeRolesCruds(CRUDBase):
             .first()
         return result is not None
 
-    def get_change_role_message(self, request_id):
+    def get_change_role_message(self, request_id) -> ChangeRoleRequest:
         return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.id == request_id).first()
-
-    def get_change_role_request_answer(self, request_id):
-        return self.db.query(AnswerChangeRoleRequest).filter(AnswerChangeRoleRequest.request_id == request_id).first()
 
     def send_change_role_message_answer(self, request: ChangeRoleRequest, message: str, request_status: ChangeRoleRequestStatus):
         answer: AnswerChangeRoleRequest = request.answer

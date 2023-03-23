@@ -8,10 +8,10 @@ from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.models.files import File
 from backend.crud.crud_change_roles import ChangeRolesCruds
 from backend.helpers.auth_helper import Authenticate
-router = APIRouter(tags=['Роли'], prefix='/roles')
+router = APIRouter(tags=['Роли'], prefix='/roles/change')
 
 
-@router.post('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(settings.MAX_CHANGE_ROLE_FILES_SIZE_MB))])
+@router.post('', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(settings.MAX_CHANGE_ROLE_FILES_SIZE_MB))])
 def send_update_role_request(
     formData: UpdateUserRoleRequest = Depends(),
     Auth: Authenticate = Depends(Authenticate()),
@@ -50,7 +50,7 @@ def send_update_role_request(
     )
 
 
-@router.get('/change', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
+@router.get('', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestInfo])
 def get_change_requests(
     Auth: Authenticate = Depends(Authenticate()),
 ):
@@ -59,7 +59,7 @@ def get_change_requests(
     return ChangeRolesCruds(Auth.db).get_user_change_role_messages(user_id=Auth.current_user_id)
 
 
-@router.get('/change/has', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=bool)
+@router.get('/has', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=bool)
 def user_has_change_requests(
     Auth: Authenticate = Depends(Authenticate()),
 ):
@@ -67,7 +67,7 @@ def user_has_change_requests(
     return ChangeRolesCruds(Auth.db).is_has_change_role_messages(user_id=Auth.current_user_id)
 
 
-@router.get('/change/all', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
+@router.get('/all', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=List[ChangeRoleRequestFullInfo])
 def get_all_change_role_requests(
     page: int = Query(1, description='Номер страницы'),
     filter: ChangeRoleRequestStatus = Query(default=None,
@@ -79,6 +79,17 @@ def get_all_change_role_requests(
         page=page, filter=filter)
 
     return messages
+
+
+@router.get('/{request_id}', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=ChangeRoleRequestFullInfo)
+def get_change_role_request(request_id: int, Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+    '''Получение запроса на смену типа аккаунта'''
+    message = ChangeRolesCruds(Auth.db).get_change_role_message(
+        request_id=request_id)
+    if not message:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Запрос на смену типа аккаута по данному id не найден")
+    return message
 
 
 @router.post('/{request_id}/answer', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=RoleRequestAnswer)

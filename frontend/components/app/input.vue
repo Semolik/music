@@ -148,7 +148,11 @@ watch(value, (val) => {
                 }
             }
         }
-
+        textarea {
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+        }
         .el-input__count {
             opacity: 1;
             user-select: none;
