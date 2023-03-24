@@ -1,17 +1,19 @@
 <template>
     <NuxtLink
         :to="to"
-        :class="['menu-link', { active: active, center: !icon }]"
+        :class="[
+            'menu-link',
+            { active: active, center: !icon, highlight: highlight },
+        ]"
     >
         <Icon :name="icon" v-if="icon" />
         <span>{{ text }}</span>
     </NuxtLink>
 </template>
 <script setup>
-const { to, icon, text, active } = defineProps({
+const { to, icon, text, active, highlight } = defineProps({
     to: {
         type: Object,
-        required: true,
     },
     icon: {
         type: String,
@@ -21,6 +23,10 @@ const { to, icon, text, active } = defineProps({
         required: true,
     },
     active: {
+        type: Boolean,
+        default: false,
+    },
+    highlight: {
         type: Boolean,
         default: false,
     },
@@ -35,6 +41,7 @@ const { to, icon, text, active } = defineProps({
     border-radius: 5px;
     color: $secondary-text;
     cursor: pointer;
+    &.highlight,
     &.active {
         background-color: $tertiary-bg;
     }
@@ -57,6 +64,9 @@ const { to, icon, text, active } = defineProps({
         }
     }
     &:hover {
+        &.highlight {
+            background-color: $quaternary-bg;
+        }
         background-color: $tertiary-bg;
     }
     svg {

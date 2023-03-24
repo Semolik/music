@@ -2,13 +2,6 @@
     <div class="page-container">
         <div class="page-container-title">
             <span>{{ title }}</span>
-            <router-link
-                class="link"
-                v-if="titleButtonText"
-                :to="{ name: titleButtonToName }"
-            >
-                {{ titleButtonText }}
-            </router-link>
         </div>
         <div class="page-container-content">
             <slot />
@@ -16,29 +9,20 @@
     </div>
 </template>
 <script setup>
-const { title, maxWidth, padding, titleButtonText, titleButtonToName } =
-    defineProps({
-        title: {
-            type: String,
-            required: true,
-        },
-        maxWidth: {
-            type: String,
-            default: "400px",
-        },
-        padding: {
-            type: String,
-            default: "2rem",
-        },
-        titleButtonText: {
-            type: String,
-            default: "",
-        },
-        titleButtonToName: {
-            type: String,
-            default: "",
-        },
-    });
+const { title, maxWidth, padding } = defineProps({
+    title: {
+        type: String,
+        required: true,
+    },
+    maxWidth: {
+        type: String,
+        default: "400px",
+    },
+    padding: {
+        type: String,
+        default: "2rem",
+    },
+});
 </script>
 <style lang="scss" scoped>
 .page-container {

@@ -51,7 +51,7 @@ class ChangeRoleRequest(Base):
             Column("change_role_request_id", ForeignKey(
                 "change_role_requests.id"), primary_key=True),
             Column("file_id", ForeignKey("files.id"), primary_key=True),
-        )
+        ), cascade="all,delete"
     )
     answer = relationship(
         "AnswerChangeRoleRequest",

@@ -102,6 +102,8 @@ class Settings(BaseSettings):
         env_config.get('MAX_SLIDE_FILE_SIZE_MB'))
     MAX_CHANGE_ROLE_FILES_SIZE_MB = int(
         env_config.get('MAX_CHANGE_ROLE_FILES_SIZE_MB'))
+    CHANGE_ROLE_PAGE_ITEMS = int(
+        env_config.get('CHANGE_ROLE_PAGE_ITEMS'))
 
 
 settings = Settings()

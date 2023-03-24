@@ -11,23 +11,25 @@
         </div>
 
         <div class="account-info">
-            <MenuItem
-                :to="{ name: 'login' }"
-                text="Кабинет музыканта"
-                active
-                v-if="isMusician"
-            />
-            <MenuItem
-                :to="{ name: 'admin-cabinet' }"
-                text="Кабинет администратора"
-                active
-                v-if="isAdmin"
-            />
-            <AppAsideProfile
-                v-if="logined"
-                :fullName="authStore.fullName"
-                :picture="userData?.picture"
-            />
+            <template v-if="logined">
+                <AppAsideProfile
+                    :fullName="authStore.fullName"
+                    :picture="userData?.picture"
+                />
+                <MenuItem
+                    :to="{ name: 'musician-cabinet' }"
+                    text="Кабинет музыканта"
+                    highlight
+                    v-if="isMusician"
+                />
+                <MenuItem
+                    :to="{ name: 'admin-cabinet' }"
+                    text="Кабинет администратора"
+                    highlight
+                    v-if="isAdmin"
+                />
+                <MenuItem @click="logout" text="Выйти из аккаунта" highlight />
+            </template>
             <MenuItem
                 :to="{ name: 'login' }"
                 :icon="loginIcon"
@@ -42,8 +44,15 @@ import { menuSelections } from "~~/configs/selections";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
+
 const { homeIcon, loginIcon } = IconsNames;
 const authStore = useAuthStore();
+const { logoutRequest } = authStore;
+const router = useRouter();
+const logout = () => {
+    router.push({ name: "index" });
+    logoutRequest();
+};
 const { logined, userData, isMusician, isAdmin } = storeToRefs(authStore);
 </script>
 <style lang="scss">

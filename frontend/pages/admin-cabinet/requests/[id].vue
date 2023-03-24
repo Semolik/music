@@ -1,11 +1,5 @@
 <template>
-    <div class="request-page">
-        <div class="user">
-            <RequestsItemContent :request="request" :show-status="false" />
-        </div>
-        <div class="message">
-            {{ request.message }}
-        </div>
+    <RequestsInfo :request="request">
         <AppInput
             v-model="message"
             class="message-input"
@@ -13,6 +7,7 @@
             type="textarea"
             resize="none"
             :rows="6"
+            v-if="request_status === ChangeRoleRequestStatus.REJECTED"
         />
         <div class="statuses">
             <div
@@ -32,7 +27,7 @@
         >
             {{ request.answer ? "Изменить" : "Отправить" }}
         </AppButton>
-    </div>
+    </RequestsInfo>
 </template>
 <script setup>
 import { Service, ChangeRoleRequestStatus } from "@/client";
@@ -56,21 +51,35 @@ const request_status = ref(
 );
 const buttonActive = computed(() => {
     return (
-        message.value.length > 0 &&
+        (request_status.value === ChangeRoleRequestStatus.REJECTED
+            ? message.value.length > 0
+            : true) &&
         (request.value.answer
             ? request_status.value !== request.value.request_status ||
-              request.value.answer.message !== message.value
+              (request_status.value === ChangeRoleRequestStatus.REJECTED
+                  ? request.value.answer.message !== message.value
+                  : false)
             : request_status.value)
     );
 });
-
+watch(
+    () => request_status.value,
+    (value) => {
+        if (value === ChangeRoleRequestStatus.ACCEPTED) {
+            message.value = "";
+        }
+    }
+);
 const sendAnswer = async () => {
     if (!buttonActive.value) return;
     request.value.answer =
         await Service.sendUpdateRoleRequestAnswerApiV1RolesChangeRequestIdAnswerPost(
             id,
             {
-                message: message.value,
+                message:
+                    request_status.value === ChangeRoleRequestStatus.REJECTED
+                        ? message.value
+                        : "",
                 request_status: request_status.value,
             }
         );
@@ -78,71 +87,52 @@ const sendAnswer = async () => {
 };
 </script>
 <style lang="scss" scoped>
-.request-page {
+.message-input {
+    --app-input-bg: #{$tertiary-bg};
+    --app-input-border-radius: 5px;
+}
+
+.statuses {
     display: flex;
-    flex-direction: column;
     gap: 10px;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: $quaternary-bg;
 
-    .user {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .message {
+    .status {
+        @include flex-center;
+        cursor: pointer;
         padding: 10px;
-        background-color: $quinary-bg;
+        height: min-content;
         border-radius: 5px;
-    }
-    .message-input {
-        --app-input-bg: #{$tertiary-bg};
-        --app-input-border-radius: 5px;
-    }
-
-    .statuses {
-        display: flex;
-        gap: 10px;
-
-        .status {
-            @include flex-center;
-            cursor: pointer;
-            padding: 10px;
-            height: min-content;
-            border-radius: 5px;
-            width: 100%;
-            cursor: pointer;
-            user-select: none;
-            background-color: $quinary-bg;
-            border: 1px solid transparent;
-            &:hover {
-                &.rejected {
-                    border-color: $accent-error;
-                }
-
-                &.accepted {
-                    border-color: $accent-success;
-                }
+        width: 100%;
+        cursor: pointer;
+        user-select: none;
+        background-color: $quinary-bg;
+        border: 1px solid transparent;
+        &:hover {
+            &.rejected {
+                border-color: $accent-error;
             }
 
-            &.active {
-                color: $primary-bg;
-                color: black;
-                cursor: pointer;
+            &.accepted {
+                border-color: $accent-success;
+            }
+        }
 
-                &.rejected {
-                    background-color: $accent-error;
-                }
+        &.active {
+            color: $primary-bg;
+            color: black;
+            cursor: pointer;
 
-                &.accepted {
-                    background-color: $accent-success;
-                }
+            &.rejected {
+                background-color: $accent-error;
+            }
+
+            &.accepted {
+                background-color: $accent-success;
             }
         }
     }
-    .send {
-        --app-button-bg: #{$quinary-bg};
-    }
+}
+.send {
+    --app-button-bg: #{$quinary-bg};
 }
 </style>

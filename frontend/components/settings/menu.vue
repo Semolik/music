@@ -203,9 +203,16 @@ const selection = computed(() => {
             flex-direction: column;
             color: $primary-text;
             padding: 10px;
+            overflow: auto;
+            max-height: 70vh;
             @include lg(true) {
                 border-radius: 10px;
+                height: min-content;
+                max-height: 100%;
+                height: 100%;
+                overflow: visible;
             }
+
             .open-selection-message {
                 @include flex-center;
                 height: 100%;

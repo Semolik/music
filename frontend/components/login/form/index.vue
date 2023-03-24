@@ -34,6 +34,7 @@
                 :maxLength="MAX_LOGIN_LENGTH"
                 :minLength="MIN_LOGIN_LENGTH"
                 :formatter="validateLogin"
+                :error="loginError || usernameAlreadyExists"
             />
             <AppInput
                 v-model="password"
@@ -41,6 +42,7 @@
                 type="password"
                 :maxLength="MAX_PASSWORD_LENGTH"
                 :minLength="MIN_PASSWORD_LENGTH"
+                :error="passwordError"
             />
             <LoginFormPasswordStrength :password="password" v-if="register" />
             <div class="login-button" @click="loginHandler">
@@ -57,6 +59,7 @@ import { useAuthStore } from "~~/stores/auth";
 import { HandleOpenApiError } from "~~/composables/errors";
 import { useToast } from "vue-toastification";
 import { routesNames } from "@typed-router";
+import { Service } from "~~/client";
 const authStore = useAuthStore();
 const runtimeConfig = useRuntimeConfig();
 const { register } = defineProps({
@@ -87,6 +90,9 @@ const messageIsShowed = ref(false);
 const messageTimer = ref(null);
 const messageNestedTimer = ref(null);
 const isErrorMessage = ref(false);
+const loginError = ref(false);
+const passwordError = ref(false);
+
 const showMessage = (messageText, isError) => {
     if (messageTimer.value) {
         clearTimeout(messageTimer.value);
@@ -104,28 +110,66 @@ const showMessage = (messageText, isError) => {
         }, 500);
     }, 3000 * (isError ? 2 : 1));
 };
+const hideMessage = () => {
+    messageIsShowed.value = false;
+    message.value = "";
+};
+const usernameAlreadyExists = ref(false);
+watch(login, async (newUsername) => {
+    if (!register || !newUsername) {
+        usernameAlreadyExists.value = false;
+        return;
+    }
+
+    usernameAlreadyExists.value =
+        await Service.checkUsernameExistsApiV1UsersUsernameExistsGet(
+            newUsername
+        );
+    if (usernameAlreadyExists.value) {
+        showMessage("Пользователь с таким именем уже существует");
+    } else {
+        hideMessage();
+    }
+});
 
 const loginHandler = async () => {
     if (login.value.length < MIN_LOGIN_LENGTH) {
+        loginError.value = true;
         showMessage(`Логин должен быть не менее ${MIN_LOGIN_LENGTH} символов`);
         return;
+    } else {
+        loginError.value = false;
     }
     if (password.value.length < MIN_PASSWORD_LENGTH) {
+        passwordError.value = true;
         showMessage(
             `Пароль должен быть не менее ${MIN_PASSWORD_LENGTH} символов`
         );
         return;
+    } else {
+        passwordError.value = false;
+    }
+    if (usernameAlreadyExists.value) {
+        showMessage("Пользователь с таким именем уже существует");
+        return;
     }
     if (password.value.length > MAX_PASSWORD_LENGTH) {
+        passwordError.value = true;
         showMessage(
             `Пароль должен быть не более ${MAX_PASSWORD_LENGTH} символов`
         );
         return;
+    } else {
+        passwordError.value = false;
     }
     if (login.value.length > MAX_LOGIN_LENGTH) {
+        loginError.value = true;
         showMessage(`Логин должен быть не более ${MAX_LOGIN_LENGTH} символов`);
         return;
+    } else {
+        loginError.value = false;
     }
+
     const error = register
         ? await authStore.registerRequest(
               login.value,

@@ -24,7 +24,6 @@ const { active, borderRadius } = defineProps({
     height: min-content;
     border-radius: v-bind(borderRadius);
     width: 100%;
-    cursor: default;
     user-select: none;
 
     &.active {

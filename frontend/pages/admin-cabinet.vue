@@ -29,5 +29,12 @@ const linksAll = [
         },
         icon: IconsNames.changeIcon,
     },
+    {
+        text: "Слайдер",
+        to: {
+            name: routesNames.adminCabinet.cabinetSlider,
+        },
+        icon: IconsNames.imageIcon,
+    },
 ];
 </script>

@@ -162,6 +162,7 @@ export default defineNuxtConfig({
             MAX_CHANGE_ROLE_FILES_SIZE_MB: Number(
                 process.env.MAX_CHANGE_ROLE_FILES_SIZE_MB
             ),
+            CHANGE_ROLE_PAGE_ITEMS: Number(process.env.CHANGE_ROLE_PAGE_ITEMS),
         },
     },
 });

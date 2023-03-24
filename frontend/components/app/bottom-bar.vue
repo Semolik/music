@@ -17,6 +17,7 @@ const { homeIcon, menuIcon, searchIcon } = IconsNames;
 </script>
 <style lang="scss" scoped>
 .bottom-bar {
+    border-top: 1px solid $tertiary-bg;
     background-color: $secondary-bg;
     position: fixed;
     bottom: 0;

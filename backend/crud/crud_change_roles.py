@@ -14,15 +14,7 @@ class ChangeRolesCruds(CRUDBase):
         )
         return self.create(db_change_role_request)
 
-    def get_user_change_role_messages(self, user_id):
-        records: List[ChangeRoleRequest] =\
-            self.db.query(ChangeRoleRequest)\
-            .order_by(ChangeRoleRequest.id.desc())\
-            .filter(ChangeRoleRequest.user_id == user_id)\
-            .all()
-        return records
-
-    def get_all_change_role_messages(self, page: int = 1, filter: ChangeRoleRequestStatus = None, page_size: int = 10) -> List[ChangeRoleRequest]:
+    def get_all_change_role_messages(self, page: int = 1, filter: ChangeRoleRequestStatus = None, page_size: int = settings.CHANGE_ROLE_PAGE_ITEMS) -> List[ChangeRoleRequest]:
         end = page * page_size
         query = self.db.query(ChangeRoleRequest).order_by(
             ChangeRoleRequest.id.desc())
@@ -30,12 +22,26 @@ class ChangeRolesCruds(CRUDBase):
             query = query.where(ChangeRoleRequest.request_status == filter)
         return query.slice(end-page_size, end).all()
 
+    def get_user_change_role_messages(self, user_id, page: int, page_size: int = settings.CHANGE_ROLE_PAGE_ITEMS):
+
+        end = page * page_size
+        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).order_by(ChangeRoleRequest.id.desc()).slice(end-page_size, end).all()
+
+    def get_current_user_change_role_message(self, user_id):
+        return self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id, ChangeRoleRequest.request_status == ChangeRoleRequestStatus.in_progress).first()
+
     def is_has_change_role_messages(self, user_id):
         return bool(self.db.query(ChangeRoleRequest).filter(ChangeRoleRequest.user_id == user_id).first())
 
     def user_have_active_change_role_request(self, user_id: int) -> bool:
         result = self.db.query(ChangeRoleRequest)\
             .filter(ChangeRoleRequest.user_id == user_id, ChangeRoleRequest.request_status == ChangeRoleRequestStatus.in_progress)\
+            .first()
+        return result is not None
+
+    def user_have_change_role_request(self, user_id: int) -> bool:
+        result = self.db.query(ChangeRoleRequest)\
+            .filter(ChangeRoleRequest.user_id == user_id)\
             .first()
         return result is not None
 
@@ -47,6 +53,8 @@ class ChangeRolesCruds(CRUDBase):
         user: User = request.user
         if request_status == ChangeRoleRequestStatus.accepted:
             user.type = settings.UserTypeEnum.musician
+        elif request_status == ChangeRoleRequestStatus.rejected:
+            user.type = settings.UserTypeEnum.user
         self.update(user)
         if not answer:
             answer = self.create(AnswerChangeRoleRequest(

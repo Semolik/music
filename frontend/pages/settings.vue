@@ -6,7 +6,6 @@
 <script setup>
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
-import { useAuthStore } from "~~/stores/auth";
 import { UserTypeEnum } from "@/client/models/UserTypeEnum";
 useHead({
     title: "Настройки",
@@ -14,13 +13,6 @@ useHead({
 definePageMeta({
     middleware: ["auth"],
 });
-const { logoutRequest } = useAuthStore();
-
-const router = useRouter();
-const logout = () => {
-    logoutRequest();
-    router.push("/");
-};
 
 const linksAll = [
     {
@@ -55,11 +47,6 @@ const linksAll = [
         },
         icon: IconsNames.changeIcon,
         UserType: UserTypeEnum.USER,
-    },
-    {
-        text: "Выйти",
-        onClick: logout,
-        icon: IconsNames.logoutIcon,
     },
 ];
 </script>

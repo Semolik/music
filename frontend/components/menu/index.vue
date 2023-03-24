@@ -3,29 +3,35 @@
         <div class="menu-title" v-if="!hideTitle">{{ title }}</div>
         <div class="menu-selection" v-if="showLoginSelection">
             <MenuCard
-                v-if="!logined"
                 :to="{ name: routesNames.login }"
                 :icon="IconsNames.loginIcon"
                 text="Войти"
+                v-if="!logined"
             />
-            <MenuCard
-                :to="{ name: 'settings' }"
-                :icon="IconsNames.settingsIcon"
-                text="Настройки"
-                v-else
-            />
-            <MenuItem
-                :to="{ name: 'login' }"
-                text="Кабинет музыканта"
-                active
-                v-if="isMusician"
-            />
-            <MenuItem
-                :to="{ name: 'admin-cabinet' }"
-                text="Кабинет администратора"
-                active
-                v-if="isAdmin"
-            />
+            <template v-else>
+                <MenuCard
+                    :to="{ name: 'settings' }"
+                    :icon="IconsNames.settingsIcon"
+                    text="Настройки"
+                />
+                <MenuItem
+                    :to="{ name: 'musician-cabinet' }"
+                    text="Кабинет музыканта"
+                    active
+                    v-if="isMusician"
+                />
+                <MenuItem
+                    :to="{ name: 'admin-cabinet' }"
+                    text="Кабинет администратора"
+                    active
+                    v-if="isAdmin"
+                />
+                <MenuItem
+                    :onClick="logoutRequest"
+                    text="Выйти из аккаунта"
+                    active
+                />
+            </template>
         </div>
         <div class="menu-selection" v-for="selection in menuSelections">
             <div class="menu-selection-title" v-if="selection.name">
@@ -35,6 +41,7 @@
                 <MenuCard v-for="link in selection.links" v-bind="link" />
             </div>
         </div>
+        <div class="menu-selection" v-if="logined"></div>
     </div>
 </template>
 <script setup>
@@ -43,7 +50,9 @@ import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
-const { logined, isMusician, isAdmin } = storeToRefs(useAuthStore());
+const authStore = useAuthStore();
+const { logoutRequest } = authStore;
+const { logined, isMusician, isAdmin } = storeToRefs(authStore);
 
 const { menuSelections, title, hideTitle } = defineProps({
     menuSelections: {

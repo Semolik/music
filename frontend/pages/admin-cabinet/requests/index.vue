@@ -25,6 +25,9 @@
                 />
             </div>
         </ClientOnly>
+        <div class="empty" v-if="requestsEmpty">
+            По данному запросу ничего не найдено
+        </div>
         <AppButton
             class="show-more-button"
             @click="showMore"
@@ -58,6 +61,7 @@ const getRequests = async (page, filter) => {
 const page = ref(1);
 
 const requests = ref(await getRequests(page.value, status.value));
+const requestsEmpty = computed(() => requests.value.length === 0);
 const showMoreButton = computed(() => {
     if (page.value === 1) {
         return requests.value.length === 10;
@@ -81,6 +85,7 @@ const onChangeFilter = async (filter) => {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    height: 100%;
     gap: 5px;
     .filters-panel {
         display: flex;
@@ -108,6 +113,11 @@ const onChangeFilter = async (filter) => {
         gap: 5px;
         overflow: hidden;
         width: 100%;
+    }
+    .empty {
+        color: $secondary-text;
+        height: 100%;
+        @include flex-center;
     }
 }
 </style>
