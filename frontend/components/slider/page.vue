@@ -90,7 +90,7 @@ const { id } = defineProps({
         type: String,
     },
 });
-const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH } =
+const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH, DATE_FORMAT } =
     useRuntimeConfig().public;
 const slide = ref(
     id ? await Service.getSlideByIdApiV1SliderSlideIdGet(id) : {}
@@ -119,26 +119,28 @@ const dateRange = ref(
           ]
         : [new Date(), new Date()]
 );
-
+const getSendData = () => {
+    return {
+        slide: JSON.stringify({
+            name: name.value,
+            is_active: active.value,
+            url: link.value,
+            active_from: moment(dateRange.value[0]).format(DATE_FORMAT),
+            active_to: moment(dateRange.value[1]).format(DATE_FORMAT),
+            order: order.value,
+        }),
+        slide_image: pictureBlob.value,
+    };
+};
 const router = useRouter();
-const createSlide = async (event) => {
+const createSlide = async () => {
     if (!buttonActive.value) return;
-
     try {
-        const response = await Service.createSlideApiV1SliderPost({
-            slide: JSON.stringify({
-                name: name.value,
-                is_active: active.value,
-                url: link.value,
-                active_from: dateRange.value[0].toString(),
-                active_to: dateRange.value[1].toString(),
-
-                order: order.value,
-            }),
-            slide_image: pictureBlob.value,
-        });
+        const response = await Service.createSlideApiV1SliderPost(
+            getSendData()
+        );
         router.push({
-            to: routesNames.adminCabinet.cabinetSliderId,
+            name: routesNames.adminCabinet.cabinetSliderId,
             params: { id: response.id },
         });
     } catch (error) {
@@ -146,22 +148,14 @@ const createSlide = async (event) => {
     }
 };
 
-const updateSlide = async (event) => {
+const updateSlide = async () => {
     if (!buttonActive.value) return;
 
     try {
-        const response = await Service.updateSlideApiV1SliderSlideIdPut(id, {
-            slide: JSON.stringify({
-                name: name.value,
-                is_active: active.value,
-                url: link.value,
-                active_from: dateRange.value[0].toString(),
-                active_to: dateRange.value[1].toString(),
-
-                order: order.value,
-            }),
-            slide_image: pictureBlob.value,
-        });
+        const response = await Service.updateSlideApiV1SliderSlideIdPut(
+            id,
+            getSendData()
+        );
         slide.value = response;
     } catch (error) {
         toast.error(HandleOpenApiError(error).message);
