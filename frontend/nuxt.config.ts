@@ -163,6 +163,9 @@ export default defineNuxtConfig({
                 process.env.MAX_CHANGE_ROLE_FILES_SIZE_MB
             ),
             CHANGE_ROLE_PAGE_ITEMS: Number(process.env.CHANGE_ROLE_PAGE_ITEMS),
+            SLIDER_PAGE_ITEMS: Number(process.env.SLIDER_PAGE_ITEMS),
+            SLIDER_ASPECT_RATIO: process.env.SLIDER_ASPECT_RATIO,
+            MAX_SLIDE_NAME_LENGTH: Number(process.env.MAX_SLIDE_NAME_LENGTH),
         },
     },
 });

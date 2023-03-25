@@ -4,6 +4,7 @@ from backend.models.slider import Slide
 from backend.models.files import Image
 from sqlalchemy.sql import or_
 from backend.crud.crud_file import FileCruds
+from backend.core.config import settings
 
 
 class SliderCrud(CRUDBase):
@@ -20,7 +21,7 @@ class SliderCrud(CRUDBase):
             )
         )
 
-    def get_all(self, page: int = 1, page_size: int = 10) -> list[Slide]:
+    def get_all(self, page: int = 1, page_size: int = settings.SLIDER_PAGE_ITEMS) -> list[Slide]:
         end = page * page_size
         return self.db.query(Slide).order_by(Slide.order, Slide.active_from).slice(end - page_size, end).all()
 

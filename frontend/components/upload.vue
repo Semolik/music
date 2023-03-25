@@ -29,6 +29,8 @@ const {
     onSuccess,
     icon,
     maxSizeMB,
+    aspectRatio,
+    borderRadius,
 } = defineProps({
     imageUrl: {
         type: String,
@@ -39,8 +41,8 @@ const {
         default: "50%",
     },
     aspectRatio: {
-        type: Number,
-        default: 1,
+        type: String,
+        default: "1",
     },
     beforeAvatarUpload: {
         type: Function,

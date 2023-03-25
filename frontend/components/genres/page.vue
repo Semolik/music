@@ -3,7 +3,7 @@
         <form class="content" ref="form" @submit.prevent="updateGenre">
             <Upload
                 :imageUrl="picture"
-                class="avatar-uploader"
+                class="genre-image-uploader"
                 name="genrePicture"
                 border-radius="5px"
                 @file="handleAvatarSuccess"
@@ -157,7 +157,7 @@ const updateGenre = async () => {
         picture.value = genreData.picture;
         pictureBlob.value = null;
     } catch (e) {
-        toast.error("Не удалось обновить жанр");
+        toast.error(HandleOpenApiError(e).message);
     }
 };
 const createGenre = async () => {
@@ -173,7 +173,7 @@ const createGenre = async () => {
             params: { id: genreData.id },
         });
     } catch (e) {
-        toast.error("Не удалось создать жанр");
+        toast.error(HandleOpenApiError(e).message);
     }
 };
 onMounted(async () => {
@@ -196,7 +196,7 @@ onMounted(async () => {
         @include flex-center;
         flex-direction: column;
     }
-    .avatar-uploader {
+    .genre-image-uploader {
         width: 100%;
         height: 100%;
         max-width: 450px;

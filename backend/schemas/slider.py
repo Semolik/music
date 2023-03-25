@@ -8,9 +8,9 @@ from backend.helpers.forms import ValidateJsonWithFormBody
 class SlideBase(BaseModel):
     name: str
     is_active: bool
-    active_from: datetime | None
-    active_to: datetime | None
-    order: int | None
+    active_from: datetime
+    active_to: datetime = None
+    order: int = None
     url: str | None
 
 

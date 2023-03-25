@@ -32,6 +32,7 @@ def create_slide(
         is_active=slide.is_active,
         active_from=slide.active_from,
         active_to=slide.active_to,
+        order=slide.order,
     )
 
 
@@ -95,4 +96,5 @@ def update_slide(
         is_active=slide.is_active,
         active_from=slide.active_from,
         active_to=slide.active_to,
+        order=slide.order,
     )

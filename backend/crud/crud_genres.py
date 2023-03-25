@@ -4,6 +4,7 @@ from backend.models.files import Image
 from backend.models.genres import Genre, LovedGenre
 from sqlalchemy import func
 from backend.core.config import settings
+from sqlalchemy import or_
 
 
 class GenresCruds(CRUDBase):
@@ -26,7 +27,8 @@ class GenresCruds(CRUDBase):
         if filter == settings.FilterGenreEnum.liked:
             query = query.filter(LovedGenre.user_id == current_user_id)
         elif filter == settings.FilterGenreEnum.not_liked:
-            query = query.filter(LovedGenre.user_id.is_(None))
+            query = query.filter(
+                or_(LovedGenre.id == None, LovedGenre.user_id != current_user_id))
 
         return query.slice(end - page_size, end).all()
 
