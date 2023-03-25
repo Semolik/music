@@ -6,7 +6,11 @@
             {{ time_created }}
         </div>
     </div>
-    <div :class="['status', request.request_status]" v-if="showStatus">
+    <div
+        :class="['status', request.request_status]"
+        v-if="showStatus"
+        :title="request.request_status"
+    >
         <Icon :name="icones[request.request_status]" />
     </div>
 </template>

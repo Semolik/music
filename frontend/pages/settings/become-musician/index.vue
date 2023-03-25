@@ -18,6 +18,27 @@
                     resize="none"
                 />
             </div>
+            <div :class="['files', { 'has-files': files.length > 0 }]">
+                <div class="files-list">
+                    <div class="add-file-button">
+                        <Icon name="material-symbols:attach-file" />
+                        <input
+                            type="file"
+                            multiple
+                            :title="filesNames"
+                            @change="handleFileChange"
+                        />
+                    </div>
+                    <div
+                        v-for="file in files"
+                        :key="file.name"
+                        class="file"
+                        @click="deleteFile(file)"
+                    >
+                        {{ file.name }}
+                    </div>
+                </div>
+            </div>
             <AppButton
                 class="become-musician-button"
                 @click="send"
@@ -27,7 +48,7 @@
             </AppButton>
             <AppButton
                 v-if="hasRequests"
-                class="become-musician-button"
+                class="show-requests-button"
                 @click="
                     () =>
                         $router.push({
@@ -58,19 +79,46 @@ definePageMeta({
 const authStore = useAuthStore();
 const { isAdmin } = storeToRefs(authStore);
 const toast = useToast();
+const runtimeConfig = useRuntimeConfig();
+const { MAX_CHANGE_ROLE_FILES_SIZE_MB } = runtimeConfig.public;
 const message = ref("");
 const currentRequest = ref(
     await Service.getCurrentChangeRequestApiV1RolesChangeCurrentGet()
 );
-const router = useRouter();
 const hasRequests = currentRequest.value
     ? false
     : await Service.hasChangeRequestsApiV1RolesChangeHasGet();
+const files = ref([]);
+const filesNames = computed(() => {
+    if (files.value.length === 0) return "Выберите файлы";
+    return files.value.map((file) => file.name).join(", ");
+});
+const deleteFile = (file) => {
+    files.value = files.value.filter((f) => f !== file);
+};
+const handleFileChange = (e) => {
+    const fileArray = Array.from(e.target.files);
+    const filesSize = fileArray
+        .map((file) => file.size)
+        .reduce((acc, size) => acc + size, 0);
+    if (filesSize > MAX_CHANGE_ROLE_FILES_SIZE_MB * 1024 * 1024) {
+        toast.error(
+            `Максимальный размер файлов ${MAX_CHANGE_ROLE_FILES_SIZE_MB} МБ`
+        );
+        return;
+    }
+    files.value = fileArray;
+};
 const send = async () => {
+    if (message.value.length === 0) {
+        toast.error("Сообщение не может быть пустым");
+        return;
+    }
     try {
         currentRequest.value =
             await Service.sendUpdateRoleRequestApiV1RolesChangePost({
                 message: message.value,
+                files: files.value,
             });
     } catch (e) {
         toast.error(HandleOpenApiError(e).message);
@@ -99,6 +147,7 @@ const deleteRequest = async () => {
     --app-button-active-bg: #{$accent-red};
     --app-button-active-hover-bg: #{$accent-error};
 }
+
 #become-musician {
     display: flex;
     flex-direction: column;
@@ -108,6 +157,64 @@ const deleteRequest = async () => {
     }
     textarea {
         resize: none;
+    }
+}
+.files {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .files-list {
+        display: flex;
+        gap: 10px;
+        .file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: $secondary-bg;
+            transition: all 0.2s ease-in-out;
+            &:hover {
+                background-color: $accent;
+                cursor: pointer;
+            }
+        }
+    }
+
+    &.has-files {
+        flex-direction: row;
+        .add-file-button {
+            width: 40px;
+        }
+    }
+    .add-file-button {
+        @include flex-center;
+        width: 100%;
+        height: 40px;
+        border: 2px dashed $secondary-text;
+        border-radius: 5px;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+        isolation: isolate;
+
+        &:hover {
+            border-color: $accent;
+            cursor: pointer;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+            fill: $secondary-text;
+        }
+        input {
+            z-index: 1;
+            opacity: 0;
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+        }
     }
 }
 </style>
