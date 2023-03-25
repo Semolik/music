@@ -98,3 +98,17 @@ def update_slide(
         active_to=slide.active_to,
         order=slide.order,
     )
+
+
+@router.delete('/{slide_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_slide(
+    slide_id: UUID,
+    Auth: Authenticate = Depends(Authenticate(is_admin=True)),
+):
+    '''Удаление слайда'''
+    slider_crud = SliderCrud(db=Auth.db)
+    slide = slider_crud.get_slide_by_id(slide_id)
+    if not slide:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Слайд не найден')
+    slider_crud.delete(slide)

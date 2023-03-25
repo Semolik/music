@@ -1,5 +1,12 @@
 <template>
     <div class="slides-page">
+        <AppButton
+            border-radius="5px"
+            active
+            @click="$router.push('/admin-cabinet/slider/new')"
+        >
+            Добавить слайд
+        </AppButton>
         <div class="slides-container">
             <SliderCard
                 v-for="slide in slides"
@@ -15,6 +22,9 @@
 <script setup>
 import { Service } from "~~/client";
 
+definePageMeta({
+    middleware: ["admin"],
+});
 const runtimeConfig = useRuntimeConfig();
 const { SLIDER_PAGE_ITEMS } = runtimeConfig.public;
 const page = ref(1);

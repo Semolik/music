@@ -26,7 +26,21 @@
                 />
             </div>
             <div class="info-line">
-                <DateRangePicker v-model="dateRange" />
+                <ClientOnly>
+                    <html class="dark">
+                        <el-date-picker
+                            v-model="dateRange"
+                            type="datetimerange"
+                            start-placeholder="Дата открытия"
+                            end-placeholder="Дата закрытия"
+                            id="date-picker"
+                            :style="{
+                                '--el-date-editor-width': '100%',
+                                '--el-input-height': '100%',
+                            }"
+                        />
+                    </html>
+                </ClientOnly>
                 <div
                     :class="['chekbox', { active: active }]"
                     @click="active = !active"
@@ -44,8 +58,9 @@
                 <AppButton
                     border-radius="5px"
                     active
-                    v-if="id"
+                    @click="deleteSlide"
                     class="remove-button"
+                    v-if="id"
                 >
                     Удалить
                 </AppButton>
@@ -73,7 +88,6 @@ const toast = useToast();
 const { id } = defineProps({
     id: {
         type: String,
-        required: true,
     },
 });
 const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH } =
@@ -90,20 +104,20 @@ const nameError = computed(() => !name.value);
 const linkError = computed(() => !link.value);
 const picture = ref(id ? slide.value.picture : "");
 const pictureBlob = ref(null);
-const order = ref(id ? slide.value.order : null);
+const order = ref(id ? String(slide.value.order) : null);
 const active = ref(id ? slide.value.is_active : true);
 const buttonActive = computed(() => !nameError.value && !linkError.value);
 const handleSliderPictureSelect = (file) => {
     picture.value = URL.createObjectURL(file);
     pictureBlob.value = file;
 };
-const dateRage = ref(
+const dateRange = ref(
     id
         ? [
-              moment(slide.value.startDate).format("DD.MM.YYYY h:mm"),
-              moment(slide.value.endDate).format("DD.MM.YYYY h:mm"),
+              moment(slide.value.startDate).toDate(),
+              moment(slide.value.endDate).toDate(),
           ]
-        : [new Date(), null]
+        : [new Date(), new Date()]
 );
 
 const router = useRouter();
@@ -112,13 +126,16 @@ const createSlide = async (event) => {
 
     try {
         const response = await Service.createSlideApiV1SliderPost({
-            name: name.value,
-            is_active: active.value,
-            url: link.value,
-            active_from: dateRage.value[0].toString(),
-            active_to: dateRage.value[1].toString(),
+            slide: JSON.stringify({
+                name: name.value,
+                is_active: active.value,
+                url: link.value,
+                active_from: dateRange.value[0].toString(),
+                active_to: dateRange.value[1].toString(),
+
+                order: order.value,
+            }),
             slide_image: pictureBlob.value,
-            order: order.value,
         });
         router.push({
             to: routesNames.adminCabinet.cabinetSliderId,
@@ -134,21 +151,34 @@ const updateSlide = async (event) => {
 
     try {
         const response = await Service.updateSlideApiV1SliderSlideIdPut(id, {
-            name: name.value,
-            is_active: active.value,
-            url: link.value,
-            active_from: dateRage.value[0].toString(),
-            active_to: dateRage.value[1].toString(),
+            slide: JSON.stringify({
+                name: name.value,
+                is_active: active.value,
+                url: link.value,
+                active_from: dateRange.value[0].toString(),
+                active_to: dateRange.value[1].toString(),
+
+                order: order.value,
+            }),
             slide_image: pictureBlob.value,
-            order: order.value,
         });
         slide.value = response;
     } catch (error) {
         toast.error(HandleOpenApiError(error).message);
     }
 };
+const deleteSlide = async () => {
+    try {
+        await Service.deleteSlideApiV1SliderSlideIdDelete(id);
+        router.push({ name: routesNames.adminCabinet.cabinetSlider });
+    } catch (error) {
+        toast.error(HandleOpenApiError(error).message);
+    }
+};
 </script>
 <style lang="scss" scoped>
+@import url(element-plus/theme-chalk/dark/css-vars.css);
+
 .info {
     display: flex;
     flex-direction: column;
