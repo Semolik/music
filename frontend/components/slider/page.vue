@@ -23,6 +23,7 @@
                     v-model="order"
                     :formatter="(value) => value.replace(/[^0-9]/g, '')"
                     :max-length="3"
+                    :error="orderError"
                 />
             </div>
             <div class="info-line">
@@ -72,7 +73,7 @@
                             id ? updateSlide(event) : createSlide(event)
                     "
                 >
-                    {{ id ? "Сохранить" : "Создать" }}
+                    {{ id ? "Изменить" : "Создать" }}
                 </AppButton>
             </div>
         </div>
@@ -104,21 +105,38 @@ const nameError = computed(() => !name.value);
 const linkError = computed(() => !link.value);
 const picture = ref(id ? slide.value.picture : "");
 const pictureBlob = ref(null);
-const order = ref(id ? String(slide.value.order) : null);
+const order = ref(String(slide.value?.order || 0));
+const orderError = computed(() => !order.value);
 const active = ref(id ? slide.value.is_active : true);
-const buttonActive = computed(() => !nameError.value && !linkError.value);
+
 const handleSliderPictureSelect = (file) => {
     picture.value = URL.createObjectURL(file);
     pictureBlob.value = file;
 };
+const dateStart = computed(() => moment(slide.value.startDate).toDate());
+const dateEnd = computed(() => moment(slide.value.endDate).toDate());
 const dateRange = ref(
-    id
-        ? [
-              moment(slide.value.startDate).toDate(),
-              moment(slide.value.endDate).toDate(),
-          ]
-        : [new Date(), new Date()]
+    id ? [dateStart.value, dateEnd.value] : [new Date(), new Date()]
 );
+const buttonActive = computed(() => {
+    return (
+        !nameError.value &&
+        !linkError.value &&
+        !orderError.value &&
+        (id
+            ? slide.value.name !== name.value ||
+              slide.value.is_active !== active.value ||
+              slide.value.url !== link.value ||
+              dateEnd.value !== dateRange.value[1] ||
+              dateStart.value !== dateRange.value[0] ||
+              String(slide.value.order) !== order.value ||
+              pictureBlob.value
+            : name.value &&
+              link.value &&
+              pictureBlob.value &&
+              dateRange.value[0])
+    );
+});
 const getSendData = () => {
     return {
         slide: JSON.stringify({
@@ -157,6 +175,9 @@ const updateSlide = async () => {
             getSendData()
         );
         slide.value = response;
+        slide.order = String(response.order);
+        pictureBlob.value = null;
+        dateRange.value = [dateStart.value, dateEnd.value];
     } catch (error) {
         toast.error(HandleOpenApiError(error).message);
     }

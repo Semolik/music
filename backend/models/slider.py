@@ -34,7 +34,7 @@ class Slide(Base):
     )
     active_from = Column(
         DateTime,
-        nullable=True
+        nullable=False
     )
     active_to = Column(
         DateTime,
@@ -42,7 +42,8 @@ class Slide(Base):
     )
     order = Column(
         Integer,
-        nullable=True
+        nullable=False,
+        default=0
     )
     url = Column(
         String,

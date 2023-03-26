@@ -41,6 +41,7 @@ const loadMore = async () => {
 .slides-page {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 
     .slides-container {
         display: grid;

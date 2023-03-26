@@ -10,7 +10,7 @@ class SlideBase(BaseModel):
     is_active: bool
     active_from: datetime
     active_to: datetime = None
-    order: int = None
+    order: int = 0
     url: str | None
 
 

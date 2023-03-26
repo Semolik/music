@@ -31,7 +31,6 @@ const { title, maxWidth, padding } = defineProps({
     @include sm {
         padding: v-bind(padding);
     }
-
     .page-container-title {
         font-size: 20px;
         font-weight: 500;
