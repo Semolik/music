@@ -44,9 +44,14 @@ class Authenticate:
 
         if self.required:
             Authorize.jwt_required()
+            current_user_id = Authorize.get_jwt_subject()
         else:
-            Authorize.jwt_optional()
-        current_user_id = Authorize.get_jwt_subject()
+            try:
+                Authorize.jwt_optional()
+                current_user_id = Authorize.get_jwt_subject()
+            except:
+                current_user_id = None
+
         if not current_user_id and not self.required:
             return self
         db_user = UserCruds(db).get_user_by_id(user_id=current_user_id)

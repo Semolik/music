@@ -78,8 +78,8 @@ def update_slide(
 ):
     '''Обновление слайда'''
     slider_crud = SliderCrud(db=Auth.db)
-    slide = slider_crud.get_slide_by_id(slide_id)
-    if not slide:
+    db_slide = slider_crud.get_slide_by_id(slide_id)
+    if not db_slide:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Слайд не найден')
     db_image = save_image(
@@ -88,8 +88,9 @@ def update_slide(
         user_id=Auth.current_user_id,
         resize_image_options=(3000, 3000)
     )
+
     return slider_crud.update_slide(
-        slide=slide,
+        slide=db_slide,
         name=slide.name,
         picture=db_image,
         url=slide.url,

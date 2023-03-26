@@ -1,7 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-
-import { IconsNames } from "./configs/icons";
-
 export default defineNuxtConfig({
     modules: [
         "nuxt-icon",
@@ -13,6 +9,7 @@ export default defineNuxtConfig({
         "nuxt-typed-router",
         "nuxt-viewport",
         "@nuxt/devtools",
+        "nuxt-swiper",
     ],
     devtools: {
         // Enable devtools (default: true)

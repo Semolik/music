@@ -113,11 +113,14 @@ const handleSliderPictureSelect = (file) => {
     picture.value = URL.createObjectURL(file);
     pictureBlob.value = file;
 };
-const dateStart = computed(() => moment(slide.value.startDate).toDate());
-const dateEnd = computed(() => moment(slide.value.endDate).toDate());
-const dateRange = ref(
-    id ? [dateStart.value, dateEnd.value] : [new Date(), new Date()]
+const dateStart = computed(() =>
+    id ? moment(slide.value.active_from).toDate() : new Date()
 );
+const dateEnd = computed(() =>
+    id ? moment(slide.value.active_to).toDate() : new Date()
+);
+const dateRange = ref([dateStart.value, dateEnd.value]);
+
 const buttonActive = computed(() => {
     return (
         !nameError.value &&
