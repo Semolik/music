@@ -5,7 +5,7 @@
             name="slide_image"
             border-radius="5px"
             :icon="IconsNames.imageIcon"
-            :aspect-ratio="SLIDER_ASPECT_RATIO_DESKTOP"
+            :aspect-ratio="SLIDER_ASPECT_RATIO"
             :imageUrl="picture"
         />
         <div class="info">
@@ -92,12 +92,8 @@ const { id } = defineProps({
         type: String,
     },
 });
-const {
-    SLIDER_ASPECT_RATIO_DESKTOP,
-    SLIDER_ASPECT_RATIO_MOBILE,
-    MAX_SLIDE_NAME_LENGTH,
-    DATE_FORMAT,
-} = useRuntimeConfig().public;
+const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH, DATE_FORMAT } =
+    useRuntimeConfig().public;
 const slide = reactive(
     id ? await Service.getSlideByIdApiV1SliderSlideIdGet(id) : {}
 );

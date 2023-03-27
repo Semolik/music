@@ -6,6 +6,7 @@
             v-model="value"
             :class="{
                 resize: resize,
+                prepend: prepend,
             }"
         >
             <template #suffix>
@@ -28,6 +29,9 @@
                         <span class="max-length">{{ maxLength }}</span>
                     </span>
                 </span>
+            </template>
+            <template #prepend v-if="prepend">
+                {{ prepend }}
             </template>
         </el-input>
     </div>
@@ -73,6 +77,10 @@ const props = defineProps({
     error: {
         type: Boolean,
         default: false,
+    },
+    prepend: {
+        type: String,
+        default: null,
     },
 });
 const height = ref(props.height);
@@ -137,6 +145,20 @@ watch(value, (val) => {
         );
         --el-input-text-color: var(--app-input-text, #{$primary-text});
         --el-input-border-radius: var(--app-input-border-radius, 10px);
+        &.prepend {
+            --el-input-border-radius: 0 var(--app-input-border-radius, 10px)
+                var(--app-input-border-radius, 10px) 0;
+        }
+        .el-input-group__prepend {
+            border-radius: var(--app-input-border-radius, 10px) 0 0
+                var(--app-input-border-radius, 10px);
+        }
+        .el-input-group__append,
+        .el-input-group__prepend {
+            background-color: var(--app-input-bg, #{$tertiary-bg});
+            color: var(--app-input-text, #{$secondary-text});
+            user-select: none;
+        }
         --el-input-height: v-bind(height);
 
         &.resize {

@@ -132,11 +132,8 @@ def update_user_public_avatar(
     user_cruds = UserCruds(Auth.db)
     db_public_profile = user_cruds.get_public_profile(
         user_id=Auth.current_user.id)
-    db_image = save_image(
-        db=Auth.db,
-        bytes_io_file=userPublicPicture,
-        user_id=Auth.current_user.id
-    )
+    db_image = save_image(db=Auth.db, upload_file=userPublicPicture,
+                          user_id=Auth.current_user.id)
     db_public_profile_updated = user_cruds.update_public_profile_avatar(
         public_profile=db_public_profile,
         userPublicPicture=db_image,

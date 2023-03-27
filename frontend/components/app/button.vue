@@ -18,7 +18,7 @@ const { active, borderRadius } = defineProps({
 <style lang="scss">
 .app-button {
     @include flex-center;
-    cursor: pointer;
+    cursor: default;
     background-color: var(--app-button-bg, $quaternary-bg);
     padding: 10px;
     height: min-content;

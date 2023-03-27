@@ -1,5 +1,7 @@
 <template>
-    <SettingsMenu :links="linksAll" indexRouteName="musician-cabinet" />
+    <SettingsMenu :links="linksAll" indexRouteName="musician-cabinet">
+        <NuxtPage />
+    </SettingsMenu>
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
@@ -14,9 +16,16 @@ definePageMeta({
 
 const linksAll = [
     {
+        text: "Профиль",
+        to: {
+            name: routesNames.musicianCabinet.cabinetProfile,
+        },
+        icon: IconsNames.userIcon,
+    },
+    {
         text: "Альбомы",
         to: {
-            name: routesNames.adminCabinet.cabinetAlbums,
+            name: routesNames.musicianCabinet.cabinetAlbums,
         },
         icon: IconsNames.albumIcon,
     },

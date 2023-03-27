@@ -162,12 +162,7 @@ export default defineNuxtConfig({
             CHANGE_ROLE_PAGE_ITEMS: Number(process.env.CHANGE_ROLE_PAGE_ITEMS),
             SLIDER_PAGE_ITEMS: Number(process.env.SLIDER_PAGE_ITEMS),
             MAX_SLIDE_NAME_LENGTH: Number(process.env.MAX_SLIDE_NAME_LENGTH),
-            SLIDER_ASPECT_RATIO_DESKTOP: Number(
-                process.env.SLIDER_ASPECT_RATIO_DESKTOP
-            ),
-            SLIDER_ASPECT_RATIO_MOBILE: Number(
-                process.env.SLIDER_ASPECT_RATIO_MOBILE
-            ),
+            SLIDER_ASPECT_RATIO: Number(process.env.SLIDER_ASPECT_RATIO),
         },
     },
 });

@@ -7,21 +7,21 @@
             delay: 4000,
             disableOnInteraction: true,
         }"
+        :spaceBetween="10"
         :style="{
-            '--aspect-ratio': $viewport.isGreaterOrEquals('lg')
-                ? SLIDER_ASPECT_RATIO_DESKTOP
-                : SLIDER_ASPECT_RATIO_MOBILE,
+            '--aspect-ratio': SLIDER_ASPECT_RATIO,
         }"
     >
         <SwiperSlide v-for="slide in slides" :key="slide.id" class="slide">
-            <img :src="slide.picture" alt="" />
+            <a :href="slide.url">
+                <img :src="slide.picture" />
+            </a>
         </SwiperSlide>
     </Swiper>
 </template>
 <script setup>
 import { Service } from "~~/client";
-const { SLIDER_ASPECT_RATIO_DESKTOP, SLIDER_ASPECT_RATIO_MOBILE } =
-    useRuntimeConfig().public;
+const { SLIDER_ASPECT_RATIO } = useRuntimeConfig().public;
 
 const slides = ref(await Service.getSlidesApiV1SliderGet());
 </script>

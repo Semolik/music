@@ -144,8 +144,8 @@ class PublicProfileLinksURLS(BaseModel):
 class PublicProfileLinks(BaseModel):
     youtube: YoutubeChannelIDToUrl = Query(default=None,
                                            description='Ссылка на канал YouTube')
-    telegram: TelegramUsernameToUrl | None = Query(default=None,
-                                                   description='Ссылка на канал/аккаунт в Telegram')
+    telegram: TelegramUsernameToUrl = Query(default=None,
+                                            description='Ссылка на канал/аккаунт в Telegram')
     vk: VKUsernameToUrl = Query(
         default=None, description='Ссылка на страницу VK')
 
