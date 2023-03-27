@@ -5,27 +5,19 @@
             name="slide_image"
             border-radius="5px"
             :icon="IconsNames.imageIcon"
-            :aspect-ratio="SLIDER_ASPECT_RATIO"
+            :aspect-ratio="SLIDER_ASPECT_RATIO_DESKTOP"
             :imageUrl="picture"
         />
         <div class="info">
-            <div class="info-line">
-                <AppInput
-                    label="Название слайда"
-                    :max-length="MAX_SLIDE_NAME_LENGTH"
-                    :min-length="1"
-                    v-model="name"
-                    show-word-limit
-                    :error="nameError"
-                />
-                <AppInput
-                    label="Cортировка"
-                    v-model="order"
-                    :formatter="(value) => value.replace(/[^0-9]/g, '')"
-                    :max-length="3"
-                    :error="orderError"
-                />
-            </div>
+            <AppInput
+                label="Название слайда"
+                :max-length="MAX_SLIDE_NAME_LENGTH"
+                :min-length="1"
+                v-model="name"
+                show-word-limit
+                :error="nameError"
+            />
+
             <div class="info-line">
                 <ClientOnly>
                     <html class="dark">
@@ -49,12 +41,21 @@
                     {{ active ? "Активный" : "Неактивный" }}
                 </div>
             </div>
-            <AppInput
-                label="Ссылка"
-                :min-length="1"
-                v-model="link"
-                :error="linkError"
-            />
+            <div class="info-line">
+                <AppInput
+                    label="Ссылка"
+                    :min-length="1"
+                    v-model="link"
+                    :error="linkError"
+                />
+                <AppInput
+                    label="Cортировка"
+                    v-model="order"
+                    :formatter="(value) => value.replace(/[^0-9]/g, '')"
+                    :max-length="3"
+                    :error="orderError"
+                />
+            </div>
             <div class="buttons">
                 <AppButton
                     border-radius="5px"
@@ -91,33 +92,37 @@ const { id } = defineProps({
         type: String,
     },
 });
-const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH, DATE_FORMAT } =
-    useRuntimeConfig().public;
-const slide = ref(
+const {
+    SLIDER_ASPECT_RATIO_DESKTOP,
+    SLIDER_ASPECT_RATIO_MOBILE,
+    MAX_SLIDE_NAME_LENGTH,
+    DATE_FORMAT,
+} = useRuntimeConfig().public;
+const slide = reactive(
     id ? await Service.getSlideByIdApiV1SliderSlideIdGet(id) : {}
 );
 const title = computed(() =>
-    id ? `Редактирование слайда ${slide.value.name}` : "Создание слайда"
+    id ? `Редактирование слайда ${slide.name}` : "Создание слайда"
 );
-const link = ref(id ? slide.value.url : "");
-const name = ref(id ? slide.value.name : "");
+const link = ref(id ? slide.url : "");
+const name = ref(id ? slide.name : "");
 const nameError = computed(() => !name.value);
 const linkError = computed(() => !link.value);
-const picture = ref(id ? slide.value.picture : "");
+const picture = ref(id ? slide.picture : "");
 const pictureBlob = ref(null);
-const order = ref(String(slide.value?.order || 0));
+const order = ref(String(slide?.order || 0));
 const orderError = computed(() => !order.value);
-const active = ref(id ? slide.value.is_active : true);
+const active = ref(id ? slide.is_active : true);
 
 const handleSliderPictureSelect = (file) => {
     picture.value = URL.createObjectURL(file);
     pictureBlob.value = file;
 };
 const dateStart = computed(() =>
-    id ? moment(slide.value.active_from).toDate() : new Date()
+    id ? moment(slide.active_from).toDate() : new Date()
 );
 const dateEnd = computed(() =>
-    id ? moment(slide.value.active_to).toDate() : new Date()
+    id ? moment(slide.active_to).toDate() : new Date()
 );
 const dateRange = ref([dateStart.value, dateEnd.value]);
 
@@ -127,12 +132,12 @@ const buttonActive = computed(() => {
         !linkError.value &&
         !orderError.value &&
         (id
-            ? slide.value.name !== name.value ||
-              slide.value.is_active !== active.value ||
-              slide.value.url !== link.value ||
+            ? slide.name !== name.value ||
+              slide.is_active !== active.value ||
+              slide.url !== link.value ||
               dateEnd.value !== dateRange.value[1] ||
               dateStart.value !== dateRange.value[0] ||
-              String(slide.value.order) !== order.value ||
+              String(slide.order) !== order.value ||
               pictureBlob.value
             : name.value &&
               link.value &&
@@ -177,7 +182,9 @@ const updateSlide = async () => {
             id,
             getSendData()
         );
-        slide.value = response;
+        for (const key in response) {
+            slide[key] = response[key];
+        }
         slide.order = String(response.order);
         pictureBlob.value = null;
         dateRange.value = [dateStart.value, dateEnd.value];

@@ -1,13 +1,8 @@
-from functools import wraps
-from inspect import iscoroutinefunction
-from typing import Callable, List
-from fastapi import Depends, HTTPException, status
-import fastapi
+from fastapi import Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
 from backend.db.db import get_db
-from backend.models.user import User
 from backend.core.config import settings
 
 

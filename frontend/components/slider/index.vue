@@ -3,22 +3,14 @@
         :modules="[SwiperAutoplay, SwiperEffectCreative]"
         :slides-per-view="1"
         :loop="true"
-        :effect="'creative'"
         :autoplay="{
-            delay: 8000,
+            delay: 4000,
             disableOnInteraction: true,
         }"
         :style="{
-            '--aspect-ratio': SLIDER_ASPECT_RATIO,
-        }"
-        :creative-effect="{
-            prev: {
-                shadow: false,
-                translate: ['-20%', 0, -1],
-            },
-            next: {
-                translate: ['100%', 0, 0],
-            },
+            '--aspect-ratio': $viewport.isGreaterOrEquals('lg')
+                ? SLIDER_ASPECT_RATIO_DESKTOP
+                : SLIDER_ASPECT_RATIO_MOBILE,
         }"
     >
         <SwiperSlide v-for="slide in slides" :key="slide.id" class="slide">
@@ -28,7 +20,8 @@
 </template>
 <script setup>
 import { Service } from "~~/client";
-const { SLIDER_ASPECT_RATIO } = useRuntimeConfig().public;
+const { SLIDER_ASPECT_RATIO_DESKTOP, SLIDER_ASPECT_RATIO_MOBILE } =
+    useRuntimeConfig().public;
 
 const slides = ref(await Service.getSlidesApiV1SliderGet());
 </script>
