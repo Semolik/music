@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "build": "nuxt build",
-        "dev": "nuxt dev --port=4000 --dotenv ../.env",
+        "dev": "npm run generate-client && nuxt dev --port=4000 --dotenv ../.env",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",

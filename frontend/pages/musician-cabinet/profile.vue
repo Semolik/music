@@ -121,7 +121,7 @@ const publicProfileData = reactive(
     await Service.getUserPublicProfileInfoApiV1UsersMePublicGet()
 );
 const name = ref(publicProfileData.name);
-const description = ref(publicProfileData.description);
+const description = ref(publicProfileData.description || "");
 const links = reactive({
     vk: publicProfileData.links.vk,
     telegram: publicProfileData.links.telegram,
