@@ -153,6 +153,18 @@ class PublicProfileLinks(BaseModel):
         orm_mode = True
 
 
+class PublicProfileLinksUsernames(BaseModel):
+    youtube: YoutubeChannelID = Query(default=None,
+                                      description='ID канала YouTube', max_length=int(env_config.get('VITE_MAX_YOUTUBE_CHANNEL_ID_LENGTH')))
+    telegram: TelegramUsername = Query(default=None,
+                                       description='Имя канала/аккаунта в Telegram', max_length=int(env_config.get('VITE_MAX_TELEGRAM_USERNAME_LENGTH')))
+    vk: VKUsername = Query(
+        default=None, description='Имя страницы VK', max_length=int(env_config.get('VITE_MAX_VK_USERNAME_LENGTH')))
+
+    class Config:
+        orm_mode = True
+
+
 class PublicProfileBase(BaseModel):
     name: str = Query(..., description='Оторажаемое имя', max_length=int(
         env_config.get('VITE_MAX_PUBLIC_PROFILE_NAME_LENGTH')
@@ -169,6 +181,14 @@ class PublicProfile(PublicProfileBase):
     id: int = Query(..., description='ID публичного профиля')
     links: PublicProfileLinks = Query(..., description='Ссылки на соц. сети')
     picture: ImageLink | None
+
+    class Config:
+        orm_mode = True
+
+
+class PublicProfileUsernames(PublicProfile):
+    links: PublicProfileLinksUsernames = Query(
+        ..., description='Ссылки на соц. сети')
 
     class Config:
         orm_mode = True

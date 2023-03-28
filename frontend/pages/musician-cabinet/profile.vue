@@ -71,22 +71,28 @@
                     type="textarea"
                     :rows="3"
                     resize="none"
+                    @max-length="
+                        (e) =>
+                            toast.error(
+                                `Максимальная длина описания - ${MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH} символов`
+                            )
+                    "
                 />
 
                 <AppInput
-                    v-model="vkID"
+                    v-model="links.vk"
                     label="Ссылка на ВК"
                     :error="!vkIsCorrect"
                     prepend="https://vk.com/"
                 />
                 <AppInput
-                    v-model="telegramID"
+                    v-model="links.telegram"
                     label="Ссылка на Telegram"
                     :error="!telegramIsCorrect"
                     prepend="https://t.me/"
                 />
                 <AppInput
-                    v-model="youtubeID"
+                    v-model="links.youtube"
                     label="Ссылка на YouTube"
                     :error="!youtubeIsCorrect"
                     prepend="https://www.youtube.com/channel/"
@@ -122,65 +128,26 @@ const publicProfileData = reactive(
 );
 const name = ref(publicProfileData.name);
 const description = ref(publicProfileData.description || "");
-const links = reactive({
-    vk: publicProfileData.links.vk,
-    telegram: publicProfileData.links.telegram,
-    youtube: publicProfileData.links.youtube,
-});
-
-const getVKIdFromLink = (link) => {
-    if (!link) {
-        return null;
-    }
-    const match = link.match(/vk\.com\/([a-zA-Z0-9_]+)/);
-    if (match) {
-        return match[1];
-    }
-    return null;
-};
-const getTelegramIdFromLink = (link) => {
-    if (!link) {
-        return null;
-    }
-    const match = link.match(/t\.me\/([a-zA-Z0-9_]+)/);
-    if (match) {
-        return match[1];
-    }
-    return null;
-};
-const getYoutubeIdFromLink = (link) => {
-    if (!link) {
-        return null;
-    }
-    const match = link.match(/youtube\.com\/channel\/([a-zA-Z0-9_]+)/);
-    if (match) {
-        return match[1];
-    }
-    return null;
-};
-
-const vkID = ref(getVKIdFromLink(links.vk) || "");
-const telegramID = ref(getTelegramIdFromLink(links.telegram) || "");
-const youtubeID = ref(getYoutubeIdFromLink(links.youtube) || "");
+const links = reactive(Object.assign({}, publicProfileData.links));
 
 const vkIsCorrect = computed(() => {
-    if (!vkID.value) {
+    if (!links.vk) {
         return true;
     }
-    return vkID.value.length <= MAX_VK_USERNAME_LENGTH;
+    return links.vk.length <= MAX_VK_USERNAME_LENGTH;
 });
 
 const telegramIsCorrect = computed(() => {
-    if (!telegramID.value) {
+    if (!links.telegram) {
         return true;
     }
-    return telegramID.value.length <= MAX_TELEGRAM_USERNAME_LENGTH;
+    return links.telegram.length <= MAX_TELEGRAM_USERNAME_LENGTH;
 });
 const youtubeIsCorrect = computed(() => {
-    if (!youtubeID.value) {
+    if (!links.youtube) {
         return true;
     }
-    return youtubeID.value.length <= MAX_YOUTUBE_CHANNEL_ID_LENGTH;
+    return links.youtube.length <= MAX_YOUTUBE_CHANNEL_ID_LENGTH;
 });
 
 const showDeleteAvatarModal = ref(false);
@@ -203,9 +170,9 @@ const buttonActive = computed(() => {
         youtubeIsCorrect.value &&
         (name.value !== publicProfileData.name ||
             description.value !== publicProfileData.description ||
-            vkID.value !== getVKIdFromLink(links.vk) ||
-            telegramID.value !== getTelegramIdFromLink(links.telegram) ||
-            youtubeID.value !== getYoutubeIdFromLink(links.youtube))
+            publicProfileData.links.vk !== links.vk ||
+            publicProfileData.links.telegram !== links.telegram ||
+            publicProfileData.links.youtube !== links.youtube)
     );
 });
 const saveProfile = async () => {
@@ -215,18 +182,17 @@ const saveProfile = async () => {
                 await Service.updateUserPublicProfileDataApiV1UsersMePublicPut({
                     name: name.value,
                     description: description.value,
-                    vk: getVKIdFromLink(links.vk),
-                    telegram: getTelegramIdFromLink(links.telegram),
-                    youtube: getYoutubeIdFromLink(links.youtube),
+                    vk: links.vk,
+                    telegram: links.telegram,
+                    youtube: links.youtube,
                 });
             publicProfileData.name = name.value;
             publicProfileData.description = description.value;
-            publicProfileData.links = response;
-            vkID.value = getVKIdFromLink(links.vk);
-            telegramID.value = getTelegramIdFromLink(links.telegram);
-            youtubeID.value = getYoutubeIdFromLink(links.youtube);
+            for (const key in response) {
+                publicProfileData[key] = response[key];
+            }
             for (const key in links) {
-                links[key] = response[key];
+                links[key] = links[key];
             }
         } catch (error) {
             toast.error(HandleOpenApiError(error).message);

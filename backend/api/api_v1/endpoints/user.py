@@ -3,7 +3,7 @@ from backend.crud.crud_user import UserCruds
 from backend.helpers.files import valid_content_length
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
-from backend.schemas.user import PublicProfile, PublicProfileModifiable, UserInfo, UserBase
+from backend.schemas.user import PublicProfile, PublicProfileModifiable, PublicProfileUsernames, UserInfo, UserBase
 from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
 from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
@@ -99,7 +99,7 @@ def get_user_info(Auth: Authenticate = Depends(Authenticate())):
     return Auth.current_user
 
 
-@router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
+@router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfileUsernames)
 def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable,
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
@@ -141,7 +141,7 @@ def update_user_public_avatar(
     return db_public_profile_updated
 
 
-@router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfile)
+@router.get('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfileUsernames)
 def get_user_public_profile_info(
     Auth: Authenticate = Depends(Authenticate(is_musician=True))
 ):

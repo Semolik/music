@@ -86,7 +86,7 @@ const props = defineProps({
 const height = ref(props.height);
 const value = ref(props.modelValue);
 const showWordLimit = ref(props.showWordLimit);
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "max-length"]);
 const resize = ref(false);
 if (props.resizeOnFocus) {
     const viewport = useViewport();
@@ -106,6 +106,7 @@ if (props.resizeOnFocus) {
 watch(value, (val) => {
     if (props.maxLength && val.length > props.maxLength) {
         value.value = val.slice(0, props.maxLength);
+        emit("max-length");
     }
     emit("update:modelValue", val);
 });
