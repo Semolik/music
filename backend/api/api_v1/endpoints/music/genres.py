@@ -85,6 +85,18 @@ def update_genre(
 
 @router.get(
     '/{genre_id}',
+    responses={**NOT_FOUND_GENRE},
+    response_model=GenreFullInfo)
+def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth: Authenticate = Depends(Authenticate(required=False))):
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
+    if not genre:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Жанр не найден")
+    return genre
+
+
+@router.get(
+    '/{genre_id}/stats',
     responses={
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
@@ -121,17 +133,15 @@ def delete_genre(genre_id: int = Path(..., description="ID жанра", ge=1), A
 @router.get('',  response_model=List[Genre])
 def get_genres(
     page: int = 1,
-    page_size: int = Query(settings.SEARCH_GENRE_LIMIT, ge=1,
-                           le=settings.SEARCH_GENRE_LIMIT),
     filter: settings.FilterGenreEnum = settings.FilterGenreEnum.all,
     Auth: Authenticate = Depends(Authenticate(required=False))
 ):
-    '''Получение всех жанров отсортированных по популярности'''
+    '''Получение  жанров отсортированных по популярности'''
     if filter != settings.FilterGenreEnum.all and not Auth.current_user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Для фильтрации жанров необходимо авторизоваться")
     genres = GenresCruds(Auth.db).get_popular_genres(
-        page=page, page_size=page_size, filter=filter, current_user_id=Auth.current_user_id)
+        page=page, page_size=settings.SEARCH_GENRE_LIMIT, filter=filter, current_user_id=Auth.current_user_id)
     genres_objs = []
     for genre in genres:
         genre_obj = Genre.from_orm(genre)

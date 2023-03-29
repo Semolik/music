@@ -1,5 +1,5 @@
 <template>
-    <GenresPage :id="id" />
+    <GenresCreatePage :id="id" />
 </template>
 <script setup>
 definePageMeta({

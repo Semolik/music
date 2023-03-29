@@ -1,13 +1,12 @@
 <template>
-    <div class="chart-conatainer">
-        <div class="head">
-            <div class="title">Чарт</div>
-            <div class="subtitle">Треки, популярные на сайте прямо сейчас</div>
-        </div>
+    <Selection
+        title="Чарт"
+        description="Треки, популярные на сайте прямо сейчас"
+    >
         <div class="tracks-container">
             <TrackCard v-for="track in tracks" :key="track.id" :track="track" />
         </div>
-    </div>
+    </Selection>
 </template>
 <script setup>
 import { Service } from "~~/client";

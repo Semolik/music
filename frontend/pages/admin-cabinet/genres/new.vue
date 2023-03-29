@@ -1,5 +1,5 @@
 <template>
-    <GenresPage />
+    <GenresCreatePage />
 </template>
 <script setup>
 definePageMeta({

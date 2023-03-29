@@ -1,5 +1,5 @@
 <template>
-    <div class="slider-container">
+    <div class="slider-container" v-if="slides.length">
         <Swiper
             :modules="[SwiperAutoplay, SwiperEffectCreative]"
             :slides-per-view="1"
@@ -25,7 +25,7 @@
 import { Service } from "~~/client";
 const { SLIDER_ASPECT_RATIO } = useRuntimeConfig().public;
 
-const slides = ref(await Service.getSlidesApiV1SliderGet());
+const slides = await Service.getSlidesApiV1SliderGet();
 </script>
 <style scoped lang="scss">
 .slide {

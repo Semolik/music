@@ -2,6 +2,7 @@
     <div class="index-page">
         <Slider />
         <Chart />
+        <Genres />
     </div>
 </template>
 <script setup>
