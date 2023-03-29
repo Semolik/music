@@ -3,6 +3,7 @@ from typing import List
 from uuid import UUID
 from backend.db.base import CRUDBase
 from backend.core.config import settings
+from backend.models.albums import Album
 from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
 from backend.schemas.statistics import TrackStats, StatsDay
 from sqlalchemy import func
@@ -30,7 +31,7 @@ class TracksCrud(CRUDBase):
 
     def get_liked_tracks(self, user_id: int, page: int) -> List[Track]:
         end = page * settings.PAGINATION_LIMIT
-        return self.db.query(Track).join(FavoriteTracks).filter(FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
+        return self.db.query(Track).join(FavoriteTracks).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
 
     def get_last_listened_tracks(self, user_id: int, page: int, page_size: int = settings.PAGINATION_LIMIT) -> List[ListenTrackHistoryItem]:
         end = page * page_size
@@ -70,6 +71,18 @@ class TracksCrud(CRUDBase):
             return self.update(model=last_listened)
         return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))
+
+    def get_popular_tracks(self,  start_date: datetime = None, end_date: datetime = None) -> List[Track]:
+
+        query = self.db.query(Track).join(ListenTrackHistoryItem, Album).filter(
+            Track.is_available, ListenTrackHistoryItem.listened == True)
+        if start_date:
+            query = query.filter(
+                ListenTrackHistoryItem.listen_datetime >= start_date)
+        if end_date:
+            query = query.filter(
+                ListenTrackHistoryItem.listen_datetime <= end_date)
+        return query.group_by(Track.id).order_by(func.count(ListenTrackHistoryItem.id).desc()).slice(0, settings.POPULAR_TRACKS_LIMIT).all()
 
     def get_track_statistics(self, track: Track) -> TrackStats:
         total_count = self.db.query(ListenTrackHistoryItem).filter(

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 from fastapi import Depends, APIRouter,  status, HTTPException, Query
 from fastapi.responses import FileResponse
@@ -36,6 +36,43 @@ def like_track(
     liked = TracksCrud(Auth.db).toggle_like_track(
         track_id=db_track.id, user_id=Auth.current_user_id)
     return liked
+
+
+@router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
+def get_liked_tracks(
+    page: int = Query(1, description="Номер страницы"),
+    Auth: Authenticate = Depends(Authenticate()),
+):
+    '''Получение лайкнутых треков'''
+
+    liked_tracks = TracksCrud(Auth.db).get_liked_tracks(
+        user_id=Auth.current_user_id,
+        page=page
+    )
+    return liked_tracks
+
+
+@router.get('/popular', response_model=List[Track])
+def get_popular_tracks(
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Получение популярных треков'''
+
+    popular_tracks = TracksCrud(Auth.db).get_popular_tracks()
+    return popular_tracks
+
+
+@router.get('/popular/month', response_model=List[Track])
+def get_popular_tracks_month(
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Получение популярных треков за месяц'''
+
+    popular_tracks = TracksCrud(Auth.db).get_popular_tracks(
+        start_date=datetime.now() - timedelta(days=30),
+        end_date=datetime.now()
+    )
+    return popular_tracks
 
 
 @router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
@@ -155,17 +192,3 @@ def get_track_file(
         return FileResponse(file_path)
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         detail="Файл не существует на сервере, но запись о нем есть")
-
-
-@router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
-def get_liked_tracks(
-    page: int = Query(1, description="Номер страницы"),
-    Auth: Authenticate = Depends(Authenticate()),
-):
-    '''Получение лайкнутых треков'''
-
-    liked_tracks = TracksCrud(Auth.db).get_liked_tracks(
-        user_id=Auth.current_user_id,
-        page=page
-    )
-    return [set_full_track_data(db=Auth.db, track=track, user_id=Auth.current_user_id) for track in liked_tracks if track.is_available]

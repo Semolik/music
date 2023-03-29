@@ -1,23 +1,25 @@
 <template>
-    <Swiper
-        :modules="[SwiperAutoplay, SwiperEffectCreative]"
-        :slides-per-view="1"
-        :loop="true"
-        :autoplay="{
-            delay: 4000,
-            disableOnInteraction: true,
-        }"
-        :spaceBetween="10"
-        :style="{
-            '--aspect-ratio': SLIDER_ASPECT_RATIO,
-        }"
-    >
-        <SwiperSlide v-for="slide in slides" :key="slide.id" class="slide">
-            <a :href="slide.url">
-                <img :src="slide.picture" />
-            </a>
-        </SwiperSlide>
-    </Swiper>
+    <div class="slider-container">
+        <Swiper
+            :modules="[SwiperAutoplay, SwiperEffectCreative]"
+            :slides-per-view="1"
+            :loop="true"
+            :autoplay="{
+                delay: 4000,
+                disableOnInteraction: true,
+            }"
+            :spaceBetween="10"
+            :style="{
+                '--aspect-ratio': SLIDER_ASPECT_RATIO,
+            }"
+        >
+            <SwiperSlide v-for="slide in slides" :key="slide.id" class="slide">
+                <a :href="slide.url">
+                    <img :src="slide.picture" />
+                </a>
+            </SwiperSlide>
+        </Swiper>
+    </div>
 </template>
 <script setup>
 import { Service } from "~~/client";

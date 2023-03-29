@@ -98,7 +98,6 @@
                     prepend="https://www.youtube.com/channel/"
                 />
             </div>
-
             <AppButton @click="saveProfile" :active="buttonActive">
                 Сохранить
             </AppButton>
