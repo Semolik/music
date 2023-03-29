@@ -72,8 +72,8 @@ class TracksCrud(CRUDBase):
         return self.create(ListenTrackHistoryItem(
             track_id=track_id, user_id=user_id, listen_datetime=time))
 
-    def get_popular_tracks(self,  start_date: datetime = None, end_date: datetime = None) -> List[Track]:
-
+    def get_popular_tracks(self,  start_date: datetime = None, end_date: datetime = None, page: int = 1, page_size: int = settings.POPULAR_TRACKS_LIMIT) -> List[Track]:
+        end = page * page_size
         query = self.db.query(Track).join(ListenTrackHistoryItem, Album).filter(
             Track.is_available, ListenTrackHistoryItem.listened == True)
         if start_date:
@@ -82,7 +82,7 @@ class TracksCrud(CRUDBase):
         if end_date:
             query = query.filter(
                 ListenTrackHistoryItem.listen_datetime <= end_date)
-        return query.group_by(Track.id).order_by(func.count(ListenTrackHistoryItem.id).desc()).slice(0, settings.POPULAR_TRACKS_LIMIT).all()
+        return query.group_by(Track.id).order_by(func.count(ListenTrackHistoryItem.id).desc()).slice(end-page_size, end).all()
 
     def get_track_statistics(self, track: Track) -> TrackStats:
         total_count = self.db.query(ListenTrackHistoryItem).filter(

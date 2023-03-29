@@ -80,6 +80,7 @@ const onFavorite = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    color: $secondary-text;
     .hover-overlay {
         position: absolute;
         top: 0;

@@ -18,8 +18,7 @@
         </div>
     </div>
     <div
-        :class="['results', category]"
-        :style="{ '--columns': category == 'tracks' ? 1 : 4 }"
+        :class="['results', category, { tracks: category == 'tracks' }]"
         v-if="isFound"
     >
         <template v-if="category === 'all'">
@@ -196,7 +195,11 @@ onBeforeUnmount(() => {
     }
     &:not(.all) {
         display: grid;
-        grid-template-columns: repeat(var(--columns), 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+
+        &.tracks {
+            grid-template-columns: 1fr;
+        }
     }
 }
 .not-found {

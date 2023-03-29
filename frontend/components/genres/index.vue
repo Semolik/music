@@ -2,12 +2,16 @@
     <Selection
         title="Жанры"
         description="Выберите любимый жанр и начните слушать музыку"
+        leftText="Все жанры"
+        leftTextLinkName="genres"
     >
         <div class="genres-container">
             <GenresCard
                 v-for="genre in genres"
                 :key="genre.id"
                 :genre="genre"
+                class="genre-card"
+                min
             />
         </div>
     </Selection>
@@ -26,9 +30,11 @@ const genres = await Service.getGenresApiV1GenresGet();
 <style lang="scss" scoped>
 .genres-container {
     display: grid;
-    height: 100%;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    --size: 200px;
+    @include sm(true) {
+        --size: 160px;
+    }
+    grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
     gap: 10px;
-    padding-bottom: 20px;
 }
 </style>

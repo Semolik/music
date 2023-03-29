@@ -1,5 +1,5 @@
 <template>
-    <SettingsPage :title="title" max-width="100%" padding="0" v-if="!loading">
+    <SettingsPage :title="title" max-width="100%" padding="0">
         <form class="content" ref="form" @submit.prevent="updateGenre">
             <Upload
                 :imageUrl="picture"
@@ -106,17 +106,13 @@ const runtimeConfig = useRuntimeConfig();
 const { MAX_GENRE_NAME_LENGTH } = runtimeConfig.public;
 const router = useRouter();
 
-const genre = ref({});
-const loading = ref(true);
-const getGenre = async (id) => {
-    try {
-        return await Service.getGenreInfoApiV1GenresGenreIdStatsGet(id);
-    } catch (e) {
-        router.push({ name: routesNames.adminCabinet.cabinetGenres });
-    }
-};
-const picture = ref("");
+const genre = ref(
+    id ? await Service.getGenreInfoApiV1GenresGenreIdStatsGet(id) : {}
+);
+const picture = ref(genre.value?.picture || null);
 const pictureBlob = ref(null);
+const name = ref(genre.value.name || "");
+
 const handleAvatarSuccess = (raw) => {
     pictureBlob.value = raw;
     picture.value = URL.createObjectURL(raw);
@@ -130,7 +126,7 @@ const deleteGenre = async () => {
     }
 };
 const form = ref(null);
-const name = ref("");
+
 const title = computed(() =>
     id ? `Редактирование жанра ${genre.value.name}` : `Создание жанра`
 );
@@ -176,16 +172,6 @@ const createGenre = async () => {
         toast.error(HandleOpenApiError(e).message);
     }
 };
-onMounted(async () => {
-    if (!id) {
-        loading.value = false;
-        return;
-    }
-    genre.value = await getGenre(id);
-    name.value = genre.value.name;
-    picture.value = genre.value.picture;
-    loading.value = false;
-});
 </script>
 <style lang="scss" scoped>
 .content {

@@ -8,6 +8,10 @@
             :aspect-ratio="SLIDER_ASPECT_RATIO"
             :imageUrl="picture"
         />
+        <div class="image-info-text">
+            Изображение имеет соотношение сторон {{ SLIDER_ASPECT_RATIO }}x1,
+            рекомендуемый размер {{ width }}x{{ height }}
+        </div>
         <div class="info">
             <AppInput
                 label="Название слайда"
@@ -87,11 +91,14 @@ const { id } = defineProps({
         type: String,
     },
 });
+const scaleValue = 400;
 const { SLIDER_ASPECT_RATIO, MAX_SLIDE_NAME_LENGTH, DATE_FORMAT } =
     useRuntimeConfig().public;
 const slide = reactive(
     id ? await Service.getSlideByIdApiV1SliderSlideIdGet(id) : {}
 );
+const width = scaleValue * SLIDER_ASPECT_RATIO;
+const height = scaleValue;
 const title = computed(() =>
     id ? `Редактирование слайда ${slide.name}` : "Создание слайда"
 );
@@ -190,6 +197,10 @@ const deleteSlide = async () => {
 </script>
 <style lang="scss" scoped>
 @import url(element-plus/theme-chalk/dark/css-vars.css);
+.image-info-text {
+    color: $secondary-text;
+    font-size: 14px;
+}
 
 .info {
     display: flex;
@@ -197,6 +208,7 @@ const deleteSlide = async () => {
     gap: 10px;
     height: 100%;
     --app-input-border-radius: 5px;
+
     .info-line {
         display: grid;
         gap: 10px;

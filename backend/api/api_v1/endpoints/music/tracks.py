@@ -65,12 +65,17 @@ def get_popular_tracks(
 @router.get('/popular/month', response_model=List[Track])
 def get_popular_tracks_month(
     Auth: Authenticate = Depends(Authenticate(required=False)),
+    page_size: int = Query(settings.POPULAR_TRACKS_LIMIT,
+                           description="Размер страницы", ge=1, le=settings.POPULAR_TRACKS_LIMIT),
+    page: int = Query(1, description="Номер страницы"),
 ):
     '''Получение популярных треков за месяц'''
 
     popular_tracks = TracksCrud(Auth.db).get_popular_tracks(
         start_date=datetime.now() - timedelta(days=30),
-        end_date=datetime.now()
+        end_date=datetime.now(),
+        page=page,
+        page_size=page_size
     )
     return popular_tracks
 

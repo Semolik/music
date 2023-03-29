@@ -17,7 +17,6 @@ const { picture, icon, borderRadius } = defineProps({
     },
     icon: {
         type: String,
-        required: true,
     },
     borderRadius: {
         type: String,
