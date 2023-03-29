@@ -1,7 +1,10 @@
 from backend.crud.crud_file import FileCruds
 from backend.db.base import CRUDBase
+from backend.models.albums import Album, AlbumGenre, FavoriteAlbum
 from backend.models.files import Image
+from backend.models.tracks import Track, FavoriteTracks
 from backend.models.genres import Genre, LovedGenre
+from backend.models.user import PublicProfile, FavoriteMusicians
 from sqlalchemy import func
 from backend.core.config import settings
 from sqlalchemy import or_
@@ -71,3 +74,34 @@ class GenresCruds(CRUDBase):
         else:
             self.delete(model=liked)
             return False
+
+    def get_popular_albums_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Album]:
+        end = page * page_size
+        return self.db.query(Album).join(AlbumGenre, FavoriteAlbum)\
+            .filter(AlbumGenre.genre_id == genre_id, Album.is_available)\
+            .group_by(Album.id)\
+            .order_by(func.count(FavoriteAlbum.album_id).desc())\
+            .slice(end - page_size, end).all()
+
+    def get_popular_tracks_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Track]:
+        end = page * page_size
+        return self.db.query(Track).join(Album, AlbumGenre, FavoriteTracks)\
+            .filter(AlbumGenre.genre_id == genre_id, Track.is_available)\
+            .group_by(Track.id)\
+            .order_by(func.count(FavoriteTracks.track_id).desc())\
+            .slice(end - page_size, end).all()
+
+    def get_popular_musicians_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[PublicProfile]:
+        end = page * page_size
+        return self.db.query(PublicProfile).join(FavoriteMusicians, Album, AlbumGenre)\
+            .filter(AlbumGenre.genre_id == genre_id)\
+            .group_by(PublicProfile.id)\
+            .order_by(func.count(FavoriteMusicians.musician_id).desc())\
+            .slice(end - page_size, end).all()
+
+    def get_new_albums_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Album]:
+        end = page * page_size
+        return self.db.query(Album).join(AlbumGenre)\
+            .filter(AlbumGenre.genre_id == genre_id, Album.is_available)\
+            .order_by(Album.open_date.desc())\
+            .slice(end - page_size, end).all()

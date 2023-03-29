@@ -8,7 +8,7 @@ from backend.helpers.files import valid_content_length
 from backend.helpers.images import save_image
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import Genre, GenreBaseForm
+from backend.schemas.music import AlbumInfo, Genre, GenreBaseForm, GenreFullInfo
 from backend.core.config import settings
 from backend.schemas.statistics import GenreStats
 
@@ -92,7 +92,29 @@ def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Жанр не найден")
-    return genre
+    genre_obj = GenreFullInfo.from_orm(genre)
+    genre_obj.liked = bool(
+        GenresCruds(Auth.db).get_liked_genre_model(
+            user_id=Auth.current_user_id, genre_id=genre.id)
+    ) if Auth.current_user_id else False
+
+    genre_obj.popular_albums = GenresCruds(Auth.db).get_popular_albums_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    genre_obj.popular_tracks = GenresCruds(Auth.db).get_popular_tracks_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    genre_obj.popular_musicians = GenresCruds(Auth.db).get_popular_musicians_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    genre_obj.new_albums = GenresCruds(Auth.db).get_new_albums_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    return genre_obj
 
 
 @router.get(

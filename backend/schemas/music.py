@@ -229,3 +229,14 @@ class MusicianFullInfo(MusicianInfo):
 
     class Config:
         orm_mode = True
+
+
+class GenreFullInfo(Genre):
+    popular_albums: List[AlbumInfo] = Query([],
+                                            description="Список популярных альбомов")
+    popular_tracks: List[Track] = Query([],
+                                        description="Список популярных треков")
+    popular_musicians: List[MusicianInfo] = Query([],
+                                                  description="Список популярных музыкантов")
+    new_albums: List[AlbumInfo] = Query([],
+                                        description="Список новых альбомов")

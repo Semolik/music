@@ -1,8 +1,5 @@
 <template>
-    <Selection
-        title="Чарт"
-        description="Треки, популярные на сайте прямо сейчас"
-    >
+    <Selection title="Чарт">
         <div class="tracks-container">
             <TrackCard v-for="track in tracks" :key="track.id" :track="track" />
         </div>
@@ -13,24 +10,9 @@ import { Service } from "~~/client";
 const tracks = await Service.getPopularTracksMonthApiV1TracksPopularMonthGet();
 </script>
 <style lang="scss" scoped>
-.chart-conatainer {
-    display: flex;
-    flex-direction: column;
-
-    .head {
-        display: flex;
-        flex-direction: column;
-
-        .title {
-            font-size: 24px;
-            font-weight: 600;
-            color: $primary-text;
-        }
-        .subtitle {
-            font-size: 14px;
-            font-weight: 400;
-            color: $secondary-text;
-        }
-    }
+.tracks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 10px;
 }
 </style>

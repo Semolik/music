@@ -108,6 +108,8 @@ class Settings(BaseSettings):
         env_config.get('SLIDER_PAGE_ITEMS'))
     POPULAR_TRACKS_LIMIT = int(
         env_config.get('POPULAR_TRACKS_LIMIT'))
+    ALBUM_PAGE_COUNT = int(
+        env_config.get('VITE_ALBUM_PAGE_COUNT'))
 
 
 settings = Settings()

@@ -110,7 +110,7 @@ const genre = ref({});
 const loading = ref(true);
 const getGenre = async (id) => {
     try {
-        return await Service.getGenreInfoApiV1GenresGenreIdGet(id);
+        return await Service.getGenreInfoApiV1GenresGenreIdStatsGet(id);
     } catch (e) {
         router.push({ name: routesNames.adminCabinet.cabinetGenres });
     }

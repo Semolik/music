@@ -21,14 +21,6 @@ class AlbumGenre(Base):
         ForeignKey("genres.id"),
         primary_key=True
     )
-    album = relationship(
-        "Album",
-        foreign_keys=[album_id],
-        backref=backref(
-            "genres",
-            cascade="all,delete"
-        )
-    )
 
 
 class Album(Base):
@@ -72,6 +64,11 @@ class Album(Base):
         Boolean,
         nullable=False,
         default=False
+    )
+    genres = relationship(
+        "Genre",
+        secondary="album_genres",
+        backref="albums"
     )
 
     @hybrid_property
