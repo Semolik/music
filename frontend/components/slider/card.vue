@@ -25,7 +25,7 @@
                     {{ endDate }}
                 </div>
             </div>
-            <div class="small" v-if="!slide.active">Деактивирован</div>
+            <div class="small" v-if="!slide.is_active">Деактивирован</div>
         </div>
     </nuxt-link>
 </template>
@@ -39,10 +39,10 @@ const { slide } = defineProps({
     },
 });
 const startDate = computed(() =>
-    moment(slide.startDate).format("DD.MM.YYYY h:mm")
+    moment(slide.active_from).format("DD.MM.YYYY h:mm")
 );
 const endDate = computed(() =>
-    slide.endDate ? moment(slide.endDate).format("DD.MM.YYYY") : "Бессрочно"
+    slide.active_to ? moment(slide.active_to).format("DD.MM.YYYY") : "Бессрочно"
 );
 </script>
 <style scoped lang="scss">

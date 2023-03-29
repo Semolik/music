@@ -42,12 +42,7 @@
                 </div>
             </div>
             <div class="info-line">
-                <AppInput
-                    label="Ссылка"
-                    :min-length="1"
-                    v-model="link"
-                    :error="linkError"
-                />
+                <AppInput label="Ссылка" :min-length="1" v-model="link" />
                 <AppInput
                     label="Cортировка"
                     v-model="order"
@@ -103,7 +98,7 @@ const title = computed(() =>
 const link = ref(id ? slide.url : "");
 const name = ref(id ? slide.name : "");
 const nameError = computed(() => !name.value);
-const linkError = computed(() => !link.value);
+
 const picture = ref(id ? slide.picture : "");
 const pictureBlob = ref(null);
 const order = ref(String(slide?.order || 0));
@@ -125,7 +120,6 @@ const dateRange = ref([dateStart.value, dateEnd.value]);
 const buttonActive = computed(() => {
     return (
         !nameError.value &&
-        !linkError.value &&
         !orderError.value &&
         (id
             ? slide.name !== name.value ||
@@ -135,10 +129,7 @@ const buttonActive = computed(() => {
               dateStart.value !== dateRange.value[0] ||
               String(slide.order) !== order.value ||
               pictureBlob.value
-            : name.value &&
-              link.value &&
-              pictureBlob.value &&
-              dateRange.value[0])
+            : name.value && pictureBlob.value && dateRange.value[0])
     );
 });
 const getSendData = () => {

@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     UUID_REGEX = '[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}'
 
     class Config:
-        case_sensitive = True  # 4
+        case_sensitive = True
 
     class JWTsettings(BaseModel):
         authjwt_secret_key: str = "secret"

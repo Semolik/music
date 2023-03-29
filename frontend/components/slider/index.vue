@@ -14,7 +14,7 @@
             }"
         >
             <SwiperSlide v-for="slide in slides" :key="slide.id" class="slide">
-                <a :href="slide.url">
+                <a :[slide.url&&`href`]="slide.url">
                     <img :src="slide.picture" />
                 </a>
             </SwiperSlide>
