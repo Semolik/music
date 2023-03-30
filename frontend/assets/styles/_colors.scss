@@ -20,3 +20,12 @@ $accent-red-hover: hwb(0 26% 38%);
 $accent-error: hsl(0, 100%, 43%);
 $accent-warning: hsl(40, 100%, 43%);
 $accent-success: hsl(153, 80%, 49%);
+@mixin var-to-css($name, $value) {
+    :root {
+        #{'--#{$name}'}: #{$value};
+    }
+}
+
+@include var-to-css("accent", $accent);
+
+@include var-to-css("accent-error", $accent-error);

@@ -5,7 +5,6 @@
         size="large"
         :suffix-icon="searching ? Loading : null"
         clearable
-        autofocus
         id="search-input"
     />
     <div class="results-categories" v-if="searchQuery">

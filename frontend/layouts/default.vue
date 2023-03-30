@@ -28,7 +28,7 @@
     .content-container {
         display: flex;
         flex-direction: column;
-        height: min-content;
+        // height: min-content;
 
         overflow-x: hidden;
         .app-content {

@@ -4,6 +4,7 @@ export const IconsNames = {
     trackIcon: "material-symbols:music-note-rounded",
     playlistIcon: "material-symbols:playlist-add-rounded",
     likeIcon: "material-symbols:favorite",
+    dislikeIcon: "ion:heart-dislike",
     playIcon: "material-symbols:play-arrow",
     dotsIcon: "material-symbols:more-horiz",
     homeIcon: "material-symbols:home-outline-rounded",
@@ -19,6 +20,8 @@ export const IconsNames = {
     deleteIcon: "material-symbols:delete",
     changeIcon: "material-symbols:change-circle-rounded",
     listIcon: "material-symbols:list",
-    plusIcon: "material-symbols:add",
+    plusIcon: "material-symbols:add-rounded",
     imageIcon: "material-symbols:image",
+    shareIcon: "material-symbols:share",
+    backIcon: "material-symbols:arrow-back",
 };

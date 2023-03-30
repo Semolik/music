@@ -1,15 +1,13 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Literal
+from typing import List
 from uuid import UUID
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from backend.schemas.music import Track
 from backend.schemas.user import UserInfo
 from fastapi import Query
 from backend.core.config import env_config
 from backend.schemas.file import ImageLink
-
-# order_playlist_by = Literal['created_at', 'name']
 
 
 class order_playlist_by(str, Enum):
@@ -20,8 +18,8 @@ class order_playlist_by(str, Enum):
 class PlaylistBase(BaseModel):
     name: str = Query(..., max_length=int(
         env_config.get('VITE_MAX_PLAYLIST_NAME_LENGTH')
-    ))
-    description: str = Query(..., max_length=int(
+    ), description='Название плейлиста', min_length=1)
+    description: str = Query(None, max_length=int(
         env_config.get('VITE_MAX_PLAYLIST_DESCRIPTION_LENGTH')
     ))
     private: bool = Query(..., description='Личный плейлист или публичный')

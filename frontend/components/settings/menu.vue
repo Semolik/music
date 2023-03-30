@@ -32,7 +32,7 @@
                 }"
                 v-if="$viewport.isLessThan('lg')"
             >
-                <Icon name="material-symbols:arrow-back" />
+                <Icon :name="IconsNames.backIcon" />
                 <span>Назад</span>
             </nuxt-link>
             <Menu
@@ -58,7 +58,7 @@
 </template>
 <script setup lang="ts">
 import { RoutePathByName, routesNames } from "@typed-router";
-
+import { IconsNames } from "~~/configs/icons";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { UserTypeEnum } from "@/client/models/UserTypeEnum";

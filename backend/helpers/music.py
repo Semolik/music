@@ -20,6 +20,7 @@ import shutil
 from backend.core.config import settings
 import io
 from datetime import datetime
+from backend.schemas.music import Track as TrackSchema
 from backend.models.albums import Album
 
 
@@ -54,6 +55,18 @@ def set_album_tracks(db: Session, db_album, db_album_obj, user_id: int = None):
     db_album_obj['tracks'] = [set_track_data(db=db, track=track, user_id=user_id)
                               for track in AlbumsCruds(db).get_album_tracks(album_id=db_album.id)]
     return db_album_obj
+
+
+def set_tracks_likes(db: Session, tracks: Track, user_id: int):
+    return [set_track_like(db=db, db_track=track, user_id=user_id) for track in tracks]
+
+
+def set_track_like(db: Session, db_track: TrackSchema, user_id: int = None):
+    track = TrackSchema.from_orm(db_track)
+    track.liked = TracksCrud(db).track_is_liked(
+        track_id=track.id, user_id=user_id) if user_id else False
+
+    return track
 
 
 def set_track_data(db: Session, track: Track, user_id: int = None):

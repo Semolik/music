@@ -31,8 +31,8 @@
         <template #items>
             <SetupGenresCard
                 v-for="(genre, index) in genres"
-                :genre="genre"
-                @liked="(liked) => onLike(liked, index)"
+                v-model:genre="genres[index]"
+                @liked="(liked) => onLike(liked, genre)"
                 :key="genre.id"
             />
         </template>
@@ -59,32 +59,20 @@ const router = useRouter();
 if (!logined.value) {
     router.push({ name: routesNames.login });
 }
-
-const runtimeConfig = useRuntimeConfig();
 const search = ref("");
 const randomGenres = await Service.getRandomGenresApiV1GenresRandomGet();
 const randomGenresNames = randomGenres.map((genre) => genre.name);
 const { typingText } = useTyping(randomGenresNames, "Найди свой жанр");
 const popularGenres = ref(
-    await Service.getGenresApiV1GenresGet(
-        1,
-        runtimeConfig.public.SEARCH_GENRE_LIMIT,
-        FilterGenreEnum.NOT_LIKED
-    )
+    await Service.getGenresApiV1GenresGet(1, FilterGenreEnum.NOT_LIKED)
 );
 const favoriteGenres = ref(
-    await Service.getGenresApiV1GenresGet(
-        1,
-        runtimeConfig.public.SEARCH_GENRE_LIMIT,
-        FilterGenreEnum.LIKED
-    )
+    await Service.getGenresApiV1GenresGet(1, FilterGenreEnum.LIKED)
 );
 
 const mergedGenres = [...favoriteGenres.value, ...popularGenres.value];
 const genres = ref(mergedGenres);
-const onLike = (liked, index) => {
-    genres.value[index].liked = liked;
-    const currentGenre = genres.value[index];
+const onLike = (liked, currentGenre) => {
     var removeArray = liked ? popularGenres : favoriteGenres;
     var addArray = liked ? favoriteGenres : popularGenres;
     removeArray.value = removeArray.value.filter(
@@ -92,22 +80,17 @@ const onLike = (liked, index) => {
     );
     addArray.value.push(currentGenre);
 };
-watch(
-    search,
-    async (value) => {
-        if (!value) {
-            genres.value = [...favoriteGenres.value, ...popularGenres.value];
-            return;
-        }
-        genres.value = await Service.getGenresApiV1SearchGenresGet(value);
-    },
-    { immediate: true }
-);
+watch(search, async (value) => {
+    if (!value) {
+        genres.value = [...favoriteGenres.value, ...popularGenres.value];
+        return;
+    }
+    genres.value = await Service.getGenresApiV1SearchGenresGet(value);
+});
 const showWarningModal = ref(false);
 const resultCheck = async (routeName) => {
     var currentLikedGenres = await Service.getGenresApiV1GenresGet(
         1,
-        runtimeConfig.public.SEARCH_GENRE_LIMIT,
         FilterGenreEnum.LIKED
     );
 

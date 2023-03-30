@@ -15,7 +15,7 @@ from backend.schemas.statistics import GenreStats
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 
 
-@router.post('', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=Genre, dependencies=[Depends(valid_content_length(
+@router.post('', responses={**NOT_ENOUGH_RIGHTS, status.HTTP_409_CONFLICT: {"model": GENRE_IS_NOT_UNIQUE}}, response_model=GenreStats, dependencies=[Depends(valid_content_length(
     settings.MAX_IMAGE_FILE_SIZE_MB))])
 def create_genre(
     genreData: GenreBaseForm = Depends(GenreBaseForm),
@@ -60,7 +60,7 @@ def like_genre(
         **NOT_ENOUGH_RIGHTS,
         **NOT_FOUND_GENRE
     },
-    response_model=Genre,
+    response_model=GenreStats,
     dependencies=[Depends(valid_content_length(
         settings.MAX_IMAGE_FILE_SIZE_MB))]
 )

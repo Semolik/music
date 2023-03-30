@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_playlists import PlaylistsCrud
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
+from backend.helpers.music import is_playlist_showed, set_tracks_likes, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
 from backend.schemas.playlists import PlaylistBase, PlaylistInfo, PlaylistCreate, PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
 from backend.core.config import settings
 router = APIRouter(prefix='/playlists', tags=['Плейлисты'])
@@ -28,6 +28,14 @@ def get_my_playlists(
         order_by=order_by,
         order_orientation=order_orientation
     )
+    playlists_objs = []
+    for playlist in playlists:
+        playlist_obj = PlaylistInfoWithoutTracks.from_orm(playlist)
+        playlist_obj.liked = PlaylistsCrud(Auth.db).is_playlist_liked(
+            playlist_id=playlist.id,
+            user_id=Auth.current_user_id
+        )
+        playlists_objs.append(playlist_obj)
     return playlists
 
 
@@ -47,11 +55,11 @@ def get_playlist_info(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Плейлист не найден")
     playlist_obj = PlaylistInfo.from_orm(playlist)
-    playlist_obj.tracks = playlist_crud.get_tracks_by_playlist_id(
+    playlist_obj.tracks = set_tracks_likes(tracks=playlist_crud.get_tracks_by_playlist_id(
         playlist_id=playlist_id,
         user_id=Auth.current_user_id
-    )
-    return playlist
+    ), user_id=Auth.current_user_id, db=Auth.db)
+    return
 
 
 @router.post('', response_model=PlaylistInfo)
@@ -72,7 +80,8 @@ def create_playlist(
         tracks_ids=[track.id for track in db_tracks]
     )
     playlist_obj = PlaylistInfo.from_orm(created_playlist)
-    playlist_obj.tracks = db_tracks
+    playlist_obj.tracks = set_tracks_likes(
+        tracks=db_tracks, user_id=Auth.current_user_id, db=Auth.db)
     return playlist_obj
 
 
@@ -94,8 +103,12 @@ def update_playlist(
         private=playlist.private
     )
     playlist_obj = PlaylistInfo.from_orm(updated_playlist)
-    playlist_obj.tracks = playlist_crud.get_tracks_by_playlist_id(
-        playlist_id=playlist_id, user_id=Auth.current_user_id)
+    playlist_obj.tracks = set_tracks_likes(
+        tracks=playlist_crud.get_tracks_by_playlist_id(
+            playlist_id=playlist_id, user_id=Auth.current_user_id),
+        user_id=Auth.current_user_id,
+        db=Auth.db
+    )
     return playlist_obj
 
 

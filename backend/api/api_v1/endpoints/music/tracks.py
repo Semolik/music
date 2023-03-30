@@ -11,7 +11,7 @@ from backend.crud.crud_tracks import TracksCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import set_full_track_data
+from backend.helpers.music import set_full_track_data, set_tracks_likes
 from backend.models.albums import Album
 from backend.responses import NOT_FOUND_TRACK, UNAUTHORIZED_401
 from backend.schemas.music import Track
@@ -49,7 +49,7 @@ def get_liked_tracks(
         user_id=Auth.current_user_id,
         page=page
     )
-    return liked_tracks
+    return set_tracks_likes(tracks=liked_tracks, user_id=Auth.current_user_id, db=Auth.db)
 
 
 @router.get('/popular', response_model=List[Track])
@@ -59,7 +59,7 @@ def get_popular_tracks(
     '''Получение популярных треков'''
 
     popular_tracks = TracksCrud(Auth.db).get_popular_tracks()
-    return popular_tracks
+    return set_tracks_likes(tracks=popular_tracks, user_id=Auth.current_user_id, db=Auth.db)
 
 
 @router.get('/popular/month', response_model=List[Track])
@@ -77,7 +77,7 @@ def get_popular_tracks_month(
         page=page,
         page_size=page_size
     )
-    return popular_tracks
+    return set_tracks_likes(tracks=popular_tracks, user_id=Auth.current_user_id, db=Auth.db)
 
 
 @router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)

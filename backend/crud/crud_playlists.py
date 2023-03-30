@@ -4,7 +4,7 @@ from backend.db.base import CRUDBase
 from backend.models.albums import Album
 from backend.models.playlists import Playlist, PlaylistTrack, FavoritePlaylist
 from backend.models.tracks import Track
-from backend.schemas.playlists import order_playlist_by
+from sqlalchemy import or_
 
 
 class PlaylistsCrud(CRUDBase):
@@ -17,8 +17,12 @@ class PlaylistsCrud(CRUDBase):
         playlist.private = private
         return self.update(playlist)
 
+    def is_playlist_liked(self, user_id: int, playlist_id: UUID) -> bool:
+        return self.db.query(FavoritePlaylist).filter(FavoritePlaylist.user_id == user_id, FavoritePlaylist.playlist_id == playlist_id).first() is not None
+
     def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str) -> List[Playlist]:
-        query = self.db.query(Playlist).filter(Playlist.user_id == owner_id)
+        query = self.db.query(Playlist).outerjoin(FavoritePlaylist).filter(or_(
+            Playlist.user_id == owner_id, FavoritePlaylist.user_id == user_id)).group_by(Playlist.id)
 
         if order_by == 'created_at':
             order_column = Playlist.created_at

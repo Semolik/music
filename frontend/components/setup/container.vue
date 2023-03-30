@@ -37,9 +37,11 @@
                     </div>
                 </Teleport>
                 <slot name="content"></slot>
-                <div class="items" v-auto-animate>
-                    <slot name="items"></slot>
-                </div>
+                <ClientOnly>
+                    <div class="items" v-auto-animate>
+                        <slot name="items"></slot>
+                    </div>
+                </ClientOnly>
             </div>
         </div>
         <ModalDialog

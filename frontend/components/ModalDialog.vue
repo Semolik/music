@@ -21,6 +21,9 @@
                     <slot name="header"></slot>
                     <div class="modal">
                         <div class="modal-content">
+                            <div class="modal-headline" v-if="props.headText">
+                                {{ props.headText }}
+                            </div>
                             <slot name="content"></slot>
                         </div>
                         <div
@@ -75,6 +78,10 @@ const props = defineProps({
     gap: {
         type: Number,
         default: 10,
+    },
+    headText: {
+        type: String,
+        default: "",
     },
 });
 const modalStateBus = useEventBus("modal-state");
@@ -199,6 +206,14 @@ onBeforeUnmount(() => {
 
         .modal-content {
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: v-bind(gapString);
+            .modal-headline {
+                color: $secondary-text;
+                font-size: 1.1rem;
+                text-align: center;
+            }
         }
 
         .modal-buttons {

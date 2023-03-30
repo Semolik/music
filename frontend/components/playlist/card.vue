@@ -1,5 +1,5 @@
 <template>
-    <card-min v-bind="props" v-if="min">
+    <card-min v-bind="props" v-if="min" @click="emit('card-click')">
         <template #content>
             <span>{{ playlist.name }}</span>
             <div class="flex gap-3px items-center secondary-text text-sm">
@@ -12,7 +12,7 @@
             </div>
         </template>
     </card-min>
-    <card v-bind="props" v-else>
+    <card v-bind="props" v-else @picture-click="emit('card-click')">
         <div class="flex flex-col grow">
             <span class="font-medium">{{ playlist.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
@@ -23,7 +23,7 @@
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
-
+const emit = defineEmits(["card-click"]);
 const { playlist, min } = defineProps({
     playlist: {
         type: Object,

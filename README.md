@@ -32,11 +32,4 @@ create a .env.local file in the root folder with the following content
 
 <h4>frontend</h4>
 
-Before running the frontend server, make sure that the backend server is running as the code generation for the API client relies on it.
-
-    cd frontend
-    npm run generate-client
-
-Set BASE api url in [api plugin](/frontend/plugins/api-client.js) default is http://localhost:8000
-
     npm run dev

@@ -1,8 +1,8 @@
 <template>
     <div class="index-page">
         <Slider />
-        <Chart />
         <Genres />
+        <Chart />
     </div>
 </template>
 <script setup>

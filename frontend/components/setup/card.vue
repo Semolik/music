@@ -2,7 +2,12 @@
     <div class="card">
         <card-picture v-bind="propsBind" @click="emit('picture-click')">
             <ClientOnly>
-                <div :class="['hover-overlay', { force: overlayActive }]">
+                <div
+                    :class="[
+                        'hover-overlay',
+                        { force: forceOverlay || (overlayOnLike && liked) },
+                    ]"
+                >
                     <div :class="['like-button', { active: liked }]">
                         <Icon :name="IconsNames.likeIcon" />
                     </div>
@@ -48,10 +53,6 @@ const { picture, name, liked, icon, forceOverlay, overlayOnLike } = defineProps(
         },
     }
 );
-
-const overlayActive = computed(() => {
-    return forceOverlay || (overlayOnLike && liked);
-});
 
 const propsBind = reactive({
     picture: picture,

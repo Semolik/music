@@ -1,5 +1,5 @@
 <template>
-    <div :class="['app-button', { active: active }]">
+    <div :class="['app-button', { active: active }, { 'no-accent': noAccent }]">
         <slot />
     </div>
 </template>
@@ -12,6 +12,10 @@ const { active, borderRadius } = defineProps({
     borderRadius: {
         type: String,
         default: "10px",
+    },
+    noAccent: {
+        type: Boolean,
+        default: false,
     },
 });
 </script>
@@ -28,9 +32,16 @@ const { active, borderRadius } = defineProps({
 
     &.active {
         background-color: var(--app-button-active-bg, $accent);
+
         color: black;
         cursor: pointer;
-
+        &.no-accent {
+            color: $primary-text;
+            background-color: $quaternary-bg;
+            &:hover {
+                background-color: $quinary-bg;
+            }
+        }
         &:hover {
             background-color: var(--app-button-active-hover-bg, $accent-hover);
         }

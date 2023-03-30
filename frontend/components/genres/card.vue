@@ -29,7 +29,7 @@ const { genre } = defineProps({
         default: false,
     },
 });
-const picture = computed(() => genre.picture);
+
 const link = computed(() => ({
     name: routesNames.genresId,
     params: { id: genre.id },
