@@ -16,12 +16,9 @@
                     :class="['track-dots-button', { active: menuOpened }]"
                     @click.self="menuOpened = !menuOpened"
                 >
-                    <Icon :name="dotsIcon" />
+                    <Icon :name="IconsNames.dotsIcon" />
                     <div class="menu" v-if="menuOpened">
-                        <div
-                            class="menu-item"
-                            @click="addToPlaylistModalOpened = true"
-                        >
+                        <div class="menu-item" @click="openAddToPlaylistModal">
                             <Icon :name="IconsNames.plusIcon" />
                             <span> Добавить в плейлист </span>
                         </div>
@@ -63,6 +60,7 @@
                 addToPlaylistModalOpened = false;
             }
         "
+        close-on-esckey
     >
         <template #content>
             <div class="playlist-modal-content">
@@ -103,7 +101,23 @@
                             :key="playlist.id"
                             :playlist="playlist"
                             min
-                        />
+                            hide-end-icon
+                            class="playlist-card"
+                            @card-click="addTrackToPlaylist(playlist.id)"
+                        >
+                            <template #card-end>
+                                <div class="add-remove-button-container">
+                                    <div
+                                        :class="[
+                                            'add-remove-button',
+                                            { remove: false },
+                                        ]"
+                                    >
+                                        <Icon :name="IconsNames.plusIcon" />
+                                    </div>
+                                </div>
+                            </template>
+                        </PlaylistCard>
                     </div>
                 </template>
             </div>
@@ -112,11 +126,17 @@
 </template>
 <script setup>
 import moment from "moment";
-
 import { IconsNames } from "@/configs/icons";
 import { usePlaylistsStore } from "@/stores/playlists";
 import { onClickOutside } from "@vueuse/core";
 import { Service } from "@/client";
+import { useAuthStore } from "~~/stores/auth";
+import { storeToRefs } from "pinia";
+import { routesNames } from "@typed-router";
+const playlistsStore = usePlaylistsStore();
+const authStore = useAuthStore();
+const { logined } = storeToRefs(authStore);
+
 const { track } = defineProps({
     track: {
         type: Object,
@@ -124,8 +144,15 @@ const { track } = defineProps({
     },
 });
 const emit = defineEmits(["update:track"]);
-const playlistsStore = usePlaylistsStore();
+const router = useRouter();
+const goToLogin = () => {
+    router.push({ name: routesNames.login });
+};
 const toggleLikeTrack = async () => {
+    if (!logined.value) {
+        goToLogin();
+        return;
+    }
     const liked = await Service.likeTrackApiV1TracksTrackIdLikePut(track.id);
     emit("update:track", { ...track, liked });
 };
@@ -138,6 +165,13 @@ const newPlaylistPublic = ref(false);
 const newPlaylistButtonActive = computed(() => {
     return newPlaylistName.value.length > 0;
 });
+const openAddToPlaylistModal = () => {
+    if (!logined.value) {
+        goToLogin();
+        return;
+    }
+    addToPlaylistModalOpened.value = true;
+};
 watch(addToPlaylistModalOpened, (value) => {
     createMode.value = false;
     newPlaylistName.value = "";
@@ -146,6 +180,14 @@ watch(addToPlaylistModalOpened, (value) => {
         menuOpened.value = false;
     }
 });
+
+const addTrackToPlaylist = async (playlistId) => {
+    await playlistsStore.addTrackToPlaylist({
+        playlistId,
+        trackId: track.id,
+    });
+    addToPlaylistModalOpened.value = false;
+};
 const createPlaylist = async () => {
     await playlistsStore.createPlaylist({
         name: newPlaylistName.value,
@@ -159,7 +201,6 @@ onMounted(() => {
         menuOpened.value = false;
     });
 });
-const { dotsIcon } = IconsNames;
 
 const duration = computed(() =>
     moment
@@ -177,6 +218,41 @@ const duration = computed(() =>
         flex-direction: column;
         gap: 10px;
         min-height: 300px;
+
+        .playlist-card {
+            &:hover {
+                .add-remove-button-container {
+                    .add-remove-button {
+                        &.remove {
+                            background-color: $accent-red;
+                            svg {
+                                color: $primary-bg;
+                            }
+                        }
+                        background-color: $accent;
+                        svg {
+                            color: $primary-bg;
+                        }
+                    }
+                }
+            }
+            .add-remove-button-container {
+                @include flex-center;
+
+                .add-remove-button {
+                    @include flex-center;
+                    border-radius: 50%;
+                    padding: 10px;
+                    background-color: $quinary-bg;
+                    aspect-ratio: 1/1;
+                    svg {
+                        color: $secondary-text;
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+            }
+        }
     }
     .create-playlist {
         display: flex;

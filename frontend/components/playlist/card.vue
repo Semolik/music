@@ -7,9 +7,13 @@
             </div>
         </template>
         <template #card-end>
-            <div class="flex justify-center items-center pr-4 secondary-text">
+            <div
+                class="flex justify-center items-center pr-4 secondary-text"
+                v-if="!hideEndIcon"
+            >
                 <Icon name="material-symbols:arrow-forward-ios" />
             </div>
+            <slot name="card-end" />
         </template>
     </card-min>
     <card v-bind="props" v-else @picture-click="emit('card-click')">
@@ -24,12 +28,16 @@
 <script setup>
 import { IconsNames } from "@/configs/icons";
 const emit = defineEmits(["card-click"]);
-const { playlist, min } = defineProps({
+const { playlist, min, hideEndIcon } = defineProps({
     playlist: {
         type: Object,
         required: true,
     },
     min: {
+        type: Boolean,
+        default: false,
+    },
+    hideEndIcon: {
         type: Boolean,
         default: false,
     },

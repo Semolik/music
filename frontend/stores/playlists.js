@@ -3,14 +3,14 @@ import { Service } from "@/client";
 export const usePlaylistsStore = defineStore({
     id: "playlists",
     state: () => ({
-        playlists_cache: null,
+        playlists_cache: [],
+        playlists_fetched: false,
     }),
     getters: {
         playlists() {
-            if (this.playlists_cache !== null) {
+            if (this.playlists_fetched) {
                 return this.playlists_cache;
             }
-            this.playlists_cache = [];
             this.fetchPlaylists();
             return this.playlists_cache;
         },
@@ -23,14 +23,26 @@ export const usePlaylistsStore = defineStore({
                 description: null,
                 private: !is_public,
             });
-            if (this.playlists_cache === null) {
-                this.playlists_cache = [];
-            }
             this.playlists_cache.push(playlist);
         },
         async fetchPlaylists() {
-            this.playlists_cache =
-                await Service.getMyPlaylistsApiV1PlaylistsGet();
+            this.playlists_cache = [
+                ...this.playlists_cache,
+                ...(await Service.getMyPlaylistsApiV1PlaylistsGet()),
+            ];
+            this.playlists_fetched = true;
+        },
+        async addTrackToPlaylist({ playlistId, trackId }) {
+            await Service.addTrackToPlaylistApiV1PlaylistsPlaylistIdTrackTrackIdPost(
+                trackId,
+                playlistId
+            );
+            this.playlists_cache = this.playlists_cache.map((playlist) => {
+                if (playlist.id === playlistId) {
+                    playlist.tracks_count += 1;
+                }
+                return playlist;
+            });
         },
     },
 });

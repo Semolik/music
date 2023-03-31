@@ -83,6 +83,10 @@ const props = defineProps({
         type: String,
         default: "",
     },
+    closeOnEsckey: {
+        type: Boolean,
+        default: false,
+    },
 });
 const modalStateBus = useEventBus("modal-state");
 const emit = defineEmits(["update:active", "mounted", "close"]);
@@ -111,7 +115,15 @@ const closeModal = () => {
         isClosing.value = false;
     }, props.transition);
 };
-
+if (props.closeOnEsckey) {
+    onMounted(() => {
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closeModal();
+            }
+        });
+    });
+}
 const openModal = () => {
     isActive.value = true;
     setTimeout(() => {
