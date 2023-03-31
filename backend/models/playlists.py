@@ -64,10 +64,6 @@ class Playlist(Base):
 
 class PlaylistTrack(Base):
     __tablename__ = 'playlists_tracks'
-    time_created = Column(
-        DateTime(timezone=True),
-        server_default=func.now()
-    )
     playlist_id = Column(
         UUID(as_uuid=True),
         ForeignKey("playlists.id"),
@@ -81,11 +77,6 @@ class PlaylistTrack(Base):
         nullable=False,
         primary_key=True,
         index=True
-    )
-    user_id = Column(
-        Integer,
-        ForeignKey("users.id"),
-        nullable=False,
     )
     track = relationship("Track", foreign_keys=[track_id], backref=backref(
         "playlists_tracks", cascade="delete, delete-orphan"))

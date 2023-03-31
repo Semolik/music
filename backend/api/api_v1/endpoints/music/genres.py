@@ -88,6 +88,7 @@ def update_genre(
     responses={**NOT_FOUND_GENRE},
     response_model=GenreFullInfo)
 def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth: Authenticate = Depends(Authenticate(required=False))):
+    '''Получение информации о жанре'''
     genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
     if not genre:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -125,6 +126,7 @@ def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth
     },
     response_model=GenreStats)
 def get_genre_info(genre_id: int = Path(..., ge=1), Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+    '''Получение статистики по жанру'''
     genre = GenresCruds(db=Auth.db).get_genre_by_id(genre_id)
     if not genre:
         raise HTTPException(

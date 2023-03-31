@@ -13,11 +13,11 @@ const searchIsActive = ref(false);
 
 onMounted(() => {
     window.addEventListener("keydown", (event) => {
-        if (event.ctrlKey && event.key === "k") {
+        if (event.ctrlKey && event.key === "k" && !searchIsActive.value) {
             event.preventDefault();
             searchIsActive.value = !searchIsActive.value;
         }
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && searchIsActive.value) {
             searchIsActive.value = false;
         }
     });

@@ -7,6 +7,7 @@
         :max-height="650"
         off-justify-content
         @close="resetSearchBus.emit()"
+        with-event-bus
     >
         <template #header>
             <span class="font-medium mb-2 p-2 text-center">

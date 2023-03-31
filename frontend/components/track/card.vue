@@ -41,12 +41,23 @@
                                 }}
                             </span>
                         </div>
-
-                        <div class="menu-item">
+                        <div
+                            class="menu-item"
+                            @click="
+                                () => {
+                                    menuOpened = false;
+                                    shareModalOpened = true;
+                                }
+                            "
+                        >
                             <Icon :name="IconsNames.shareIcon" />
                             <span> Поделиться </span>
                         </div>
                     </div>
+                    <Share
+                        :active="shareModalOpened"
+                        @update:active="shareModalOpened = $event"
+                    />
                 </div>
             </div>
         </template>
@@ -60,6 +71,7 @@
                 addToPlaylistModalOpened = false;
             }
         "
+        key="playlist-modal"
         close-on-esckey
     >
         <template #content>
@@ -132,11 +144,10 @@ import { onClickOutside } from "@vueuse/core";
 import { Service } from "@/client";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
-import { routesNames } from "@typed-router";
+import { useEventBus } from "@vueuse/core";
 const playlistsStore = usePlaylistsStore();
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
-
 const { track } = defineProps({
     track: {
         type: Object,
@@ -144,18 +155,17 @@ const { track } = defineProps({
     },
 });
 const emit = defineEmits(["update:track"]);
-const router = useRouter();
-const goToLogin = () => {
-    router.push({ name: routesNames.login });
-};
+
+const goToLoginBus = useEventBus("go-to-login");
 const toggleLikeTrack = async () => {
     if (!logined.value) {
-        goToLogin();
+        goToLoginBus.emit();
         return;
     }
     const liked = await Service.likeTrackApiV1TracksTrackIdLikePut(track.id);
     emit("update:track", { ...track, liked });
 };
+const shareModalOpened = ref(false);
 const addToPlaylistModalOpened = ref(false);
 const card = ref(null);
 const menuOpened = ref(false);
@@ -165,9 +175,14 @@ const newPlaylistPublic = ref(false);
 const newPlaylistButtonActive = computed(() => {
     return newPlaylistName.value.length > 0;
 });
+watch(menuOpened, (value) => {
+    if (value) {
+        addToPlaylistModalOpened.value = false;
+    }
+});
 const openAddToPlaylistModal = () => {
     if (!logined.value) {
-        goToLogin();
+        goToLoginBus.emit();
         return;
     }
     addToPlaylistModalOpened.value = true;

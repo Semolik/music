@@ -107,7 +107,6 @@ const isClosing = ref(false);
 const isActive = ref(true);
 const closeModal = () => {
     isClosing.value = true;
-
     setTimeout(() => {
         emit("update:active", false);
         emit("close");
@@ -118,7 +117,7 @@ const closeModal = () => {
 if (props.closeOnEsckey) {
     onMounted(() => {
         window.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
+            if (e.key === "Escape" && props.active) {
                 closeModal();
             }
         });
@@ -130,16 +129,13 @@ const openModal = () => {
         emit("mounted");
     }, props.transition);
 };
-watch(
-    () => props.active,
-    (value) => {
-        if (value) {
-            openModal();
-        } else {
-            closeModal();
-        }
+watch(props, (value) => {
+    if (value.active) {
+        openModal();
+    } else {
+        closeModal();
     }
-);
+});
 const unsubscribe = modalStateBus.on((state) => {
     if (state) {
         openModal();
