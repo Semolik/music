@@ -1,10 +1,8 @@
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum
-from sqlalchemy.orm import relationship, backref, scoped_session
+from sqlalchemy.orm import relationship, backref, object_session
 from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
-from backend.db.session import SessionLocal
-session = scoped_session(SessionLocal)
 
 
 class FavoriteMusicians(Base):
@@ -129,7 +127,7 @@ class PublicProfile(Base):
     @property
     def likes(self):
         if not hasattr(self, '_likes_count'):
-            self._likes_count = session.query(
+            self._likes_count = object_session(self).query(
                 FavoriteMusicians
             ).filter(
                 FavoriteMusicians.musician_id == self.id

@@ -1,11 +1,8 @@
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime, Enum, Boolean
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship, backref
 import enum
-from backend.core.config import settings
 
 
 class ChangeRoleRequestStatus(str, enum.Enum):

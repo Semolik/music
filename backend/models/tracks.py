@@ -1,17 +1,14 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, Boolean, event
+from sqlalchemy.orm import relationship, backref
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import uuid
-from sqlalchemy.orm import backref
-from sqlalchemy import event
 from pathlib import Path
 import os
 from backend.core.config import settings
 from sqlalchemy.ext.hybrid import hybrid_property
-
 from backend.models.albums import Album
 
 
