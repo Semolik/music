@@ -129,13 +129,16 @@ const openModal = () => {
         emit("mounted");
     }, props.transition);
 };
-watch(props, (value) => {
-    if (value.active) {
-        openModal();
-    } else {
-        closeModal();
+watch(
+    () => props.active,
+    (value) => {
+        if (value) {
+            openModal();
+        } else {
+            closeModal();
+        }
     }
-});
+);
 const unsubscribe = modalStateBus.on((state) => {
     if (state) {
         openModal();

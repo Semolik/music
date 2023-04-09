@@ -181,6 +181,7 @@ watch(menuOpened, (value) => {
     }
 });
 const openAddToPlaylistModal = () => {
+    console.log(logined.value);
     if (!logined.value) {
         goToLoginBus.emit();
         return;

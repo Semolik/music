@@ -52,8 +52,7 @@ class PlaylistsCrud(CRUDBase):
         for track_id in tracks_ids:
             playlist_track = PlaylistTrack(
                 playlist_id=playlist.id,
-                track_id=track_id,
-                user_id=user_id
+                track_id=track_id
             )
             self.db.add(playlist_track)
         self.db.commit()

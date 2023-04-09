@@ -38,8 +38,18 @@ class Authenticate:
         self.current_user = None
 
         if self.required:
-            Authorize.jwt_required()
-            current_user_id = Authorize.get_jwt_subject()
+            try:
+                Authorize.jwt_required()
+                current_user_id = Authorize.get_jwt_subject()
+            except:
+                if self.required:
+                    print(self.required)
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Необходима авторизация"
+                    )
+                else:
+                    return self
         else:
             try:
                 Authorize.jwt_optional()
@@ -51,10 +61,14 @@ class Authenticate:
             return self
         db_user = UserCruds(db).get_user_by_id(user_id=current_user_id)
         if not db_user:
-            raise HTTPException(
-                status_code=403,
-                detail="Авторизованный пользователь не найден"
-            )
+            if self.required:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Авторизованный пользователь не найден"
+                )
+            else:
+                Authorize.unset_jwt_cookies()
+                return self
         if not self.only_user and db_user.type not in self.types:
             raise HTTPException(
                 status_code=403,
