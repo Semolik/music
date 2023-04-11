@@ -181,7 +181,6 @@ watch(menuOpened, (value) => {
     }
 });
 const openAddToPlaylistModal = () => {
-    console.log(logined.value);
     if (!logined.value) {
         goToLoginBus.emit();
         return;
@@ -302,9 +301,12 @@ const duration = computed(() =>
         &.active {
             background-color: $secondary-bg;
         }
-        &:hover {
-            background-color: $quaternary-bg;
+        @include lg {
+            &:hover {
+                background-color: $quaternary-bg;
+            }
         }
+
         &::after {
             content: "";
             position: absolute;
@@ -331,8 +333,10 @@ const duration = computed(() =>
                 cursor: pointer;
                 border-radius: 5px;
                 padding: 5px 10px;
-                &:hover {
-                    background-color: $quaternary-bg;
+                @include lg {
+                    &:hover {
+                        background-color: $quaternary-bg;
+                    }
                 }
                 svg {
                     width: 20px;

@@ -3,7 +3,7 @@
         <div class="default-layout">
             <AppAside v-if="$viewport.isGreaterOrEquals('lg')" />
             <div class="content-container">
-                <AppHeader v-if="$viewport.isGreaterOrEquals('lg')" />
+                <AppHeader />
                 <div class="app-content">
                     <slot />
                 </div>
@@ -33,6 +33,7 @@
         overflow-x: hidden;
         .app-content {
             flex-grow: 1;
+            padding-top: 10px;
             padding-inline: 20px;
             @include lg(true) {
                 padding: 10px;

@@ -1,4 +1,3 @@
-import { routesNames } from "@typed-router";
 import { IconsNames } from "./icons";
 const { playlistIcon, albumIcon, trackIcon, userIcon, historyIcon } =
     IconsNames;
@@ -8,27 +7,27 @@ const menuSelections = [
         links: [
             {
                 icon: trackIcon,
-                to: { name: routesNames.favoriteTracks },
+                to: { name: "favorite-tracks" },
                 text: "Треки",
             },
             {
                 icon: albumIcon,
-                to: { name: routesNames.favoriteAlbums },
+                to: { name: "favorite-albums" },
                 text: "Альбомы",
             },
             {
                 icon: userIcon,
-                to: { name: routesNames.favoriteArtists },
+                to: { name: "favorite-artists" },
                 text: "Исполнители",
             },
             {
                 icon: playlistIcon,
-                to: { name: routesNames.favoritePlaylists },
+                to: { name: "favorite-playlists" },
                 text: "Плейлисты",
             },
             {
                 icon: historyIcon,
-                to: { name: routesNames.history },
+                to: { name: "history" },
                 text: "История",
             },
         ],

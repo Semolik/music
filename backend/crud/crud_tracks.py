@@ -31,7 +31,7 @@ class TracksCrud(CRUDBase):
 
     def get_liked_tracks(self, user_id: int, page: int) -> List[Track]:
         end = page * settings.PAGINATION_LIMIT
-        return self.db.query(Track, Album).join(FavoriteTracks).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
+        return self.db.query(Track).join(FavoriteTracks, Album).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
 
     def get_last_listened_tracks(self, user_id: int, page: int, page_size: int = settings.PAGINATION_LIMIT) -> List[ListenTrackHistoryItem]:
         end = page * page_size

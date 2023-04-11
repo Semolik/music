@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
-import { routesNames, navigateTo } from "@typed-router";
+import { routesNames } from "@typed-router";
 export const useAuthMiddleware = async (context, userType) => {
     const authStore = useAuthStore();
     const { logout, refresh } = authStore;

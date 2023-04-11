@@ -1,16 +1,56 @@
 <template>
-    <header>
-        <div class="search-button" @click="searchIsActive = true">
-            <Icon name="material-symbols:search-rounded" />
-            <span class="button-text"> Поиск </span>
-            <span class="button-hotkey-text"> Ctrl + K </span>
+    <header :class="{ 'header-bar-active': headerBarActive }">
+        <template v-if="!headerBarActive">
+            <div class="search-button" @click="searchIsActive = true">
+                <Icon name="material-symbols:search-rounded" />
+                <span class="button-text">Поиск</span>
+                <span class="button-hotkey-text">Ctrl + K</span>
+            </div>
+            <AppHeaderSearch v-model:searchActive="searchIsActive" />
+        </template>
+        <div class="header-bar" v-else>
+            <div class="current-page-title" v-if="currentPageTitle">
+                {{ currentPageTitle }}
+            </div>
+            <ClientOnly>
+                <div class="links" v-if="links.length">
+                    <nuxt-link
+                        v-for="link in links"
+                        :key="link.name"
+                        :to="{ name: link.name }"
+                        class="header-bar-link"
+                    >
+                        {{ link.title }}
+                    </nuxt-link>
+                </div>
+            </ClientOnly>
         </div>
-        <AppHeaderSearch v-model:searchActive="searchIsActive" />
     </header>
 </template>
 <script setup>
+const viewport = useViewport();
+const router = useRouter();
+const links = computed(() => router.currentRoute.value.meta.headerLinks || []);
+const headerBarActive = ref(false);
+watch(
+    [viewport.breakpoint, router.currentRoute],
+    ([breakpoint, route]) => {
+        headerBarActive.value =
+            viewport.isLessThan("lg") || route.name !== "index";
+    },
+    { immediate: true }
+);
 const searchIsActive = ref(false);
 
+const currentPageTitle = ref(null);
+useHead({
+    title: currentPageTitle,
+});
+watch(
+    router.currentRoute,
+    (value) => (currentPageTitle.value = value.meta?.title),
+    { immediate: true }
+);
 onMounted(() => {
     window.addEventListener("keydown", (event) => {
         if (event.ctrlKey && event.key === "k") {
@@ -27,10 +67,66 @@ onUnmounted(() => {
     window.removeEventListener("keydown", () => {});
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 header {
     padding: 20px;
+    padding-bottom: 0;
     display: flex;
+    &.header-bar-active {
+        padding: 0px;
+    }
+    .header-bar {
+        color: $primary-text;
+        width: 100%;
+        padding: 20px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 20px;
+        @include lg(true) {
+            flex-direction: column;
+            padding: 10px;
+            padding-bottom: 0;
+        }
+        .current-page-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: $secondary-text;
+            @include lg(true) {
+                text-align: center;
+                width: 100%;
+                padding-top: 5px;
+            }
+        }
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            @include lg(true) {
+                width: 100%;
+            }
+            .header-bar-link {
+                font-weight: 500;
+                color: $secondary-text;
+                border: 1px solid $tertiary-text;
+                padding: 5px 20px;
+                border-radius: 5px;
+                @include flex-center;
+                @include lg(true) {
+                    flex-grow: 1;
+                }
+                &.router-link-active {
+                    border-color: $accent;
+                    background-color: $accent;
+                    color: $primary-bg;
+                }
+                &:not(.router-link-active):hover {
+                    border-color: $accent;
+                    color: $accent;
+                }
+            }
+        }
+    }
 
     .search-button {
         @include flex-center;

@@ -1,5 +1,5 @@
 <template>
-    <card-min v-bind="props" v-if="min" @click="emit('card-click')">
+    <card-min v-bind="props" v-if="min" @click="onCardClick">
         <template #content>
             <span>{{ playlist.name }}</span>
             <div class="flex gap-3px items-center secondary-text text-sm">
@@ -16,9 +16,9 @@
             <slot name="card-end" />
         </template>
     </card-min>
-    <card v-bind="props" v-else @picture-click="emit('card-click')">
+    <card @click="onCardClick" v-bind="props" v-else>
         <div class="flex flex-col grow">
-            <span class="font-medium">{{ playlist.name }}</span>
+            <span class="primary-text font-medium">{{ playlist.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
                 <span> Количество треков: {{ playlist.tracks_count }}</span>
             </div>
@@ -27,8 +27,9 @@
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
+import { routesNames } from "@typed-router";
 const emit = defineEmits(["card-click"]);
-const { playlist, min, hideEndIcon } = defineProps({
+const { playlist, min, hideEndIcon, isLink } = defineProps({
     playlist: {
         type: Object,
         required: true,
@@ -41,8 +42,21 @@ const { playlist, min, hideEndIcon } = defineProps({
         type: Boolean,
         default: false,
     },
+    isLink: {
+        type: Boolean,
+        default: false,
+    },
 });
-
+const router = useRouter();
+const onCardClick = () => {
+    emit("card-click");
+    if (isLink) {
+        router.push({
+            name: routesNames.playlistId,
+            params: { id: playlist.id },
+        });
+    }
+};
 const props = reactive({
     picture: playlist.picture,
     icon: IconsNames.playlistIcon,
