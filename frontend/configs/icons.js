@@ -24,4 +24,11 @@ export const IconsNames = {
     imageIcon: "material-symbols:image",
     shareIcon: "material-symbols:share",
     backIcon: "material-symbols:arrow-back",
+    forwardIcon: "material-symbols:arrow-forward",
+    copyIcon: "material-symbols:content-copy-rounded",
+    checkIcon: "material-symbols:check-box-rounded",
+    telegramIcon: "mdi:telegram",
+    vkIcon: "ion:logo-vk",
+    filter: "material-symbols:filter-alt",
+    close: "material-symbols:close",
 };

@@ -7,22 +7,22 @@ const menuSelections = [
         links: [
             {
                 icon: trackIcon,
-                to: { name: "favorite-tracks" },
+                to: { name: "library-tracks" },
                 text: "Треки",
             },
             {
                 icon: albumIcon,
-                to: { name: "favorite-albums" },
+                to: { name: "library-albums" },
                 text: "Альбомы",
             },
             {
                 icon: userIcon,
-                to: { name: "favorite-artists" },
+                to: { name: "library-artists" },
                 text: "Исполнители",
             },
             {
                 icon: playlistIcon,
-                to: { name: "favorite-playlists" },
+                to: { name: "library-playlists" },
                 text: "Плейлисты",
             },
             {

@@ -56,7 +56,6 @@ class PlaylistInfo(PlaylistInfoWithoutTracks):
 class PlaylistTrack(BaseModel):
     track: Track = Query(..., description='Трек')
     playlist: PlaylistInfoWithoutTracks = Query(..., description='Плейлист')
-    user_id: int = Query(..., description='id пользователя')
 
     class Config:
         orm_mode = True

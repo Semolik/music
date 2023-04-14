@@ -4,6 +4,7 @@ from uuid import UUID
 from backend.db.base import CRUDBase
 from backend.core.config import settings
 from backend.models.albums import Album
+from backend.models.playlists import Playlist, PlaylistTrack
 from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
 from backend.schemas.statistics import TrackStats, StatsDay
 from sqlalchemy import func
@@ -107,3 +108,7 @@ class TracksCrud(CRUDBase):
             total_listens=total_count,
             calendar=days
         )
+
+    def get_my_track_playlists(self, track_id: int, user_id: int) -> List[Playlist]:
+        return self.db.query(Playlist).join(PlaylistTrack).filter(
+            PlaylistTrack.track_id == track_id, Playlist.user_id == user_id).all()

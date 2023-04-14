@@ -33,22 +33,25 @@ const { text, picture, icon, borderRadius } = defineProps({
 .card-min {
     padding: 7px;
     display: grid;
-    grid-template-columns: 50px 1fr min-content;
+    grid-template-columns: min-content 1fr min-content;
     min-height: 70px;
     max-height: 70px;
-    gap: 20px;
+    gap: 10px;
     background-color: $quaternary-bg;
     border-radius: 10px;
     color: $secondary-text;
-    &:hover {
-        background-color: $quinary-bg;
-        cursor: pointer;
+    @include lg {
+        &:hover {
+            background-color: $quinary-bg;
+            cursor: pointer;
+        }
     }
     .card-min-content {
         display: flex;
         flex-direction: column;
         justify-content: center;
         flex-grow: 1;
+        width: 100%;
     }
 }
 </style>

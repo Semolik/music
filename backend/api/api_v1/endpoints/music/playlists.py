@@ -59,7 +59,7 @@ def get_playlist_info(
         playlist_id=playlist_id,
         user_id=Auth.current_user_id
     ), user_id=Auth.current_user_id, db=Auth.db)
-    return
+    return playlist_obj
 
 
 @router.post('', response_model=PlaylistInfo)
@@ -129,8 +129,7 @@ def add_track_to_playlist(
                             detail="Трек уже есть в плейлисте")
     return playlist_crud.add_track_to_playlist(
         playlist_id=playlist_id,
-        track_id=track_id,
-        user_id=Auth.current_user_id
+        track_id=track_id
     )
 
 

@@ -29,6 +29,8 @@ const { active, borderRadius } = defineProps({
     border-radius: v-bind(borderRadius);
     width: 100%;
     user-select: none;
+    position: relative;
+    overflow: hidden;
 
     &.active {
         background-color: var(--app-button-active-bg, $accent);

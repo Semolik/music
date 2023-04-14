@@ -59,17 +59,16 @@ class PlaylistsCrud(CRUDBase):
         return playlist
 
     def get_tracks_by_playlist_id(self, playlist_id: UUID, user_id: int) -> List[Track]:
-        return self.db.query(Track).join(PlaylistTrack, Album).filter(Album.is_available, PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.user_id == user_id).all()
+        return self.db.query(Track).join(PlaylistTrack, Playlist, Album).filter(Album.is_available, PlaylistTrack.playlist_id == playlist_id, Playlist.user_id == user_id).all()
 
     def get_playlist_track(self, playlist_id: UUID, track_id: UUID, user_id: int) -> PlaylistTrack:
-        return self.db.query(PlaylistTrack).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id, PlaylistTrack.user_id == user_id).first()
+        return self.db.query(PlaylistTrack).join(Playlist).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id, Playlist.user_id == user_id).first()
 
-    def add_track_to_playlist(self, playlist_id: UUID, track_id: UUID, user_id: int) -> PlaylistTrack:
+    def add_track_to_playlist(self, playlist_id: UUID, track_id: UUID) -> PlaylistTrack:
         return self.create(
             PlaylistTrack(
                 playlist_id=playlist_id,
-                track_id=track_id,
-                user_id=user_id
+                track_id=track_id
             )
         )
 

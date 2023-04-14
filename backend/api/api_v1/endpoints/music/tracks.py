@@ -3,25 +3,21 @@ from typing import List
 from fastapi import Depends, APIRouter,  status, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
-from fastapi_jwt_auth import AuthJWT
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
-from backend.db.base import CRUDBase
 from backend.crud.crud_tracks import TracksCrud
-from backend.db.db import get_db
-from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import set_full_track_data, set_tracks_likes
+from backend.helpers.music import set_tracks_likes
 from backend.models.albums import Album
-from backend.responses import NOT_FOUND_TRACK, UNAUTHORIZED_401
 from backend.schemas.music import Track
 import uuid as uuid_pkg
 from backend.core.config import settings
+from backend.schemas.playlists import PlaylistInfoWithoutTracks
 from backend.schemas.statistics import TrackStats
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 
-@router.put('/{track_id}/like', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=bool)
+@router.put('/{track_id}/like',  response_model=bool)
 def like_track(
     track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),
@@ -38,7 +34,7 @@ def like_track(
     return liked
 
 
-@router.get('/liked', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=List[Track])
+@router.get('/liked',  response_model=List[Track])
 def get_liked_tracks(
     page: int = Query(1, description="Номер страницы"),
     Auth: Authenticate = Depends(Authenticate()),
@@ -80,7 +76,7 @@ def get_popular_tracks_month(
     return set_tracks_likes(tracks=popular_tracks, user_id=Auth.current_user_id, db=Auth.db)
 
 
-@router.get('/{track_id}', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=Track)
+@router.get('/{track_id}',  response_model=Track)
 def get_track(
     track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate(required=False)),
@@ -104,7 +100,22 @@ def get_track(
     return track_obj
 
 
-@router.get('/{track_id}/stats', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, response_model=TrackStats)
+@router.get('/{track_id}/playlists/my',  response_model=List[PlaylistInfoWithoutTracks])
+def get_track_playlists(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate())):
+    '''Получение ваших плейлистов, в которых есть трек'''
+    tracks_crud = TracksCrud(db=Auth.db)
+    track = tracks_crud.get_track(track_id=track_id)
+    if not track:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Трек не найден'
+        )
+    playlists = tracks_crud.get_my_track_playlists(
+        track_id=track_id, user_id=Auth.current_user_id)
+    return playlists
+
+
+@router.get('/{track_id}/stats',  response_model=TrackStats)
 def get_track_statistics(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate(is_admin=True, is_musician=True))):
     '''Получение статистики по треку'''
     tracks_crud = TracksCrud(db=Auth.db)
@@ -126,7 +137,7 @@ def get_track_statistics(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(A
     return tracks_crud.get_track_statistics(track=track)
 
 
-@router.post('/{track_id}/listening', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)
+@router.post('/{track_id}/listening',  status_code=status.HTTP_204_NO_CONTENT)
 def start_listening_track(
     track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),
@@ -146,7 +157,7 @@ def start_listening_track(
             track_id=db_track.id, user_id=Auth.current_user_id, time=time)
 
 
-@router.put('/{track_id}/listening', responses={**UNAUTHORIZED_401, **NOT_FOUND_TRACK}, status_code=status.HTTP_204_NO_CONTENT)
+@router.put('/{track_id}/listening',  status_code=status.HTTP_204_NO_CONTENT)
 def set_listened_track(
     track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),

@@ -10,6 +10,7 @@
                 :key="track.id"
                 v-model:track="tracks[index]"
                 class="track-card"
+                :min="$viewport.isGreaterOrEquals('lg')"
             />
         </div>
     </Selection>

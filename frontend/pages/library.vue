@@ -6,19 +6,19 @@ definePageMeta({
     middleware: ["auth"],
     headerLinks: [
         {
-            name: "favorite-playlists",
+            name: "library-playlists",
             title: "Плейлисты",
         },
         {
-            name: "favorite-tracks",
+            name: "library-tracks",
             title: "Треки",
         },
         {
-            name: "favorite-albums",
+            name: "library-albums",
             title: "Альбомы",
         },
         {
-            name: "favorite-artists",
+            name: "library-artists",
             title: "Исполнители",
         },
     ],
@@ -28,17 +28,6 @@ definePageMeta({
 const router = useRouter();
 
 if (!router.currentRoute.value.name) {
-    router.push({ name: "favorite-playlists" });
+    router.push({ name: "library-playlists" });
 }
 </script>
-<style lang="scss" scoped>
-.favorite-page-container {
-    display: flex;
-    flex-direction: column;
-    .favorite-page-title {
-        font-size: 2.5rem;
-        font-weight: 500;
-        color: $secondary-text;
-    }
-}
-</style>

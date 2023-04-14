@@ -16,11 +16,16 @@
             <slot name="card-end" />
         </template>
     </card-min>
-    <card @click="onCardClick" v-bind="props" v-else>
+    <card
+        @click="onCardClick"
+        v-bind="props"
+        v-else
+        :class="{ 'is-link': isLink }"
+    >
         <div class="flex flex-col grow">
             <span class="primary-text font-medium">{{ playlist.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
-                <span> Количество треков: {{ playlist.tracks_count }}</span>
+                <span>Количество треков: {{ playlist.tracks_count }}</span>
             </div>
         </div>
     </card>
@@ -62,3 +67,15 @@ const props = reactive({
     icon: IconsNames.playlistIcon,
 });
 </script>
+<style scoped lang="scss">
+.is-link {
+    background-color: $secondary-bg;
+    padding: 10px;
+    border-radius: 10px;
+    @include lg {
+        &:hover {
+            background-color: $secondary-bg-2;
+        }
+    }
+}
+</style>

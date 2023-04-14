@@ -47,7 +47,7 @@ class Track(Base):
         ForeignKey("public_profiles.id"),
         nullable=False
     )
-    artist = relationship(
+    musician = relationship(
         "PublicProfile",
         foreign_keys=[artist_id]
     )

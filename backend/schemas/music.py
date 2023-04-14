@@ -158,7 +158,9 @@ class AlbumWithTracks(AlbumInfo):
 
 
 class Track(AlbumTrack):
-    album: AlbumInfo = Query(..., description="Информация об альбоме")
+    album: AlbumInfoWithoutMusician = Query(...,
+                                            description="Информация об альбоме")
+    musician: PublicProfile = Query(..., description="Информация о музыканте")
 
     class Config:
         orm_mode = True
