@@ -1,11 +1,22 @@
-<h1>Getting started</h1>
+<h1>Cкриншоты сайта</h1>
 
-<h3>Requirements</h3>
+## [Главная страница](/docs/home/README.md)
+
+## [Библиотека](/docs/library/README.md)
+
+## [Поиск](/docs/search/README.md)
+
+## [Кабинет администратора](/docs/admin-cabinet/README.md)
+
+<h1>Настройка</h1>
+
+<h3>Зависимости</h3>
 
     - Python 3.10
     - ffmpeg
+    - PostgreSQL
 
-<h3>Install</h3>
+<h3>Установка</h3>
 
     cd backend
     pip install -r reqirements.txt
@@ -15,8 +26,9 @@
     cd frontend
     npm i
 
-<h3>Setting</h3>
-create a .env.local file in the root folder with the following content
+<h3>Настройка</h3>
+
+Создайте файл .env.local в корневой папке с следующим содержимым
 
     DB_NAME=*****
     DB_USER=*****
@@ -24,12 +36,14 @@ create a .env.local file in the root folder with the following content
     DB_PORT=5432
     DB_HOST=localhost
 
-<h3>Run</h3>
+<h3>Запуск</h3>
 
 <h4>backend</h4>
 
     uvicorn backend.main:app --host localhost
 
 <h4>frontend</h4>
+
+Запускать только после запуска backend (делается запрос для генерации клиента API)
 
     npm run dev
