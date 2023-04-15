@@ -1,5 +1,12 @@
 <template>
     <div class="favorite-page-container">
+        <Transition name="fade">
+            <div
+                @click="filtersMenuOpened = false"
+                class="bg"
+                v-if="filtersMenuOpened"
+            ></div>
+        </Transition>
         <div class="buttons-line">
             <div
                 :class="[
@@ -11,24 +18,35 @@
                 <div
                     class="filters-button filter"
                     @click="filtersMenuOpened = !filtersMenuOpened"
+                    ref="filtersButton"
                 >
-                    <div class="text">Фильтры</div>
-                    <Icon :name="IconsNames.filter" />
+                    Фильтры
                 </div>
-                <nuxt-link
+                <div
                     class="filters-button add"
-                    :to="{ name: 'library-playlists-add' }"
+                    @click="createPlaylistModalOpened = true"
                 >
-                    <div class="text">Создать плейлист</div>
-                    <Icon :name="IconsNames.plusIcon" />
-                </nuxt-link>
-                <div class="bg" @click="filtersMenuOpened = false"></div>
+                    Создать плейлист
+                </div>
+                <ModalDialog
+                    @close="createPlaylistModalOpened = false"
+                    :active="createPlaylistModalOpened"
+                >
+                    <template #content>
+                        <PlaylistCreateModalContent
+                            @creared="onCreatedPlaylist"
+                        />
+                    </template>
+                </ModalDialog>
                 <div class="filters-menu" ref="filtersMenu">
                     <div
                         class="filter-item"
                         v-for="(filter, name) in filters"
                         :key="filter.title"
                     >
+                        <div class="disabled" v-if="filter.disabled">
+                            <Icon name="material-symbols:lock" />
+                        </div>
                         <div class="title">{{ name }}</div>
                         <div class="values">
                             <div
@@ -75,6 +93,8 @@ import { Service } from "@/client";
 import { IconsNames } from "~~/configs/icons";
 const filtersMenuOpened = ref(false);
 const filtersMenu = ref(null);
+const createPlaylistModalOpened = ref(false);
+
 var filters = reactive({
     "Сортировать по": {
         values: ["Названию", "Дате добавления"],
@@ -82,14 +102,15 @@ var filters = reactive({
         default: "Названию",
     },
     Тип: {
-        values: ["Публичные", "Приватные"],
+        values: ["Все", "Приватные"],
         active: null,
-        default: "Публичные",
+        default: "Все",
     },
     Создатель: {
         values: ["Все", "Мои"],
         active: null,
         default: "Все",
+        disabled: false,
     },
     "Направление сортировки": {
         values: ["По возрастанию", "По убыванию"],
@@ -99,54 +120,95 @@ var filters = reactive({
 });
 const fething = ref(false);
 const playlists = ref([]);
+const reseting = ref(false);
+const getPlaylists = async () => {
+    fething.value = true;
+    playlists.value = [];
+    const order_by =
+        filters["Сортировать по"].active === "Названию" ? "name" : "created_at";
+    const order =
+        filters["Направление сортировки"].active === "По возрастанию"
+            ? "asc"
+            : "desc";
+    const owned_only = filters["Создатель"].active === "Мои" ? true : false;
+    const private_ = filters["Тип"].active === "Приватные" ? true : false;
+    playlists.value = await Service.getMyPlaylistsApiV1PlaylistsGet(
+        order_by,
+        order,
+        owned_only,
+        private_
+    );
+    fething.value = false;
+};
 watch(
     filters,
-    async () => {
-        fething.value = true;
-        playlists.value = [];
-        const order_by =
-            filters["Сортировать по"].active === "Названию"
-                ? "name"
-                : "created_at";
-        const order =
-            filters["Направление сортировки"].active === "По возрастанию"
-                ? "asc"
-                : "desc";
-        const owned_only = filters["Создатель"].active === "Мои" ? true : false;
-        const private_ = filters["Тип"].active === "Приватные" ? true : false;
-        playlists.value = await Service.getMyPlaylistsApiV1PlaylistsGet(
-            order_by,
-            order,
-            owned_only,
-            private_
-        );
-        fething.value = false;
+    async (value) => {
+        if (reseting.value) return;
+        if (value["Тип"].active === "Приватные") {
+            value["Создатель"].disabled = true;
+            value["Создатель"].active = "Мои";
+        } else {
+            value["Создатель"].disabled = false;
+        }
+        await getPlaylists();
     },
     { immediate: true }
 );
 const filtersIsActived = computed(() => {
-    return Object.values(filters).some((filter) => filter.active);
+    return Object.values(filters).some(
+        (filter) => filter.active && filter.active !== filter.default
+    );
 });
-const resetFilters = () => {
+const resetFilters = async (on_reset = false) => {
+    reseting.value = true;
     filtersMenuOpened.value = false;
     Object.values(filters).forEach((filter) => {
         filter.active = null;
+        filter.disabled = false;
     });
+
+    reseting.value = on_reset;
+    await getPlaylists();
 };
+const onCreatedPlaylist = async (playlist) => {
+    createPlaylistModalOpened.value = false;
+    await resetFilters();
+    playlists.value.unshift(playlist);
+};
+const filtersButton = ref(null);
 onMounted(() => {
-    onClickOutside(filtersMenu, () => {
+    onClickOutside(filtersMenu, (e) => {
+        if (e.target === filtersButton.value) return;
         filtersMenuOpened.value = false;
     });
 });
 </script>
 <style lang="scss" scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
 .favorite-page-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    .bg {
+        position: absolute;
+        z-index: 90;
+        background-color: rgba(0, 0, 0, 0.5);
+        transition: opacity 0.3s ease;
+        inset: 0;
+    }
     .filters {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
         position: relative;
         &.active {
             .filters-button {
@@ -159,29 +221,13 @@ onMounted(() => {
                     }
                 }
             }
-            @include lg(true) {
-                .bg {
-                    display: block;
-                }
-            }
         }
-        @include lg(true) {
-            .bg {
-                display: none;
-                position: absolute;
-                inset: 0;
-                z-index: 90;
-            }
+
+        &.opened .filters-menu {
+            opacity: 1;
+            z-index: 99;
         }
-        &.opened {
-            .filters-button.filter {
-                border-color: $accent;
-            }
-            .filters-menu {
-                opacity: 1;
-                z-index: 99;
-            }
-        }
+
         @include lg {
             &:not(.opened) {
                 .filters-button:hover {
@@ -192,28 +238,18 @@ onMounted(() => {
 
         .filters-button {
             @include flex-center;
-            width: 40px;
-            height: 40px;
             border-radius: 10px;
+            padding: 5px 20px;
+            gap: 5px;
             background-color: $tertiary-bg;
             cursor: pointer;
             color: $secondary-text;
             user-select: none;
-            border: 1px solid transparent;
             &.add {
                 margin-left: auto;
             }
-            .text {
-                display: none;
-            }
             @include lg(true) {
-                width: 100%;
-                gap: 5px;
-                height: min-content;
-                padding: 10px;
-                .text {
-                    display: block;
-                }
+                flex-grow: 1;
             }
 
             svg {
@@ -223,7 +259,7 @@ onMounted(() => {
         }
         .filters-menu {
             position: absolute;
-            top: 110%;
+            top: calc(100% + 10px);
             background-color: $quaternary-bg;
             border-radius: 10px;
             padding: 10px;
@@ -241,15 +277,13 @@ onMounted(() => {
                 border-radius: 10px;
                 cursor: pointer;
                 user-select: none;
-                height: 0px;
-                opacity: 0;
-                padding: 0;
+                padding: 5px 10px;
+                height: min-content;
+                background-color: $accent-red;
+                color: $primary-bg;
+                display: none;
                 &.active {
-                    padding: 5px 10px;
-                    height: min-content;
-                    opacity: 1;
-                    background-color: $accent-red;
-                    color: $primary-bg;
+                    display: flex;
                 }
             }
 
@@ -257,6 +291,20 @@ onMounted(() => {
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
+                position: relative;
+                .disabled {
+                    position: absolute;
+                    inset: -3px;
+                    border-radius: 10px;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    @include flex-center;
+
+                    svg {
+                        width: 30px;
+                        height: 30px;
+                        color: $secondary-text;
+                    }
+                }
                 .title {
                     font-size: 14px;
                     color: $secondary-text;

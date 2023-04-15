@@ -5,15 +5,7 @@
         leftText="Все жанры"
         leftTextLinkName="genres"
     >
-        <div class="genres-container">
-            <GenresCard
-                v-for="genre in genres"
-                :key="genre.id"
-                :genre="genre"
-                class="genre-card"
-                min
-            />
-        </div>
+        <GenresList :genres="genres" />
     </Selection>
 </template>
 <script setup>
@@ -27,14 +19,4 @@ const { all } = defineProps({
 });
 const genres = await Service.getGenresApiV1GenresGet();
 </script>
-<style lang="scss" scoped>
-.genres-container {
-    display: grid;
-    --size: 200px;
-    @include sm(true) {
-        --size: 160px;
-    }
-    grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
-    gap: 10px;
-}
-</style>
+<style lang="scss" scoped></style>

@@ -140,26 +140,7 @@
                         {{ createMode ? "Назад" : "Создать новый плейлист" }}
                     </span>
                 </AppButton>
-                <div class="create-playlist" v-if="createMode">
-                    <AppInput
-                        placeholder="Название плейлиста"
-                        v-model="newPlaylistName"
-                    />
-                    <div class="playlist-type">
-                        <span class="playlist-type-text"> Тип плейлиста </span>
-                        <AppSwitch
-                            active-text="Публичный"
-                            inactive-text="Приватный"
-                            v-model="newPlaylistPublic"
-                        />
-                    </div>
-                    <AppButton
-                        :active="newPlaylistButtonActive"
-                        @click="createPlaylist"
-                    >
-                        Создать
-                    </AppButton>
-                </div>
+                <PlaylistCreateModalContent v-if="createMode" />
                 <template v-else>
                     <div class="playlists">
                         <PlaylistCard
@@ -266,11 +247,7 @@ const addToPlaylistModalOpened = ref(false);
 const card = ref(null);
 const menuOpened = ref(false);
 const createMode = ref(false);
-const newPlaylistName = ref("");
-const newPlaylistPublic = ref(false);
-const newPlaylistButtonActive = computed(() => {
-    return newPlaylistName.value.length > 0;
-});
+
 watch(menuOpened, (value) => {
     if (value) {
         addToPlaylistModalOpened.value = false;
@@ -285,8 +262,6 @@ const openAddToPlaylistModal = () => {
 };
 watch(addToPlaylistModalOpened, (value) => {
     createMode.value = false;
-    newPlaylistName.value = "";
-    newPlaylistPublic.value = false;
     if (value) {
         menuOpened.value = false;
     }
@@ -304,14 +279,7 @@ const addTrackToPlaylist = async (playlistId) => {
 
     addToPlaylistModalOpened.value = false;
 };
-const createPlaylist = async () => {
-    await playlistsStore.createPlaylist({
-        name: newPlaylistName.value,
-        is_public: newPlaylistPublic.value,
-        trackIds: [track.id],
-    });
-    addToPlaylistModalOpened.value = false;
-};
+
 onMounted(() => {
     onClickOutside(card, () => {
         menuOpened.value = false;
@@ -369,22 +337,6 @@ const duration = computed(() =>
                         height: 20px;
                     }
                 }
-            }
-        }
-    }
-    .create-playlist {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        .playlist-type {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: auto;
-            .playlist-type-text {
-                font-size: 14px;
-                color: $secondary-text;
             }
         }
     }

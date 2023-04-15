@@ -31,4 +31,5 @@ export const IconsNames = {
     vkIcon: "ion:logo-vk",
     filter: "material-symbols:filter-alt",
     close: "material-symbols:close",
+    libraryIcon: "fluent:library-16-filled",
 };

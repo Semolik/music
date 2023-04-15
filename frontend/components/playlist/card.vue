@@ -28,7 +28,10 @@
             </div>
         </template>
         <div class="flex flex-col grow">
-            <span class="primary-text font-medium">{{ playlist.name }}</span>
+            <span
+                class="primary-text font-medium text-ellipsis overflow-hidden"
+                >{{ playlist.name }}</span
+            >
             <div class="secondary-text text-sm flex-wrap flex items-center">
                 <span>Количество треков: {{ playlist.tracks_count }}</span>
             </div>

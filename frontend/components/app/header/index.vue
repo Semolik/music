@@ -70,7 +70,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 header {
     padding: 20px;
-    padding-bottom: 0;
+    padding-bottom: 0px;
     display: flex;
     &.header-bar-active {
         padding: 0px;
@@ -79,6 +79,7 @@ header {
         color: $primary-text;
         width: 100%;
         padding: 20px;
+        padding-bottom: 0px;
         display: flex;
         align-items: baseline;
         justify-content: space-between;
@@ -110,19 +111,21 @@ header {
                 color: $secondary-text;
                 border: 1px solid $tertiary-text;
                 padding: 5px 20px;
-                border-radius: 5px;
+                border-radius: 10px;
                 @include flex-center;
                 @include lg(true) {
                     flex-grow: 1;
+                }
+                @include lg {
+                    &:not(.router-link-active):hover {
+                        border-color: $accent;
+                        color: $accent;
+                    }
                 }
                 &.router-link-active {
                     border-color: $accent;
                     background-color: $accent;
                     color: $primary-bg;
-                }
-                &:not(.router-link-active):hover {
-                    border-color: $accent;
-                    color: $accent;
                 }
             }
         }

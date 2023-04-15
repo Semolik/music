@@ -26,8 +26,7 @@ definePageMeta({
 });
 
 const router = useRouter();
-
-if (!router.currentRoute.value.name) {
+if (router.currentRoute.value.name === "library") {
     router.push({ name: "library-playlists" });
 }
 </script>

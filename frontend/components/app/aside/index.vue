@@ -1,15 +1,8 @@
 <template>
     <aside v-bind="$attrs">
         <div class="selections">
-            <MenuItem :to="{ name: 'index' }" :icon="homeIcon" text="Главная" />
-            <template v-for="selection in menuSelections">
-                <div class="selection-title" v-if="selection.name">
-                    {{ selection.name }}
-                </div>
-                <MenuItem v-for="link in selection.links" v-bind="link" />
-            </template>
+            <MenuItem v-for="link in links" :key="link.text" v-bind="link" />
         </div>
-
         <div class="account-info">
             <template v-if="logined">
                 <AppAsideProfile
@@ -40,11 +33,21 @@
     </aside>
 </template>
 <script setup>
-import { menuSelections } from "~~/configs/selections";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
-
+const links = [
+    {
+        to: { name: "index" },
+        icon: IconsNames.homeIcon,
+        text: "Главная",
+    },
+    {
+        to: { name: "library" },
+        icon: IconsNames.libraryIcon,
+        text: "Библиотека",
+    },
+];
 const { homeIcon, loginIcon } = IconsNames;
 const authStore = useAuthStore();
 const { logoutRequest } = authStore;
