@@ -22,6 +22,11 @@
         v-else
         :class="{ 'is-link': isLink }"
     >
+        <template #picture v-if="playlist.private">
+            <div class="private-icon">
+                <Icon name="material-symbols:lock" />
+            </div>
+        </template>
         <div class="flex flex-col grow">
             <span class="primary-text font-medium">{{ playlist.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
@@ -68,6 +73,19 @@ const props = reactive({
 });
 </script>
 <style scoped lang="scss">
+.private-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: $secondary-bg;
+    border-radius: 5px;
+
+    svg {
+        width: 30px;
+        height: 30px;
+        color: $secondary-text;
+    }
+}
 .is-link {
     background-color: $secondary-bg;
     padding: 10px;

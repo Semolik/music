@@ -5,7 +5,9 @@
             :icon="icon"
             :borderRadius="borderRadius"
             @click="$emit('picture-click')"
-        />
+        >
+            <slot name="picture" />
+        </CardPicture>
         <slot />
     </div>
 </template>

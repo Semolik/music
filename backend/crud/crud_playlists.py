@@ -20,10 +20,17 @@ class PlaylistsCrud(CRUDBase):
     def is_playlist_liked(self, user_id: int, playlist_id: UUID) -> bool:
         return self.db.query(FavoritePlaylist).filter(FavoritePlaylist.user_id == user_id, FavoritePlaylist.playlist_id == playlist_id).first() is not None
 
-    def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str) -> List[Playlist]:
-        query = self.db.query(Playlist).outerjoin(FavoritePlaylist).filter(or_(
-            Playlist.user_id == owner_id, FavoritePlaylist.user_id == user_id)).group_by(Playlist.id)
-
+    def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str, owned_only: bool, private: bool) -> List[Playlist]:
+        query = self.db.query(Playlist).outerjoin(FavoritePlaylist)
+        if owned_only:
+            query = query.filter(Playlist.user_id == owner_id)
+        else:
+            query = query.filter(or_(
+                Playlist.user_id == owner_id, FavoritePlaylist.user_id == user_id))
+        if private:
+            query = query.filter(Playlist.private == True,
+                                 Playlist.user_id == owner_id)
+        query = query.group_by(Playlist.id)
         if order_by == 'created_at':
             order_column = Playlist.created_at
         elif order_by == 'name':

@@ -15,6 +15,10 @@ def get_my_playlists(
         default=order_playlist_by.created_at, description='Порядок сортировки'),
     order_orientation: settings.Order = Query(
         default=settings.Order.asc, description='Направление сортировки'),
+    owned_only: bool = Query(
+        default=False, description='Показывать только мои плейлисты'),
+    private: bool = Query(
+        default=False, description='Показывать только приватные плейлисты'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Получение списка плейлистов'''
@@ -26,7 +30,9 @@ def get_my_playlists(
         user_id=Auth.current_user_id,
         owner_id=Auth.current_user_id,
         order_by=order_by,
-        order_orientation=order_orientation
+        order_orientation=order_orientation,
+        owned_only=owned_only,
+        private=private
     )
     playlists_objs = []
     for playlist in playlists:

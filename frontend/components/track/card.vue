@@ -13,7 +13,6 @@
                         {{ musicanName }}
                     </span>
                 </div>
-
                 <nuxt-link
                     class="info-item album-name"
                     v-if="!min && albumName"
@@ -29,7 +28,7 @@
                     {{ musicanName }}
                 </nuxt-link>
                 <div class="track-dots-button-container">
-                    <span>{{ duration }}</span>
+                    <span class="duration">{{ duration }}</span>
                     <div class="button" @click="toggleLikeTrack" v-if="!min">
                         <Icon
                             :name="IconsNames.likeIcon"
@@ -422,10 +421,7 @@ const duration = computed(() =>
         .info-item {
             color: $secondary-text;
             @include md(true) {
-                &.album-name,
-                &.musican-name {
-                    display: none;
-                }
+                display: none;
             }
 
             @include lg {

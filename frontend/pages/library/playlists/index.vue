@@ -15,10 +15,13 @@
                     <div class="text">Фильтры</div>
                     <Icon :name="IconsNames.filter" />
                 </div>
-                <div class="filters-button add">
+                <nuxt-link
+                    class="filters-button add"
+                    :to="{ name: 'library-playlists-add' }"
+                >
                     <div class="text">Создать плейлист</div>
                     <Icon :name="IconsNames.plusIcon" />
-                </div>
+                </nuxt-link>
                 <div class="bg" @click="filtersMenuOpened = false"></div>
                 <div class="filters-menu" ref="filtersMenu">
                     <div
@@ -94,11 +97,12 @@ var filters = reactive({
         default: "По возрастанию",
     },
 });
-
+const fething = ref(false);
 const playlists = ref([]);
 watch(
     filters,
     async () => {
+        fething.value = true;
         playlists.value = [];
         const order_by =
             filters["Сортировать по"].active === "Названию"
@@ -108,10 +112,15 @@ watch(
             filters["Направление сортировки"].active === "По возрастанию"
                 ? "asc"
                 : "desc";
+        const owned_only = filters["Создатель"].active === "Мои" ? true : false;
+        const private_ = filters["Тип"].active === "Приватные" ? true : false;
         playlists.value = await Service.getMyPlaylistsApiV1PlaylistsGet(
             order_by,
-            order
+            order,
+            owned_only,
+            private_
         );
+        fething.value = false;
     },
     { immediate: true }
 );
@@ -144,6 +153,10 @@ onMounted(() => {
                 &.filter {
                     background-color: $accent;
                     color: $primary-bg;
+
+                    &:hover {
+                        background-color: $accent-hover;
+                    }
                 }
             }
             @include lg(true) {
@@ -232,7 +245,7 @@ onMounted(() => {
                 opacity: 0;
                 padding: 0;
                 &.active {
-                    padding: 10px;
+                    padding: 5px 10px;
                     height: min-content;
                     opacity: 1;
                     background-color: $accent-red;
