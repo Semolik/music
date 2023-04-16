@@ -46,6 +46,12 @@
                     >
                         <Icon :name="IconsNames.dotsIcon" />
                         <div class="menu" v-if="menuOpened">
+                            <div class="menu-item" v-if="playlistId && logined">
+                                <Icon :name="IconsNames.deleteIcon" />
+                                <span @click="removeTrackFromPlaylist">
+                                    Удалить из плейлиста
+                                </span>
+                            </div>
                             <div
                                 class="menu-item like"
                                 @click="toggleLikeTrack"
@@ -70,6 +76,14 @@
                                     }}
                                 </span>
                             </div>
+                            <div
+                                v-if="!playlistId && logined"
+                                class="menu-item"
+                                @click="openAddToPlaylistModal"
+                            >
+                                <Icon :name="IconsNames.plusIcon" />
+                                <span> Добавить в плейлист </span>
+                            </div>
                             <nuxt-link
                                 :to="albumLink"
                                 class="menu-item"
@@ -86,13 +100,6 @@
                                 <Icon :name="IconsNames.userIcon" />
                                 <span>Перейти к исполнителю</span>
                             </nuxt-link>
-                            <div
-                                class="menu-item"
-                                @click="openAddToPlaylistModal"
-                            >
-                                <Icon :name="IconsNames.plusIcon" />
-                                <span> Добавить в плейлист </span>
-                            </div>
                             <div
                                 class="menu-item"
                                 @click="
@@ -185,8 +192,9 @@ const playlistsStore = usePlaylistsStore();
 const toast = useToast();
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
+const emit = defineEmits(["update:track", "playlist-remove-track"]);
 
-const { track, albumInfo, min, musicanInfo } = defineProps({
+const { track, albumInfo, min, musicanInfo, playlistId } = defineProps({
     track: {
         type: Object,
         required: true,
@@ -202,6 +210,10 @@ const { track, albumInfo, min, musicanInfo } = defineProps({
     min: {
         type: Boolean,
         default: false,
+    },
+    playlistId: {
+        type: String,
+        default: null,
     },
 });
 const albumLink = computed(() => {
@@ -225,7 +237,7 @@ const musicianLink = computed(() => {
         params: { id: musician_id },
     };
 });
-const emit = defineEmits(["update:track"]);
+
 const musicanName = computed(
     () =>
         musicanInfo?.name ||
@@ -247,7 +259,18 @@ const addToPlaylistModalOpened = ref(false);
 const card = ref(null);
 const menuOpened = ref(false);
 const createMode = ref(false);
-
+const removeTrackFromPlaylist = async () => {
+    try {
+        menuOpened.value = false;
+        await playlistsStore.removeTrackFromPlaylist({
+            playlistId,
+            trackId: track.id,
+        });
+        emit("playlist-remove-track", track.id);
+    } catch (e) {
+        toast.error("Не удалось удалить трек из плейлиста");
+    }
+};
 watch(menuOpened, (value) => {
     if (value) {
         addToPlaylistModalOpened.value = false;

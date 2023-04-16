@@ -15,7 +15,7 @@ from backend.helpers.music import set_album_info, set_album_tracks,  validate_ge
 from backend.helpers.users import get_public_profile_as_dict, set_musician_info
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, CreateAlbumJson, MusicianInfo, TrackAfterUpload, UpdateAlbum, UpdateAlbumJson, UploadTrackForm
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoWithoutMusician, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, CreateAlbumJson, MusicianInfo, TrackAfterUpload, UpdateAlbum, UpdateAlbumJson, UploadTrackForm
 from backend.helpers.images import save_image, set_picture
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
@@ -110,6 +110,17 @@ def get_my_albums(
         album_info = AlbumInfo.from_orm(album)
         album_info.musician = MusicianInfo.from_orm(db_musician)
         albums_obj.append(album_info)
+    return albums
+
+
+@router.get('/my/search', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfoWithoutMusician])
+def search_my_albums(
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+    text: str = Query(..., description='Строка поиска'),
+):
+    '''Поиск альбомов музыканта'''
+    albums = AlbumsCruds(Auth.db).search_my_albums(
+        user_id=Auth.current_user.id, text=text)
     return albums
 
 

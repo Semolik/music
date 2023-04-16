@@ -7,6 +7,8 @@
                 :key="track.id"
                 v-model:track="playlist.tracks[index]"
                 album-info
+                :playlist-id="playlist.id"
+                @playlist-remove-track="playlist.tracks.splice(index, 1)"
             />
         </div>
     </div>

@@ -76,21 +76,26 @@
                 </div>
             </div>
         </div>
-        <ClientOnly>
-            <div class="playlists-contaner" v-auto-animate>
-                <PlaylistCard
-                    v-for="playlist in playlists"
-                    :playlist="playlist"
-                    :key="playlist.id"
-                    is-link
-                />
-            </div>
-        </ClientOnly>
+        <CardsContainer>
+            <PlaylistCard
+                v-for="playlist in playlists"
+                :playlist="playlist"
+                :key="playlist.id"
+                is-link
+            />
+        </CardsContainer>
+        <NotFound
+            :text="
+                filtersIsActived
+                    ? 'По вашему запросу ничего не найдено'
+                    : 'У вас нет плейлистов'
+            "
+            v-if="!playlists.length && !fething"
+        />
     </div>
 </template>
 <script setup>
 import { Service } from "@/client";
-import { IconsNames } from "~~/configs/icons";
 const filtersMenuOpened = ref(false);
 const filtersMenu = ref(null);
 const createPlaylistModalOpened = ref(false);
@@ -172,8 +177,9 @@ const resetFilters = async (on_reset = false) => {
 };
 const onCreatedPlaylist = async (playlist) => {
     createPlaylistModalOpened.value = false;
-    await resetFilters();
+    reseting.value = true;
     playlists.value.unshift(playlist);
+    reseting.value = false;
 };
 const filtersButton = ref(null);
 onMounted(() => {
@@ -198,6 +204,8 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100%;
+
     .bg {
         position: absolute;
         z-index: 90;
@@ -335,15 +343,6 @@ onMounted(() => {
                 }
             }
         }
-    }
-    .playlists-contaner {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-        gap: 10px;
-        @include lg(true) {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        }
-        grid-template-rows: min-content;
     }
 }
 </style>

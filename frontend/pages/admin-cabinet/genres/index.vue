@@ -1,19 +1,10 @@
 <template>
     <div class="genres-page-container">
-        <div class="search-container">
-            <AppInput
-                class="search"
-                placeholder="Поиск по жанрам"
-                v-model="search"
-                clearable
-            />
-            <nuxt-link
-                class="add"
-                :to="{ name: routesNames.adminCabinet.cabinetGenresNew }"
-            >
-                <Icon :name="IconsNames.plusIcon" />
-            </nuxt-link>
-        </div>
+        <AddSearch
+            :to="{ name: routesNames.adminCabinet.cabinetGenresNew }"
+            v-model:search="search"
+            placeholder="Поиск по жанрам"
+        />
         <ClientOnly>
             <div class="genres" ref="genresContainer" v-auto-animate>
                 <nuxt-link
@@ -96,26 +87,6 @@ watch(search, async (value) => {
     flex-direction: column;
     gap: 5px;
     height: 100%;
-    .search-container {
-        display: grid;
-        grid-template-columns: 1fr min-content;
-        gap: 5px;
-        .search {
-            --app-input-border-radius: 5px;
-        }
-        .add {
-            border: 1px solid $quaternary-text;
-            width: 40px;
-            height: 100%;
-            border-radius: 5px;
-            @include flex-center;
-            background-color: $secondary-bg;
-
-            &:hover {
-                border-color: $tertiary-text;
-            }
-        }
-    }
 
     .empty {
         @include flex-center;

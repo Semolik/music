@@ -26,6 +26,9 @@ class AlbumsCruds(CRUDBase):
                          open_date=date, picture=db_image, genres=genres, uploaded=False)
         return self.create(model=db_album)
 
+    def search_my_albums(self, user_id: int, text: str) -> List[Album]:
+        return self.db.query(Album).join(PublicProfile, PublicProfile.user_id == user_id).filter(func.lower(Album.name).contains(text.lower())).all()
+
     def get_album_count_by_genre_id(self, genre_id: int) -> int:
         return self.db.query(AlbumGenre).filter(AlbumGenre.genre_id == genre_id).count()
 

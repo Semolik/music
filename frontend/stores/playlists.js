@@ -44,5 +44,17 @@ export const usePlaylistsStore = defineStore({
                 return playlist;
             });
         },
+        async removeTrackFromPlaylist({ playlistId, trackId }) {
+            await Service.deleteTrackFromPlaylistApiV1PlaylistsPlaylistIdTrackTrackIdDelete(
+                trackId,
+                playlistId
+            );
+            this.playlists_cache = this.playlists_cache.map((playlist) => {
+                if (playlist.id === playlistId) {
+                    playlist.tracks_count -= 1;
+                }
+                return playlist;
+            });
+        },
     },
 });

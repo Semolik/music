@@ -36,5 +36,8 @@
     },
     "overrides": {
         "vue": "latest"
+    },
+    "peerDependencies": {
+        "consola": "3.0.1"
     }
 }
