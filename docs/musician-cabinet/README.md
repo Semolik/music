@@ -1,10 +1,6 @@
-# Настройки
+# Кабинет музыканта
 
 ## [Профиль](profile/README.md)
-
-## [Безопасность](security/README.md)
-
-## [Настройка жанров](../register/setup/genres/README.md)
 
 Настольная версия
 

@@ -8,6 +8,12 @@
 
 ## [Кабинет администратора](/docs/admin-cabinet/README.md)
 
+## [Кабинет музыканта](/docs/musician-cabinet/README.md)
+
+## [Авторизация](/docs/login/README.md)
+
+## [Регистрация](/docs/register/README.md)
+
 <h1>Настройка</h1>
 
 <h3>Зависимости</h3>
