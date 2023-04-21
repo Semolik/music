@@ -4,7 +4,12 @@
             <AppAside v-if="$viewport.isGreaterOrEquals('lg')" />
             <div class="content-container">
                 <AppHeader />
-                <div class="app-content">
+                <div
+                    :class="[
+                        'app-content',
+                        { 'enable-padding': !disableDefaultLayoutPadding },
+                    ]"
+                >
                     <slot />
                 </div>
             </div>
@@ -28,23 +33,29 @@
     .content-container {
         display: flex;
         flex-direction: column;
-        // height: min-content;
-
         overflow-x: hidden;
         .app-content {
             flex-grow: 1;
-            padding-top: 10px;
-            padding-inline: 20px;
-            @include lg(true) {
-                padding: 10px;
-                padding-bottom: 80px;
+
+            .enable-padding {
+                padding-top: 10px;
+                padding-inline: 20px;
+                @include lg(true) {
+                    padding: 10px;
+                    padding-bottom: 80px;
+                }
             }
+
             height: 100%;
         }
     }
 }
 </style>
 <script setup>
+const router = useRouter();
+const disableDefaultLayoutPadding = computed(
+    () => router.currentRoute.value.meta.disableDefaultLayoutPadding
+);
 const fixIssue = (error) => {
     error.value = null;
 };

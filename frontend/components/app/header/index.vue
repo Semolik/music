@@ -8,7 +8,7 @@
             </div>
             <AppHeaderSearch v-model:searchActive="searchIsActive" />
         </template>
-        <div class="header-bar" v-else>
+        <div class="header-bar" v-else-if="links.length || currentPageTitle">
             <div class="current-page-title" v-if="currentPageTitle">
                 {{ currentPageTitle }}
             </div>

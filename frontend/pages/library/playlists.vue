@@ -128,7 +128,7 @@ const playlists = ref([]);
 const reseting = ref(false);
 const getPlaylists = async () => {
     fething.value = true;
-    playlists.value = [];
+
     const order_by =
         filters["Сортировать по"].active === "Названию" ? "name" : "created_at";
     const order =

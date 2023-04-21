@@ -6,6 +6,7 @@ from backend.core.config import env_config
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref
+from backend.models.tracks import Track
 
 
 class Playlist(Base):
@@ -60,6 +61,12 @@ class Playlist(Base):
     @hybrid_property
     def tracks_count(self):
         return len(self.playlists_tracks)
+
+    @property
+    def picture(self):
+        tracks = self.playlists_tracks
+        if tracks:
+            return tracks[0].track.picture
 
 
 class PlaylistTrack(Base):

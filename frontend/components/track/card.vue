@@ -62,11 +62,6 @@
                                             ? IconsNames.dislikeIcon
                                             : IconsNames.likeIcon
                                     "
-                                    :color="
-                                        track.liked
-                                            ? 'var(--accent-error)'
-                                            : null
-                                    "
                                 />
                                 <span>
                                     {{
@@ -325,6 +320,7 @@ const duration = computed(() =>
         flex-direction: column;
         gap: 10px;
         min-height: 300px;
+        overflow: hidden;
 
         .playlist-card {
             @include lg {
@@ -372,20 +368,32 @@ const duration = computed(() =>
     }
     &.min {
         gap: 10px;
-        .info-container .info .musican-name {
-            display: block;
+        .info-container {
+            grid-template-columns: 1fr min-content;
+            .info .musican-name {
+                display: block;
+            }
         }
     }
     .info-container {
         @include flex-center;
-        gap: 30px;
+        display: grid;
+        grid-template-columns: 1fr repeat(3, min-content);
+        gap: 20px;
+        @include md(true) {
+            grid-template-columns: 1fr min-content;
+        }
 
         .info {
             display: flex;
             flex-direction: column;
             margin-right: auto;
+            width: 100%;
+            overflow: hidden;
             .track-name {
                 color: $primary-text;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
             .musican-name {
                 @include lg {

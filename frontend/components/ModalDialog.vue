@@ -209,6 +209,7 @@ onBeforeUnmount(() => {
         flex-direction: column;
         padding: 10px;
         gap: v-bind(gapString);
+        overflow: auto;
 
         .description {
             font-size: 0.875rem;
