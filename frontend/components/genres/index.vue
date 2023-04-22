@@ -3,7 +3,7 @@
         title="Жанры"
         description="Выберите любимый жанр и начните слушать музыку"
         leftText="Все жанры"
-        leftTextLinkName="genres"
+        :leftTextLink="{ name: 'genres' }"
     >
         <GenresList :genres="genres" />
     </Selection>

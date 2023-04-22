@@ -2,7 +2,7 @@
     <Selection
         title="Чарт"
         leftText="Cмотреть все"
-        :leftTextLinkName="routesNames.popularTracks"
+        :leftTextLink="{ name: routesNames.popularTracks }"
     >
         <div class="tracks-container">
             <TrackCard

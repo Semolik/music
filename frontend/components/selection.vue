@@ -6,10 +6,7 @@
                     {{ title }}
                 </div>
                 <div class="left-text" v-if="leftText">
-                    <nuxt-link
-                        :to="{ name: leftTextLinkName, params: leftLinkParams }"
-                        v-if="leftTextLinkName"
-                    >
+                    <nuxt-link :to="leftTextLink" v-if="leftTextLink">
                         {{ leftText }}
                     </nuxt-link>
                     <span v-else>
@@ -40,14 +37,10 @@ defineProps({
         type: String,
         required: false,
     },
-    leftTextLinkName: {
-        type: String,
-        required: false,
-    },
-    leftLinkParams: {
+    leftTextLink: {
         type: Object,
         required: false,
-        default: () => ({}),
+        default: null,
     },
 });
 </script>

@@ -16,9 +16,11 @@
         <div class="musician-page-content">
             <selection
                 title="Популярные треки"
-                leftTextLinkName="musician-id-tracks"
                 left-text="Все треки"
-                :left-text-link-params="{ id: musician.id }"
+                :left-text-link="{
+                    name: routesNames.musicianIdTracks,
+                    params: { id: musician.id },
+                }"
                 v-if="musician.popular.tracks.length"
             >
                 <div class="popular-tracks">
@@ -31,9 +33,11 @@
             </selection>
             <selection
                 title="Популярные альбомы"
-                leftTextLinkName="musician-id-albums"
                 left-text="Все альбомы"
-                :left-text-link-params="{ id: musician.id }"
+                :left-text-link="{
+                    name: routesNames.musicianIdAlbums,
+                    params: { id: musician.id },
+                }"
                 v-if="musician.popular.albums.length"
             >
                 <CardsContainer>
@@ -47,9 +51,11 @@
             </selection>
             <selection
                 title="Клипы"
-                leftTextLinkName="musician-id-clips"
                 left-text="Все клипы"
-                :left-text-link-params="{ id: musician.id }"
+                :left-text-link="{
+                    name: routesNames.musicianIdClips,
+                    params: { id: musician.id },
+                }"
                 v-if="musician.popular.clips.length"
             >
                 {{ musician.popular.clips }}

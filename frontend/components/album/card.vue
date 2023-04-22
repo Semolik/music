@@ -57,7 +57,6 @@ const props = reactive({
 });
 const router = useRouter();
 const goToAlbum = () => {
-    console.log("goToAlbum");
     if (disableLink) {
         return;
     }
