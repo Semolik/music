@@ -5,13 +5,16 @@
         </div>
         <div class="account-info">
             <template v-if="logined">
-                <AppAsideProfile
-                    :fullName="authStore.fullName"
-                    :picture="userData?.picture"
+                <MenuItem
+                    :to="{ name: 'settings' }"
+                    text="Настройки"
+                    highlight
+                    :icon="IconsNames.settingsIcon"
                 />
                 <MenuItem
                     :to="{ name: 'musician-cabinet' }"
                     text="Кабинет музыканта"
+                    :icon="IconsNames.userIcon"
                     highlight
                     v-if="isMusician"
                 />
@@ -21,11 +24,16 @@
                     highlight
                     v-if="isAdmin"
                 />
-                <MenuItem @click="logout" text="Выйти из аккаунта" highlight />
+                <MenuItem
+                    @click="logout"
+                    text="Выйти из аккаунта"
+                    highlight
+                    :icon="IconsNames.logoutIcon"
+                />
             </template>
             <MenuItem
                 :to="{ name: 'login' }"
-                :icon="loginIcon"
+                :icon="IconsNames.loginIcon"
                 text="Войти в аккаунт"
                 v-else
             />
@@ -36,6 +44,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { IconsNames } from "@/configs/icons";
+import { useEventBus } from "@vueuse/core";
 const links = [
     {
         to: { name: "index" },
@@ -43,12 +52,18 @@ const links = [
         text: "Главная",
     },
     {
+        icon: IconsNames.searchIcon,
+        text: "Поиск",
+        onClick: () => {
+            openSearchBus.emit();
+        },
+    },
+    {
         to: { name: "library" },
         icon: IconsNames.libraryIcon,
         text: "Библиотека",
     },
 ];
-const { homeIcon, loginIcon } = IconsNames;
 const authStore = useAuthStore();
 const { logoutRequest } = authStore;
 const router = useRouter();
@@ -56,7 +71,8 @@ const logout = () => {
     router.push({ name: "index" });
     logoutRequest();
 };
-const { logined, userData, isMusician, isAdmin } = storeToRefs(authStore);
+const openSearchBus = useEventBus("openSearch");
+const { logined, isMusician, isAdmin } = storeToRefs(authStore);
 </script>
 <style lang="scss">
 aside {
@@ -66,7 +82,9 @@ aside {
     flex-direction: column;
     flex-grow: 1;
     min-width: 300px;
-
+    @include xxl(true) {
+        min-width: auto;
+    }
     .selections {
         display: flex;
         flex-direction: column;

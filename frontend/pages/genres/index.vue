@@ -11,6 +11,12 @@
     </div>
 </template>
 <script setup>
+useHead({
+    title: "Жанры",
+});
+definePageMeta({
+    title: "Жанры",
+});
 import { Service } from "@/client";
 const page = ref(0);
 const genres = ref([]);

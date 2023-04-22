@@ -53,6 +53,10 @@ const link = computed(() => ({
     border-radius: 5px;
     overflow: hidden;
     background-color: $tertiary-bg;
+    --brightness: 0.5;
+    &:hover {
+        --brightness: 0.7;
+    }
     img {
         position: absolute;
         inset: 0;
@@ -60,7 +64,8 @@ const link = computed(() => ({
         height: 100%;
         object-fit: cover;
         z-index: -1;
-        filter: brightness(0.5) blur(2px);
+        transition: filter 0.2s ease-in-out;
+        filter: brightness(var(--brightness)) blur(2px);
     }
 
     .genre-card__name {

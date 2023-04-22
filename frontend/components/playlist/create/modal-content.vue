@@ -4,6 +4,8 @@
             placeholder="Название плейлиста"
             v-model="newPlaylistName"
             class="playlist-name"
+            :max-length="MAX_PLAYLIST_NAME_LENGTH"
+            show-word-limit
             autofocus
         />
         <div class="playlist-type">
@@ -24,6 +26,7 @@
     </div>
 </template>
 <script setup>
+const { MAX_PLAYLIST_NAME_LENGTH } = useRuntimeConfig().public;
 import { Service } from "~~/client";
 const { track_id } = defineProps({
     track_id: {

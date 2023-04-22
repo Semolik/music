@@ -6,6 +6,7 @@ export const useAuthStore = defineStore({
     state: () => ({
         logined: false,
         userData: null,
+        musicianProfile: null,
     }),
     getters: {
         fullName() {
@@ -63,6 +64,13 @@ export const useAuthStore = defineStore({
             try {
                 const userData = await Service.getUserInfoApiV1UsersMeGet();
                 this.userData = userData;
+                try {
+                    const musicianProfile =
+                        await Service.getUserPublicProfileInfoApiV1UsersMePublicGet();
+                    this.musicianProfile = musicianProfile;
+                } catch (error) {
+                    this.musicianProfile = null;
+                }
                 this.logined = true;
                 return userData;
             } catch (error) {

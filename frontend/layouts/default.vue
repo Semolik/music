@@ -37,16 +37,13 @@
         .app-content {
             flex-grow: 1;
 
-            .enable-padding {
-                padding-top: 10px;
-                padding-inline: 20px;
+            &.enable-padding {
+                padding: 20px;
                 @include lg(true) {
                     padding: 10px;
                     padding-bottom: 80px;
                 }
             }
-
-            height: 100%;
         }
     }
 }

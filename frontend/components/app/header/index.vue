@@ -1,14 +1,10 @@
 <template>
     <header :class="{ 'header-bar-active': headerBarActive }">
-        <template v-if="!headerBarActive">
-            <div class="search-button" @click="searchIsActive = true">
-                <Icon name="material-symbols:search-rounded" />
-                <span class="button-text">Поиск</span>
-                <span class="button-hotkey-text">Ctrl + K</span>
-            </div>
-            <AppHeaderSearch v-model:searchActive="searchIsActive" />
-        </template>
-        <div class="header-bar" v-else-if="links.length || currentPageTitle">
+        <AppHeaderSearch v-model:searchActive="searchIsActive" />
+        <div
+            class="header-bar"
+            v-if="headerBarActive && (links.length || currentPageTitle)"
+        >
             <div class="current-page-title" v-if="currentPageTitle">
                 {{ currentPageTitle }}
             </div>
@@ -28,6 +24,8 @@
     </header>
 </template>
 <script setup>
+import { useEventBus } from "@vueuse/core";
+const openSearchBus = useEventBus("openSearch");
 const viewport = useViewport();
 const router = useRouter();
 const links = computed(() => router.currentRoute.value.meta.headerLinks || []);
@@ -41,8 +39,14 @@ watch(
     { immediate: true }
 );
 const searchIsActive = ref(false);
-
 const currentPageTitle = ref(null);
+const unsubscribeOpenSearchBus = openSearchBus.on(() => {
+    searchIsActive.value = true;
+});
+
+onBeforeUnmount(() => {
+    unsubscribeOpenSearchBus();
+});
 useHead({
     title: currentPageTitle,
 });
@@ -71,9 +75,11 @@ onUnmounted(() => {
 header {
     padding: 20px;
     padding-bottom: 0px;
-    display: flex;
+
+    display: none;
     &.header-bar-active {
         padding: 0px;
+        display: flex;
     }
     .header-bar {
         color: $primary-text;

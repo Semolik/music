@@ -1,158 +1,226 @@
 <template>
-    <div class="playlist-page-container">
-        <div class="playlist-info">
-            <div
-                :class="[
-                    'playlist-info-bg',
-                    { 'no-picture': !playlist.picture },
-                ]"
-            >
-                <img
-                    class="playlist-info-bg"
-                    :src="playlist.picture"
-                    v-if="playlist.picture"
-                />
-            </div>
-            <div class="playlist-picture">
-                <img :src="playlist.picture" v-if="playlist.picture" />
-                <div class="icon" v-else>
-                    <Icon :name="IconsNames.playlistIcon" />
-                </div>
-            </div>
-            <div class="playlist-info-content">
-                <div class="info-line">ПЛЕЙЛИСТ</div>
-                <div class="playlist-name">
-                    {{ playlist.name }}
-                </div>
-                <div class="info-line">
-                    Составитель:
-                    <div class="value">{{ userName }}</div>
-                    <div class="dot"></div>
-                    <div class="value">
-                        {{ playlist.tracks_count }} тре{{ track_word_end }}
-                    </div>
-                </div>
-            </div>
+    <ContentHead
+        :name="playlist.name"
+        :picture="playlist.picture"
+        :icon="IconsNames.playlistIcon"
+        :info="info"
+        type="Плейлист"
+        :is-owner="isOwner"
+        @edit="openEditModal"
+        @delete="openDeleteModal"
+        :is-liked="playlist.liked"
+        @like="toggleLikePlaylist"
+    >
+        <div
+            :class="['description', { splitter: !playlist.picture }]"
+            v-if="playlist.description"
+        >
+            {{ playlist.description }}
         </div>
         <div class="playlist-tracks">
             <TrackCard
                 v-for="(track, index) in playlist.tracks"
                 :key="track.id"
                 v-model:track="playlist.tracks[index]"
-                album-info
                 :playlist-id="playlist.id"
                 @playlist-remove-track="playlist.tracks.splice(index, 1)"
             />
         </div>
-    </div>
+    </ContentHead>
+    <ModalDialog
+        :active="editModalOpened"
+        @close="editModalOpened = false"
+        head-text="Редактирование плейлиста"
+        :buttons="[
+            {
+                text: 'Отмена',
+                onClick: () => (editModalOpened = false),
+            },
+            {
+                text: 'Сохранить',
+                active: saveButtonIsActive,
+                onClick: updatePlaylist,
+            },
+        ]"
+    >
+        <template #content>
+            <AppInput
+                v-model="newPlaylistName"
+                label="Название плейлиста"
+                :error="newPlaylistNameError"
+                :max-length="MAX_PLAYLIST_NAME_LENGTH"
+                show-word-limit
+            />
+            <AppInput
+                v-model="newPlaylistDescription"
+                label="Описание плейлиста"
+                :max-length="MAX_PLAYLIST_DESCRIPTION_LENGTH"
+                show-word-limit
+                type="textarea"
+                rows="8"
+                resize="none"
+            />
+            <div class="private-switch">
+                <AppSwitch
+                    v-model="newPlaylistPrivate"
+                    active-text="Публичный"
+                    inactive-text="Приватный"
+                />
+            </div>
+        </template>
+    </ModalDialog>
+    <ModalDialog
+        :active="deleteModalOpened"
+        @close="deleteModalOpened = false"
+        head-text="Удаление плейлиста"
+        :buttons="[
+            {
+                text: 'Отмена',
+                onClick: () => (deleteModalOpened = false),
+            },
+            {
+                text: 'Удалить',
+                active: true,
+                onClick: deletePlaylist,
+            },
+        ]"
+    >
+        <template #content>
+            <div class="delete-modal-text">
+                Вы действительно хотите удалить плейлист {{ playlist.name }}?
+            </div>
+        </template>
+    </ModalDialog>
 </template>
 <script setup>
 import { Service } from "@/client";
 import { IconsNames } from "~/configs/icons";
+import { useAuthStore } from "~/stores/auth";
+import { storeToRefs } from "pinia";
+import { routesNames } from "@typed-router";
+import { useEventBus } from "@vueuse/core";
+const goToLoginBus = useEventBus("go-to-login");
+const { MAX_PLAYLIST_NAME_LENGTH, MAX_PLAYLIST_DESCRIPTION_LENGTH } =
+    useRuntimeConfig().public;
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
-
 const route = useRoute();
+const router = useRouter();
 const { id } = route.params;
 const playlist = ref(
     await Service.getPlaylistInfoApiV1PlaylistsPlaylistIdGet(id)
 );
-const track_word_end = usePluralize(playlist.value.tracks_count, [
-    "к",
-    "ка",
-    "ков",
+useHead({
+    title: "Плейлист " + playlist.value.name,
+});
+const authStore = useAuthStore();
+const { userData, logined } = storeToRefs(authStore);
+const isOwner = computed(
+    () => logined.value && userData.value.id === playlist.value.user.id
+);
+const editModalOpened = ref(false);
+const deleteModalOpened = ref(false);
+const openEditModal = () => {
+    deleteModalOpened.value = false;
+    editModalOpened.value = true;
+};
+const toggleLikePlaylist = async () => {
+    if (!logined.value) {
+        goToLoginBus.emit();
+        return;
+    }
+    playlist.value.liked =
+        await Service.likePlaylistApiV1PlaylistsPlaylistIdLikePut(id);
+};
+const openDeleteModal = () => {
+    editModalOpened.value = false;
+    deleteModalOpened.value = true;
+};
+const newPlaylistName = ref(playlist.value.name);
+const newPlaylistDescription = ref(playlist.value.description || "");
+const newPlaylistNameError = computed(() => newPlaylistName.value.length === 0);
+const newPlaylistPrivate = ref(playlist.value.private);
+
+watch(editModalOpened, (value) => {
+    if (!value) {
+        newPlaylistName.value = playlist.value.name;
+        newPlaylistDescription.value = playlist.value.description || "";
+        newPlaylistPrivate.value = playlist.value.private;
+    }
+});
+const playlistDescriptionChanged = computed(() => {
+    if (
+        newPlaylistDescription.value === "" &&
+        playlist.value.description === null
+    ) {
+        return false;
+    }
+    return newPlaylistDescription.value !== playlist.value.description;
+});
+const saveButtonIsActive = computed(
+    () =>
+        !newPlaylistNameError.value &&
+        (newPlaylistName.value !== playlist.value.name ||
+            playlistDescriptionChanged.value ||
+            newPlaylistPrivate.value !== playlist.value.private)
+);
+const updatePlaylist = async () => {
+    if (!saveButtonIsActive.value) {
+        return;
+    }
+    const data = {
+        name: newPlaylistName.value,
+        description: newPlaylistDescription.value,
+        private: newPlaylistPrivate.value,
+    };
+    playlist.value = await Service.updatePlaylistApiV1PlaylistsPlaylistIdPut(
+        id,
+        data
+    );
+    editModalOpened.value = false;
+};
+const deletePlaylist = async () => {
+    await Service.deletePlaylistApiV1PlaylistsPlaylistIdDelete(id);
+    router.push({ name: routesNames.library.playlists });
+};
+const tracks_word = usePluralize(playlist.value.tracks_count, [
+    "трек",
+    "трека",
+    "треков",
 ]);
 const userName = computed(() => useFullName(playlist.value.user));
+const info = computed(() => [
+    {
+        name: "Автор:",
+        value: userName.value,
+        link: {
+            name: "user-id",
+            params: { id: playlist.value.user.id },
+        },
+    },
+    {
+        name: null,
+        value: `${playlist.value.tracks_count} ${tracks_word}`,
+    },
+]);
 </script>
 <style lang="scss" scoped>
-.playlist-page-container {
+.private-switch {
+    @include flex-center;
+}
+.playlist-tracks {
     display: flex;
     flex-direction: column;
-    color: $primary-text;
-    .playlist-info {
-        position: relative;
-        display: grid;
-        grid-template-columns: 300px 1fr;
-        gap: 20px;
-        isolation: isolate;
-        padding: 20px;
+    gap: 10px;
+    padding: 10px;
+}
+.description {
+    padding: 10px;
+    background-color: $tertiary-bg;
 
-        .playlist-picture {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 10px;
-            overflow: hidden;
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            .icon {
-                @include flex-center;
-                height: 100%;
-                width: 100%;
-                background-color: $quinary-bg;
-
-                svg {
-                    width: 40%;
-                    height: 40%;
-                    color: $secondary-text;
-                }
-            }
-        }
-
-        .playlist-info-bg {
-            z-index: -1;
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            &.no-picture {
-                background-color: $tertiary-bg;
-            }
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                filter: blur(20px) brightness(0.7);
-            }
-        }
-
-        .playlist-info-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            .info-line {
-                color: $secondary-text;
-                font-size: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                .value {
-                    color: $primary-text;
-                }
-                .dot {
-                    width: 3px;
-                    height: 3px;
-                    border-radius: 50%;
-                    background-color: $secondary-text;
-                }
-            }
-            .playlist-name {
-                --font-size: 4rem;
-                line-height: calc(var(--font-size) * 1.1);
-                font-size: var(--font-size);
-                font-weight: 700;
-                text-transform: uppercase;
-            }
-        }
-    }
-    .playlist-tracks {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px;
+    &.splitter {
+        border-top: 1px solid $quinary-bg;
     }
 }
 </style>

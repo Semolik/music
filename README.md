@@ -14,6 +14,10 @@
 
 ## [Регистрация](/docs/register/README.md)
 
+## [Плейлист](/docs/playlist/README.md)
+
+## [Альбом](/docs/album/README.md)
+
 <h1>Настройка</h1>
 
 <h3>Зависимости</h3>

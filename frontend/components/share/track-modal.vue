@@ -1,15 +1,15 @@
 <template>
-    <ModalDialog
+    <ShareModal
         :active="active"
-        head-text="Поделиться треком"
-        close-on-esckey
-        @close="emit('update:active', false)"
+        text="Поделиться треком"
+        :link="trackLink"
+        @update:active="emit('update:active', $event)"
     >
         <template #content>
             <ShareSocial :link="trackLink" />
             <AppButtonCopy :value="trackLink" />
         </template>
-    </ModalDialog>
+    </ShareModal>
 </template>
 
 <script setup>
@@ -23,8 +23,9 @@ const { active, track } = defineProps({
         default: null,
     },
 });
-const trackLink = computed(() => {
-    return window.location.origin + "/track/" + track.id;
+const trackLink = ref("");
+onMounted(() => {
+    trackLink.value = window.location.origin + "/track/" + track.id;
 });
 const emit = defineEmits(["update:active"]);
 </script>

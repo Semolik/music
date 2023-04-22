@@ -138,6 +138,8 @@ class AlbumInfoWithoutMusician(AlbumBase):
     picture: ImageLink = Query(...,
                                description="Ссылка на картинку альбома")
     liked: bool = Query(default=False, description="Лайкнут ли альбом")
+    likes_count: int = Query(
+        default=0, description="Количество лайков альбома")
 
     class Config:
         orm_mode = True

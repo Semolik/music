@@ -118,9 +118,9 @@ var filters = reactive({
         disabled: false,
     },
     "Направление сортировки": {
-        values: ["По возрастанию", "По убыванию"],
+        values: ["По убыванию", "По возрастанию"],
         active: null,
-        default: "По возрастанию",
+        default: "По убыванию",
     },
 });
 const fething = ref(false);

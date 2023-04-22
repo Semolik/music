@@ -3,6 +3,7 @@ $screen-sm-min: 576px;
 $screen-md-min: 768px;
 $screen-lg-min: 992px;
 $screen-xl-min: 1200px;
+$screen-xxl-min: 1400px;
 
 @mixin xs($max: false) {
     @media (#{if($max, max-width, min-width)} : #{$screen-xs-min - 1}) {
@@ -26,6 +27,11 @@ $screen-xl-min: 1200px;
 }
 @mixin xl($max: false) {
     @media (#{if($max, max-width, min-width)} : #{if($max, $screen-xl-min - 1, $screen-xl-min)}) {
+        @content;
+    }
+}
+@mixin xxl($max: false) {
+    @media (#{if($max, max-width, min-width)} : #{if($max, $screen-xxl-min - 1, $screen-xxl-min)}) {
         @content;
     }
 }

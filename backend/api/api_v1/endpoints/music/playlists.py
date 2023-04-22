@@ -65,6 +65,11 @@ def get_playlist_info(
         playlist_id=playlist_id,
         user_id=Auth.current_user_id
     ), user_id=Auth.current_user_id, db=Auth.db)
+    if Auth.current_user_id:
+        playlist_obj.liked = playlist_crud.is_playlist_liked(
+            playlist_id=playlist_id,
+            user_id=Auth.current_user_id
+        )
     return playlist_obj
 
 

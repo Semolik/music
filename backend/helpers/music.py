@@ -187,7 +187,7 @@ def validate_tracks(db: Session, tracks_ids: List[UUID], user_id: int) -> List[T
     return tracks
 
 
-def set_album_info(db_album: Album):
+def set_album_info(db_album: Album, db: Session = None, user_id: int = None) -> dict:
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['date'] = db_album.open_date
@@ -199,6 +199,11 @@ def set_album_info(db_album: Album):
         )
         for db_genre in db_album.genres]
     db_album_obj = set_picture(db_album_obj, db_album.picture)
+    if user_id is not None:
+        if db is None:
+            raise Exception("При запросе лайка альбома необходимо передать db")
+        db_album_obj['liked'] = bool(AlbumsCruds(
+            db).get_album_like(album=db_album, user_id=user_id))
     return db_album_obj
 
 

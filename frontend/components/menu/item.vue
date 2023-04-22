@@ -3,7 +3,12 @@
         :to="to"
         :class="[
             'menu-link',
-            { active: active, center: !icon, highlight: highlight },
+            {
+                active: active,
+                center: !icon,
+                highlight: highlight,
+                'only-mini-icon': onlyMiniIcon,
+            },
         ]"
     >
         <Icon :name="icon" v-if="icon" />
@@ -11,7 +16,7 @@
     </NuxtLink>
 </template>
 <script setup>
-const { to, icon, text, active, highlight } = defineProps({
+const { to, icon, text, active, highlight, onlyMiniIcon } = defineProps({
     to: {
         type: Object,
     },
@@ -30,6 +35,10 @@ const { to, icon, text, active, highlight } = defineProps({
         type: Boolean,
         default: false,
     },
+    onlyMiniIcon: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 <style lang="scss">
@@ -44,6 +53,11 @@ const { to, icon, text, active, highlight } = defineProps({
     &.highlight,
     &.active {
         background-color: $tertiary-bg;
+        @include xxl(true) {
+            &.highlight {
+                background-color: transparent;
+            }
+        }
     }
     &.router-link-active {
         background-color: $tertiary-bg;
@@ -67,11 +81,14 @@ const { to, icon, text, active, highlight } = defineProps({
         &.highlight {
             background-color: $quaternary-bg;
         }
+        @include xxl(true) {
+            background-color: $quinary-bg;
+        }
         background-color: $tertiary-bg;
     }
     svg {
-        width: 20px;
-        height: 20px;
+        width: 25px;
+        height: 25px;
         color: $primary-text;
         transition: color 0s;
     }
@@ -83,12 +100,22 @@ const { to, icon, text, active, highlight } = defineProps({
             margin: 0;
         }
     }
+    &.only-mini-icon {
+        @include xxl {
+            svg {
+                display: none;
+            }
+        }
+    }
     span {
         flex-grow: 1;
         display: flex;
         align-items: center;
         margin-right: 20px;
         white-space: nowrap;
+        @include xxl(true) {
+            display: none;
+        }
     }
 }
 </style>

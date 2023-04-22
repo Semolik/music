@@ -31,7 +31,13 @@
                             v-if="props.buttons.length > 0"
                         >
                             <div
-                                class="button"
+                                :class="[
+                                    'button',
+                                    {
+                                        active: button.active,
+                                        disabled: button.active === false,
+                                    },
+                                ]"
                                 v-for="button in props.buttons"
                                 @click="button.onClick"
                             >
@@ -238,11 +244,24 @@ onBeforeUnmount(() => {
                 border-radius: 10px;
                 background-color: $quaternary-bg;
                 flex-grow: 1;
-                cursor: pointer;
                 text-align: center;
-
+                user-select: none;
+                cursor: pointer;
                 &:hover {
                     background-color: $quinary-bg;
+                }
+                &.disabled {
+                    background-color: $quaternary-bg;
+                    cursor: auto;
+                    color: $secondary-text;
+                }
+                &.active {
+                    background-color: $accent;
+                    cursor: pointer;
+                    color: $primary-bg;
+                    &:hover {
+                        background-color: $accent-hover;
+                    }
                 }
             }
         }
