@@ -149,9 +149,10 @@ def get_liked_albums(
 
     albums = []
     for db_album in AlbumsCruds(Auth.db).get_liked_albums(user_id=Auth.current_user_id):
-        album_info = set_album_info(db_album=db_album)
+        album_info = set_album_info(
+            db_album=db_album, db=Auth.db)
         album_info = set_musician_info(
-            album_info=album_info, db_album=db_album, db=Auth.db
+            data=album_info, db=Auth.db, public_profile_id=db_album.musician_id
         )
         album_info['liked'] = True
         albums.append(album_info)
@@ -176,7 +177,7 @@ def get_album_by_id(
     db_album_obj = set_album_info(
         db_album=db_album, user_id=Auth.current_user_id, db=Auth.db)
     db_album_obj = set_musician_info(
-        data=db_album_obj, public_profile_id=db_album.musician_id, db=Auth.db, user_id=Auth.current_user_id)
+        data=db_album_obj, public_profile_id=db_album.musician_id, db=Auth.db)
     return set_album_tracks(db=Auth.db, db_album=db_album, db_album_obj=db_album_obj, user_id=Auth.current_user_id)
 
 

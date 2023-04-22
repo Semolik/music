@@ -7,8 +7,8 @@
             >
                 <template v-for="item in selection.links">
                     <nuxt-link
-                        class="settings-aside-item"
                         :key="item.text"
+                        class="settings-aside-item"
                         :to="item.to"
                         v-if="item.to"
                     >
@@ -204,7 +204,7 @@ const selection = computed(() => {
             color: $primary-text;
             padding: 10px;
             overflow: auto;
-            max-height: 70vh;
+            max-height: 90vh;
             @include lg(true) {
                 border-radius: 10px;
                 height: min-content;

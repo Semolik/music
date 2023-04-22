@@ -210,7 +210,8 @@ class MusicianClipWithoutMusician(CreateMusicianClip):
 
 class MusicianInfo(PublicProfile):
     liked: bool = Query(default=False, description="Лайкнут ли музыкант")
-    likes: int = Query(default=0, description="Количество лайков музыканта")
+    likes_count: int = Query(
+        default=0, description="Количество лайков музыканта")
 
     class Config:
         orm_mode = True
@@ -224,12 +225,16 @@ class MusicianClip(MusicianClipWithoutMusician):
         orm_mode = True
 
 
-class MusicianFullInfo(MusicianInfo):
-
+class MusicianContent(BaseModel):
     clips: List[MusicianClipWithoutMusician] = Query(...,
                                                      description="Клипы музыканта")
     albums: List[AlbumInfoWithoutMusician] = Query(...,
                                                    description="Альбомы музыканта")
+    tracks: List[Track] = Query(..., description="Треки музыканта")
+
+
+class MusicianFullInfo(MusicianInfo):
+    popular: MusicianContent = Query(..., description="Популярное музыканта")
 
     class Config:
         orm_mode = True

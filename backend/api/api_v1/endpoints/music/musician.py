@@ -2,7 +2,9 @@ from typing import List
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.auth_helper import Authenticate
-from backend.schemas.music import AlbumInfo, MusicianClip, Track, MusicianFullInfo, MusicianInfo
+from backend.helpers.music import set_tracks_likes
+from backend.schemas.base import LikesInfo
+from backend.schemas.music import AlbumInfo, MusicianClip, MusicianContent, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_musician import MusicianCrud
@@ -51,7 +53,7 @@ def get_popular_musician_profiles(
     return popular_musician_profiles
 
 
-@router.put('/{profile_id}/like', response_model=bool)
+@router.put('/{profile_id}/like', response_model=LikesInfo)
 def like_musician(
     profile_id: int = Path(..., description='ID профиля', ge=1),
     Auth: Authenticate = Depends(Authenticate()),
@@ -62,8 +64,11 @@ def like_musician(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     liked = MusicianCrud(Auth.db).toggle_like_musician(
-        musician_id=profile_id, user_id=Auth.current_user_id)
-    return liked
+        user_id=Auth.current_user_id,
+        musician_id=profile_id)
+    likes_count = MusicianCrud(Auth.db).get_musician_likes_count(
+        musician_id=profile_id)
+    return LikesInfo(liked=liked, likes_count=likes_count)
 
 
 @router.get('/{profile_id}', response_model=MusicianFullInfo)
@@ -78,11 +83,19 @@ def get_public_profile_info(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     musician_info = MusicianInfo.from_orm(public_profile)
-    public_profile_obj = MusicianFullInfo(
-        **musician_info.dict(),
-        albums=MusicianCrud(Auth.db).get_musician_albums(
+    db_tracks = MusicianCrud(Auth.db).get_popular_musician_tracks(
+        musician_id=profile_id)
+    tracks_objs = set_tracks_likes(
+        tracks=db_tracks, user_id=Auth.current_user_id, db=Auth.db)
+    content = MusicianContent(
+        albums=MusicianCrud(Auth.db).get_popular_musician_albums(
             musician_id=profile_id),
         clips=ClipsCruds(Auth.db).get_musician_clips(musician_id=profile_id),
+        tracks=tracks_objs
+    )
+    public_profile_obj = MusicianFullInfo(
+        **musician_info.dict(),
+        popular=content
     )
     if Auth.current_user_id:
         public_profile_obj.liked = MusicianCrud(Auth.db).musician_is_liked(
@@ -90,7 +103,7 @@ def get_public_profile_info(
     return public_profile_obj
 
 
-@router.get('/{profile_id}/clips', response_model=List[MusicianClip])
+@ router.get('/{profile_id}/clips', response_model=List[MusicianClip])
 def get_musician_clips(
     profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
@@ -106,7 +119,7 @@ def get_musician_clips(
     return clips
 
 
-@router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
+@ router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
 def get_musician_albums(
     profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
@@ -127,7 +140,7 @@ def get_musician_albums(
     return albums
 
 
-@router.get('/{profile_id}/popular', response_model=List[Track])
+@ router.get('/{profile_id}/popular', response_model=List[Track])
 def get_musician_popular_tracks(
     profile_id: int = Query(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),

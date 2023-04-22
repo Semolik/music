@@ -34,15 +34,15 @@
         display: flex;
         flex-direction: column;
         overflow-x: hidden;
+
+        @include lg(true) {
+            padding-bottom: 70px;
+        }
         .app-content {
             flex-grow: 1;
 
             &.enable-padding {
                 padding: 20px;
-                @include lg(true) {
-                    padding: 10px;
-                    padding-bottom: 80px;
-                }
             }
         }
     }

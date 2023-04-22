@@ -4,7 +4,7 @@
             <div :class="['content-info-bg', { 'no-picture': !picture }]">
                 <img class="content-info-bg" :src="picture" v-if="picture" />
             </div>
-            <div class="content-picture">
+            <div :class="['content-picture', { musician: isMusician }]">
                 <img :src="picture" v-if="picture" />
                 <div class="icon" v-else>
                     <Icon :name="icon" />
@@ -26,18 +26,22 @@
                 <div class="actions-buttons">
                     <div class="play action-button" @click="$emit('play')">
                         <Icon :name="IconsNames.playIcon" />
-                        {{ playButtonText }}
+                        <span class="text">{{ playButtonText }}</span>
                     </div>
                     <div
                         :class="['like', 'action-button', { active: isLiked }]"
                         @click="$emit('like')"
                     >
+                        <span class="text">{{ likesCount }}</span>
                         <Icon :name="IconsNames.likeIcon" />
-                        Нравится
+                        <span class="text">Нравится</span>
                     </div>
                     <div class="action-button" @click="shareModalOpened = true">
                         <Icon :name="IconsNames.shareIcon" />
-                        Поделиться
+                        <span class="text">Поделиться</span>
+                    </div>
+                    <div class="action-button edit" @click="$emit('edit')">
+                        <Icon :name="IconsNames.pencilIcon" />
                     </div>
                     <ShareModal
                         v-model:active="shareModalOpened"
@@ -110,6 +114,16 @@ const { name, type, picture, info, icon, isOwner, playButtonText, isLiked } =
             required: false,
             default: false,
         },
+        likesCount: {
+            type: Number,
+            required: false,
+            default: null,
+        },
+        isMusician: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     });
 const emit = defineEmits(["edit", "delete", "like", "play"]);
 const shareLink = ref("");
@@ -130,6 +144,10 @@ const shareModalOpened = ref(false);
         isolation: isolate;
         padding: 20px;
         grid-template-columns: 300px 1fr;
+        @include md(true) {
+            @include flex-center;
+            flex-direction: column;
+        }
         &.is-owner {
             grid-template-columns: 300px 1fr min-content;
             .content-info-actions {
@@ -140,6 +158,10 @@ const shareModalOpened = ref(false);
                     @include flex-center;
                     width: 45px;
                     height: 45px;
+                    @include md(true) {
+                        display: none;
+                    }
+
                     border-radius: 10px;
                     background-color: $quinary-bg;
                     cursor: pointer;
@@ -163,6 +185,13 @@ const shareModalOpened = ref(false);
             aspect-ratio: 1;
             border-radius: 10px;
             overflow: hidden;
+            @include md(true) {
+                max-width: 300px;
+            }
+
+            &.musician {
+                border-radius: 50%;
+            }
             img {
                 width: 100%;
                 height: 100%;
@@ -205,8 +234,13 @@ const shareModalOpened = ref(false);
             overflow: hidden;
             text-overflow: ellipsis;
             gap: 10px;
+
             .actions-buttons {
                 display: flex;
+                @include md(true) {
+                    @include flex-center;
+                }
+                flex-wrap: wrap;
                 gap: 10px;
                 margin-top: 10px;
                 .action-button {
@@ -221,11 +255,20 @@ const shareModalOpened = ref(false);
                     &:hover {
                         background-color: $senary-bg;
                     }
-
+                    @include md(true) {
+                        aspect-ratio: 1;
+                        .text {
+                            display: none;
+                        }
+                    }
                     svg {
                         width: 20px;
                         height: 20px;
                         color: $secondary-text;
+                        @include md(true) {
+                            width: 30px;
+                            height: 30px;
+                        }
                     }
 
                     &.play {
@@ -242,6 +285,11 @@ const shareModalOpened = ref(false);
                     &.like.active svg {
                         color: $accent-error;
                     }
+                    &.edit {
+                        @include md {
+                            display: none;
+                        }
+                    }
                 }
             }
             .info-line {
@@ -252,6 +300,9 @@ const shareModalOpened = ref(false);
                 &.type {
                     text-transform: uppercase;
                     color: $secondary-text;
+                    @include md(true) {
+                        display: none;
+                    }
                 }
 
                 .dot {
@@ -269,6 +320,10 @@ const shareModalOpened = ref(false);
                 text-transform: uppercase;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                @include md(true) {
+                    text-align: center;
+                    --font-size: clamp(2rem, 8vw, 3rem);
+                }
             }
         }
     }

@@ -1,9 +1,9 @@
 <template>
-    <card-min v-bind="props" v-if="min">
+    <card-min v-bind="props" v-if="min" @click="goToAlbum">
         <template #content>
             <span>{{ album.name }}</span>
             <div class="flex gap-3px items-center secondary-text text-sm">
-                <span>{{ album.musician.name }}</span>
+                <span>{{ musicianName }}</span>
                 <Icon name="ci:dot-02-s" />
                 <span>{{ album.year }}</span>
             </div>
@@ -14,11 +14,11 @@
             </div>
         </template>
     </card-min>
-    <card v-bind="props" v-else>
+    <card v-bind="props" v-else @picture-click="goToAlbum">
         <div class="flex flex-col grow">
             <span class="font-medium">{{ album.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
-                <span>{{ album.musician.name }}</span>
+                <span>{{ musicianName }}</span>
                 <Icon name="ci:dot-02-s" />
                 <span>{{ album.year }}</span>
             </div>
@@ -27,7 +27,7 @@
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
-const { album } = defineProps({
+const { album, musicianInfo, disableLink } = defineProps({
     album: {
         type: Object,
         required: true,
@@ -36,10 +36,37 @@ const { album } = defineProps({
         type: Boolean,
         default: false,
     },
+    musicianInfo: {
+        type: Object,
+        required: false,
+    },
+    disableLink: {
+        type: Boolean,
+        default: false,
+    },
 });
-
+const musicianName = computed(() => {
+    if (musicianInfo) {
+        return musicianInfo.name;
+    }
+    return album.musician.name;
+});
 const props = reactive({
     picture: album.picture,
     icon: IconsNames.albumIcon,
 });
+const router = useRouter();
+const goToAlbum = () => {
+    console.log("goToAlbum");
+    if (disableLink) {
+        return;
+    }
+    router.push({
+        name: "album-id",
+        params: {
+            id: album.id,
+            albumId: album.id,
+        },
+    });
+};
 </script>

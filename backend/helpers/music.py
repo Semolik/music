@@ -191,7 +191,7 @@ def set_album_info(db_album: Album, db: Session = None, user_id: int = None) -> 
     db_album_obj = db_album.as_dict()
     db_album_obj['year'] = db_album.open_date.year
     db_album_obj['date'] = db_album.open_date
-
+    db_album_obj['likes_count'] = db_album.likes_count
     db_album_obj['genres'] = [
         set_picture(
             db_genre.as_dict(),

@@ -125,7 +125,7 @@ class PublicProfile(Base):
     )
 
     @property
-    def likes(self):
+    def likes_count(self):
         if not hasattr(self, '_likes_count'):
             self._likes_count = object_session(self).query(
                 FavoriteMusicians

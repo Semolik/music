@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime,  Boolean
 from sqlalchemy.orm import relationship
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, object_session
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -90,6 +90,10 @@ class Album(Base):
     @hybrid_property
     def musician_user_id(self):
         return self.musician.user_id
+
+    @property
+    def likes_count(self):
+        return object_session(self).query(FavoriteAlbum).filter(FavoriteAlbum.album_id == self.id).count()
 
 
 class FavoriteAlbum(Base):

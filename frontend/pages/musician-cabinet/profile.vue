@@ -101,6 +101,18 @@
             <AppButton @click="saveProfile" :active="buttonActive">
                 Сохранить
             </AppButton>
+            <AppButton
+                active
+                @click="
+                    () =>
+                        $router.push({
+                            name: 'musician-id',
+                            params: { id: publicProfileData.id },
+                        })
+                "
+            >
+                Перейти в профиль
+            </AppButton>
         </div>
     </div>
 </template>

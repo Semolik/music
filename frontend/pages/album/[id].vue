@@ -10,7 +10,7 @@
         :is-liked="album.liked"
         @like="toggleLikeAlbum"
         hide-delete-button
-        :likes-count="album.likesCount"
+        :likes-count="album.likes_count"
     >
         <div class="tracks">
             <TrackCard

@@ -228,7 +228,7 @@ const musicianLink = computed(() => {
         null;
     if (!musician_id) return null;
     return {
-        name: "artist-id",
+        name: "musician-id",
         params: { id: musician_id },
     };
 });
