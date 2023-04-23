@@ -32,4 +32,5 @@ export const IconsNames = {
     filter: "material-symbols:filter-alt",
     close: "material-symbols:close",
     libraryIcon: "fluent:library-16-filled",
+    clipIcon: "material-symbols:video-library",
 };

@@ -56,20 +56,16 @@ const props = defineProps({
     active: Boolean,
     style: Object,
     offJustifyContent: Boolean,
-    maxWidth: {
-        type: Number,
-        default: 400,
-    },
     transition: {
         type: Number,
         default: 250,
     },
     maxWidth: {
-        type: Number,
+        type: [Number, String],
         default: 500,
     },
     maxHeight: {
-        type: Number,
+        type: [Number, null],
         default: 800,
     },
 
@@ -100,9 +96,15 @@ const transitionString = computed(() => {
     return `${props.transition}ms`;
 });
 const width = computed(() => {
+    if (typeof props.maxWidth === "string") {
+        return props.maxWidth;
+    }
     return `${props.maxWidth}px`;
 });
 const height = computed(() => {
+    if (props.maxHeight === null) {
+        return "auto";
+    }
     return `${props.maxHeight}px`;
 });
 

@@ -10,19 +10,24 @@ class ClipsCruds(CRUDBase):
         end = page * page_size
         return self.db.query(Clip).filter(Clip.musician_id == musician_id).slice(end-page_size, end).all()
 
-    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: Image):
+    def create_clip(self, musician_id: int,  name: str, video_id: str, image_model: Image, track_id: int | None = None) -> Clip:
         return self.create(
             Clip(
                 musician_id=musician_id,
                 picture=image_model,
                 name=name,
-                video_id=video_id
+                video_id=video_id,
+                track_id=track_id
             )
         )
 
-    def update_clip(self, db_clip: Clip, name: str, video_id: str, image: Image):
+    def search_musician_clips(self, musician_id: int, search: str) -> list[Clip]:
+        return self.db.query(Clip).filter(Clip.musician_id == musician_id).filter(Clip.name.ilike(f"%{search}%")).all()
+
+    def update_clip(self, db_clip: Clip, name: str, video_id: str, image: Image, track_id: int | None = None) -> Clip:
         db_clip.name = name
         db_clip.video_id = video_id
+        db_clip.track_id = track_id
         if image:
             FileCruds(self.db).replace_old_picture(
                 model=db_clip, new_picture=image)

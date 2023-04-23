@@ -5,6 +5,28 @@
             class="header-bar"
             v-if="headerBarActive && (links.length || currentPageTitle)"
         >
+            <div class="navigate-buttons">
+                <div
+                    :class="[
+                        'navigate-button',
+                        { active: router.options.history.state.back },
+                    ]"
+                    @click="router.back()"
+                    v-if="router.currentRoute.value.name !== 'index'"
+                >
+                    <Icon :name="IconsNames.backIcon" />
+                </div>
+                <div
+                    :class="[
+                        'navigate-button',
+                        { active: router.options.history.state.forward },
+                    ]"
+                    @click="router.forward()"
+                    v-if="router.currentRoute.value.name !== 'index'"
+                >
+                    <Icon :name="IconsNames.forwardIcon" />
+                </div>
+            </div>
             <div class="current-page-title" v-if="currentPageTitle">
                 {{ currentPageTitle }}
             </div>
@@ -25,6 +47,7 @@
 </template>
 <script setup>
 import { useEventBus } from "@vueuse/core";
+import { IconsNames } from "~/configs/icons";
 const openSearchBus = useEventBus("openSearch");
 const viewport = useViewport();
 const router = useRouter();
@@ -38,6 +61,7 @@ watch(
     },
     { immediate: true }
 );
+
 const searchIsActive = ref(false);
 const currentPageTitle = ref(null);
 const unsubscribeOpenSearchBus = openSearchBus.on(() => {
@@ -97,12 +121,35 @@ header {
         padding-bottom: 0px;
         display: flex;
         align-items: baseline;
-        justify-content: space-between;
+
         gap: 20px;
         @include lg(true) {
             flex-direction: column;
             padding: 10px;
             padding-bottom: 0;
+        }
+        .navigate-buttons {
+            display: flex;
+            gap: 10px;
+
+            .navigate-button {
+                @include flex-center;
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                background-color: $tertiary-bg;
+                color: $tertiary-text;
+
+                &.active {
+                    cursor: pointer;
+                    background-color: $quaternary-bg;
+                    color: $primary-text;
+
+                    &:hover {
+                        background-color: $quinary-bg;
+                    }
+                }
+            }
         }
         .current-page-title {
             font-size: 1.5rem;
@@ -115,6 +162,7 @@ header {
             }
         }
         .links {
+            margin-left: auto;
             display: flex;
             flex-wrap: wrap;
             gap: 5px;

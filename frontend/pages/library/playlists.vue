@@ -39,34 +39,17 @@
                     </template>
                 </ModalDialog>
                 <div class="filters-menu" ref="filtersMenu">
-                    <div
-                        class="filter-item"
+                    <AppSelect
                         v-for="(filter, name) in filters"
-                        :key="filter.title"
-                    >
-                        <div class="disabled" v-if="filter.disabled">
-                            <Icon name="material-symbols:lock" />
-                        </div>
-                        <div class="title">{{ name }}</div>
-                        <div class="values">
-                            <div
-                                :class="[
-                                    'value',
-                                    {
-                                        active:
-                                            filter.active === value ||
-                                            (!filter.active &&
-                                                filter.default === value),
-                                    },
-                                ]"
-                                v-for="value in filter.values"
-                                :key="value"
-                                @click="filter.active = value"
-                            >
-                                {{ value }}
-                            </div>
-                        </div>
-                    </div>
+                        :values="filters[name].values"
+                        :title="name"
+                        :model-value="
+                            filters[name].active || filters[name].default
+                        "
+                        @update:model-value="
+                            (value) => (filters[name].active = value)
+                        "
+                    />
                     <div
                         @click="resetFilters"
                         :class="['reset-button', { active: filtersIsActived }]"

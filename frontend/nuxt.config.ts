@@ -162,6 +162,11 @@ export default defineNuxtConfig({
             SLIDER_PAGE_ITEMS: Number(process.env.SLIDER_PAGE_ITEMS),
             MAX_SLIDE_NAME_LENGTH: Number(process.env.MAX_SLIDE_NAME_LENGTH),
             SLIDER_ASPECT_RATIO: Number(process.env.SLIDER_ASPECT_RATIO),
+            YOUTUBE_EMBED_URL: process.env.YOUTUBE_EMBED_URL,
+            MUSICIAN_ALL_TRACKS_LIMIT: Number(
+                process.env.MUSICIAN_ALL_TRACKS_LIMIT
+            ),
+            YOUTUBE_VIDEO: process.env.YOUTUBE_VIDEO,
         },
     },
 });

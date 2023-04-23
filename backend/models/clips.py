@@ -37,5 +37,12 @@ class Clip(Base):
     picture = relationship(
         "Image",
         foreign_keys=[picture_id],
-        cascade="all,delete",
+        cascade="all,delete"
     )
+    track_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("tracks.id"),
+        nullable=True,
+        index=True,
+    )
+    track = relationship("Track", foreign_keys=[track_id])

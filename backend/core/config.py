@@ -26,7 +26,7 @@ class Settings(BaseSettings):
         'telegram': 'https://t.me/{0}',
         'vk': 'https://vk.com/{0}',
         'youtube': 'https://www.youtube.com/channel/{0}',
-        'youtube_video': 'https://www.youtube.com/watch?v={0}',
+        'youtube_video': env_config.get('YOUTUBE_VIDEO')+'{0}',
     }
 
     TEST_USER_USERNAME = 'test_user'

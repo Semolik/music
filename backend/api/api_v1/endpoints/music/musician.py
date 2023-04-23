@@ -167,5 +167,7 @@ def get_musician_popular_tracks(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     tracks = MusicianCrud(db).get_popular_musician_tracks(
-        musician_id=db_public_profile.id, page=page)
+        musician_id=db_public_profile.id, page=page, page_size=int(
+            env_config.get('MUSICIAN_ALL_TRACKS_LIMIT'))
+    )
     return tracks

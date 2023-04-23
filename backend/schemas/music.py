@@ -180,6 +180,7 @@ class CreateMusicianClip(BaseModel):
         max_length=int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH')),
         description="ID видео на YouTube"
     )
+    track_id: uuid_pkg.UUID = Query(None, description="ID трека")
 
 
 @form_body

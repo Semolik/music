@@ -29,5 +29,12 @@ const linksAll = [
         },
         icon: IconsNames.albumIcon,
     },
+    {
+        text: "Клипы",
+        to: {
+            name: routesNames.musicianCabinet.cabinetClips,
+        },
+        icon: IconsNames.clipIcon,
+    },
 ];
 </script>

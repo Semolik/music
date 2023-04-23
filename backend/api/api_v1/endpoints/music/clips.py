@@ -3,10 +3,12 @@ from fastapi import Depends, APIRouter, Path, UploadFile, File, status, HTTPExce
 from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.crud.crud_clips import ClipsCruds
+from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.images import save_image
 from backend.helpers.clips import video_is_exists
+from backend.helpers.music import validate_track
 from backend.schemas.music import CreateMusicianClipForm, MusicianClip
 from backend.helpers.files import save_image_in_db_by_url, valid_content_length
 from backend.db.db import get_db
@@ -45,8 +47,11 @@ def create_clip(
     if not image_model:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Необходимо или передать картинку или указать image_from_youtube = true")
+    if clipData.track_id:
+        validate_track(db=Auth.db, track_id=clipData.track_id,
+                       user_id=Auth.current_user_id)
     clip = ClipsCruds(Auth.db).create_clip(
-        musician_id=db_public_profile.id, video_id=clipData.video_id, name=clipData.name, image_model=image_model)
+        musician_id=db_public_profile.id, video_id=clipData.video_id, name=clipData.name, image_model=image_model, track_id=clipData.track_id)
     return clip
 
 
@@ -104,8 +109,11 @@ def update_clip(
             user_id=Auth.current_user_id,
             resize_image_options=(1000, 1000)
         )
+    if clipData.track_id:
+        validate_track(db=Auth.db, track_id=clipData.track_id,
+                       user_id=Auth.current_user_id)
     clip = ClipsCruds(Auth.db).update_clip(
-        db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image=image_model)
+        db_clip=db_clip, video_id=clipData.video_id, name=clipData.name, image=image_model, track_id=clipData.track_id)
     return clip
 
 
@@ -120,6 +128,20 @@ def get_my_clips(
         Auth.db).get_public_profile(user_id=Auth.current_user_id)
     clips = ClipsCruds(Auth.db).get_musician_clips(
         musician_id=db_public_profile.id, page=page)
+    return clips
+
+
+@router.get('/my/search', response_model=List[MusicianClip])
+def search_my_clips(
+    search: str = Query(..., description='Строка поиска'),
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+):
+    '''Поиск моих клипов'''
+
+    db_public_profile = UserCruds(
+        Auth.db).get_public_profile(user_id=Auth.current_user_id)
+    clips = ClipsCruds(Auth.db).search_musician_clips(
+        musician_id=db_public_profile.id, search=search)
     return clips
 
 

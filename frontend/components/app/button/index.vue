@@ -1,10 +1,15 @@
 <template>
     <div :class="['app-button', { active: active }, { 'no-accent': noAccent }]">
-        <slot />
+        <template v-if="!loading">
+            <slot />
+        </template>
+        <div v-else class="loading">
+            <Icon name="eos-icons:loading" />
+        </div>
     </div>
 </template>
 <script setup>
-const { active, borderRadius } = defineProps({
+const { active, borderRadius, loading } = defineProps({
     active: {
         type: Boolean,
         default: false,
@@ -14,6 +19,10 @@ const { active, borderRadius } = defineProps({
         default: "10px",
     },
     noAccent: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
         type: Boolean,
         default: false,
     },
@@ -46,6 +55,15 @@ const { active, borderRadius } = defineProps({
         }
         &:hover {
             background-color: var(--app-button-active-hover-bg, $accent-hover);
+        }
+    }
+    .loading {
+        @include flex-center;
+        width: 100%;
+        height: 100%;
+        svg {
+            width: 24px;
+            height: 24px;
         }
     }
 }

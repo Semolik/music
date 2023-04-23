@@ -41,7 +41,7 @@ const {
         default: "50%",
     },
     aspectRatio: {
-        type: Number,
+        type: [Number, String],
         default: 1,
     },
     beforeAvatarUpload: {
