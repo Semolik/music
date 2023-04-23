@@ -52,9 +52,18 @@ useHead({
 });
 watch(
     router.currentRoute,
-    (value) => (currentPageTitle.value = value.meta?.title),
+    (value) => {
+        if (value.meta?.getTitle) {
+            onMounted(async () => {
+                currentPageTitle.value = document.title;
+            });
+        } else {
+            currentPageTitle.value = value.meta?.title;
+        }
+    },
     { immediate: true }
 );
+
 onMounted(() => {
     window.addEventListener("keydown", (event) => {
         if (event.ctrlKey && event.key === "k") {

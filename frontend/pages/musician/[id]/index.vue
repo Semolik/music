@@ -58,7 +58,15 @@
                 }"
                 v-if="musician.popular.clips.length"
             >
-                {{ musician.popular.clips }}
+                <SliderSwiper class="slider" :loop="false" :autoplay="false">
+                    <SwiperSlide
+                        v-for="clip in musician.popular.clips"
+                        :key="clip.id"
+                        class="slide"
+                    >
+                        <ClipCard :clip="clip" :musician-info="musician" />
+                    </SwiperSlide>
+                </SliderSwiper>
             </selection>
         </div>
     </ContentHead>
@@ -116,6 +124,12 @@ const toggleLikeMusician = async () => {
         display: flex;
         flex-direction: column;
         gap: 10px;
+    }
+}
+.slider {
+    width: 100%;
+    .slide {
+        max-width: 300px;
     }
 }
 </style>

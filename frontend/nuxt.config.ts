@@ -75,7 +75,6 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             AuthBusKey: "auth",
-
             MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH: Number(
                 process.env.VITE_MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH
             ),

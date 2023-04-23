@@ -1,14 +1,6 @@
 <template>
     <div class="slider-container" v-if="slides.length">
-        <Swiper
-            :modules="[SwiperAutoplay, SwiperEffectCreative]"
-            :slides-per-view="1"
-            :loop="true"
-            :autoplay="{
-                delay: 4000,
-                disableOnInteraction: true,
-            }"
-            :spaceBetween="10"
+        <SliderSwiper
             :style="{
                 '--aspect-ratio': SLIDER_ASPECT_RATIO,
             }"
@@ -18,7 +10,7 @@
                     <img :src="slide.picture" />
                 </a>
             </SwiperSlide>
-        </Swiper>
+        </SliderSwiper>
     </div>
 </template>
 <script setup>

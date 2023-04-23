@@ -48,7 +48,6 @@ const createPlaylist = async () => {
         description: null,
         private: !newPlaylistPublic.value,
     });
-    console.log(playlist);
     emit("creared", playlist);
 };
 </script>

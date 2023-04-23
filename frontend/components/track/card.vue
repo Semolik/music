@@ -122,12 +122,7 @@
     <ModalDialog
         :active="addToPlaylistModalOpened"
         :head-text="createMode ? 'Создание плейлиста' : 'Добавление в плейлист'"
-        @close="
-            () => {
-                menuOpened = false;
-                addToPlaylistModalOpened = false;
-            }
-        "
+        @close="closeAddToPlaylistModal"
         key="playlist-modal"
         close-on-esckey
     >
@@ -142,7 +137,10 @@
                         {{ createMode ? "Назад" : "Создать новый плейлист" }}
                     </span>
                 </AppButton>
-                <PlaylistCreateModalContent v-if="createMode" />
+                <PlaylistCreateModalContent
+                    v-if="createMode"
+                    @creared="closeAddToPlaylistModal"
+                />
                 <template v-else>
                     <div class="playlists">
                         <PlaylistCard
@@ -277,6 +275,10 @@ const openAddToPlaylistModal = () => {
         return;
     }
     addToPlaylistModalOpened.value = true;
+};
+const closeAddToPlaylistModal = () => {
+    menuOpened.value = false;
+    addToPlaylistModalOpened.value = false;
 };
 watch(addToPlaylistModalOpened, (value) => {
     createMode.value = false;
