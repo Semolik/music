@@ -2,7 +2,7 @@
     <div class="clips-page">
         <AddSearch
             v-model:search="search"
-            placeholder="Поиск по вашим альбомам"
+            placeholder="Поиск по вашим клипам"
             :to="{ name: 'musician-cabinet-clips-add' }"
         />
         <CardsContainer :mdWidth="200" :width="250">
