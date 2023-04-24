@@ -21,6 +21,7 @@
                 <MenuItem
                     :to="{ name: 'admin-cabinet' }"
                     text="Кабинет администратора"
+                    :icon="IconsNames.adminIcon"
                     highlight
                     v-if="isAdmin"
                 />

@@ -180,12 +180,12 @@ header {
                     flex-grow: 1;
                 }
                 @include lg {
-                    &:not(.router-link-active):hover {
+                    &:not(.router-link-exact-active):hover {
                         border-color: $accent;
                         color: $accent;
                     }
                 }
-                &.router-link-active {
+                &.router-link-exact-active {
                     border-color: $accent;
                     background-color: $accent;
                     color: $primary-bg;

@@ -98,18 +98,15 @@ def update_album(
 
 @router.get('/my', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
 def get_my_albums(
+    page: int = Query(1, description='Номер страницы'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Получение альбомов музыканта'''
 
     db_musician = UserCruds(Auth.db).get_public_profile(
         user_id=Auth.current_user.id)
-    albums = []
-    albums_obj = []
-    for album in albums:
-        album_info = AlbumInfo.from_orm(album)
-        album_info.musician = MusicianInfo.from_orm(db_musician)
-        albums_obj.append(album_info)
+    albums = AlbumsCruds(Auth.db).get_musician_albums(
+        musician_id=db_musician.id, page=page)
     return albums
 
 
@@ -174,11 +171,7 @@ def get_album_by_id(
         if not Auth.current_user or album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Альбом не найден")
-    db_album_obj = set_album_info(
-        db_album=db_album, user_id=Auth.current_user_id, db=Auth.db)
-    db_album_obj = set_musician_info(
-        data=db_album_obj, public_profile_id=db_album.musician_id, db=Auth.db)
-    return set_album_tracks(db=Auth.db, db_album=db_album, db_album_obj=db_album_obj, user_id=Auth.current_user_id)
+    return db_album
 
 
 @router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(

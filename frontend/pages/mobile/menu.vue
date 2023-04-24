@@ -1,3 +1,3 @@
 <template>
-    <Menu show-login-selection show-title />
+    <Menu show-login-selection />
 </template>

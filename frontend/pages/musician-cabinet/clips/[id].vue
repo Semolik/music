@@ -29,6 +29,7 @@
                     label="Ссылка на видео"
                     :error="!urlCorrect"
                 />
+                Сделать выбор трека
                 <AppButton
                     @click="save"
                     :active="buttonActive"

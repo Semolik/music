@@ -27,7 +27,7 @@ const menuSelections = [
             },
             {
                 icon: historyIcon,
-                to: { name: "history" },
+                to: { name: "library-history" },
                 text: "История",
             },
         ],

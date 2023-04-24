@@ -85,7 +85,6 @@ def get_track(
 
     tracks_crud = TracksCrud(Auth.db)
     db_track = tracks_crud.get_track(track_id=track_id)
-
     if not db_track or not db_track.album_uploaded:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Трек не найден")

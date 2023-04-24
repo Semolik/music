@@ -85,3 +85,6 @@ class AlbumsCruds(CRUDBase):
 
     def get_album_likes_count(self, album: Album) -> int:
         return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album.id).count()
+
+    def get_musician_albums(self, musician_id: int, page: int, page_size: int = 100) -> List[Album]:
+        return self.db.query(Album).filter(Album.musician_id == musician_id).offset((page-1)*page_size).limit(page_size).all()

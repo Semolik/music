@@ -21,6 +21,10 @@ definePageMeta({
             name: "library-artists",
             title: "Исполнители",
         },
+        {
+            name: "library-history",
+            title: "История",
+        },
     ],
     title: "Библиотека",
 });

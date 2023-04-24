@@ -3,6 +3,8 @@
         <Slider />
         <Genres />
         <Chart />
+        <History />
+        <NewReleases />
     </div>
 </template>
 <script setup>
