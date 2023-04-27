@@ -1,5 +1,5 @@
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, func
 from sqlalchemy.orm import relationship, backref, object_session
 from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
@@ -82,6 +82,10 @@ class User(Base):
 class PublicProfile(Base):
     __tablename__ = 'public_profiles'
 
+    def __init__(self, current_user_id=None, is_liked=False):
+        self.current_user_id = current_user_id
+        self.is_liked = is_liked
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(
         String(
@@ -134,6 +138,21 @@ class PublicProfile(Base):
             ).count()
         return self._likes_count
 
+    @property
+    def liked(self):
+        is_liked = self.is_liked if hasattr(self, 'is_liked') else False
+        if is_liked:
+            return True
+        current_user_id = self.current_user_id if hasattr(
+            self, 'current_user_id') else None
+        if current_user_id is None:
+            return False
+        return object_session(self).query(
+            FavoriteMusicians).filter(
+                FavoriteMusicians.musician_id == self.id,
+                FavoriteMusicians.user_id == self.current_user_id
+        ).first() is not None
+
 
 class PublicProfileLinks(Base):
     __tablename__ = 'public_profiles_links'
@@ -168,4 +187,27 @@ class PublicProfileLinks(Base):
                 env_config.get('VITE_MAX_VK_USERNAME_LENGTH')
             )
         )
+    )
+
+
+class ListenMusicianHistoryItem(Base):
+    __tablename__ = 'listen_musician_history'
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey(
+        "users.id", ondelete='CASCADE'))
+    user = relationship(
+        "User",
+        foreign_keys=[user_id],
+    )
+    musician_id = Column(Integer, ForeignKey(
+        "public_profiles.id", ondelete='CASCADE'))
+    musician = relationship(
+        "PublicProfile",
+        foreign_keys=[musician_id],
+    )
+    listen_datetime = Column(
+        DateTime(timezone=False),
+        server_default=func.now(),
+        nullable=False
     )

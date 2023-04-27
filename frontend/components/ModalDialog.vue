@@ -179,6 +179,8 @@ onBeforeUnmount(() => {
     color: $primary-text;
     flex-direction: column;
     transition: opacity v-bind(transitionString) ease-in-out;
+    backdrop-filter: blur(8px);
+    padding: 10px;
     &.open {
         animation: open v-bind(transitionString) ease-in-out;
         opacity: 1;

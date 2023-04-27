@@ -121,16 +121,20 @@ header {
         padding-bottom: 0px;
         display: flex;
         align-items: baseline;
-
         gap: 20px;
         @include lg(true) {
             flex-direction: column;
             padding: 10px;
             padding-bottom: 0;
+            gap: 10px;
         }
         .navigate-buttons {
             display: flex;
             gap: 10px;
+
+            @include lg(true) {
+                display: none;
+            }
 
             .navigate-button {
                 @include flex-center;

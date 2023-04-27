@@ -5,7 +5,7 @@ from backend.models.files import Image
 from backend.models.tracks import Track, FavoriteTracks
 from backend.models.genres import Genre, LovedGenre
 from backend.models.user import PublicProfile, FavoriteMusicians
-from sqlalchemy import func
+from sqlalchemy import func, select
 from backend.core.config import settings
 from sqlalchemy import or_
 
@@ -18,11 +18,11 @@ class GenresCruds(CRUDBase):
         end = page * page_size
         query = self.db.query(Genre)
         if filter == settings.FilterGenreEnum.liked:
-            query = query.join(LovedGenre)
+            query = query.join(LovedGenre, LovedGenre.genre_id == Genre.id)
         else:
-            query = query.outerjoin(LovedGenre)
-        query = query.group_by(Genre.id).order_by(
-            func.count(LovedGenre.genre_id).desc())
+            query = query.outerjoin(
+                LovedGenre, LovedGenre.genre_id == Genre.id)
+
         if filter != settings.FilterGenreEnum.all:
             if not current_user_id:
                 raise Exception(
@@ -31,12 +31,16 @@ class GenresCruds(CRUDBase):
             query = query.filter(LovedGenre.user_id == current_user_id)
         elif filter == settings.FilterGenreEnum.not_liked:
             query = query.filter(
-                or_(LovedGenre.id == None, LovedGenre.user_id != current_user_id))
-
+                Genre.id.notin_(
+                    select(LovedGenre.genre_id).where(
+                        LovedGenre.user_id == current_user_id
+                    )
+                )
+            ).filter(LovedGenre.user_id == None)
         return query.slice(end - page_size, end).all()
 
     def get_liked_genres_ordered_by_likes(self, user_id: int) -> list[Genre]:
-        return self.db.query(Genre).join(LovedGenre).filter(LovedGenre.user_id == user_id).order_by(func.count(LovedGenre.genre_id).desc()).all()
+        return self.db.query(Genre).join(LovedGenre, LovedGenre.genre_id == Genre.id).filter(LovedGenre.user_id == user_id).order_by(func.count(LovedGenre.genre_id).desc()).all()
 
     def get_random_genres(self, count: int = settings.SEARCH_GENRE_LIMIT) -> list[Genre]:
         return self.db.query(Genre).order_by(func.random()).limit(count).all()
@@ -77,7 +81,8 @@ class GenresCruds(CRUDBase):
 
     def get_popular_albums_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Album]:
         end = page * page_size
-        return self.db.query(Album).join(AlbumGenre, FavoriteAlbum)\
+        return self.db.query(Album).join(AlbumGenre, LovedGenre.genre_id == Genre.id)\
+            .join(FavoriteAlbum, Album.id == FavoriteAlbum.album_id)\
             .filter(AlbumGenre.genre_id == genre_id, Album.is_available)\
             .group_by(Album.id)\
             .order_by(func.count(FavoriteAlbum.album_id).desc())\
@@ -85,7 +90,9 @@ class GenresCruds(CRUDBase):
 
     def get_popular_tracks_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Track]:
         end = page * page_size
-        return self.db.query(Track).join(Album, AlbumGenre, FavoriteTracks)\
+        return self.db.query(Track).join(Album, Album.id == Track.album_id)\
+            .join(AlbumGenre, AlbumGenre.album_id == Album.id)\
+            .join(FavoriteTracks, Track.id == FavoriteTracks.track_id)\
             .filter(AlbumGenre.genre_id == genre_id, Track.is_available)\
             .group_by(Track.id)\
             .order_by(func.count(FavoriteTracks.track_id).desc())\
@@ -93,7 +100,9 @@ class GenresCruds(CRUDBase):
 
     def get_popular_musicians_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[PublicProfile]:
         end = page * page_size
-        return self.db.query(PublicProfile).join(FavoriteMusicians, Album, AlbumGenre)\
+        return self.db.query(PublicProfile).join(FavoriteMusicians, PublicProfile.id == FavoriteMusicians.musician_id)\
+            .join(Album, Album.musician_id == PublicProfile.id)\
+            .join(AlbumGenre, AlbumGenre.album_id == Album.id)\
             .filter(AlbumGenre.genre_id == genre_id)\
             .group_by(PublicProfile.id)\
             .order_by(func.count(FavoriteMusicians.musician_id).desc())\
@@ -101,7 +110,7 @@ class GenresCruds(CRUDBase):
 
     def get_new_albums_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Album]:
         end = page * page_size
-        return self.db.query(Album).join(AlbumGenre)\
+        return self.db.query(Album).join(AlbumGenre, AlbumGenre.album_id == Album.id)\
             .filter(AlbumGenre.genre_id == genre_id, Album.is_available)\
             .order_by(Album.open_date.desc())\
             .slice(end - page_size, end).all()

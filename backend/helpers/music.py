@@ -10,7 +10,7 @@ from backend.helpers.urls import get_track_url_by_id
 from backend.models.files import Image
 from backend.models.playlists import Playlist
 from backend.models.tracks import Track
-from backend.schemas.music import UploadTrackForm
+from backend.schemas.music import UploadTrackForm, AlbumInfo as AlbumInfoSchema
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_playlists import PlaylistsCrud
 from backend.db.base import CRUDBase
@@ -49,39 +49,6 @@ def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Ima
         return db_track
     except:
         raise HTTPException(status_code=422, detail="поврежденный файл")
-
-
-def set_album_tracks(db: Session, db_album, db_album_obj, user_id: int = None):
-    db_album_obj['tracks'] = [set_track_data(db=db, track=track, user_id=user_id)
-                              for track in AlbumsCruds(db).get_album_tracks(album_id=db_album.id)]
-    return db_album_obj
-
-
-def set_tracks_likes(db: Session, tracks: List[Track], user_id: int):
-    return [set_track_like(db=db, db_track=db_track, user_id=user_id) for db_track in tracks]
-
-
-def set_track_like(db: Session, db_track: Track, user_id: int = None):
-    track = TrackSchema.from_orm(db_track)
-    track.liked = TracksCrud(db).track_is_liked(
-        track_id=track.id, user_id=user_id) if user_id else False
-
-    return track
-
-
-def set_track_data(db: Session, track: Track, user_id: int = None):
-    track_obj = set_picture(track.as_dict(), track.picture)
-    track_obj['url'] = get_track_url(track=track)
-    if user_id:
-        track_obj['liked'] = TracksCrud(db).track_is_liked(
-            track_id=track.id, user_id=user_id)
-    return track_obj
-
-
-def set_full_track_data(db: Session, track: Track, user_id: int = None):
-    track_obj = set_track_data(track=track, db=db, user_id=user_id)
-    track_obj['album'] = set_album_info(db_album=track.album)
-    return track_obj
 
 
 def get_track_url(track: Track):
@@ -185,26 +152,6 @@ def validate_tracks(db: Session, tracks_ids: List[UUID], user_id: int) -> List[T
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Трек{letter} с id {','.join(map(str, not_found_tracks_ids))} не найден{letter}")
     return tracks
-
-
-def set_album_info(db_album: Album, db: Session = None, user_id: int = None) -> dict:
-    db_album_obj = db_album.as_dict()
-    db_album_obj['year'] = db_album.open_date.year
-    db_album_obj['date'] = db_album.open_date
-    db_album_obj['likes_count'] = db_album.likes_count
-    db_album_obj['genres'] = [
-        set_picture(
-            db_genre.as_dict(),
-            db_genre.picture
-        )
-        for db_genre in db_album.genres]
-    db_album_obj = set_picture(db_album_obj, db_album.picture)
-    if user_id is not None:
-        if db is None:
-            raise Exception("При запросе лайка альбома необходимо передать db")
-        db_album_obj['liked'] = bool(AlbumsCruds(
-            db).get_album_like(album=db_album, user_id=user_id))
-    return db_album_obj
 
 
 def album_is_available(db: Session, user_id: int, album_id: int = None, album: Album = None, message: str = "Альбом не найден"):

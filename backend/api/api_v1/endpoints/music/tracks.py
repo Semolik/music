@@ -7,7 +7,6 @@ from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import set_tracks_likes
 from backend.models.albums import Album
 from backend.schemas.music import Track
 import uuid as uuid_pkg
@@ -45,7 +44,9 @@ def get_liked_tracks(
         user_id=Auth.current_user_id,
         page=page
     )
-    return set_tracks_likes(tracks=liked_tracks, user_id=Auth.current_user_id, db=Auth.db)
+    for track in liked_tracks:
+        track.is_liked = True
+    return liked_tracks
 
 
 @router.get('/popular', response_model=List[Track])
@@ -53,9 +54,10 @@ def get_popular_tracks(
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение популярных треков'''
-
     popular_tracks = TracksCrud(Auth.db).get_popular_tracks()
-    return set_tracks_likes(tracks=popular_tracks, user_id=Auth.current_user_id, db=Auth.db)
+    for track in popular_tracks:
+        track.current_user_id = Auth.current_user_id
+    return popular_tracks
 
 
 @router.get('/popular/month', response_model=List[Track])
@@ -73,7 +75,9 @@ def get_popular_tracks_month(
         page=page,
         page_size=page_size
     )
-    return set_tracks_likes(tracks=popular_tracks, user_id=Auth.current_user_id, db=Auth.db)
+    for track in popular_tracks:
+        track.current_user_id = Auth.current_user_id
+    return popular_tracks
 
 
 @router.get('/{track_id}',  response_model=Track)
@@ -92,11 +96,8 @@ def get_track(
         if not Auth.current_user or AlbumsCruds(Auth.db).album_belongs_to_user(album=db_track.album, user_id=Auth.current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Трек не найден")
-    track_obj = Track.from_orm(db_track)
-    if Auth.current_user_id:
-        track_obj.liked = tracks_crud.track_is_liked(
-            track_id=db_track.id, user_id=Auth.current_user_id)
-    return track_obj
+    db_track.current_user_id = Auth.current_user_id
+    return db_track
 
 
 @router.get('/{track_id}/playlists/my',  response_model=List[PlaylistInfoWithoutTracks])
@@ -111,6 +112,8 @@ def get_track_playlists(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Au
         )
     playlists = tracks_crud.get_my_track_playlists(
         track_id=track_id, user_id=Auth.current_user_id)
+    for playlist in playlists:
+        playlist.current_user_id = Auth.current_user_id
     return playlists
 
 

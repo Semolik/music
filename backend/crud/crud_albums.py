@@ -13,11 +13,10 @@ from sqlalchemy import func
 
 
 class AlbumsCruds(CRUDBase):
-    def get_album_tracks(self, album_id: int) -> List[Track]:
-        tracks = self.db.query(Track).filter(Track.album_id == album_id).all()
-        if None in [track.track_position for track in tracks]:
-            return tracks
-        return sorted(tracks, key=lambda track: track.track_position)
+
+    def get_last_albums(self, page: int, page_size: int) -> List[Album]:
+        end = page * page_size
+        return self.db.query(Album).filter(Album.is_available).order_by(Album.open_date.desc()).slice(end - page_size, end).all()
 
     def create_album(self, user_id: int, name: str,  date: datetime, picture: Image | None, genres: List[Genre]):
         db_image = self.create(model=picture) if picture else None
@@ -63,6 +62,9 @@ class AlbumsCruds(CRUDBase):
     def get_album(self, album_id: int) -> Album:
         return self.get(id=album_id, model=Album)
 
+    def get_albums_by_ids(self, albums_ids: List[int]) -> List[Album]:
+        return self.db.query(Album).filter(Album.id.in_(albums_ids)).all()
+
     def get_album_like(self, album: Album, user_id: int) -> FavoriteAlbum:
         return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album.id, FavoriteAlbum.user_id == user_id).first()
 
@@ -78,7 +80,7 @@ class AlbumsCruds(CRUDBase):
 
     def get_liked_albums(self, user_id: int) -> List[Album]:
         now = datetime.now()
-        return self.db.query(Album).join(FavoriteAlbum).filter(Album.uploaded == True, FavoriteAlbum.user_id == user_id, Album.open_date <= now).all()
+        return self.db.query(Album).join(FavoriteAlbum, FavoriteAlbum.album_id == Album.id).filter(Album.uploaded == True, FavoriteAlbum.user_id == user_id, Album.open_date <= now).all()
 
     def album_is_liked(self, album_id: int, user_id: int) -> bool:
         return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album_id, FavoriteAlbum.user_id == user_id).first() is not None
@@ -87,4 +89,5 @@ class AlbumsCruds(CRUDBase):
         return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album.id).count()
 
     def get_musician_albums(self, musician_id: int, page: int, page_size: int = 100) -> List[Album]:
-        return self.db.query(Album).filter(Album.musician_id == musician_id).offset((page-1)*page_size).limit(page_size).all()
+        end = page * page_size
+        return self.db.query(Album).filter(Album.musician_id == musician_id).slice(end - page_size, end).all()

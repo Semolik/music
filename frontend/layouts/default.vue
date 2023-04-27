@@ -43,6 +43,9 @@
 
             &.enable-padding {
                 padding: 20px;
+                @include lg(true) {
+                    padding: 10px;
+                }
             }
         }
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="card">
+    <div :class="['card', { 'is-link': isLink }]">
         <CardPicture
             :picture="picture"
             :icon="icon"
@@ -12,7 +12,7 @@
     </div>
 </template>
 <script setup>
-const { picture, icon, borderRadius } = defineProps({
+const { picture, icon, borderRadius, isLink } = defineProps({
     picture: {
         type: [String, null],
         required: true,
@@ -25,9 +25,13 @@ const { picture, icon, borderRadius } = defineProps({
         required: false,
         default: "5px",
     },
+    isLink: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .card {
     display: flex;
     flex-direction: column;
@@ -35,5 +39,15 @@ const { picture, icon, borderRadius } = defineProps({
     width: 100%;
     gap: 5px;
     cursor: pointer;
+    &.is-link {
+        background-color: $secondary-bg;
+        padding: 10px;
+        border-radius: 10px;
+        @include lg {
+            &:hover {
+                background-color: $secondary-bg-2;
+            }
+        }
+    }
 }
 </style>

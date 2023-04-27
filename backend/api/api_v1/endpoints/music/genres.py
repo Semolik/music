@@ -1,14 +1,12 @@
 from typing import List
-from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException, Query
+from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException
 from backend.crud.crud_genres import GenresCruds
-from backend.db.db import get_db
-from sqlalchemy.orm import Session
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.files import valid_content_length
 from backend.helpers.images import save_image
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import AlbumInfo, Genre, GenreBaseForm, GenreFullInfo
+from backend.schemas.music import Genre, GenreBaseForm, GenreFullInfo
 from backend.core.config import settings
 from backend.schemas.statistics import GenreStats
 
@@ -35,9 +33,12 @@ def create_genre(
 
 
 @router.get('/random',  response_model=List[Genre])
-def get_random_genres(db: Session = Depends(get_db)):
+def get_random_genres(Auth: Authenticate = Depends(Authenticate(is_admin=True))):
     '''Получение случайных жанров'''
-    return GenresCruds(db).get_random_genres()
+    genres = GenresCruds(Auth.db).get_random_genres()
+    for genre in genres:
+        genre.current_user_id = Auth.current_user_id
+    return
 
 
 @router.put('/{genre_id}/like', response_model=bool)
@@ -80,6 +81,7 @@ def update_genre(
                           user_id=Auth.current_user_id)
     genre = GenresCruds(Auth.db).update_genre(
         name=genreData.name, picture=db_image, genre=genre)
+    genre.current_user_id = Auth.current_user_id
     return genre
 
 
@@ -98,23 +100,38 @@ def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth
         GenresCruds(Auth.db).get_liked_genre_model(
             user_id=Auth.current_user_id, genre_id=genre.id)
     ) if Auth.current_user_id else False
+    popular_albums = GenresCruds(Auth.db).get_popular_albums_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    new_albums = GenresCruds(Auth.db).get_new_albums_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    popular_tracks = GenresCruds(Auth.db).get_popular_tracks_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    popular_musicians = GenresCruds(Auth.db).get_popular_musicians_by_genre_id(
+        page=1,
+        genre_id=genre_id
+    )
+    for album in popular_albums:
+        album.current_user_id = Auth.current_user_id
 
-    genre_obj.popular_albums = GenresCruds(Auth.db).get_popular_albums_by_genre_id(
-        page=1,
-        genre_id=genre_id
-    )
-    genre_obj.popular_tracks = GenresCruds(Auth.db).get_popular_tracks_by_genre_id(
-        page=1,
-        genre_id=genre_id
-    )
-    genre_obj.popular_musicians = GenresCruds(Auth.db).get_popular_musicians_by_genre_id(
-        page=1,
-        genre_id=genre_id
-    )
-    genre_obj.new_albums = GenresCruds(Auth.db).get_new_albums_by_genre_id(
-        page=1,
-        genre_id=genre_id
-    )
+    for album in new_albums:
+        album.current_user_id = Auth.current_user_id
+
+    for track in popular_tracks:
+        track.current_user_id = Auth.current_user_id
+
+    for musician in popular_musicians:
+        musician.current_user_id = Auth.current_user_id
+
+    genre_obj.popular_albums = popular_albums
+    genre_obj.new_albums = new_albums
+    genre_obj.popular_tracks = popular_tracks
+    genre_obj.popular_musicians = popular_musicians
     return genre_obj
 
 
@@ -133,6 +150,7 @@ def get_genre_info(genre_id: int = Path(..., ge=1), Auth: Authenticate = Depends
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Жанр не найден'
         )
+    genre.current_user_id = Auth.current_user_id
     return genre
 
 
@@ -166,13 +184,6 @@ def get_genres(
                             detail="Для фильтрации жанров необходимо авторизоваться")
     genres = GenresCruds(Auth.db).get_popular_genres(
         page=page, page_size=settings.SEARCH_GENRE_LIMIT, filter=filter, current_user_id=Auth.current_user_id)
-    genres_objs = []
     for genre in genres:
-        genre_obj = Genre.from_orm(genre)
-        if Auth.current_user_id:
-            genre_obj.liked = bool(
-                GenresCruds(Auth.db).get_liked_genre_model(
-                    user_id=Auth.current_user_id, genre_id=genre.id)
-            )
-        genres_objs.append(genre_obj)
-    return genres_objs
+        genre.current_user_id = Auth.current_user_id
+    return genres

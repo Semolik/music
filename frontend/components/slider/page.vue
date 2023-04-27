@@ -125,7 +125,7 @@ const dateEnd = computed(() =>
 const dateRange = ref([dateStart.value, dateEnd.value]);
 
 const buttonActive = computed(() => {
-    return (
+    return !!(
         !nameError.value &&
         !orderError.value &&
         (id

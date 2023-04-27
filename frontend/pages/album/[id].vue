@@ -42,7 +42,9 @@ const authStore = useAuthStore();
 const { logined, musicianProfile } = storeToRefs(authStore);
 
 const isOwner = computed(
-    () => logined.value && musicianProfile.value.id === album.value.musician.id
+    () =>
+        musicianProfile.value &&
+        musicianProfile.value.id === album.value.musician.id
 );
 const toggleLikeAlbum = async () => {
     if (!logined.value) {

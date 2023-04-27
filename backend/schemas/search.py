@@ -1,6 +1,4 @@
-from typing import List
 from typing import Union
-from fastapi import Query
 from pydantic import BaseModel
 
 from backend.schemas.music import AlbumInfo, Track, MusicianClip
@@ -33,6 +31,3 @@ class AllSearchItem(BaseModel):
     info: Union[SearchMusician, SearchAlbum,
                 SearchTrack, SearchClip, SearchPlaylist]
     likes_count: int
-
-    # class Class:
-    #     orm_mode = True

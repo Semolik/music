@@ -11,6 +11,9 @@ class PlaylistsCrud(CRUDBase):
     def get_playlist_info(self, playlist_id: UUID) -> Playlist:
         return self.db.query(Playlist).filter(Playlist.id == playlist_id).first()
 
+    def get_playlists_by_ids(self, playlist_ids: List[UUID]) -> List[Playlist]:
+        return self.db.query(Playlist).filter(Playlist.id.in_(playlist_ids)).all()
+
     def update_playlist(self, playlist: Playlist, name: str, description: str, private: bool) -> Playlist:
         playlist.name = name
         playlist.description = description
@@ -21,7 +24,8 @@ class PlaylistsCrud(CRUDBase):
         return self.db.query(FavoritePlaylist).filter(FavoritePlaylist.user_id == user_id, FavoritePlaylist.playlist_id == playlist_id).first() is not None
 
     def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str, owned_only: bool, private: bool) -> List[Playlist]:
-        query = self.db.query(Playlist).outerjoin(FavoritePlaylist)
+        query = self.db.query(Playlist).outerjoin(
+            FavoritePlaylist, FavoritePlaylist.playlist_id == Playlist.id)
         if owned_only:
             query = query.filter(Playlist.user_id == owner_id)
         else:
@@ -66,10 +70,13 @@ class PlaylistsCrud(CRUDBase):
         return playlist
 
     def get_tracks_by_playlist_id(self, playlist_id: UUID, user_id: int) -> List[Track]:
-        return self.db.query(Track).join(PlaylistTrack, Playlist, Album).filter(Album.is_available, PlaylistTrack.playlist_id == playlist_id, Playlist.user_id == user_id).all()
+        return self.db.query(Track).join(PlaylistTrack, PlaylistTrack.track_id == Track.id)\
+            .join(Playlist, Playlist.id == PlaylistTrack.playlist_id)\
+            .join(Album, Album.id == Track.album_id)\
+            .filter(Album.is_available, PlaylistTrack.playlist_id == playlist_id, Playlist.user_id == user_id).all()
 
     def get_playlist_track(self, playlist_id: UUID, track_id: UUID, user_id: int) -> PlaylistTrack:
-        return self.db.query(PlaylistTrack).join(Playlist).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id, Playlist.user_id == user_id).first()
+        return self.db.query(PlaylistTrack).join(Playlist, PlaylistTrack.playlist_id == Playlist.id).filter(PlaylistTrack.playlist_id == playlist_id, PlaylistTrack.track_id == track_id, Playlist.user_id == user_id).first()
 
     def add_track_to_playlist(self, playlist_id: UUID, track_id: UUID) -> PlaylistTrack:
         return self.create(

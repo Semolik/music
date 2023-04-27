@@ -1,22 +1,17 @@
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
-from fastapi_jwt_auth import AuthJWT
 from backend.core.config import settings
 from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_musician import MusicianCrud
-from backend.db.db import get_db
-from sqlalchemy.orm import Session
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.files import valid_content_length
 from backend.helpers.music import album_is_available, save_track
 from backend.helpers.images import save_image
-from backend.helpers.music import set_album_info, set_album_tracks,  validate_genres
-from backend.helpers.users import get_public_profile_as_dict, set_musician_info
+from backend.helpers.music import validate_genres
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoWithoutMusician, AlbumIsCLosed, AlbumWithTracks, CreateAlbum, CreateAlbumJson, MusicianInfo, TrackAfterUpload, UpdateAlbum, UpdateAlbumJson, UploadTrackForm
-from backend.helpers.images import save_image, set_picture
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoWithoutMusician, AlbumWithTracks, CreateAlbumJson, TrackAfterUpload, UpdateAlbumJson, UploadTrackForm
+from backend.helpers.images import save_image
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 
@@ -41,8 +36,7 @@ def create_album(
         picture=db_image,
         genres=genres
     )
-    album_obj = set_album_info(db_album=db_album)
-    return album_obj
+    return db_album
 
 
 @router.put('/{album_id}/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, status_code=status.HTTP_204_NO_CONTENT)
@@ -93,6 +87,9 @@ def update_album(
                           user_id=Auth.current_user.id)
     db_album = AlbumsCruds(Auth.db).update_album(album=db_album,
                                                  name=albumData.name, date=albumData.open_date, genres=genres, image=db_image, tracks_ids=tracks_ids)
+    db_album.current_user_id = Auth.current_user.id
+    for track in db_album.tracks:
+        track.current_user_id = Auth.current_user.id
     return db_album
 
 
@@ -107,6 +104,8 @@ def get_my_albums(
         user_id=Auth.current_user.id)
     albums = AlbumsCruds(Auth.db).get_musician_albums(
         musician_id=db_musician.id, page=page)
+    for album in albums:
+        album.current_user_id = Auth.current_user.id
     return albums
 
 
@@ -118,6 +117,8 @@ def search_my_albums(
     '''Поиск альбомов музыканта'''
     albums = AlbumsCruds(Auth.db).search_my_albums(
         user_id=Auth.current_user.id, text=text)
+    for album in albums:
+        album.current_user_id = Auth.current_user.id
     return albums
 
 
@@ -143,16 +144,24 @@ def get_liked_albums(
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Получение лайкнутых альбомов'''
+    albums = AlbumsCruds(Auth.db).get_liked_albums(
+        user_id=Auth.current_user_id)
+    for album in albums:
+        album.is_liked = True
+    return albums
 
-    albums = []
-    for db_album in AlbumsCruds(Auth.db).get_liked_albums(user_id=Auth.current_user_id):
-        album_info = set_album_info(
-            db_album=db_album, db=Auth.db)
-        album_info = set_musician_info(
-            data=album_info, db=Auth.db, public_profile_id=db_album.musician_id
-        )
-        album_info['liked'] = True
-        albums.append(album_info)
+
+@router.get('/last', response_model=List[AlbumInfo])
+def get_last_albums(
+    page: int = Query(1, description='Номер страницы'),
+    page_size: int = Query(100, description='Размер страницы', ge=1, le=100),
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение последних альбомов'''
+    albums = AlbumsCruds(Auth.db).get_last_albums(
+        page=page, page_size=page_size)
+    for album in albums:
+        album.current_user_id = Auth.current_user_id
     return albums
 
 
@@ -167,10 +176,13 @@ def get_album_by_id(
     if not db_album or not db_album.is_available:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
-    if not db_album.is_opened:
+    if not db_album.is_available:
         if not Auth.current_user or album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Альбом не найден")
+    db_album.current_user_id = Auth.current_user_id
+    for track in db_album.tracks:
+        track.current_user_id = Auth.current_user_id
     return db_album
 
 
@@ -209,8 +221,7 @@ def upload_track(
         track=trackData,
         picture=db_image
     )
-    track_obj = set_picture(db_track.as_dict(), db_image)
-    return track_obj
+    return db_track
 
 
 @router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)

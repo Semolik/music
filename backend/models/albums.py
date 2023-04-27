@@ -1,10 +1,9 @@
 from datetime import datetime
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime,  Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime,  Boolean, func
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import backref, object_session
+from sqlalchemy.orm import backref, object_session, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -26,6 +25,9 @@ class AlbumGenre(Base):
 class Album(Base):
     __tablename__ = 'albums'
 
+    def __init__(self, current_user_id=None, is_liked=False):
+        self.current_user_id = current_user_id
+        self.is_liked = is_liked
     id = Column(Integer, primary_key=True, index=True)
     musician_id = Column(
         Integer,
@@ -94,6 +96,48 @@ class Album(Base):
     @property
     def likes_count(self):
         return object_session(self).query(FavoriteAlbum).filter(FavoriteAlbum.album_id == self.id).count()
+
+    @property
+    def liked(self):
+        is_liked = self.is_liked if hasattr(self, 'is_liked') else False
+        if is_liked:
+            return True
+        current_user_id = self.current_user_id if hasattr(
+            self, 'current_user_id') else None
+        if current_user_id is None:
+            return False
+        return object_session(self).query(FavoriteAlbum).filter(FavoriteAlbum.album_id == self.id, FavoriteAlbum.user_id == self.current_user_id).first() is not None
+
+
+class ListenAlbumHistoryItem(Base):
+    __tablename__ = 'listen_album_history'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+    album_id = Column(
+        Integer,
+        ForeignKey("albums.id", ondelete="CASCADE"),
+        primary_key=True
+    )
+
+    user = relationship(
+        "User",
+        foreign_keys=[user_id],
+
+    )
+    album = relationship(
+        "Album",
+        foreign_keys=[album_id],
+    )
+
+    listen_datetime = Column(
+        DateTime(timezone=False),
+        server_default=func.now(),
+        nullable=False
+    )
 
 
 class FavoriteAlbum(Base):

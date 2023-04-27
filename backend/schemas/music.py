@@ -159,9 +159,12 @@ class AlbumWithTracks(AlbumInfo):
         orm_mode = True
 
 
-class Track(AlbumTrack):
+class TrackWithoutMusician(AlbumTrack):
     album: AlbumInfoWithoutMusician = Query(...,
                                             description="Информация об альбоме")
+
+
+class Track(TrackWithoutMusician):
     musician: PublicProfile = Query(..., description="Информация о музыканте")
 
     class Config:
@@ -231,11 +234,15 @@ class MusicianContent(BaseModel):
                                                      description="Клипы музыканта")
     albums: List[AlbumInfoWithoutMusician] = Query(...,
                                                    description="Альбомы музыканта")
-    tracks: List[Track] = Query(..., description="Треки музыканта")
+    tracks: List[TrackWithoutMusician] = Query(
+        ..., description="Треки музыканта")
+
+    class Config:
+        orm_mode = True
 
 
 class MusicianFullInfo(MusicianInfo):
-    popular: MusicianContent = Query(..., description="Популярное музыканта")
+    popular: MusicianContent = Query(..., description="Популярное")
 
     class Config:
         orm_mode = True

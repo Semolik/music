@@ -16,12 +16,7 @@
             <slot name="card-end" />
         </template>
     </card-min>
-    <card
-        @click="onCardClick"
-        v-bind="props"
-        v-else
-        :class="{ 'is-link': isLink }"
-    >
+    <card @click="onCardClick" v-bind="props" v-else :is-link="isLink">
         <template #picture v-if="playlist.private">
             <div class="private-icon">
                 <Icon name="material-symbols:lock" />
@@ -87,16 +82,6 @@ const props = reactive({
         width: 30px;
         height: 30px;
         color: $secondary-text;
-    }
-}
-.is-link {
-    background-color: $secondary-bg;
-    padding: 10px;
-    border-radius: 10px;
-    @include lg {
-        &:hover {
-            background-color: $secondary-bg-2;
-        }
     }
 }
 </style>

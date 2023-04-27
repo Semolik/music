@@ -2,7 +2,6 @@ from typing import List
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_clips import ClipsCruds
 from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import set_tracks_likes
 from backend.schemas.base import LikesInfo
 from backend.schemas.music import AlbumInfo, MusicianClip, MusicianContent, Track, MusicianFullInfo, MusicianInfo
 from backend.schemas.user import PublicProfile
@@ -83,25 +82,27 @@ def get_public_profile_info(
     if not public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    musician_info = MusicianInfo.from_orm(public_profile)
+    public_profile.current_user_id = Auth.current_user_id
     db_tracks = MusicianCrud(Auth.db).get_popular_musician_tracks(
         musician_id=profile_id)
-    tracks_objs = set_tracks_likes(
-        tracks=db_tracks, user_id=Auth.current_user_id, db=Auth.db)
-    content = MusicianContent(
-        albums=MusicianCrud(Auth.db).get_popular_musician_albums(
-            musician_id=profile_id),
-        clips=ClipsCruds(Auth.db).get_musician_clips(musician_id=profile_id, page_size=int(
-            env_config.get('VITE_CLIP_PAGE_COUNT_MUSICIAN'))),
-        tracks=tracks_objs
-    )
+    db_albums = MusicianCrud(Auth.db).get_popular_musician_albums(
+        musician_id=profile_id)
+    clips = ClipsCruds(Auth.db).get_musician_clips(musician_id=profile_id, page_size=int(
+        env_config.get('VITE_CLIP_PAGE_COUNT_MUSICIAN')))
+
+    for track in db_tracks:
+        track.current_user_id = Auth.current_user_id
+    for album in db_albums:
+        album.current_user_id = Auth.current_user_id
+
     public_profile_obj = MusicianFullInfo(
-        **musician_info.dict(),
-        popular=content
+        **MusicianInfo.from_orm(public_profile).dict(),
+        popular=MusicianContent(
+            albums=db_albums,
+            clips=clips,
+            tracks=db_tracks
+        )
     )
-    if Auth.current_user_id:
-        public_profile_obj.liked = MusicianCrud(Auth.db).musician_is_liked(
-            musician_id=profile_id, user_id=Auth.current_user_id)
     return public_profile_obj
 
 

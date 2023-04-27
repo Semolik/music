@@ -9,7 +9,7 @@
             </div>
         </template>
     </card-min>
-    <div class="musician-card" v-else>
+    <div v-else class="musician-card">
         <card-picture v-bind="props">
             <div class="hover-overlay">
                 <div
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </card-picture>
-        <div class="flex flex-col grow text-center">
+        <div class="flex flex-col grow text-center primary-text">
             {{ musician.name }}
         </div>
     </div>
@@ -47,12 +47,16 @@ const { logined } = storeToRefs(authStore);
 
 const { likeIcon, playIcon, dotsIcon } = IconsNames;
 const goToLoginBus = useEventBus("go-to-login");
-const { musician } = defineProps({
+const { musician, isLink } = defineProps({
     musician: {
         type: Object,
         required: true,
     },
     min: {
+        type: Boolean,
+        default: false,
+    },
+    isLink: {
         type: Boolean,
         default: false,
     },

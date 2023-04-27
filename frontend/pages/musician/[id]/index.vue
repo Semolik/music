@@ -25,9 +25,9 @@
             >
                 <div class="popular-tracks">
                     <TrackCard
-                        v-for="track in musician.popular.tracks"
+                        v-for="(track, index) in musician.popular.tracks"
                         :track="track"
-                        @update:track="musician.tracks[index] = $event"
+                        @update:track="musician.popular.tracks[index] = $event"
                     />
                 </div>
             </selection>
@@ -85,6 +85,7 @@ const { id } = route.params;
 const musician = ref(
     await Service.getPublicProfileInfoApiV1MusicianProfileIdGet(id)
 );
+
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
@@ -94,7 +95,8 @@ useHead({
 const authStore = useAuthStore();
 const { musicianProfile, logined } = storeToRefs(authStore);
 const isOwner = computed(
-    () => logined.value && musicianProfile.value.id === musician.value.id
+    () =>
+        musicianProfile.value && musicianProfile.value.id === musician.value.id
 );
 const router = useRouter();
 const goToEditPage = () => {
@@ -120,6 +122,11 @@ const toggleLikeMusician = async () => {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    @include lg(true) {
+        padding: 10px;
+        padding-top: 20px;
+    }
     .popular-tracks {
         display: flex;
         flex-direction: column;

@@ -14,9 +14,9 @@
             </div>
         </template>
     </card-min>
-    <card v-bind="props" v-else @picture-click="goToAlbum">
+    <card v-bind="props" v-else @picture-click="goToAlbum" :is-link="isLink">
         <div class="flex flex-col grow">
-            <span class="font-medium">{{ album.name }}</span>
+            <span class="font-medium primary-text">{{ album.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
                 <span>{{ musicianName }}</span>
                 <Icon name="ci:dot-02-s" />
@@ -27,7 +27,7 @@
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
-const { album, musicianInfo, disableLink } = defineProps({
+const { album, musicianInfo, disableLink, isLink } = defineProps({
     album: {
         type: Object,
         required: true,
@@ -41,6 +41,10 @@ const { album, musicianInfo, disableLink } = defineProps({
         required: false,
     },
     disableLink: {
+        type: Boolean,
+        default: false,
+    },
+    isLink: {
         type: Boolean,
         default: false,
     },

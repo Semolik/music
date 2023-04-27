@@ -40,7 +40,11 @@
                         <Icon :name="IconsNames.shareIcon" />
                         <span class="text">Поделиться</span>
                     </div>
-                    <div class="action-button edit" @click="$emit('edit')">
+                    <div
+                        class="action-button edit"
+                        @click="$emit('edit')"
+                        v-if="isOwner"
+                    >
                         <Icon :name="IconsNames.pencilIcon" />
                     </div>
                     <ShareModal
@@ -296,7 +300,9 @@ const shareModalOpened = ref(false);
                 display: flex;
                 align-items: center;
                 gap: 5px;
-
+                @include lg(true) {
+                    @include flex-center;
+                }
                 &.type {
                     text-transform: uppercase;
                     color: $secondary-text;

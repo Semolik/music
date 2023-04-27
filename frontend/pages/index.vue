@@ -3,11 +3,15 @@
         <Slider />
         <Genres />
         <Chart />
-        <History />
+        <History v-if="logined" />
         <NewReleases />
     </div>
 </template>
 <script setup>
+import { useAuthStore } from "~/stores/auth";
+import { storeToRefs } from "pinia";
+const authStore = useAuthStore();
+const { logined } = storeToRefs(authStore);
 useHead({
     title: "Главная",
 });

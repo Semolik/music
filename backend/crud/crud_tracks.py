@@ -32,7 +32,7 @@ class TracksCrud(CRUDBase):
 
     def get_liked_tracks(self, user_id: int, page: int) -> List[Track]:
         end = page * settings.PAGINATION_LIMIT
-        return self.db.query(Track).join(FavoriteTracks, Album).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
+        return self.db.query(Track).join(FavoriteTracks, FavoriteTracks.track_id == Track.id).join(Album, Album.id == Track.album_id).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
 
     def get_last_listened_tracks(self, user_id: int, page: int, page_size: int = settings.PAGINATION_LIMIT) -> List[ListenTrackHistoryItem]:
         end = page * page_size
@@ -75,7 +75,7 @@ class TracksCrud(CRUDBase):
 
     def get_popular_tracks(self,  start_date: datetime = None, end_date: datetime = None, page: int = 1, page_size: int = settings.POPULAR_TRACKS_LIMIT) -> List[Track]:
         end = page * page_size
-        query = self.db.query(Track).join(ListenTrackHistoryItem, Album).filter(
+        query = self.db.query(Track).join(ListenTrackHistoryItem, ListenTrackHistoryItem.track_id == Track.id).join(Album, Album.id == Track.album_id).filter(
             Track.is_available, ListenTrackHistoryItem.listened == True)
         if start_date:
             query = query.filter(
@@ -110,5 +110,5 @@ class TracksCrud(CRUDBase):
         )
 
     def get_my_track_playlists(self, track_id: int, user_id: int) -> List[Playlist]:
-        return self.db.query(Playlist).join(PlaylistTrack).filter(
+        return self.db.query(Playlist).join(PlaylistTrack, PlaylistTrack.playlist_id == Playlist.id).filter(
             PlaylistTrack.track_id == track_id, Playlist.user_id == user_id).all()

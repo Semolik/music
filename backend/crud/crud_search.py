@@ -25,7 +25,7 @@ class SearchCrud(CRUDBase):
         return self.db.query(Album).filter(Album.is_available, func.lower(Album.name).contains(name.lower())).limit(limit).all()
 
     def search_tracks_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_TRACK_LIMIT) -> list[Track]:
-        return self.db.query(Track).join(Album, isouter=True).filter(Album.is_available, func.lower(Track.name).contains(name.lower())).limit(limit).all()
+        return self.db.query(Track).join(Album, Track.album_id == Album.id, isouter=True).filter(Album.is_available, func.lower(Track.name).contains(name.lower())).limit(limit).all()
 
     def search_musicians_by_name(self, name: str, limit: int = settings.AUTOCOMPLETE_SEARCH_MUSICIAN_LIMIT) -> list[PublicProfile]:
         return self.base_search_by_name(name=name, limit=limit, model=PublicProfile)
@@ -35,7 +35,7 @@ class SearchCrud(CRUDBase):
 
     def search_genres_by_name_sorted_by_likes(self, name: str, limit: int = settings.SEARCH_GENRE_LIMIT) -> list[Genre]:
         return self.db.query(Genre)\
-            .outerjoin(LovedGenre)\
+            .outerjoin(LovedGenre, Genre.id == LovedGenre.genre_id)\
             .group_by(Genre.id)\
             .order_by(func.count(LovedGenre.genre_id).desc())\
             .filter(func.lower(Genre.name).contains(name.lower()))\

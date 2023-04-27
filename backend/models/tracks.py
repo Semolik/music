@@ -1,6 +1,6 @@
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, DECIMAL, Boolean, event
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, object_session
 from backend.core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -36,6 +36,10 @@ class FavoriteTracks(Base):
 
 class Track(Base):
     __tablename__ = 'tracks'
+
+    def __init__(self, current_user_id=None, is_liked=False):
+        self.current_user_id = current_user_id
+        self.is_liked = is_liked
 
     id = Column(
         UUID(as_uuid=True),
@@ -115,6 +119,19 @@ class Track(Base):
     def is_available(self):
         return self.is_opened & self.album_uploaded
 
+    @property
+    def liked(self):
+        is_liked = self.is_liked if hasattr(self, 'is_liked') else False
+        if is_liked:
+            return True
+        current_user_id = self.current_user_id if hasattr(
+            self, 'current_user_id') else None
+        if current_user_id is None:
+            return False
+        return object_session(self).query(FavoriteTracks).filter_by(
+            track_id=self.id,
+            user_id=self.current_user_id).first() is not None
+
 
 @event.listens_for(Track, "after_delete")
 def receive_after_delete(mapper, connection, target: Track):
@@ -134,33 +151,26 @@ class ListenTrackHistoryItem(Base):
     )
     track_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("tracks.id"),
+        ForeignKey("tracks.id", ondelete="CASCADE"),
         nullable=False
     )
     track = relationship(
         Track,
         foreign_keys=[track_id],
-        backref=backref(
-            "history",
-            cascade="delete, delete-orphan"
-        )
     )
     user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
     user = relationship(
         "User",
         foreign_keys=[user_id],
-        backref=backref(
-            "listen_track_history",
-            cascade="delete, delete-orphan"
-        )
     )
     listen_datetime = Column(
         DateTime(timezone=False),
-        server_default=func.now()
+        server_default=func.now(),
+        nullable=False
     )
     listened = Column(
         Boolean,
