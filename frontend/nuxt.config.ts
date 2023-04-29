@@ -167,6 +167,13 @@ export default defineNuxtConfig({
                 process.env.MUSICIAN_ALL_TRACKS_LIMIT
             ),
             YOUTUBE_VIDEO: process.env.YOUTUBE_VIDEO,
+            HISTORY_ALL_TRACKS_LIMIT: Number(
+                process.env.HISTORY_ALL_TRACKS_LIMIT
+            ),
+            FAVORITE_ALBUMS_LIMIT: Number(process.env.FAVORITE_ALBUMS_LIMIT),
+            LAST_ALBUMS_LIMIT: Number(process.env.LAST_ALBUMS_LIMIT),
+            POPULAR_TRACKS_LIMIT: Number(process.env.POPULAR_TRACKS_LIMIT),
+            GENRES_ALL_LIMIT: Number(process.env.GENRES_ALL_LIMIT),
         },
     },
 });

@@ -1,7 +1,8 @@
 from typing import List
-from fastapi import Depends, APIRouter, Path, File, status, HTTPException
+from fastapi import Depends, APIRouter, Path, File, status, HTTPException, Query
 from backend.helpers.auth_helper import Authenticate
 from backend.schemas.history import HistoryItem
+from backend.schemas.music import Track
 from backend.crud.crud_history import HistoryCrud
 
 router = APIRouter(prefix="/history", tags=['История'])
@@ -13,3 +14,12 @@ def get_history(
 ):
     '''Получение истории'''
     return HistoryCrud(Auth.db).get_history(user_id=Auth.current_user_id)
+
+
+@router.get('/tracks', response_model=List[Track])
+def get_history_tracks(
+    page: int = Query(1, ge=1),
+    Auth: Authenticate = Depends(Authenticate()),
+):
+    '''Получение треков из истории'''
+    return HistoryCrud(Auth.db).get_tracks_history(user_id=Auth.current_user_id, page=page)

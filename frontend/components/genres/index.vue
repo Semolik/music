@@ -5,7 +5,7 @@
         leftText="Все жанры"
         :leftTextLink="{ name: 'genres' }"
     >
-        <GenresList :genres="genres" />
+        <GenresList :genres="genres" one-line />
     </Selection>
 </template>
 <script setup>
@@ -19,4 +19,3 @@ const { all } = defineProps({
 });
 const genres = await Service.getGenresApiV1GenresGet();
 </script>
-<style lang="scss" scoped></style>

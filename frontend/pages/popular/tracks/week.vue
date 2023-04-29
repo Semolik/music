@@ -1,1 +1,3 @@
-<template></template>
+<template>
+    <PopularTracks period="week" />
+</template>

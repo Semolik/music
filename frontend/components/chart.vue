@@ -19,9 +19,15 @@
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
 const viewport = useViewport();
-
+const end = new Date();
+const start = new Date(end.getFullYear(), end.getMonth() - 1, end.getDate());
 const tracksRaw = ref(
-    await Service.getPopularTracksMonthApiV1TracksPopularMonthGet(9, 1)
+    await Service.getPopularTracksPeriodApiV1TracksPopularPeriodGet(
+        start.toISOString(),
+        end.toISOString(),
+        9,
+        1
+    )
 );
 
 const showedTracks = ref([]);
@@ -42,6 +48,7 @@ watch(
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     grid-template-rows: min-content;
+    height: min-content;
     @include lg(true) {
         grid-template-columns: 1fr;
     }

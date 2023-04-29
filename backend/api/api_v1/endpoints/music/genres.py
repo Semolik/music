@@ -33,12 +33,13 @@ def create_genre(
 
 
 @router.get('/random',  response_model=List[Genre])
-def get_random_genres(Auth: Authenticate = Depends(Authenticate(is_admin=True))):
+def get_random_genres(Auth: Authenticate = Depends(Authenticate(required=False))):
     '''Получение случайных жанров'''
     genres = GenresCruds(Auth.db).get_random_genres()
-    for genre in genres:
-        genre.current_user_id = Auth.current_user_id
-    return
+    if Auth.current_user_id:
+        for genre in genres:
+            genre.current_user_id = Auth.current_user_id
+    return genres
 
 
 @router.put('/{genre_id}/like', response_model=bool)

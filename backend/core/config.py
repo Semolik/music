@@ -70,6 +70,11 @@ class Settings(BaseSettings):
         liked = "liked"
         not_liked = "not_liked"
 
+    class OrderAlbums(str, enum.Enum):
+        date = "date"
+        name = "name"
+        likes = "likes"
+
     class Order(str, enum.Enum):
         asc = "asc"
         desc = "desc"

@@ -1,12 +1,11 @@
 from datetime import datetime
 from typing import List
-from backend.core.config import settings
+from backend.core.config import settings, env_config
 from backend.crud.crud_file import FileCruds
 from backend.crud.crud_user import UserCruds
 from backend.db.base import CRUDBase
 from backend.models.files import Image
 from backend.models.genres import Genre
-from backend.models.tracks import Track
 from backend.models.albums import Album, FavoriteAlbum, AlbumGenre
 from backend.models.user import PublicProfile
 from sqlalchemy import func
@@ -78,9 +77,24 @@ class AlbumsCruds(CRUDBase):
                 album_id=album.id, user_id=user_id))
             return True
 
-    def get_liked_albums(self, user_id: int) -> List[Album]:
-        now = datetime.now()
-        return self.db.query(Album).join(FavoriteAlbum, FavoriteAlbum.album_id == Album.id).filter(Album.uploaded == True, FavoriteAlbum.user_id == user_id, Album.open_date <= now).all()
+    def get_liked_albums(self, user_id: int, page: int, page_size: int = int(env_config.get('FAVORITE_ALBUMS_LIMIT')), order_by: settings.OrderAlbums = settings.OrderAlbums.date, order: settings.Order = settings.Order.desc) -> List[Album]:
+        end = page * page_size
+        query = self.db.query(Album).join(FavoriteAlbum, FavoriteAlbum.album_id == Album.id).filter(
+            Album.is_available, FavoriteAlbum.user_id == user_id)
+        if order_by == settings.OrderAlbums.date:
+            order_query = Album.open_date
+            query = query.order_by(
+                order_query.desc() if order == settings.Order.desc else order_query.asc())
+        elif order_by == settings.OrderAlbums.likes:
+            order_query = func.count(FavoriteAlbum.date)
+            query = query.group_by(Album.id).order_by(
+                order_query.desc() if order == settings.Order.desc else order_query.asc())
+        elif order_by == settings.OrderAlbums.name:
+            order_query = Album.name
+            query = query.order_by(
+                order_query.desc() if order == settings.Order.desc else order_query.asc())
+
+        return query.slice(end - page_size, end).all()
 
     def album_is_liked(self, album_id: int, user_id: int) -> bool:
         return self.db.query(FavoriteAlbum).filter(FavoriteAlbum.album_id == album_id, FavoriteAlbum.user_id == user_id).first() is not None

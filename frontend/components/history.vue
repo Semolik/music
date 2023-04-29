@@ -3,8 +3,9 @@
         title="Вы недавно слушали"
         leftText="Cмотреть все"
         :leftTextLink="{ name: routesNames.library.history }"
+        v-if="items.length > 0"
     >
-        <CardsContainer>
+        <CardsContainer one-line>
             <template v-for="item in items">
                 <AlbumCard
                     :album="item.info"
@@ -29,5 +30,4 @@
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
 const items = await Service.getHistoryApiV1HistoryGet();
-const viewport = useViewport();
 </script>

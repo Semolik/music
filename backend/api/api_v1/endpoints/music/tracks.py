@@ -52,26 +52,34 @@ def get_liked_tracks(
 @router.get('/popular', response_model=List[Track])
 def get_popular_tracks(
     Auth: Authenticate = Depends(Authenticate(required=False)),
+    page: int = Query(1, description="Номер страницы"),
+    page_size: int = Query(settings.POPULAR_TRACKS_LIMIT,
+                           description="Размер страницы", ge=1, le=settings.POPULAR_TRACKS_LIMIT),
 ):
     '''Получение популярных треков'''
-    popular_tracks = TracksCrud(Auth.db).get_popular_tracks()
+    popular_tracks = TracksCrud(Auth.db).get_popular_tracks(
+        page=page,
+        page_size=page_size
+    )
     for track in popular_tracks:
         track.current_user_id = Auth.current_user_id
     return popular_tracks
 
 
-@router.get('/popular/month', response_model=List[Track])
-def get_popular_tracks_month(
+@router.get('/popular/period', response_model=List[Track])
+def get_popular_tracks_period(
     Auth: Authenticate = Depends(Authenticate(required=False)),
     page_size: int = Query(settings.POPULAR_TRACKS_LIMIT,
                            description="Размер страницы", ge=1, le=settings.POPULAR_TRACKS_LIMIT),
     page: int = Query(1, description="Номер страницы"),
+    start_date: datetime = Query(..., description="Дата начала периода"),
+    end_date: datetime = Query(..., description="Дата конца периода"),
 ):
     '''Получение популярных треков за месяц'''
 
     popular_tracks = TracksCrud(Auth.db).get_popular_tracks(
-        start_date=datetime.now() - timedelta(days=30),
-        end_date=datetime.now(),
+        start_date=start_date,
+        end_date=end_date,
         page=page,
         page_size=page_size
     )

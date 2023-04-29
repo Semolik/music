@@ -49,7 +49,7 @@ defineProps({
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: 100%;
+
     .selection-head {
         display: flex;
         flex-direction: column;
@@ -86,7 +86,7 @@ defineProps({
         display: flex;
         flex-direction: column;
         gap: 10px;
-        height: 100%;
+        height: min-content;
     }
 }
 </style>

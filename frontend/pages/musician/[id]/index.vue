@@ -28,6 +28,9 @@
                         v-for="(track, index) in musician.popular.tracks"
                         :track="track"
                         @update:track="musician.popular.tracks[index] = $event"
+                        min
+                        :musican-info="musician"
+                        class="track-card"
                     />
                 </div>
             </selection>
@@ -40,7 +43,7 @@
                 }"
                 v-if="musician.popular.albums.length"
             >
-                <CardsContainer>
+                <CardsContainer one-line>
                     <AlbumCard
                         v-for="album in musician.popular.albums"
                         :album="album"
@@ -128,9 +131,17 @@ const toggleLikeMusician = async () => {
         padding-top: 20px;
     }
     .popular-tracks {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-rows: min-content;
+        height: min-content;
+        @include lg(true) {
+            grid-template-columns: 1fr;
+        }
         gap: 10px;
+        .track-card {
+            flex-grow: 1;
+        }
     }
 }
 .slider {

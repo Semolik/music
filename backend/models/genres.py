@@ -10,7 +10,8 @@ from backend.models.albums import AlbumGenre
 class Genre(Base):
     __tablename__ = 'genres'
 
-    def __init__(self, current_user_id=None, is_liked=False):
+    def __init__(self, current_user_id=None, is_liked=False, **kwargs):
+        super().__init__(**kwargs)
         self.current_user_id = current_user_id
         self.is_liked = is_liked
 

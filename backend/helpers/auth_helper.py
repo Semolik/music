@@ -43,7 +43,6 @@ class Authenticate:
                 current_user_id = Authorize.get_jwt_subject()
             except:
                 if self.required:
-                    print(self.required)
                     raise HTTPException(
                         status_code=403,
                         detail="Необходима авторизация"

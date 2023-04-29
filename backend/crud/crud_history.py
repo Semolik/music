@@ -4,7 +4,9 @@ from backend.crud.crud_playlists import PlaylistsCrud
 from backend.db.base import CRUDBase
 from backend.models.albums import Album,  ListenAlbumHistoryItem
 from backend.models.playlists import Playlist, ListenPlaylistHistoryItem
+from backend.models.tracks import Track, ListenTrackHistoryItem
 from backend.models.user import PublicProfile, ListenMusicianHistoryItem
+from backend.core.config import env_config
 from sqlalchemy import desc,  literal_column, Text, cast,  union_all
 import uuid
 
@@ -12,7 +14,7 @@ from backend.schemas.history import HistoryItem
 
 
 class HistoryCrud(CRUDBase):
-    def get_history(self, user_id: int, limit: int = 20) -> list[HistoryItem]:
+    def get_history(self, user_id: int, limit: int = int(env_config.get('HISTORY_ALL_LIMIT'))) -> list[HistoryItem]:
         label_resource_type = "resource_type"
         label_listen_date = "listen_date"
         label_id = "id"
@@ -116,3 +118,16 @@ class HistoryCrud(CRUDBase):
         all_items = result_albums + result_playlists + result_musicians
         all_items.sort(key=lambda x: x[2], reverse=True)
         return [HistoryItem(id=int(item[3]), type=item[1],  info=item[4]) for item in all_items]
+
+    def get_tracks_history(self, user_id: int, page: int = 1, page_size: int = int(env_config.get('HISTORY_ALL_TRACKS_LIMIT'))):
+        end = page * page_size
+        start = end - page_size
+        query = (
+            self.db.query(Track, ListenTrackHistoryItem)
+            .select_from(ListenTrackHistoryItem)
+            .join(Track, ListenTrackHistoryItem.track_id == Track.id)
+            .filter(ListenTrackHistoryItem.user_id == user_id)
+            .order_by(desc(ListenTrackHistoryItem.listen_datetime))
+            .slice(start, end)
+        )
+        return [item[0] for item in query.all()]

@@ -25,9 +25,11 @@ class AlbumGenre(Base):
 class Album(Base):
     __tablename__ = 'albums'
 
-    def __init__(self, current_user_id=None, is_liked=False):
+    def __init__(self, current_user_id=None, is_liked=False, **kwargs):
         self.current_user_id = current_user_id
         self.is_liked = is_liked
+        super().__init__(**kwargs)
+
     id = Column(Integer, primary_key=True, index=True)
     musician_id = Column(
         Integer,
@@ -167,4 +169,9 @@ class FavoriteAlbum(Base):
             "favorite_albums",
             cascade="all,delete"
         )
+    )
+    date = Column(
+        DateTime(timezone=False),
+        server_default=func.now(),
+        nullable=False
     )

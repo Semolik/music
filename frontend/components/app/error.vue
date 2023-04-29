@@ -24,7 +24,7 @@ const handleError = () => {
     emit("clearError");
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .error {
     display: flex;
     justify-content: center;
@@ -43,6 +43,8 @@ const handleError = () => {
         .error__content__message {
             font-size: 20px;
             font-weight: 500;
+            text-align: center;
+            padding: 5px;
         }
         .button {
             padding: 10px 20px;

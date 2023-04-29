@@ -1,2 +1,3 @@
-<template></template>
-<script setup></script>
+<template>
+    <PopularTracks period="month" />
+</template>

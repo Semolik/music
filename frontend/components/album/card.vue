@@ -18,7 +18,7 @@
         <div class="flex flex-col grow">
             <span class="font-medium primary-text">{{ album.name }}</span>
             <div class="secondary-text text-sm flex-wrap flex items-center">
-                <span>{{ musicianName }}</span>
+                <span> {{ musicianName }}</span>
                 <Icon name="ci:dot-02-s" />
                 <span>{{ album.year }}</span>
             </div>

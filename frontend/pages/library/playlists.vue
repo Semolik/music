@@ -1,64 +1,19 @@
 <template>
     <div class="favorite-page-container">
-        <Transition name="fade">
-            <div
-                @click="filtersMenuOpened = false"
-                class="bg"
-                v-if="filtersMenuOpened"
-            ></div>
-        </Transition>
-        <div class="buttons-line">
-            <div
-                :class="[
-                    'filters',
-                    { opened: filtersMenuOpened },
-                    { active: filtersIsActived },
-                ]"
-            >
-                <div
-                    class="filters-button filter"
-                    @click="filtersMenuOpened = !filtersMenuOpened"
-                    ref="filtersButton"
-                >
-                    Фильтры
-                </div>
-                <div
-                    class="filters-button add"
-                    @click="createPlaylistModalOpened = true"
-                >
-                    Создать плейлист
-                </div>
-                <ModalDialog
-                    @close="createPlaylistModalOpened = false"
-                    :active="createPlaylistModalOpened"
-                >
-                    <template #content>
-                        <PlaylistCreateModalContent
-                            @creared="onCreatedPlaylist"
-                        />
-                    </template>
-                </ModalDialog>
-                <div class="filters-menu" ref="filtersMenu">
-                    <AppSelect
-                        v-for="(filter, name) in filters"
-                        :values="filters[name].values"
-                        :title="name"
-                        :model-value="
-                            filters[name].active || filters[name].default
-                        "
-                        @update:model-value="
-                            (value) => (filters[name].active = value)
-                        "
-                    />
-                    <div
-                        @click="resetFilters"
-                        :class="['reset-button', { active: filtersIsActived }]"
-                    >
-                        Cбросить фильтры
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Filters v-model:filters="filters">
+            <FiltersButton @click="createPlaylistModalOpened = true">
+                Создать плейлист
+            </FiltersButton>
+        </Filters>
+
+        <ModalDialog
+            @close="createPlaylistModalOpened = false"
+            :active="createPlaylistModalOpened"
+        >
+            <template #content>
+                <PlaylistCreateModalContent @creared="onCreatedPlaylist" />
+            </template>
+        </ModalDialog>
         <CardsContainer>
             <PlaylistCard
                 v-for="playlist in playlists"
@@ -80,7 +35,7 @@
 <script setup>
 import { Service } from "@/client";
 const filtersMenuOpened = ref(false);
-const filtersMenu = ref(null);
+const filtersIsActived = ref(false);
 const createPlaylistModalOpened = ref(false);
 
 var filters = reactive({
@@ -108,10 +63,10 @@ var filters = reactive({
 });
 const fething = ref(false);
 const playlists = ref([]);
-const reseting = ref(false);
-const getPlaylists = async () => {
-    fething.value = true;
 
+const getPlaylists = async () => {
+    if (fething.value) return;
+    fething.value = true;
     const order_by =
         filters["Сортировать по"].active === "Названию" ? "name" : "created_at";
     const order =
@@ -128,204 +83,34 @@ const getPlaylists = async () => {
     );
     fething.value = false;
 };
+
 watch(
     filters,
     async (value) => {
-        if (reseting.value) return;
         if (value["Тип"].active === "Приватные") {
             value["Создатель"].disabled = true;
             value["Создатель"].active = "Мои";
         } else {
             value["Создатель"].disabled = false;
         }
+
         await getPlaylists();
     },
     { immediate: true }
 );
-const filtersIsActived = computed(() => {
-    return Object.values(filters).some(
-        (filter) => filter.active && filter.active !== filter.default
-    );
-});
-const resetFilters = async (on_reset = false) => {
-    reseting.value = true;
-    filtersMenuOpened.value = false;
-    Object.values(filters).forEach((filter) => {
-        filter.active = null;
-        filter.disabled = false;
-    });
 
-    reseting.value = on_reset;
-    await getPlaylists();
-};
 const onCreatedPlaylist = async (playlist) => {
     createPlaylistModalOpened.value = false;
-    reseting.value = true;
+    fething.value = true;
     playlists.value.unshift(playlist);
-    reseting.value = false;
+    fething.value = false;
 };
-const filtersButton = ref(null);
-onMounted(() => {
-    onClickOutside(filtersMenu, (e) => {
-        if (e.target === filtersButton.value) return;
-        filtersMenuOpened.value = false;
-    });
-});
 </script>
 <style lang="scss" scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
 .favorite-page-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
     height: 100%;
-
-    .bg {
-        position: absolute;
-        z-index: 90;
-        background-color: rgba(0, 0, 0, 0.5);
-        transition: opacity 0.3s ease;
-        inset: 0;
-    }
-    .filters {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        position: relative;
-        &.active {
-            .filters-button {
-                &.filter {
-                    background-color: $accent;
-                    color: $primary-bg;
-
-                    &:hover {
-                        background-color: $accent-hover;
-                    }
-                }
-            }
-        }
-
-        &.opened .filters-menu {
-            opacity: 1;
-            z-index: 99;
-        }
-
-        @include lg {
-            &:not(.opened) {
-                .filters-button:hover {
-                    background-color: $quaternary-bg;
-                }
-            }
-        }
-
-        .filters-button {
-            @include flex-center;
-            border-radius: 10px;
-            padding: 5px 20px;
-            gap: 5px;
-            background-color: $tertiary-bg;
-            cursor: pointer;
-            color: $secondary-text;
-            user-select: none;
-            &.add {
-                margin-left: auto;
-            }
-            @include lg(true) {
-                flex-grow: 1;
-            }
-
-            svg {
-                width: 20px;
-                height: 20px;
-            }
-        }
-        .filters-menu {
-            position: absolute;
-            top: calc(100% + 10px);
-            background-color: $quaternary-bg;
-            border-radius: 10px;
-            padding: 10px;
-            opacity: 0;
-            z-index: -1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 1px solid $quaternary-text;
-            @include lg(true) {
-                width: 100%;
-            }
-            .reset-button {
-                @include flex-center;
-                border-radius: 10px;
-                cursor: pointer;
-                user-select: none;
-                padding: 5px 10px;
-                height: min-content;
-                background-color: $accent-red;
-                color: $primary-bg;
-                display: none;
-                &.active {
-                    display: flex;
-                }
-            }
-
-            .filter-item {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-                position: relative;
-                .disabled {
-                    position: absolute;
-                    inset: -3px;
-                    border-radius: 10px;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    @include flex-center;
-
-                    svg {
-                        width: 30px;
-                        height: 30px;
-                        color: $secondary-text;
-                    }
-                }
-                .title {
-                    font-size: 14px;
-                    color: $secondary-text;
-                }
-                .values {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 5px;
-                    padding: 5px;
-                    background-color: $tertiary-bg;
-                    border-radius: 10px;
-                    .value {
-                        @include flex-center;
-                        height: 30px;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        color: $secondary-text;
-                        user-select: none;
-                        flex-grow: 1;
-                        padding: 0 10px;
-                        text-align: center;
-
-                        &.active {
-                            background-color: $accent;
-                            color: $primary-bg;
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 </style>

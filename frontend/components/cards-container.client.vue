@@ -1,5 +1,8 @@
 <template>
-    <div v-auto-animate class="cards-container">
+    <div
+        v-auto-animate
+        :class="['cards-container', { 'one-line': props.oneLine }]"
+    >
         <slot />
     </div>
 </template>
@@ -12,6 +15,14 @@
         grid-template-columns: repeat(auto-fill, minmax(v-bind(mdWidth), 1fr));
     }
     grid-template-rows: min-content;
+    height: min-content;
+    &.one-line {
+        grid-template-rows: 1fr;
+        grid-auto-rows: 0;
+        gap: 0px;
+        column-gap: 10px;
+        overflow-y: hidden;
+    }
 }
 </style>
 <script setup>
@@ -25,6 +36,11 @@ const props = defineProps({
         type: Number,
         required: false,
         default: 170,
+    },
+    oneLine: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 const mdWidth = computed(() => props.mdWidth + "px");

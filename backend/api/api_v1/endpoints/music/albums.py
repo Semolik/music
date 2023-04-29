@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
-from backend.core.config import settings
+from backend.core.config import settings, env_config
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.helpers.auth_helper import Authenticate
@@ -141,11 +141,20 @@ def album_like(
 
 @router.get('/liked', responses={**UNAUTHORIZED_401}, response_model=List[AlbumInfo])
 def get_liked_albums(
+    order_by: settings.OrderAlbums = Query(
+        settings.OrderAlbums.date, description='Сортировка'),
+    order: settings.Order = Query(
+        settings.Order.desc, description='Порядок сортировки'),
+    page: int = Query(1, description='Номер страницы'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Получение лайкнутых альбомов'''
     albums = AlbumsCruds(Auth.db).get_liked_albums(
-        user_id=Auth.current_user_id)
+        user_id=Auth.current_user_id,
+        order_by=order_by,
+        order=order,
+        page=page
+    )
     for album in albums:
         album.is_liked = True
     return albums
@@ -154,7 +163,9 @@ def get_liked_albums(
 @router.get('/last', response_model=List[AlbumInfo])
 def get_last_albums(
     page: int = Query(1, description='Номер страницы'),
-    page_size: int = Query(100, description='Размер страницы', ge=1, le=100),
+    page_size: int = Query(int(env_config.get(
+        'LAST_ALBUMS_LIMIT')), description='Размер страницы', ge=1, le=int(env_config.get(
+        'LAST_ALBUMS_LIMIT'))),
     Auth: Authenticate = Depends(Authenticate(required=False))
 ):
     '''Получение последних альбомов'''
@@ -165,7 +176,7 @@ def get_last_albums(
     return albums
 
 
-@router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@ router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
 def get_album_by_id(
     album_id: int = Query(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
@@ -186,7 +197,7 @@ def get_album_by_id(
     return db_album
 
 
-@router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
+@ router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
     settings.MAX_TRACK_FILE_SIZE_MB))])
 def upload_track(
     album_id: int = Query(..., description='ID альбома'),
@@ -224,7 +235,7 @@ def upload_track(
     return db_track
 
 
-@router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)
+@ router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)
 def delete_album_by_id(
     album_id: int = Query(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate()),

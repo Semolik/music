@@ -47,6 +47,9 @@ const emit = defineEmits(["update:modelValue"]);
     display: flex;
     flex-direction: column;
     gap: 5px;
+    @include lg(true) {
+        gap: 10px;
+    }
     position: relative;
     .disabled {
         position: absolute;
@@ -72,6 +75,13 @@ const emit = defineEmits(["update:modelValue"]);
         padding: 5px;
         background-color: var(--app-select-bg, $tertiary-bg);
         border-radius: 10px;
+        @include lg(true) {
+            padding: 0px;
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 10px;
+            gap: 0px;
+        }
         .value {
             @include flex-center;
             height: 30px;
@@ -82,7 +92,10 @@ const emit = defineEmits(["update:modelValue"]);
             flex-grow: 1;
             padding: 0 10px;
             text-align: center;
-
+            @include lg(true) {
+                border-radius: 0px;
+                min-height: 40px;
+            }
             &.active {
                 background-color: $accent;
                 color: $primary-bg;

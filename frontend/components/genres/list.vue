@@ -1,5 +1,5 @@
 <template>
-    <div class="genres-container">
+    <div :class="['genres-container', { 'one-line': oneLine }]">
         <GenresCard
             v-for="genre in genres"
             :key="genre.id"
@@ -15,6 +15,11 @@ defineProps({
         type: Array,
         required: true,
     },
+    oneLine: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 </script>
 <style scoped lang="scss">
@@ -26,5 +31,10 @@ defineProps({
     }
     grid-template-columns: repeat(auto-fill, minmax(var(--size), 1fr));
     gap: 10px;
+    &.one-line {
+        grid-auto-rows: 0px;
+        grid-template-rows: 1fr;
+        overflow-y: hidden;
+    }
 }
 </style>

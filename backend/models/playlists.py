@@ -11,9 +11,10 @@ from sqlalchemy.orm import relationship, backref, object_session
 class Playlist(Base):
     __tablename__ = 'playlists'
 
-    def __init__(self, current_user_id=None, is_liked=False):
+    def __init__(self, current_user_id=None, is_liked=False, **kwargs):
         self.current_user_id = current_user_id
         self.is_liked = is_liked
+        super().__init__(**kwargs)
 
     id = Column(
         UUID(as_uuid=True),
