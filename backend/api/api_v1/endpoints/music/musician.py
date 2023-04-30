@@ -21,6 +21,8 @@ def get_liked_musician_profiles(
     '''Получение списка любимых музыкантов'''
     liked_musician_profiles = MusicianCrud(Auth.db).get_liked_musicians(
         user_id=Auth.current_user_id, page=page)
+    for profile in liked_musician_profiles:
+        profile.is_liked = True
     return liked_musician_profiles
 
 
@@ -31,6 +33,9 @@ def get_random_musician_profiles(
     '''Получение списка случайных музыкантов'''
     random_musician_profiles = MusicianCrud(
         Auth.db).get_random_musician_profiles()
+    if Auth.current_user_id:
+        for profile in random_musician_profiles:
+            profile.current_user_id = Auth.current_user_id
     return random_musician_profiles
 
 
@@ -43,13 +48,8 @@ def get_popular_musician_profiles(
     popular_musician_profiles = MusicianCrud(
         Auth.db).get_popular_musician_profiles(page=page)
     if Auth.current_user_id:
-        popular_musician_profiles_objs = []
         for profile in popular_musician_profiles:
-            musician_info = MusicianInfo.from_orm(profile)
-            musician_info.liked = MusicianCrud(Auth.db).musician_is_liked(
-                musician_id=profile.id, user_id=Auth.current_user_id)
-            popular_musician_profiles_objs.append(musician_info)
-        return popular_musician_profiles_objs
+            profile.current_user_id = Auth.current_user_id
     return popular_musician_profiles
 
 

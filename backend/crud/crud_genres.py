@@ -81,7 +81,7 @@ class GenresCruds(CRUDBase):
 
     def get_popular_albums_by_genre_id(self, genre_id: int, page: int, page_size: int = settings.ALBUM_PAGE_COUNT) -> list[Album]:
         end = page * page_size
-        return self.db.query(Album).join(AlbumGenre, LovedGenre.genre_id == Genre.id)\
+        return self.db.query(Album).join(AlbumGenre, AlbumGenre.album_id == Album.id)\
             .join(FavoriteAlbum, Album.id == FavoriteAlbum.album_id)\
             .filter(AlbumGenre.genre_id == genre_id, Album.is_available)\
             .group_by(Album.id)\

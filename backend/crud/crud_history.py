@@ -14,6 +14,37 @@ from backend.schemas.history import HistoryItem
 
 
 class HistoryCrud(CRUDBase):
+
+    def add_playlist_to_history(self, track_id: uuid.UUID, user_id: int) -> ListenPlaylistHistoryItem:
+        last = self.get_last_track_history_item(user_id=user_id)
+        if last and last.track_id == track_id:
+            return last
+        return self.create(ListenTrackHistoryItem(track_id=track_id, user_id=user_id))
+
+    def add_album_to_history(self, album_id: uuid.UUID, user_id: int) -> ListenAlbumHistoryItem:
+        last = self.get_last_album_history_item(user_id=user_id)
+        if last and last.album_id == album_id:
+            return last
+        return self.create(ListenAlbumHistoryItem(album_id=album_id, user_id=user_id))
+
+    def add_musician_to_history(self, musician_id: uuid.UUID, user_id: int) -> ListenMusicianHistoryItem:
+        last = self.get_last_musician_history_item(user_id=user_id)
+        if last and last.musician_id == musician_id:
+            return last
+        return self.create(ListenMusicianHistoryItem(musician_id=musician_id, user_id=user_id))
+
+    def get_last_musician_history_item(self, user_id: int) -> ListenMusicianHistoryItem:
+        return self.db.query(ListenMusicianHistoryItem).filter(ListenMusicianHistoryItem.user_id == user_id).order_by(desc(ListenMusicianHistoryItem.listen_datetime)).first()
+
+    def get_last_album_history_item(self, user_id: int) -> ListenAlbumHistoryItem:
+        return self.db.query(ListenAlbumHistoryItem).filter(ListenAlbumHistoryItem.user_id == user_id).order_by(desc(ListenAlbumHistoryItem.listen_datetime)).first()
+
+    def get_last_track_history_item(self, user_id: int) -> ListenTrackHistoryItem:
+        return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.user_id == user_id).order_by(desc(ListenTrackHistoryItem.listen_datetime)).first()
+
+    def get_track_history_item(self,  history_item_id: uuid.UUID) -> ListenTrackHistoryItem:
+        return self.db.query(ListenTrackHistoryItem).filter(ListenTrackHistoryItem.id == history_item_id).first()
+
     def get_history(self, user_id: int, limit: int = int(env_config.get('HISTORY_ALL_LIMIT'))) -> list[HistoryItem]:
         label_resource_type = "resource_type"
         label_listen_date = "listen_date"
@@ -123,11 +154,9 @@ class HistoryCrud(CRUDBase):
         end = page * page_size
         start = end - page_size
         query = (
-            self.db.query(Track, ListenTrackHistoryItem)
-            .select_from(ListenTrackHistoryItem)
-            .join(Track, ListenTrackHistoryItem.track_id == Track.id)
+            self.db.query(ListenTrackHistoryItem)
             .filter(ListenTrackHistoryItem.user_id == user_id)
             .order_by(desc(ListenTrackHistoryItem.listen_datetime))
             .slice(start, end)
         )
-        return [item[0] for item in query.all()]
+        return query.all()

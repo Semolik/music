@@ -1,3 +1,4 @@
+import uuid
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, func
 from sqlalchemy.orm import relationship, backref, object_session
@@ -193,7 +194,12 @@ class PublicProfileLinks(Base):
 class ListenMusicianHistoryItem(Base):
     __tablename__ = 'listen_musician_history'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        index=True,
+        default=uuid.uuid4
+    )
     user_id = Column(Integer, ForeignKey(
         "users.id", ondelete='CASCADE'))
     user = relationship(

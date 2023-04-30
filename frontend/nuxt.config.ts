@@ -174,6 +174,10 @@ export default defineNuxtConfig({
             LAST_ALBUMS_LIMIT: Number(process.env.LAST_ALBUMS_LIMIT),
             POPULAR_TRACKS_LIMIT: Number(process.env.POPULAR_TRACKS_LIMIT),
             GENRES_ALL_LIMIT: Number(process.env.GENRES_ALL_LIMIT),
+            FAVORITE_MUSICIANS_LIMIT: Number(
+                process.env.FAVORITE_MUSICIANS_LIMIT
+            ),
+            FAVORITE_TRACKS_LIMIT: Number(process.env.FAVORITE_TRACKS_LIMIT),
         },
     },
 });

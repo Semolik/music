@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 from backend.db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime,  Boolean, func
 from backend.core.config import env_config
@@ -113,7 +114,12 @@ class Album(Base):
 
 class ListenAlbumHistoryItem(Base):
     __tablename__ = 'listen_album_history'
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        index=True,
+        default=uuid.uuid4
+    )
     user_id = Column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),

@@ -73,7 +73,7 @@ class MusicianCrud(CRUDBase):
             .slice(start=(end - page_size), stop=end)\
             .all()
 
-    def get_liked_musicians(self, user_id: int, page: int = 1, page_size: int = 10) -> List[Album]:
+    def get_liked_musicians(self, user_id: int, page: int = 1, page_size: int = int(env_config.get('FAVORITE_MUSICIANS_LIMIT'))) -> List[PublicProfile]:
         end = page * page_size
         return self.db.query(PublicProfile).join(FavoriteMusicians, FavoriteMusicians.musician_id == PublicProfile.id).filter(
             FavoriteMusicians.user_id == user_id).order_by(PublicProfile.name.asc()).slice(

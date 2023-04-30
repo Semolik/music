@@ -146,9 +146,10 @@ class ListenTrackHistoryItem(Base):
     __tablename__ = 'listen_track_history'
 
     id = Column(
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        index=True
+        index=True,
+        default=uuid.uuid4
     )
     track_id = Column(
         UUID(as_uuid=True),

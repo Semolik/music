@@ -92,9 +92,10 @@ class ListenPlaylistHistoryItem(Base):
     __tablename__ = 'listen_playlist_history'
 
     id = Column(
-        Integer,
+        UUID(as_uuid=True),
         primary_key=True,
-        index=True
+        index=True,
+        default=uuid.uuid4
     )
     playlist_id = Column(
         UUID(as_uuid=True),

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 from uuid import UUID
 from backend.db.base import CRUDBase
-from backend.core.config import settings
+from backend.core.config import settings, env_config
 from backend.models.albums import Album
 from backend.models.playlists import Playlist, PlaylistTrack
 from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
@@ -30,9 +30,10 @@ class TracksCrud(CRUDBase):
     def track_is_liked(self, track_id: int, user_id: int):
         return bool(self.get_liked_track_model(track_id=track_id, user_id=user_id))
 
-    def get_liked_tracks(self, user_id: int, page: int) -> List[Track]:
-        end = page * settings.PAGINATION_LIMIT
-        return self.db.query(Track).join(FavoriteTracks, FavoriteTracks.track_id == Track.id).join(Album, Album.id == Track.album_id).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(end-settings.PAGINATION_LIMIT, end).all()
+    def get_liked_tracks(self, user_id: int, page: int, page_size: int = int(env_config.get('FAVORITE_TRACKS_LIMIT'))) -> List[Track]:
+        end = page * page_size
+        start = end - page_size
+        return self.db.query(Track).join(FavoriteTracks, FavoriteTracks.track_id == Track.id).join(Album, Album.id == Track.album_id).filter(Track.is_available, FavoriteTracks.user_id == user_id).slice(start, end).all()
 
     def get_last_listened_tracks(self, user_id: int, page: int, page_size: int = settings.PAGINATION_LIMIT) -> List[ListenTrackHistoryItem]:
         end = page * page_size

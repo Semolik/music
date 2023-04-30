@@ -4,6 +4,7 @@
         <CardsContainer>
             <AlbumCard v-for="album in albums" :album="album" is-link />
         </CardsContainer>
+        <NotFound v-if="!albums.length" />
         <AppButton
             v-if="loadMoreButton"
             @click="loadMore"
@@ -80,6 +81,7 @@ watch(
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100%;
     color: $primary-text;
 }
 </style>

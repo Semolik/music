@@ -46,6 +46,12 @@
                     >
                         <Icon :name="IconsNames.dotsIcon" />
                         <div class="menu" v-if="menuOpened">
+                            <div class="menu-item" v-for="item in menuButtons">
+                                <Icon :name="item.icon" />
+                                <span @click="item.onClick">
+                                    {{ item.text }}
+                                </span>
+                            </div>
                             <div class="menu-item" v-if="playlistId && logined">
                                 <Icon :name="IconsNames.deleteIcon" />
                                 <span @click="removeTrackFromPlaylist">
@@ -187,28 +193,33 @@ const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
 const emit = defineEmits(["update:track", "playlist-remove-track"]);
 
-const { track, albumInfo, min, musicanInfo, playlistId } = defineProps({
-    track: {
-        type: Object,
-        required: true,
-    },
-    albumInfo: {
-        type: Object,
-        default: null,
-    },
-    musicanInfo: {
-        type: Object,
-        default: null,
-    },
-    min: {
-        type: Boolean,
-        default: false,
-    },
-    playlistId: {
-        type: String,
-        default: null,
-    },
-});
+const { track, albumInfo, min, musicanInfo, playlistId, menuButtons } =
+    defineProps({
+        track: {
+            type: Object,
+            required: true,
+        },
+        albumInfo: {
+            type: Object,
+            default: null,
+        },
+        musicanInfo: {
+            type: Object,
+            default: null,
+        },
+        min: {
+            type: Boolean,
+            default: false,
+        },
+        playlistId: {
+            type: String,
+            default: null,
+        },
+        menuButtons: {
+            type: Array,
+            default: [],
+        },
+    });
 const albumLink = computed(() => {
     var album_id = track?.album?.id || albumInfo?.id;
     if (!album_id) return null;
