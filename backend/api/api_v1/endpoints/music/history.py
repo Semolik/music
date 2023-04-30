@@ -12,7 +12,7 @@ router = APIRouter(prefix="/history", tags=['История'])
 def get_history(
     Auth: Authenticate = Depends(Authenticate()),
 ):
-    '''Получение истории'''
+    '''Получение последних прослушанных плейлистов, альбомов и музыкантов'''
     return HistoryCrud(Auth.db).get_history(user_id=Auth.current_user_id)
 
 

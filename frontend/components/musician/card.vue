@@ -1,5 +1,5 @@
 <template>
-    <card-min v-bind="props" v-if="min">
+    <card-min v-bind="props" v-if="min" @click="onClick">
         <template #content>
             <span>{{ musician.name }}</span>
         </template>
@@ -9,26 +9,31 @@
             </div>
         </template>
     </card-min>
-    <div v-else class="musician-card">
+    <div v-else class="musician-card" @click="onClick">
         <card-picture v-bind="props">
             <div class="hover-overlay">
                 <div
                     :class="[
                         'favorite',
                         'button',
-                        { active: liked },
+                        { active: musician.liked },
                         { disabled: !logined },
                     ]"
-                    @click="onFavorite"
+                    @click.stop="onFavorite"
                 >
                     <Icon :name="likeIcon" />
                 </div>
-                <div class="play button">
+                <div class="play button" @click.stop="">
                     <Icon :name="playIcon" />
                 </div>
-                <div class="more button">
-                    <Icon :name="dotsIcon" />
+                <div class="more button" @click.stop="ShareModalOpened = true">
+                    <Icon :name="shareIcon" />
                 </div>
+                <ShareModal
+                    v-model:active="ShareModalOpened"
+                    :link="`/musician/${musician.id}`"
+                    add-host
+                />
             </div>
         </card-picture>
         <div class="flex flex-col grow text-center primary-text">
@@ -42,10 +47,11 @@ import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
 import { IconsNames } from "@/configs/icons";
+import { routesNames } from "@typed-router";
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
-
-const { likeIcon, playIcon, dotsIcon } = IconsNames;
+const ShareModalOpened = ref(false);
+const { likeIcon, playIcon, shareIcon } = IconsNames;
 const goToLoginBus = useEventBus("go-to-login");
 const { musician, isLink } = defineProps({
     musician: {
@@ -61,8 +67,16 @@ const { musician, isLink } = defineProps({
         default: false,
     },
 });
-
-const liked = ref(musician.liked);
+const router = useRouter();
+const onClick = () => {
+    if (isLink) {
+        router.push({
+            name: routesNames.musicianId,
+            params: { id: musician.id },
+        });
+    }
+};
+const emit = defineEmits(["update:musician"]);
 
 const props = reactive({
     picture: musician.picture,
@@ -74,9 +88,9 @@ const onFavorite = async () => {
         goToLoginBus.emit();
         return;
     }
-    liked.value = await Service.likeMusicianApiV1MusicianProfileIdLikePut(
-        musician.id
-    );
+    const { liked, likes_count } =
+        await Service.likeMusicianApiV1MusicianProfileIdLikePut(musician.id);
+    emit("update:musician", { ...musician, liked });
 };
 </script>
 <style lang="scss" scoped>
@@ -84,8 +98,10 @@ const onFavorite = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    user-select: none;
     color: $secondary-text;
     .hover-overlay {
+        cursor: pointer;
         position: absolute;
         top: 0;
         left: 0;

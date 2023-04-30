@@ -6,14 +6,14 @@
         @close="emit('update:active', false)"
     >
         <template #content>
-            <ShareSocial :link="link" />
-            <AppButtonCopy :value="link" />
+            <ShareSocial :link="linkLocal" />
+            <AppButtonCopy :value="linkLocal" />
         </template>
     </ModalDialog>
 </template>
 
 <script setup>
-defineProps({
+const { active, link, text, addHost } = defineProps({
     active: {
         type: Boolean,
         default: false,
@@ -26,7 +26,16 @@ defineProps({
         type: String,
         default: null,
     },
+    addHost: {
+        type: Boolean,
+        default: false,
+    },
 });
-
+const linkLocal = ref(link);
+if (addHost) {
+    onMounted(() => {
+        linkLocal.value = `${window.location.origin}${link}`;
+    });
+}
 const emit = defineEmits(["update:active"]);
 </script>

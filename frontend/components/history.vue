@@ -8,17 +8,17 @@
         <CardsContainer one-line>
             <template v-for="item in items">
                 <AlbumCard
-                    :album="item.info"
+                    v-model:album="item.info"
                     v-if="item.type == 'album'"
                     is-link
                 />
                 <MusicianCard
-                    :musician="item.info"
+                    v-model:musician="item.info"
                     v-else-if="item.type == 'musician'"
                     is-link
                 />
                 <PlaylistCard
-                    :playlist="item.info"
+                    v-model:playlist="item.info"
                     v-else-if="item.type == 'playlist'"
                     is-link
                 />
@@ -29,5 +29,5 @@
 <script setup>
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
-const items = await Service.getHistoryApiV1HistoryGet();
+const items = ref(await Service.getHistoryApiV1HistoryGet());
 </script>

@@ -77,6 +77,7 @@ useHead({
 watch(
     router.currentRoute,
     (value) => {
+        searchIsActive.value = false;
         if (value.meta?.getTitle) {
             onMounted(async () => {
                 currentPageTitle.value = document.title;

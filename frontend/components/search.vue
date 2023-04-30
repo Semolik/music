@@ -27,6 +27,7 @@
                     v-if="item.type == 'musician'"
                     :musician="item.info"
                     min
+                    is-link
                 />
                 <TrackCard v-if="item.type == 'track'" :track="item.info" />
                 <PlaylistCard
