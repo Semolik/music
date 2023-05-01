@@ -1,5 +1,5 @@
 <template>
-    <div :class="['genres-container', { 'one-line': oneLine }]">
+    <div :class="['genres-container', { 'one-line': oneLine }, { cut: cut }]">
         <GenresCard
             v-for="genre in genres"
             :key="genre.id"
@@ -20,6 +20,11 @@ defineProps({
         required: false,
         default: false,
     },
+    cut: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 </script>
 <style scoped lang="scss">
@@ -35,6 +40,14 @@ defineProps({
         grid-auto-rows: 0px;
         grid-template-rows: 1fr;
         overflow-y: hidden;
+    }
+
+    &.cut {
+        @include xl(true) {
+            .genre-card:nth-child(n + 5) {
+                display: none;
+            }
+        }
     }
 }
 </style>

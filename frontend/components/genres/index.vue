@@ -5,11 +5,10 @@
         leftText="Все жанры"
         :leftTextLink="{ name: 'genres' }"
     >
-        <GenresList :genres="genres" one-line />
+        <GenresList :genres="genres" cut />
     </Selection>
 </template>
 <script setup>
-import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
 const { all } = defineProps({
     all: {
