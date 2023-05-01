@@ -1,5 +1,5 @@
 <template>
-    <div class="tracks">
+    <TracksContainer animate>
         <TrackCard
             v-for="(history_item, index) in history_tracks"
             :key="history_item.id"
@@ -16,7 +16,7 @@
         <AppButton @click="getNextPage" active v-if="showNextButton">
             Показать ещё
         </AppButton>
-    </div>
+    </TracksContainer>
 </template>
 
 <script setup>

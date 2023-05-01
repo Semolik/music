@@ -99,13 +99,16 @@ import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "@typed-router";
 import { useEventBus } from "@vueuse/core";
+import { useHeaderStore } from "~/stores/header";
+const headerStore = useHeaderStore();
+const route = useRoute();
+const { setTitle } = headerStore;
 const goToLoginBus = useEventBus("go-to-login");
 const { MAX_PLAYLIST_NAME_LENGTH, MAX_PLAYLIST_DESCRIPTION_LENGTH } =
     useRuntimeConfig().public;
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
-const route = useRoute();
 const router = useRouter();
 const { id } = route.params;
 const playlist = ref(
@@ -114,6 +117,7 @@ const playlist = ref(
 useHead({
     title: "Плейлист " + playlist.value.name,
 });
+setTitle("Плейлист " + playlist.value.name);
 const authStore = useAuthStore();
 const { userData, logined } = storeToRefs(authStore);
 const isOwner = computed(

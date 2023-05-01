@@ -19,9 +19,12 @@
 </template>
 <script setup>
 import { Service } from "~/client";
+import { useHeaderStore } from "~/stores/header";
+const headerStore = useHeaderStore();
 definePageMeta({
     title: "Новые релизы",
 });
+headerStore.setTitle("Новые релизы");
 const albums = ref([]);
 const loadMoreButton = ref(false);
 const page = ref(0);

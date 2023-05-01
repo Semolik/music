@@ -9,7 +9,7 @@ from backend.crud.crud_user import UserCruds
 from backend.crud.crud_musician import MusicianCrud
 from backend.db.db import get_db
 from sqlalchemy.orm import Session
-from backend.core.config import env_config
+from backend.core.config import settings, env_config
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 
@@ -135,7 +135,7 @@ def get_musician_clips(
     return clips
 
 
-@ router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
+@router.get('/{profile_id}/albums', response_model=List[AlbumInfo])
 def get_musician_albums(
     profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
@@ -146,8 +146,8 @@ def get_musician_albums(
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    albums = MusicianCrud(db).get_musician_albums(
-        musician_id=db_public_profile.id, page=page)
+    albums = MusicianCrud(db).get_popular_musician_albums(
+        musician_id=db_public_profile.id, page=page, page_size=settings.ALBUM_PAGE_COUNT_ALL)
     albums_obj = []
     for album in albums:
         album_info = AlbumInfo.from_orm(album)
@@ -156,7 +156,7 @@ def get_musician_albums(
     return albums
 
 
-@ router.get('/{profile_id}/popular', response_model=List[Track])
+@router.get('/{profile_id}/popular', response_model=List[Track])
 def get_musician_popular_tracks(
     profile_id: int = Query(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
@@ -168,7 +168,6 @@ def get_musician_popular_tracks(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
     tracks = MusicianCrud(db).get_popular_musician_tracks(
-        musician_id=db_public_profile.id, page=page, page_size=int(
-            env_config.get('MUSICIAN_ALL_TRACKS_LIMIT'))
+        musician_id=db_public_profile.id, page=page
     )
     return tracks

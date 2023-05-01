@@ -1,8 +1,13 @@
 <template>
-    <div
-        v-auto-animate
-        :class="['cards-container', { 'one-line': props.oneLine }]"
-    >
+    <ClientOnly v-if="animate">
+        <div
+            v-auto-animate
+            :class="['cards-container', { 'one-line': props.oneLine }]"
+        >
+            <slot />
+        </div>
+    </ClientOnly>
+    <div :class="['cards-container', { 'one-line': props.oneLine }]" v-else>
         <slot />
     </div>
 </template>
@@ -38,6 +43,11 @@ const props = defineProps({
         default: 170,
     },
     oneLine: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    animate: {
         type: Boolean,
         required: false,
         default: false,

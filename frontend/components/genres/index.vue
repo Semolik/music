@@ -9,6 +9,7 @@
     </Selection>
 </template>
 <script setup>
+import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
 const { all } = defineProps({
     all: {

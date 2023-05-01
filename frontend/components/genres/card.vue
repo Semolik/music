@@ -31,7 +31,7 @@ const { genre } = defineProps({
 });
 
 const link = computed(() => ({
-    name: routesNames.genresId,
+    name: routesNames.genresId.index,
     params: { id: genre.id },
 }));
 </script>

@@ -68,7 +68,6 @@ const goToAlbum = () => {
         name: "album-id",
         params: {
             id: album.id,
-            albumId: album.id,
         },
     });
 };

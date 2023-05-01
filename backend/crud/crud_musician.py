@@ -42,7 +42,7 @@ class MusicianCrud(CRUDBase):
         return self.db.query(PublicProfile).outerjoin(FavoriteMusicians, FavoriteMusicians.musician_id == PublicProfile.id).group_by(PublicProfile.id).order_by(
             func.count(FavoriteMusicians.musician_id).desc()).slice(start=(end - page_size), stop=end).all()
 
-    def get_musician_albums(self, musician_id: int, page: int = 1, page_size: int = int(env_config.get('VITE_ALBUM_PAGE_COUNT'))) -> List[Album]:
+    def get_musician_albums(self, musician_id: int, page: int = 1, page_size: int = settings.ALBUM_PAGE_COUNT_ALL) -> List[Album]:
         end = page * page_size
         return self.db.query(Album).filter(Album.musician_id == musician_id).order_by(Album.open_date.desc()).slice(
             start=(end - page_size), stop=end).all()
@@ -52,7 +52,7 @@ class MusicianCrud(CRUDBase):
             Album.musician_id == musician_id).order_by(Album.open_date.desc())
         return query.limit(limit).all() if limit else query.all()
 
-    def get_popular_musician_tracks(self, musician_id: int, page: int = 1, page_size: int = 10) -> List[Track]:
+    def get_popular_musician_tracks(self, musician_id: int, page: int = 1, page_size: int = settings.POPULAR_TRACKS_LIMIT_ALL) -> List[Track]:
         end = page * page_size
         return self.db.query(Track)\
             .join(Album, Album.id == Track.album_id)\
@@ -63,7 +63,7 @@ class MusicianCrud(CRUDBase):
             .slice(start=(end - page_size), stop=end)\
             .all()
 
-    def get_popular_musician_albums(self, musician_id: int, page: int = 1, page_size: int = 10) -> List[Album]:
+    def get_popular_musician_albums(self, musician_id: int, page: int = 1, page_size: int = settings.ALBUM_PAGE_COUNT_ALL) -> List[Album]:
         end = page * page_size
         return self.db.query(Album)\
             .filter(Album.musician_id == musician_id)\

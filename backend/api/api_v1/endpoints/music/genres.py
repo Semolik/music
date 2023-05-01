@@ -1,13 +1,14 @@
 from typing import List
-from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException
+from fastapi import Depends, APIRouter, Path, Query,  UploadFile, File, status, HTTPException
 from backend.crud.crud_genres import GenresCruds
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.files import valid_content_length
 from backend.helpers.images import save_image
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
 from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import Genre, GenreBaseForm, GenreFullInfo
+from backend.schemas.music import Genre, GenreBaseForm, GenreFullInfo, AlbumInfo, Track, MusicianInfo
 from backend.core.config import settings
+from backend.schemas.playlists import PlaylistInfo
 from backend.schemas.statistics import GenreStats
 
 router = APIRouter(prefix="/genres", tags=['Жанры'])
@@ -87,6 +88,20 @@ def update_genre(
 
 
 @router.get(
+    '/{genre_id}/info',
+    responses={**NOT_FOUND_GENRE},
+    response_model=Genre)
+def get_genre_info(genre_id: int = Path(..., description="ID жанра", ge=1), Auth: Authenticate = Depends(Authenticate(required=False))):
+    '''Получение информации о жанре'''
+    genre = GenresCruds(Auth.db).get_genre_by_id(id=genre_id)
+    if not genre:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Жанр не найден")
+    genre.current_user_id = Auth.current_user_id
+    return genre
+
+
+@router.get(
     '/{genre_id}',
     responses={**NOT_FOUND_GENRE},
     response_model=GenreFullInfo)
@@ -103,19 +118,23 @@ def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth
     ) if Auth.current_user_id else False
     popular_albums = GenresCruds(Auth.db).get_popular_albums_by_genre_id(
         page=1,
-        genre_id=genre_id
+        genre_id=genre_id,
+        page_size=settings.ALBUM_PAGE_COUNT
     )
     new_albums = GenresCruds(Auth.db).get_new_albums_by_genre_id(
         page=1,
-        genre_id=genre_id
+        genre_id=genre_id,
+        page_size=settings.ALBUM_PAGE_COUNT
     )
     popular_tracks = GenresCruds(Auth.db).get_popular_tracks_by_genre_id(
         page=1,
-        genre_id=genre_id
+        genre_id=genre_id,
+        page_size=settings.POPULAR_TRACKS_LIMIT
     )
     popular_musicians = GenresCruds(Auth.db).get_popular_musicians_by_genre_id(
         page=1,
-        genre_id=genre_id
+        genre_id=genre_id,
+        page_size=settings.POPULAR_MUSICIANS_LIMIT
     )
     for album in popular_albums:
         album.current_user_id = Auth.current_user_id
@@ -134,6 +153,70 @@ def get_genre(genre_id: int = Path(..., description="ID жанра", ge=1), Auth
     genre_obj.popular_tracks = popular_tracks
     genre_obj.popular_musicians = popular_musicians
     return genre_obj
+
+
+@router.get('/{genre_id}/albums', response_model=List[AlbumInfo])
+def get_popular_albums_by_genre_id(
+    genre_id: int = Path(..., description="ID жанра", ge=1),
+    page: int = Query(1, ge=1),
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение популярных альбомов по жанру'''
+    albums = GenresCruds(Auth.db).get_popular_albums_by_genre_id(
+        page=page,
+        genre_id=genre_id
+    )
+    for album in albums:
+        album.current_user_id = Auth.current_user_id
+    return albums
+
+
+@router.get('/{genre_id}/albums/new', response_model=List[AlbumInfo])
+def get_new_albums_by_genre_id(
+    genre_id: int = Path(..., description="ID жанра", ge=1),
+    page: int = Query(1, ge=1),
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение новых альбомов по жанру'''
+    albums = GenresCruds(Auth.db).get_new_albums_by_genre_id(
+        page=page,
+        genre_id=genre_id
+    )
+    for album in albums:
+        album.current_user_id = Auth.current_user_id
+    return albums
+
+
+@router.get('/{genre_id}/tracks', response_model=List[Track])
+def get_popular_tracks_by_genre_id(
+    genre_id: int = Path(..., description="ID жанра", ge=1),
+    page: int = Query(1, ge=1),
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение популярных треков по жанру'''
+    tracks = GenresCruds(Auth.db).get_popular_tracks_by_genre_id(
+        page=page,
+        genre_id=genre_id
+    )
+    for track in tracks:
+        track.current_user_id = Auth.current_user_id
+    return tracks
+
+
+@router.get('/{genre_id}/musicians', response_model=List[MusicianInfo])
+def get_popular_musicians_by_genre_id(
+    genre_id: int = Path(..., description="ID жанра", ge=1),
+    page: int = Query(1, ge=1),
+    Auth: Authenticate = Depends(Authenticate(required=False))
+):
+    '''Получение популярных музыкантов по жанру'''
+    musicians = GenresCruds(Auth.db).get_popular_musicians_by_genre_id(
+        page=page,
+        genre_id=genre_id
+    )
+    for musician in musicians:
+        musician.current_user_id = Auth.current_user_id
+    return musicians
 
 
 @router.get(

@@ -4,6 +4,8 @@
 
 ## [Библиотека](/docs/library/README.md)
 
+## [Страница жанра](/docs/genre/README.md)
+
 ## [Поиск](/docs/search/README.md)
 
 ## [Кабинет администратора](/docs/admin-cabinet/README.md)

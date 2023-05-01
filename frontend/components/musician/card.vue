@@ -71,7 +71,7 @@ const router = useRouter();
 const onClick = () => {
     if (isLink) {
         router.push({
-            name: routesNames.musicianId,
+            name: routesNames.musicianId.index,
             params: { id: musician.id },
         });
     }

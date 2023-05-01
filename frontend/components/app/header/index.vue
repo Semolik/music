@@ -3,7 +3,7 @@
         <AppHeaderSearch v-model:searchActive="searchIsActive" />
         <div
             class="header-bar"
-            v-if="headerBarActive && (links.length || currentPageTitle)"
+            v-if="headerBarActive && headerStore.isActive()"
         >
             <div class="navigate-buttons">
                 <div
@@ -27,8 +27,8 @@
                     <Icon :name="IconsNames.forwardIcon" />
                 </div>
             </div>
-            <div class="current-page-title" v-if="currentPageTitle">
-                {{ currentPageTitle }}
+            <div class="current-page-title" v-if="title">
+                {{ title }}
             </div>
             <ClientOnly>
                 <div class="links" v-if="links.length">
@@ -48,10 +48,14 @@
 <script setup>
 import { useEventBus } from "@vueuse/core";
 import { IconsNames } from "~/configs/icons";
+import { useHeaderStore } from "~/stores/header";
+import { storeToRefs } from "pinia";
+const headerStore = useHeaderStore();
+const { links, title, currentRouteName } = storeToRefs(headerStore);
 const openSearchBus = useEventBus("openSearch");
 const viewport = useViewport();
 const router = useRouter();
-const links = computed(() => router.currentRoute.value.meta.headerLinks || []);
+
 const headerBarActive = ref(false);
 watch(
     [viewport.breakpoint, router.currentRoute],
@@ -63,7 +67,6 @@ watch(
 );
 
 const searchIsActive = ref(false);
-const currentPageTitle = ref(null);
 const unsubscribeOpenSearchBus = openSearchBus.on(() => {
     searchIsActive.value = true;
 });
@@ -71,20 +74,14 @@ const unsubscribeOpenSearchBus = openSearchBus.on(() => {
 onBeforeUnmount(() => {
     unsubscribeOpenSearchBus();
 });
-useHead({
-    title: currentPageTitle,
-});
+
 watch(
     router.currentRoute,
     (value) => {
         searchIsActive.value = false;
-        if (value.meta?.getTitle) {
-            onMounted(async () => {
-                currentPageTitle.value = document.title;
-            });
-        } else {
-            currentPageTitle.value = value.meta?.title;
-        }
+        if (currentRouteName.value === value.name) return;
+        headerStore.reset();
+        headerStore.currentRouteName = value.name;
     },
     { immediate: true }
 );

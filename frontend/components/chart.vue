@@ -4,15 +4,15 @@
         leftText="Cмотреть все"
         :leftTextLink="{ name: routesNames.popularTracks.index }"
     >
-        <div class="tracks-container">
+        <TracksContainer grid cut>
             <TrackCard
-                v-for="(track, index) in showedTracks"
+                v-for="(track, index) in tracks"
                 :track="track"
                 @update:track="tracksRaw[index] = $event"
                 class="track-card"
                 min
             />
-        </div>
+        </TracksContainer>
     </Selection>
 </template>
 <script setup>
@@ -21,7 +21,7 @@ import { Service } from "~~/client";
 const viewport = useViewport();
 const end = new Date();
 const start = new Date(end.getFullYear(), end.getMonth() - 1, end.getDate());
-const tracksRaw = ref(
+const tracks = ref(
     await Service.getPopularTracksPeriodApiV1TracksPopularPeriodGet(
         start.toISOString(),
         end.toISOString(),
@@ -29,32 +29,4 @@ const tracksRaw = ref(
         1
     )
 );
-
-const showedTracks = ref([]);
-watch(
-    viewport.breakpoint,
-    () => {
-        if (viewport.isLessThan("lg")) {
-            showedTracks.value = tracksRaw.value.slice(0, 4);
-        } else {
-            showedTracks.value = tracksRaw.value;
-        }
-    },
-    { immediate: true }
-);
 </script>
-<style lang="scss" scoped>
-.tracks-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    grid-template-rows: min-content;
-    height: min-content;
-    @include lg(true) {
-        grid-template-columns: 1fr;
-    }
-    gap: 10px;
-    .track-card {
-        flex-grow: 1;
-    }
-}
-</style>

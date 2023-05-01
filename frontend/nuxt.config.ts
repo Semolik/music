@@ -12,12 +12,12 @@ export default defineNuxtConfig({
         "nuxt-swiper",
     ],
     devtools: {
-        // Enable devtools (default: true)
         enabled: true,
-        // VS Code Server options
         vscode: {},
-        // ...other options
     },
+    // app: {
+    //     pageTransition: { name: "page", mode: "out-in" },
+    // },
     viewport: {
         breakpoints: {
             xs: 360,
@@ -178,6 +178,19 @@ export default defineNuxtConfig({
                 process.env.FAVORITE_MUSICIANS_LIMIT
             ),
             FAVORITE_TRACKS_LIMIT: Number(process.env.FAVORITE_TRACKS_LIMIT),
+            POPULAR_TRACKS_LIMIT_ALL: Number(
+                process.env.POPULAR_TRACKS_LIMIT_ALL
+            ),
+            POPULAR_ALBUMS_LIMIT: Number(process.env.POPULAR_ALBUMS_LIMIT),
+            POPULAR_ALBUMS_LIMIT_ALL: Number(
+                process.env.POPULAR_ALBUMS_LIMIT_ALL
+            ),
+            POPULAR_MUSICIANS_LIMIT: Number(
+                process.env.POPULAR_MUSICIANS_LIMIT
+            ),
+            POPULAR_MUSICIANS_LIMIT_ALL: Number(
+                process.env.POPULAR_MUSICIANS_LIMIT_ALL
+            ),
         },
     },
 });

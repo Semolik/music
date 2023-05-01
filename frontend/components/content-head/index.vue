@@ -24,7 +24,11 @@
                     </template>
                 </div>
                 <div class="actions-buttons">
-                    <div class="play action-button" @click="$emit('play')">
+                    <div
+                        class="play action-button"
+                        @click="$emit('play')"
+                        v-if="!hidePlayButton"
+                    >
                         <Icon :name="IconsNames.playIcon" />
                         <span class="text">{{ playButtonText }}</span>
                     </div>
@@ -74,61 +78,78 @@
 </template>
 <script setup>
 import { IconsNames } from "~/configs/icons";
-const { name, type, picture, info, icon, isOwner, playButtonText, isLiked } =
-    defineProps({
-        name: {
-            type: String,
-            required: true,
-        },
-        type: {
-            type: String,
-            required: true,
-        },
-        picture: {
-            type: [String, null],
-            required: true,
-        },
-        info: {
-            type: Array,
-            required: false,
-            default: [],
-        },
-        icon: {
-            type: String,
-            required: false,
-            default: IconsNames.imageIcon,
-        },
-        isOwner: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
-        isLiked: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
-        playButtonText: {
-            type: String,
-            required: false,
-            default: "Воспроизвести",
-        },
-        hideDeleteButton: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
-        likesCount: {
-            type: Number,
-            required: false,
-            default: null,
-        },
-        isMusician: {
-            type: Boolean,
-            required: false,
-            default: false,
-        },
-    });
+const {
+    name,
+    type,
+    picture,
+    info,
+    icon,
+    isOwner,
+    playButtonText,
+    isLiked,
+    hideDeleteButton,
+    likesCount,
+    isMusician,
+    hidePlayButton,
+} = defineProps({
+    name: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+    picture: {
+        type: [String, null],
+        required: true,
+    },
+    info: {
+        type: Array,
+        required: false,
+        default: [],
+    },
+    icon: {
+        type: String,
+        required: false,
+        default: IconsNames.imageIcon,
+    },
+    isOwner: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    isLiked: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    playButtonText: {
+        type: String,
+        required: false,
+        default: "Воспроизвести",
+    },
+    hideDeleteButton: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    likesCount: {
+        type: Number,
+        required: false,
+        default: null,
+    },
+    isMusician: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    hidePlayButton: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
 const emit = defineEmits(["edit", "delete", "like", "play"]);
 const shareLink = ref("");
 onMounted(() => {
@@ -141,6 +162,13 @@ const shareModalOpened = ref(false);
     display: flex;
     flex-direction: column;
     color: $primary-text;
+    height: 100%;
+    .page-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
     .content-info {
         position: relative;
         display: grid;

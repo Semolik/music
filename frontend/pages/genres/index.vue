@@ -7,12 +7,14 @@
     </div>
 </template>
 <script setup>
-useHead({
-    title: "Жанры",
-});
+import { useHeaderStore } from "~/stores/header";
+const headerStore = useHeaderStore();
+const { setTitle } = headerStore;
+
 definePageMeta({
     title: "Жанры",
 });
+setTitle("Жанры");
 import { Service } from "@/client";
 const page = ref(0);
 const genres = ref([]);

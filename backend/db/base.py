@@ -19,7 +19,7 @@ class CRUDBase:
 
     def create(self,  model):
         self.db.add(model)
-        self.update(model)
+        self.db.commit()
         return model
 
     def delete(self, model):

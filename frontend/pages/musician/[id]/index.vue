@@ -18,27 +18,26 @@
                 title="Популярные треки"
                 left-text="Все треки"
                 :left-text-link="{
-                    name: routesNames.musicianIdTracks,
+                    name: routesNames.musicianId.idTracks,
                     params: { id: musician.id },
                 }"
                 v-if="musician.popular.tracks.length"
             >
-                <div class="popular-tracks">
+                <TracksContainer grid :animate="false">
                     <TrackCard
                         v-for="(track, index) in musician.popular.tracks"
                         :track="track"
                         @update:track="musician.popular.tracks[index] = $event"
                         min
                         :musican-info="musician"
-                        class="track-card"
                     />
-                </div>
+                </TracksContainer>
             </selection>
             <selection
                 title="Популярные альбомы"
                 left-text="Все альбомы"
                 :left-text-link="{
-                    name: routesNames.musicianIdAlbums,
+                    name: routesNames.musicianId.idAlbums,
                     params: { id: musician.id },
                 }"
                 v-if="musician.popular.albums.length"
@@ -56,7 +55,7 @@
                 title="Клипы"
                 left-text="Все клипы"
                 :left-text-link="{
-                    name: routesNames.musicianIdClips,
+                    name: routesNames.musicianId.idClips,
                     params: { id: musician.id },
                 }"
                 v-if="musician.popular.clips.length"
@@ -92,6 +91,7 @@ const musician = ref(
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
+
 useHead({
     title: musician.value.name,
 });
@@ -129,19 +129,6 @@ const toggleLikeMusician = async () => {
     @include lg(true) {
         padding: 10px;
         padding-top: 20px;
-    }
-    .popular-tracks {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        grid-template-rows: min-content;
-        height: min-content;
-        @include lg(true) {
-            grid-template-columns: 1fr;
-        }
-        gap: 10px;
-        .track-card {
-            flex-grow: 1;
-        }
     }
 }
 .slider {
