@@ -35,6 +35,15 @@
                             :color="track.liked ? 'var(--accent-error)' : null"
                         />
                     </div>
+                    <template v-if="createTrackMode">
+                        <div class="button" @click="emit('edit')">
+                            <Icon :name="IconsNames.pencilIcon" />
+                        </div>
+                        <div class="button" @click="emit('delete')">
+                            <Icon :name="IconsNames.deleteIcon" />
+                        </div>
+                    </template>
+
                     <div
                         :class="[
                             'track-dots-button',
@@ -43,6 +52,7 @@
                         ]"
                         ref="card"
                         @click.self="menuOpened = !menuOpened"
+                        v-if="!createTrackMode"
                     >
                         <Icon :name="IconsNames.dotsIcon" />
                         <div class="menu" v-if="menuOpened">
@@ -191,35 +201,51 @@ const playlistsStore = usePlaylistsStore();
 const toast = useToast();
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
-const emit = defineEmits(["update:track", "playlist-remove-track"]);
+const emit = defineEmits([
+    "update:track",
+    "playlist-remove-track",
+    "delete",
+    "edit",
+]);
 
-const { track, albumInfo, min, musicanInfo, playlistId, menuButtons } =
-    defineProps({
-        track: {
-            type: Object,
-            required: true,
-        },
-        albumInfo: {
-            type: Object,
-            default: null,
-        },
-        musicanInfo: {
-            type: Object,
-            default: null,
-        },
-        min: {
-            type: Boolean,
-            default: false,
-        },
-        playlistId: {
-            type: String,
-            default: null,
-        },
-        menuButtons: {
-            type: Array,
-            default: [],
-        },
-    });
+const {
+    track,
+    albumInfo,
+    min,
+    musicanInfo,
+    playlistId,
+    menuButtons,
+    createTrackMode,
+} = defineProps({
+    track: {
+        type: Object,
+        required: true,
+    },
+    albumInfo: {
+        type: Object,
+        default: null,
+    },
+    musicanInfo: {
+        type: Object,
+        default: null,
+    },
+    min: {
+        type: Boolean,
+        default: false,
+    },
+    playlistId: {
+        type: String,
+        default: null,
+    },
+    menuButtons: {
+        type: Array,
+        default: [],
+    },
+    createTrackMode: {
+        type: Boolean,
+        default: false,
+    },
+});
 const albumLink = computed(() => {
     var album_id = track?.album?.id || albumInfo?.id;
     if (!album_id) return null;

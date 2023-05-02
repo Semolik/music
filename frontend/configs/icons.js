@@ -25,6 +25,8 @@ export const IconsNames = {
     shareIcon: "material-symbols:share",
     backIcon: "material-symbols:arrow-back",
     forwardIcon: "material-symbols:arrow-forward",
+    upIcon: "material-symbols:arrow-upward",
+    downIcon: "material-symbols:arrow-downward",
     copyIcon: "material-symbols:content-copy-rounded",
     checkIcon: "material-symbols:check-box-rounded",
     telegramIcon: "mdi:telegram",
