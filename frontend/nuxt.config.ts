@@ -15,9 +15,15 @@ export default defineNuxtConfig({
         enabled: true,
         vscode: {},
     },
-    // app: {
-    //     pageTransition: { name: "page", mode: "out-in" },
-    // },
+    app: {
+        head: {
+            htmlAttrs: {
+                lang: "ru",
+                class: "dark",
+            },
+        },
+        // pageTransition: { name: "page", mode: "out-in" },
+    },
     viewport: {
         breakpoints: {
             xs: 360,

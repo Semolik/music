@@ -3,26 +3,28 @@
 </template>
 <script setup>
 import { useHeaderStore } from "~/stores/header";
+import { routesNames } from "@typed-router";
 const headerStore = useHeaderStore();
 const route = useRoute();
 const { setTitle } = headerStore;
 const links = [
     {
-        name: "popular-tracks-week",
+        name: routesNames.popularTracks.tracksWeek,
         title: "За неделю",
     },
     {
-        name: "popular-tracks",
+        name: routesNames.popularTracks.index,
         title: "За месяц",
     },
     {
-        name: "popular-tracks-all",
+        name: routesNames.popularTracks.tracksAll,
         title: "За все время",
     },
 ];
 watch(
     () => route.name,
     async (value) => {
+        if (!Object.values(routesNames.popularTracks).includes(value)) return;
         headerStore.reset();
         headerStore.currentRouteName = value;
         switch (value) {

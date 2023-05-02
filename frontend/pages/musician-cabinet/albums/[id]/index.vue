@@ -1,5 +1,5 @@
 <template>
-    <ClipPage :id="id" />
+    <AlbumPage :id="id" />
 </template>
 <script setup>
 const route = useRoute();

@@ -37,12 +37,15 @@ class AlbumsCruds(CRUDBase):
         if image:
             FileCruds(self.db).replace_old_picture(
                 model=album, new_picture=image)
+        return self.update(model=album)
+
+    def update_album_tracks_order(self, album: Album, tracks_ids: List[int]):
         tracks = album.tracks
         for index, track_id in enumerate(tracks_ids):
             for track in tracks:
                 if track.id == track_id:
                     track.track_position = index
-        return self.create(model=album)
+        return self.update(model=album)
 
     def album_belongs_to_user(self, album: Album, user_id: int) -> bool:
         public_profile = self.db.query(PublicProfile).filter(

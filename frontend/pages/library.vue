@@ -41,6 +41,7 @@ watch(
             router.push({ name: "library-playlists" });
             return;
         }
+        if (!Object.values(routesNames.library).includes(value.name)) return;
         headerStore.reset();
         headerStore.currentRouteName = route.name;
         headerStore.title = "Библиотека";

@@ -34,7 +34,6 @@
 </template>
 <script setup>
 import { Service } from "@/client";
-const filtersMenuOpened = ref(false);
 const filtersIsActived = ref(false);
 const createPlaylistModalOpened = ref(false);
 

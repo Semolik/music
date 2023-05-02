@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
 from backend.core.config import settings, env_config
 from backend.crud.crud_albums import AlbumsCruds
@@ -10,7 +10,7 @@ from backend.helpers.images import save_image
 from backend.helpers.music import validate_genres
 from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
 from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoWithoutMusician, AlbumWithTracks, CreateAlbumJson, TrackAfterUpload, UpdateAlbumJson, UploadTrackForm
+from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoUploaded, AlbumInfoWithoutMusician, AlbumWithTracks, AlbumWithTracksUploaded, CreateAlbumJson, TrackAfterUpload, UpdateAlbumJson, UploadTrackForm
 from backend.helpers.images import save_image
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
@@ -60,7 +60,7 @@ def close_album_uploading(
     AlbumsCruds(Auth.db).close_uploading(album=db_album)
 
 
-@router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks, dependencies=[Depends(valid_content_length(
+@router.put('/{album_id}', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumInfoUploaded, dependencies=[Depends(valid_content_length(
     settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_album(
     albumData: UpdateAlbumJson,
@@ -78,15 +78,38 @@ def update_album(
     if db_album.musician_user_id != Auth.current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Нет прав изменять этот альбом")
-    tracks_ids = albumData.tracks_ids
-    if sorted(i.id for i in db_album.tracks) != sorted(tracks_ids):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Переданые id треков не соответствуют трекам в альбоме")
     genres = validate_genres(db=Auth.db, genres_ids=albumData.genres_ids)
     db_image = save_image(db=Auth.db, upload_file=albumPicture,
                           user_id=Auth.current_user.id)
     db_album = AlbumsCruds(Auth.db).update_album(album=db_album,
-                                                 name=albumData.name, date=albumData.open_date, genres=genres, image=db_image, tracks_ids=tracks_ids)
+                                                 name=albumData.name, date=albumData.open_date, genres=genres, image=db_image)
+    db_album.current_user_id = Auth.current_user.id
+    for track in db_album.tracks:
+        track.current_user_id = Auth.current_user.id
+    return db_album
+
+
+@router.put('/{album_id}/tracks-order', responses={**UNAUTHORIZED_401, **NOT_ENOUGH_RIGHTS, **NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+def update_album_tracks_order(
+    tracks_ids: List[int] = Query(...,
+                                  description='ID треков в новом порядке'),
+    album_id: int = Query(..., description='ID альбома'),
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+):
+    '''Обновление порядка треков в альбоме'''
+
+    db_album = AlbumsCruds(Auth.db).get_album(album_id=album_id)
+    if not db_album:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    if db_album.musician_user_id != Auth.current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Нет прав изменять этот альбом")
+    if sorted(i.id for i in db_album.tracks) != sorted(tracks_ids):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Переданые id треков не соответствуют трекам в альбоме")
+    db_album = AlbumsCruds(Auth.db).update_album_tracks_order(
+        album=db_album, tracks_ids=tracks_ids)
     db_album.current_user_id = Auth.current_user.id
     for track in db_album.tracks:
         track.current_user_id = Auth.current_user.id
@@ -176,7 +199,7 @@ def get_last_albums(
     return albums
 
 
-@ router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=AlbumWithTracks)
+@router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=Union[AlbumWithTracks, AlbumWithTracksUploaded])
 def get_album_by_id(
     album_id: int = Query(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
@@ -184,20 +207,40 @@ def get_album_by_id(
     '''Получение альбома по id'''
     album_cruds = AlbumsCruds(db=Auth.db)
     db_album = album_cruds.get_album(album_id=album_id)
-    if not db_album or not db_album.is_available:
+    if not db_album:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Альбом не найден")
     if not db_album.is_available:
-        if not Auth.current_user or album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
+        if not Auth.current_user_id or not album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Альбом не найден")
     db_album.current_user_id = Auth.current_user_id
     for track in db_album.tracks:
         track.current_user_id = Auth.current_user_id
+    if not Auth.current_user_id or not album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
+        return AlbumWithTracks.from_orm(db_album)
+    return AlbumWithTracksUploaded.from_orm(db_album)
+
+
+@router.get('/{album_id}/info', responses={**NOT_FOUND_ALBUM}, response_model=AlbumInfoUploaded)
+def get_album_info_by_id(
+    album_id: int = Query(..., description='ID альбома'),
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+):
+    '''Получение информации об альбоме по id'''
+    album_cruds = AlbumsCruds(db=Auth.db)
+    db_album = album_cruds.get_album(album_id=album_id)
+    if not db_album:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Альбом не найден")
+    if not Auth.current_user_id or not album_cruds.album_belongs_to_user(album=db_album, user_id=Auth.current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Доступ запрещен")
+    db_album.current_user_id = Auth.current_user_id
     return db_album
 
 
-@ router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
+@router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
     settings.MAX_TRACK_FILE_SIZE_MB))])
 def upload_track(
     album_id: int = Query(..., description='ID альбома'),

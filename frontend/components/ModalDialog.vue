@@ -68,7 +68,10 @@ const props = defineProps({
         type: [Number, null],
         default: 800,
     },
-
+    minHeight: {
+        type: [Number, null],
+        default: null,
+    },
     offOutsideClickClose: {
         type: Boolean,
         default: false,
@@ -110,6 +113,12 @@ const height = computed(() => {
 
 const gapString = computed(() => {
     return `${props.gap}px`;
+});
+const minHeight = computed(() => {
+    if (props.minHeight === null) {
+        return "auto";
+    }
+    return `${props.minHeight}px`;
 });
 const isClosing = ref(false);
 const isActive = ref(true);
@@ -220,6 +229,7 @@ onBeforeUnmount(() => {
         padding: 10px;
         gap: v-bind(gapString);
         overflow: auto;
+        min-height: v-bind(minHeight);
 
         .description {
             font-size: 0.875rem;

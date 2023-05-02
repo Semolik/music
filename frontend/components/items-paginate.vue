@@ -11,7 +11,7 @@ const { onNextPage, page_size } = defineProps({
         type: Function,
         required: true,
     },
-    page_size: {
+    pageSize: {
         type: Number,
         required: true,
     },

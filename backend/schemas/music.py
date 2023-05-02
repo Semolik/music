@@ -152,8 +152,22 @@ class AlbumInfo(AlbumInfoWithoutMusician):
         orm_mode = True
 
 
+class AlbumInfoUploaded(AlbumInfo):
+    uploaded: bool = Query(..., description="Загружен ли альбом")
+
+    class Config:
+        orm_mode = True
+
+
 class AlbumWithTracks(AlbumInfo):
     tracks: List[AlbumTrack] = Query(..., description="Список треков альбома")
+
+    class Config:
+        orm_mode = True
+
+
+class AlbumWithTracksUploaded(AlbumWithTracks):
+    uploaded: bool = Query(..., description="Загружен ли альбом")
 
     class Config:
         orm_mode = True

@@ -108,6 +108,28 @@ def get_track(
     return db_track
 
 
+@router.delete('/{track_id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_track(
+    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+):
+    '''Удаление трека'''
+    tracks_crud = TracksCrud(Auth.db)
+    db_track = tracks_crud.get_track(track_id=track_id)
+    if not db_track:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Трек не найден")
+    if not AlbumsCruds(Auth.db).album_belongs_to_user(album=db_track.album, user_id=Auth.current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="У вас нет доступа к этому треку")
+    if db_track.album.uploaded:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Нельзя удалить трек, из уже загруженного альбома"
+        )
+    tracks_crud.delete(db_track)
+
+
 @router.get('/{track_id}/playlists/my',  response_model=List[PlaylistInfoWithoutTracks])
 def get_track_playlists(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate())):
     '''Получение ваших плейлистов, в которых есть трек'''
