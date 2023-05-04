@@ -30,12 +30,7 @@ class CreateAlbumJson(ValidateJsonWithFormBody, CreateAlbum):
     ...
 
 
-class UpdateAlbum(CreateAlbum):
-    tracks_ids: List[uuid_pkg.UUID] = Query(...,
-                                            description="Список ID треков")
-
-
-class UpdateAlbumJson(UpdateAlbum, ValidateJsonWithFormBody):
+class UpdateAlbumJson(CreateAlbum, ValidateJsonWithFormBody):
     ...
 
 
@@ -212,6 +207,7 @@ class MusicianClipWithoutMusician(CreateMusicianClip):
 
     video_id: str = Query(..., description="ID видео на YouTube")
     video: str = None
+    track: TrackWithoutMusician = Query(None, description="Информация о треке")
 
     @validator("video", always=True)
     def link_from_video_id(cls, v, values):

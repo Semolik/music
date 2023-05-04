@@ -8,7 +8,7 @@
             <TrackCard
                 v-for="(track, index) in tracks"
                 :track="track"
-                @update:track="tracksRaw[index] = $event"
+                @update:track="tracks[index] = $event"
                 class="track-card"
                 min
             />

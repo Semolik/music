@@ -354,7 +354,9 @@ const shareModalOpened = ref(false);
                 text-transform: uppercase;
                 overflow: hidden;
                 text-overflow: ellipsis;
+
                 @include md(true) {
+                    word-wrap: anywhere;
                     text-align: center;
                     --font-size: clamp(2rem, 8vw, 3rem);
                 }

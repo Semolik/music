@@ -204,7 +204,7 @@ const selection = computed(() => {
             color: $primary-text;
             padding: 10px;
             overflow: auto;
-            max-height: 90vh;
+            max-height: 85vh;
             @include lg(true) {
                 border-radius: 10px;
                 height: min-content;

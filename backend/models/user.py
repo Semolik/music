@@ -83,9 +83,10 @@ class User(Base):
 class PublicProfile(Base):
     __tablename__ = 'public_profiles'
 
-    def __init__(self, current_user_id=None, is_liked=False):
+    def __init__(self, current_user_id=None, is_liked=False, **kwargs):
         self.current_user_id = current_user_id
         self.is_liked = is_liked
+        super().__init__(**kwargs)
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(

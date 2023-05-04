@@ -79,8 +79,6 @@ watch(
     router.currentRoute,
     (value) => {
         searchIsActive.value = false;
-        if (currentRouteName.value === value.name) return;
-        headerStore.reset();
         headerStore.currentRouteName = value.name;
     },
     { immediate: true }

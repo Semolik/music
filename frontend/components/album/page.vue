@@ -29,21 +29,56 @@
                     />
                 </div>
                 <GenresSelector v-model="genres" class="genres-selector" />
+                <div class="buttons">
+                    <AppButton
+                        v-if="id && !album.uploaded"
+                        @click="goToEditTracks(album)"
+                        active
+                    >
+                        Редактировать треки
+                    </AppButton>
+                    <AppButton
+                        :active="buttonIsActive"
+                        @click="id ? updateAlbum() : createAlbum()"
+                    >
+                        {{
+                            id
+                                ? "Обновить"
+                                : "Создать и перейти к загрузке треков"
+                        }}
+                    </AppButton>
+                </div>
                 <AppButton
-                    v-if="id && !album.uploaded"
-                    @click="goToEditTracks(album)"
+                    v-if="id"
+                    @click="deleteModalOpened = true"
                     active
+                    class="delete"
                 >
-                    Редактировать треки
+                    Удалить альбом
                 </AppButton>
-                <AppButton
-                    :active="buttonIsActive"
-                    @click="id ? updateAlbum() : createAlbum()"
+                <ModalDialog
+                    :active="deleteModalOpened"
+                    @close="deleteModalOpened = false"
+                    head-text="Удаление альбома"
+                    :buttons="[
+                        {
+                            text: 'Удалить',
+                            onClick: deleteAlbum,
+                            active: true,
+                            red: true,
+                        },
+                        {
+                            text: 'Отмена',
+                            onClick: () => (deleteModalOpened = false),
+                        },
+                    ]"
                 >
-                    {{
-                        id ? "Обновить" : "Создать и перейти к загрузке треков"
-                    }}
-                </AppButton>
+                    <template #content>
+                        Вы уверены, что хотите удалить альбом? <br />
+                        Это действие нельзя будет отменить. <br />
+                        Все треки, входящие в альбом, также будут удалены.
+                    </template>
+                </ModalDialog>
             </div>
         </div>
     </SettingsPage>
@@ -53,7 +88,7 @@ import { Service } from "~/client";
 import { useToast } from "vue-toastification";
 import { IconsNames } from "~/configs/icons";
 import { routesNames } from "~/.nuxt/typed-router";
-
+import moment from "moment";
 const { id } = defineProps({
     id: {
         type: String,
@@ -74,6 +109,7 @@ const title = computed(() =>
 useHead({
     title: title.value,
 });
+const deleteModalOpened = ref(false);
 const picture = ref(album.value?.picture || null);
 const pictureBlob = ref(null);
 const handleAvatarSuccess = (raw) => {
@@ -88,6 +124,7 @@ const genresIsChanged = computed(() => {
     }
     return genres.value.some((g) => !album.value.genres.includes(g));
 });
+const openDate = ref(id ? moment(album.value.open_date).toDate() : new Date());
 const buttonIsActive = computed(() => {
     if (!id) {
         return !!(
@@ -96,13 +133,16 @@ const buttonIsActive = computed(() => {
             pictureBlob.value
         );
     }
+
     return !!(
         name.value !== album.value.name ||
         pictureBlob.value ||
-        genresIsChanged.value
+        genresIsChanged.value ||
+        moment(album.value.open_date).toDate().toDateString() !==
+            openDate.value.toDateString()
     );
 });
-const openDate = computed(() => (id ? album.value.open_date : new Date()));
+
 const router = useRouter();
 const goToEditTracks = (album) => {
     router.push({
@@ -145,6 +185,18 @@ const updateAlbum = async () => {
             }
         );
         album.value = updated_album;
+        genres.value = updated_album.genres;
+        pictureBlob.value = null;
+    } catch (e) {
+        toast.error(HandleOpenApiError(e).message);
+    }
+};
+const deleteAlbum = async () => {
+    try {
+        await Service.deleteAlbumByIdApiV1AlbumsAlbumIdDelete(id);
+        router.push({
+            name: routesNames.musicianCabinet.cabinetAlbums,
+        });
     } catch (e) {
         toast.error(HandleOpenApiError(e).message);
     }
@@ -170,10 +222,22 @@ const updateAlbum = async () => {
     display: grid;
     grid-template-columns: 230px 1fr;
     gap: 10px;
+
+    @include lg(true) {
+        grid-template-columns: 1fr;
+    }
     .fields {
         display: flex;
         gap: 10px;
         flex-direction: column;
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .delete {
+            --app-button-active-bg: #{$accent-red};
+            --app-button-active-hover-bg: #{$accent-red-hover};
+        }
     }
 }
 </style>

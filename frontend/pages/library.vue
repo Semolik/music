@@ -5,7 +5,7 @@
 import { routesNames } from "@typed-router";
 import { useHeaderStore } from "~/stores/header";
 const headerStore = useHeaderStore();
-const { setTitle } = headerStore;
+
 const route = useRoute();
 definePageMeta({
     middleware: ["auth"],
@@ -41,10 +41,9 @@ watch(
             router.push({ name: "library-playlists" });
             return;
         }
-        if (!Object.values(routesNames.library).includes(value.name)) return;
-        headerStore.reset();
         headerStore.currentRouteName = route.name;
-        headerStore.title = "Библиотека";
+
+        headerStore.setTitle("Библиотека");
         headerStore.links = links;
     },
     { immediate: true }

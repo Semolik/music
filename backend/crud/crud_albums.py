@@ -30,7 +30,7 @@ class AlbumsCruds(CRUDBase):
     def get_album_count_by_genre_id(self, genre_id: int) -> int:
         return self.db.query(AlbumGenre).filter(AlbumGenre.genre_id == genre_id).count()
 
-    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: Image, tracks_ids: List[int]):
+    def update_album(self, album: Album, name: str,  date: datetime, genres: List[Genre], image: Image):
         album.name = name
         album.open_date = date
         album.genres = genres

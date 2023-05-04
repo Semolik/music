@@ -36,4 +36,5 @@ export const IconsNames = {
     libraryIcon: "fluent:library-16-filled",
     clipIcon: "material-symbols:video-library",
     adminIcon: "material-symbols:admin-panel-settings",
+    fileIcon: "material-symbols:file-present-rounded",
 };

@@ -434,11 +434,6 @@ const duration = computed(() =>
                 text-overflow: ellipsis;
                 overflow: hidden;
             }
-            .musican-name {
-                @include lg {
-                    display: none;
-                }
-            }
         }
         .info-item {
             color: $secondary-text;
@@ -450,6 +445,9 @@ const duration = computed(() =>
                 &:hover {
                     color: $primary-text;
                 }
+            }
+            &.musican-name {
+                white-space: nowrap;
             }
         }
     }

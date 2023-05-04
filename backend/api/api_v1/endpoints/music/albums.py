@@ -246,7 +246,8 @@ def upload_track(
     album_id: int = Query(..., description='ID альбома'),
     trackData: UploadTrackForm = Depends(UploadTrackForm),
     trackPicture: UploadFile = File(..., description="Изображение трека"),
-    track: UploadFile = File(..., description="Файл трека"),
+    track: UploadFile = File(..., description="Файл трека",
+                             media_type='audio/mpeg'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Создание трека'''

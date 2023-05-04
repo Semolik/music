@@ -36,6 +36,7 @@
                                     {
                                         active: button.active,
                                         disabled: button.active === false,
+                                        red: button.red,
                                     },
                                 ]"
                                 v-for="button in props.buttons"
@@ -65,11 +66,11 @@ const props = defineProps({
         default: 500,
     },
     maxHeight: {
-        type: [Number, null],
+        type: [Number, null, String],
         default: 800,
     },
     minHeight: {
-        type: [Number, null],
+        type: [Number, null, String],
         default: null,
     },
     offOutsideClickClose: {
@@ -108,6 +109,9 @@ const height = computed(() => {
     if (props.maxHeight === null) {
         return "auto";
     }
+    if (typeof props.maxHeight === "string") {
+        return props.maxHeight;
+    }
     return `${props.maxHeight}px`;
 });
 
@@ -117,6 +121,9 @@ const gapString = computed(() => {
 const minHeight = computed(() => {
     if (props.minHeight === null) {
         return "auto";
+    }
+    if (typeof props.minHeight === "string") {
+        return props.minHeight;
     }
     return `${props.minHeight}px`;
 });
@@ -275,6 +282,13 @@ onBeforeUnmount(() => {
                     color: $primary-bg;
                     &:hover {
                         background-color: $accent-hover;
+                    }
+
+                    &.red {
+                        background-color: $accent-red;
+                        &:hover {
+                            background-color: $accent-red-hover;
+                        }
                     }
                 }
             }

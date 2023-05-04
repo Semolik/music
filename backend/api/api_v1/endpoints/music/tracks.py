@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta
 from typing import List
-from fastapi import Depends, APIRouter,  status, HTTPException, Query
+from fastapi import Depends, APIRouter, File, UploadFile,  status, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.helpers.auth_helper import Authenticate
+from backend.helpers.music import update_track
 from backend.models.albums import Album
-from backend.schemas.music import Track
+from backend.schemas.music import Track, UploadTrackForm
 import uuid as uuid_pkg
 from backend.core.config import settings
 from backend.schemas.playlists import PlaylistInfoWithoutTracks
@@ -105,6 +106,37 @@ def get_track(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Трек не найден")
     db_track.current_user_id = Auth.current_user_id
+    return db_track
+
+
+@router.put('/{track_id}', response_model=Track)
+def update_track_by_id(
+    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    trackData: UploadTrackForm = Depends(UploadTrackForm),
+    trackPicture: UploadFile = File(None, description="Изображение трека"),
+    track: UploadFile = File(None, description="Файл трека"),
+    Auth: Authenticate = Depends(Authenticate(is_musician=True)),
+):
+    '''Обновление трека'''
+    tracks_crud = TracksCrud(Auth.db)
+    db_track = tracks_crud.get_track(track_id=track_id)
+    if not db_track:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Трек не найден")
+    if not AlbumsCruds(Auth.db).album_belongs_to_user(album=db_track.album, user_id=Auth.current_user_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="У вас нет доступа к этому треку")
+    if db_track.album.uploaded:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Нельзя изменить трек, из уже загруженного альбома")
+    db_track = update_track(
+        db=Auth.db,
+        track=db_track,
+        track_form=trackData,
+        picture=trackPicture,
+        upload_file=track
+    )
     return db_track
 
 

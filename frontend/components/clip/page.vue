@@ -47,7 +47,19 @@
                     label="Ссылка на видео"
                     :error="!urlCorrect"
                 />
-                Сделать выбор трека
+                <TrackCard
+                    min
+                    :track="clip.track"
+                    create-track-mode
+                    v-if="clip.track"
+                />
+                <AppButton
+                    active
+                    @click="connectToTrackModalOpened = true"
+                    v-else
+                >
+                    Привязять к треку
+                </AppButton>
                 <AppButton
                     @click="save"
                     :active="buttonActive"
@@ -55,6 +67,11 @@
                 >
                     Сохранить
                 </AppButton>
+                <ModalDialog
+                    :active="connectToTrackModalOpened"
+                    @close="connectToTrackModalOpened = false"
+                >
+                </ModalDialog>
             </div>
         </div>
     </SettingsPage>
@@ -73,7 +90,7 @@ const { id } = defineProps({
 });
 const { MAX_CLIP_NAME_LENGTH, YOUTUBE_VIDEO } = useRuntimeConfig().public;
 const toast = useToast();
-
+const connectToTrackModalOpened = ref(false);
 const clip = id ? ref(await Service.getClipByIdApiV1ClipsClipIdGet(id)) : {};
 const title = computed(() =>
     id ? "Редактирование клипа " + clip.value.name : "Создание клипа"
@@ -143,7 +160,7 @@ const image_url = computed(() => {
 watch(
     image_url,
     async (new_url) => {
-        if (!new_url) return;
+        if (!new_url || image_type.value !== "Из видео") return;
         image_url_correct.value = await testImageUrl(new_url);
     },
     { immediate: true }
@@ -217,7 +234,6 @@ useHead({
             width: 100%;
             height: 100%;
             border-radius: 10px;
-            aspect-ratio: 16/9;
             border: 2px dashed transparent;
             overflow: hidden;
 

@@ -28,7 +28,7 @@
         head-text="Поиск жанра"
         closeOnEsckey
         :min-height="400"
-        :max-height="400"
+        max-height="60vh"
     >
         <template #content>
             <AppInput
@@ -134,7 +134,6 @@ watch(
         }
         flex-grow: 1;
         span {
-            font-size: 14px;
             font-weight: 500;
             color: $primary-text;
         }

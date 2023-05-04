@@ -23,21 +23,18 @@
             />
 
             <div class="info-line">
-                <ClientOnly>
-                    <html class="dark">
-                        <el-date-picker
-                            v-model="dateRange"
-                            type="datetimerange"
-                            start-placeholder="Дата открытия"
-                            end-placeholder="Дата закрытия"
-                            id="date-picker"
-                            :style="{
-                                '--el-date-editor-width': '100%',
-                                '--el-input-height': '100%',
-                            }"
-                        />
-                    </html>
-                </ClientOnly>
+                <el-date-picker
+                    v-model="dateRange"
+                    type="datetimerange"
+                    start-placeholder="Дата открытия"
+                    end-placeholder="Дата закрытия"
+                    id="date-picker"
+                    :style="{
+                        '--el-date-editor-width': '100%',
+                        '--el-input-height': '100%',
+                    }"
+                />
+
                 <div
                     :class="['chekbox', { active: active }]"
                     @click="active = !active"

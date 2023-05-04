@@ -1,6 +1,7 @@
 
 from typing import List
 from uuid import UUID
+from backend.crud.crud_file import FileCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.crud.crud_genres import GenresCruds
 from backend.crud.crud_albums import AlbumsCruds
@@ -49,6 +50,29 @@ def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Ima
         return db_track
     except:
         raise HTTPException(status_code=422, detail="поврежденный файл")
+
+
+def update_track(db: Session, track: Track, track_form: TrackSchema, picture: Image, upload_file: UploadFile):
+    if upload_file:
+        buf = io.BytesIO()
+        shutil.copyfileobj(upload_file.file, buf)
+        buf.seek(0)
+        try:
+            segment = AudioSegment.from_file(buf)
+            ext = settings.SONGS_EXTENTION
+            segment.export('/'.join([settings.TRACKS_FOLDER, str(track.id)+ext]),
+                           format=ext.replace('.', ''))
+            track.duration = round(segment.duration_seconds)
+        except:
+            raise HTTPException(status_code=422, detail="поврежденный файл")
+    if picture:
+        track.picture = FileCruds(db).replace_old_picture(
+            model=track.picture, new_picture=picture)
+    track.name = track_form.name
+    track.feat = track_form.feat
+    db.commit()
+    db.refresh(track)
+    return track
 
 
 def get_track_url(track: Track):
