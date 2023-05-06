@@ -25,6 +25,7 @@
                 :playlist-id="playlist.id"
                 @playlist-remove-track="playlist.tracks.splice(index, 1)"
             />
+            <NotFound v-if="!playlist.tracks.length" text="Плейлист пуст" />
         </div>
     </ContentHead>
     <ModalDialog
@@ -99,10 +100,9 @@ import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "@typed-router";
 import { useEventBus } from "@vueuse/core";
-import { useHeaderStore } from "~/stores/header";
-const headerStore = useHeaderStore();
+
 const route = useRoute();
-const { setTitle } = headerStore;
+
 const goToLoginBus = useEventBus("go-to-login");
 const { MAX_PLAYLIST_NAME_LENGTH, MAX_PLAYLIST_DESCRIPTION_LENGTH } =
     useRuntimeConfig().public;
@@ -117,7 +117,7 @@ const playlist = ref(
 useHead({
     title: "Плейлист " + playlist.value.name,
 });
-setTitle("Плейлист " + playlist.value.name);
+
 const authStore = useAuthStore();
 const { userData, logined } = storeToRefs(authStore);
 const isOwner = computed(
@@ -217,6 +217,7 @@ const info = computed(() => [
     display: flex;
     flex-direction: column;
     gap: 10px;
+    height: 100%;
     padding: 10px;
 }
 .description {

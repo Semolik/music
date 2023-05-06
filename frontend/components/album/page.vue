@@ -10,33 +10,45 @@
                 :icon="IconsNames.imageIcon"
             />
             <div class="fields">
-                <AppInput
-                    v-model="name"
-                    label="Название"
-                    :error="!name"
-                    :max-length="MAX_ALBUM_NAME_LENGTH"
-                    show-word-limit
-                />
-                <div class="app-input">
-                    <label class="app-input__label">
-                        Дата выхода альбома
-                    </label>
-                    <el-date-picker
-                        v-model="openDate"
-                        type="datetime"
-                        placeholder="Дата открытия"
-                        id="date-picker"
+                <div class="items">
+                    <AppInput
+                        v-model="name"
+                        label="Название"
+                        :error="!name"
+                        :max-length="MAX_ALBUM_NAME_LENGTH"
+                        show-word-limit
                     />
+                    <div class="app-input">
+                        <label class="app-input__label">
+                            Дата выхода альбома
+                        </label>
+                        <el-date-picker
+                            v-model="openDate"
+                            type="datetime"
+                            placeholder="Дата открытия"
+                            id="date-picker"
+                        />
+                    </div>
                 </div>
                 <GenresSelector v-model="genres" class="genres-selector" />
-                <div class="buttons">
-                    <AppButton
-                        v-if="id && !album.uploaded"
-                        @click="goToEditTracks(album)"
-                        active
-                    >
-                        Редактировать треки
-                    </AppButton>
+                <div class="items">
+                    <template v-if="id">
+                        <AppButton
+                            v-if="!album.uploaded"
+                            @click="goToEditTracks(album)"
+                            active
+                        >
+                            Редактировать треки
+                        </AppButton>
+                        <AppButton
+                            v-else
+                            @click="goToAlbum(album)"
+                            :active="albumIsOpened"
+                        >
+                            Перейти к альбому
+                        </AppButton>
+                    </template>
+
                     <AppButton
                         :active="buttonIsActive"
                         @click="id ? updateAlbum() : createAlbum()"
@@ -150,6 +162,20 @@ const goToEditTracks = (album) => {
         params: { id: album.id },
     });
 };
+const now = new Date();
+const albumIsOpened = computed(
+    () => moment(album.value.open_date).toDate() < now
+);
+const goToAlbum = (album) => {
+    if (!albumIsOpened.value) {
+        toast.error("Альбом еще не открыт");
+        return;
+    }
+    router.push({
+        name: routesNames.albumId,
+        params: { id: album.id },
+    });
+};
 const createAlbum = async () => {
     if (!buttonIsActive.value) {
         return;
@@ -230,9 +256,12 @@ const deleteAlbum = async () => {
         display: flex;
         gap: 10px;
         flex-direction: column;
-        .buttons {
+        .items {
             display: flex;
             gap: 10px;
+            @include lg(true) {
+                flex-direction: column;
+            }
         }
         .delete {
             --app-button-active-bg: #{$accent-red};
