@@ -16,8 +16,14 @@
     </card-min>
     <card v-bind="props" v-else @picture-click="goToAlbum" :is-link="isLink">
         <div class="flex flex-col grow">
-            <span class="font-medium primary-text">{{ album.name }}</span>
-            <div class="secondary-text text-sm flex-wrap flex items-center">
+            <span
+                class="font-medium primary-text text-ellipsis overflow-hidden"
+            >
+                {{ album.name }}
+            </span>
+            <div
+                class="secondary-text text-sm flex-wrap flex items-center text-ellipsis overflow-hidden"
+            >
                 <span> {{ musicianName }}</span>
                 <Icon name="ci:dot-02-s" />
                 <span>{{ album.year }}</span>

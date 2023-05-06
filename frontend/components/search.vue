@@ -26,10 +26,13 @@
                 <MusicianCard
                     v-if="item.type == 'musician'"
                     :musician="item.info"
-                    min
-                    is-link
                 />
-                <TrackCard v-if="item.type == 'track'" :track="item.info" />
+                <TrackCard
+                    v-if="item.type == 'track'"
+                    :track="item.info"
+                    min
+                    hide-dots-menu
+                />
                 <PlaylistCard
                     v-if="item.type == 'playlist'"
                     :playlist="item.info"
@@ -44,7 +47,12 @@
             />
         </template>
         <template v-if="category === 'tracks'">
-            <TrackCard v-for="track in results.tracks" :track="track" />
+            <TrackCard
+                v-for="(track, index) in results.tracks"
+                v-model:track="results.tracks[index]"
+                hide-dots-menu
+                min
+            />
         </template>
         <template v-if="category === 'albums'">
             <AlbumCard v-for="album in results.albums" :album="album" />
@@ -182,7 +190,8 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     &.all {
         .results-item {

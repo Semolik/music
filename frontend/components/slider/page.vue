@@ -33,6 +33,7 @@
                         '--el-date-editor-width': '100%',
                         '--el-input-height': '100%',
                     }"
+                    :clearable="false"
                 />
 
                 <div

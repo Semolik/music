@@ -133,6 +133,7 @@ const resetFilters = async () => {
         border: none;
         border-radius: 10px 10px 0 0;
         padding-bottom: 20px;
+        z-index: 1002;
     }
     .reset-button {
         @include flex-center;

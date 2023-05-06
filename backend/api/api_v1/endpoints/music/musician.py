@@ -139,20 +139,16 @@ def get_musician_clips(
 def get_musician_albums(
     profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение альбомов музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
+    db_public_profile = UserCruds(
+        Auth.db).get_public_profile_by_id(id=profile_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    albums = MusicianCrud(db).get_popular_musician_albums(
+    albums = MusicianCrud(Auth.db).get_popular_musician_albums(
         musician_id=db_public_profile.id, page=page, page_size=settings.ALBUM_PAGE_COUNT_ALL)
-    albums_obj = []
-    for album in albums:
-        album_info = AlbumInfo.from_orm(album)
-        album_info.musician = MusicianInfo.from_orm(db_public_profile)
-        albums_obj.append(album_info)
     return albums
 
 
@@ -160,14 +156,39 @@ def get_musician_albums(
 def get_musician_popular_tracks(
     profile_id: int = Query(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
-    db: Session = Depends(get_db)
+    Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение популярных треков музыканта'''
-    db_public_profile = UserCruds(db).get_public_profile_by_id(id=profile_id)
+    db_public_profile = UserCruds(
+        Auth.db).get_public_profile_by_id(id=profile_id)
     if not db_public_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Профиль музыканта не найден")
-    tracks = MusicianCrud(db).get_popular_musician_tracks(
+    tracks = MusicianCrud(Auth.db).get_popular_musician_tracks(
         musician_id=db_public_profile.id, page=page
     )
+    if Auth.current_user_id:
+        for track in tracks:
+            track.current_user_id = Auth.current_user_id
+    return tracks
+
+
+@router.get('/{profile_id}/popular/search', response_model=List[Track])
+def search_musician_popular_tracks(
+    profile_id: int = Query(..., description='ID музыканта'),
+    search: str = Query(..., description='Поисковый запрос'),
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Поиск популярных треков музыканта'''
+    db_public_profile = UserCruds(
+        Auth.db).get_public_profile_by_id(id=profile_id)
+    if not db_public_profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Профиль музыканта не найден")
+    tracks = MusicianCrud(Auth.db).search_popular_musician_tracks(
+        musician_id=db_public_profile.id, search=search
+    )
+    if Auth.current_user_id:
+        for track in tracks:
+            track.current_user_id = Auth.current_user_id
     return tracks

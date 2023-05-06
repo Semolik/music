@@ -75,14 +75,13 @@ onBeforeUnmount(() => {
     unsubscribeOpenSearchBus();
 });
 
-watch(
-    router.currentRoute,
-    (value) => {
-        searchIsActive.value = false;
-        headerStore.currentRouteName = value.name;
-    },
-    { immediate: true }
-);
+watch(router.currentRoute, (value) => {
+    searchIsActive.value = false;
+    headerStore.currentRouteName = value.name;
+
+    // if (links.value.includes(value.name)) return;
+    // headerStore.reset();
+});
 
 onMounted(() => {
     window.addEventListener("keydown", (event) => {

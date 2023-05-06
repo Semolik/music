@@ -4,6 +4,7 @@
         :icon="IconsNames.trackIcon"
         v-bind="$attrs"
         :class="['track-card', { min: min }]"
+        @click="handleCardClick"
     >
         <template #content>
             <div :class="['info-container', { min: min }]">
@@ -43,16 +44,16 @@
                             <Icon :name="IconsNames.deleteIcon" />
                         </div>
                     </template>
-
                     <div
                         :class="[
                             'track-dots-button',
                             'button',
                             { active: menuOpened },
+                            { 'hide-dots-menu': hideDotsMenu },
                         ]"
-                        ref="card"
+                        ref="dotsButton"
                         @click.self="menuOpened = !menuOpened"
-                        v-if="!createTrackMode"
+                        v-if="!(hideDotsMenu || createTrackMode)"
                     >
                         <Icon :name="IconsNames.dotsIcon" />
                         <div class="menu" v-if="menuOpened">
@@ -111,6 +112,25 @@
                                 <Icon :name="IconsNames.userIcon" />
                                 <span>Перейти к исполнителю</span>
                             </nuxt-link>
+                            <template v-if="track.clip">
+                                <div
+                                    class="menu-item"
+                                    @click="clipModalOpeneded = true"
+                                >
+                                    <Icon :name="IconsNames.clipIcon" />
+                                    <span>Клип</span>
+                                </div>
+                                <ClipModal
+                                    v-model:modalOpened="clipModalOpeneded"
+                                    :clip="track.clip"
+                                    @update:clip="
+                                        emit('update:track', {
+                                            ...track,
+                                            clip: $event,
+                                        })
+                                    "
+                                />
+                            </template>
                             <div
                                 class="menu-item"
                                 @click="
@@ -133,7 +153,6 @@
                 </div>
             </div>
         </template>
-        <template #card-end> </template>
     </card-min>
     <ModalDialog
         :active="addToPlaylistModalOpened"
@@ -216,6 +235,8 @@ const {
     playlistId,
     menuButtons,
     createTrackMode,
+    hideDotsMenu,
+    onCardClick,
 } = defineProps({
     track: {
         type: Object,
@@ -245,6 +266,14 @@ const {
         type: Boolean,
         default: false,
     },
+    hideDotsMenu: {
+        type: Boolean,
+        default: false,
+    },
+    onCardClick: {
+        type: Function,
+        default: null,
+    },
 });
 const albumLink = computed(() => {
     var album_id = track?.album?.id || albumInfo?.id;
@@ -254,6 +283,7 @@ const albumLink = computed(() => {
         params: { id: album_id },
     };
 });
+const clipModalOpeneded = ref(false);
 const albumName = computed(() => albumInfo?.name || track?.album?.name || null);
 const musicianLink = computed(() => {
     var musician_id =
@@ -286,9 +316,24 @@ const toggleLikeTrack = async () => {
 };
 const shareModalOpened = ref(false);
 const addToPlaylistModalOpened = ref(false);
-const card = ref(null);
 const menuOpened = ref(false);
 const createMode = ref(false);
+const dotsButton = ref(null);
+const handleCardClick = (event) => {
+    if (event.target === dotsButton.value) return;
+
+    if (onCardClick) {
+        onCardClick();
+        return;
+    }
+};
+onMounted(() => {
+    onClickOutside(dotsButton, () => {
+        if (clipModalOpeneded.value) return;
+        menuOpened.value = false;
+    });
+});
+
 const removeTrackFromPlaylist = async () => {
     try {
         menuOpened.value = false;
@@ -337,12 +382,6 @@ const addTrackToPlaylist = async (playlistId) => {
     addToPlaylistModalOpened.value = false;
 };
 
-onMounted(() => {
-    onClickOutside(card, () => {
-        menuOpened.value = false;
-    });
-});
-
 const duration = computed(() =>
     moment
         .utc(moment.duration(track.duration, "seconds").asMilliseconds())
@@ -354,6 +393,7 @@ const duration = computed(() =>
     display: flex;
     flex-direction: column;
     gap: 10px;
+
     .playlists {
         display: flex;
         flex-direction: column;
@@ -405,6 +445,7 @@ const duration = computed(() =>
     @include lg(true) {
         gap: 10px;
     }
+    user-select: none;
     &.min {
         gap: 10px;
         .info-container {
@@ -433,6 +474,7 @@ const duration = computed(() =>
                 color: $primary-text;
                 text-overflow: ellipsis;
                 overflow: hidden;
+                white-space: nowrap;
             }
         }
         .info-item {
@@ -446,7 +488,11 @@ const duration = computed(() =>
                     color: $primary-text;
                 }
             }
+            &.track-name,
+            &.album-name,
             &.musican-name {
+                text-overflow: ellipsis;
+                overflow: hidden;
                 white-space: nowrap;
             }
         }
@@ -456,7 +502,9 @@ const duration = computed(() =>
         @include flex-center;
         color: $secondary-text;
         gap: 8px;
-
+        &.hide-dots-menu {
+            padding-right: 20px;
+        }
         .button {
             @include flex-center;
             cursor: pointer;

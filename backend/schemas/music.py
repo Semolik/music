@@ -107,23 +107,52 @@ class UploadTrackForm(UploadTrackBase):
     ...
 
 
-class TrackAfterUpload(UploadTrackBase):
-    id: uuid_pkg.UUID = Query(..., description="ID трека")
-    picture: ImageLink | None = Query(...,
-                                      description="Ссылка на картинку трека")
+class CreateMusicianClip(BaseModel):
+
+    name: str = Query(
+        ...,
+        max_length=int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH')),
+        description="Название клипа"
+    )
+    video_id: str = Query(
+        ...,
+        max_length=int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH')),
+        description="ID видео на YouTube"
+    )
+    track_id: uuid_pkg.UUID = Query(None, description="ID трека")
+
+
+@form_body
+class CreateMusicianClipForm(CreateMusicianClip):
+    image_from_youtube: bool = Query(...,
+                                     description="Использовать ли картинку с YouTube")
+
+
+class MusicianClipWithoutTrack(CreateMusicianClip):
+    id: int = Query(..., description="ID клипа")
+    picture: ImageLink = Query(..., description="Ссылка на картинку клипа")
+
+    video_id: str = Query(..., description="ID видео на YouTube")
+    video: str = None
+
+    @validator("video", always=True)
+    def link_from_video_id(cls, v, values):
+
+        video_id = values.get("video_id")
+        if video_id:
+            return f"https://www.youtube.com/watch?v={video_id}"
+        else:
+            return v
 
     class Config:
         orm_mode = True
 
 
-class AlbumTrack(TrackAfterUpload):
-    duration: float = Query(..., description="Длительность трека")
-    url: str = Query(None, description="Ссылка на трек")
-    liked: bool = Query(default=False, description="Лайкнут ли трек")
-
-    @validator("url", always=True)
-    def url_generator(cls, v, values):
-        return get_track_url_by_id(values.get('id'))
+class TrackAfterUpload(UploadTrackBase):
+    id: uuid_pkg.UUID = Query(..., description="ID трека")
+    picture: ImageLink | None = Query(...,
+                                      description="Ссылка на картинку трека")
+    clip: MusicianClipWithoutTrack | None
 
     class Config:
         orm_mode = True
@@ -149,6 +178,19 @@ class AlbumInfo(AlbumInfoWithoutMusician):
 
 class AlbumInfoUploaded(AlbumInfo):
     uploaded: bool = Query(..., description="Загружен ли альбом")
+
+    class Config:
+        orm_mode = True
+
+
+class AlbumTrack(TrackAfterUpload):
+    duration: float = Query(..., description="Длительность трека")
+    url: str = Query(None, description="Ссылка на трек")
+    liked: bool = Query(default=False, description="Лайкнут ли трек")
+
+    @validator("url", always=True)
+    def url_generator(cls, v, values):
+        return get_track_url_by_id(values.get('id'))
 
     class Config:
         orm_mode = True
@@ -180,43 +222,9 @@ class Track(TrackWithoutMusician):
         orm_mode = True
 
 
-class CreateMusicianClip(BaseModel):
+class MusicianClipWithoutMusician(MusicianClipWithoutTrack):
 
-    name: str = Query(
-        ...,
-        max_length=int(env_config.get('VITE_MAX_CLIP_NAME_LENGTH')),
-        description="Название клипа"
-    )
-    video_id: str = Query(
-        ...,
-        max_length=int(env_config.get('VITE_MAX_YOUTUBE_VIDEOID_LENGTH')),
-        description="ID видео на YouTube"
-    )
-    track_id: uuid_pkg.UUID = Query(None, description="ID трека")
-
-
-@form_body
-class CreateMusicianClipForm(CreateMusicianClip):
-    image_from_youtube: bool = Query(...,
-                                     description="Использовать ли картинку с YouTube")
-
-
-class MusicianClipWithoutMusician(CreateMusicianClip):
-    id: int = Query(..., description="ID клипа")
-    picture: ImageLink = Query(..., description="Ссылка на картинку клипа")
-
-    video_id: str = Query(..., description="ID видео на YouTube")
-    video: str = None
     track: TrackWithoutMusician = Query(None, description="Информация о треке")
-
-    @validator("video", always=True)
-    def link_from_video_id(cls, v, values):
-
-        video_id = values.get("video_id")
-        if video_id:
-            return f"https://www.youtube.com/watch?v={video_id}"
-        else:
-            return v
 
     class Config:
         orm_mode = True

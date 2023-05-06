@@ -10,6 +10,7 @@ import os
 from backend.core.config import settings
 from sqlalchemy.ext.hybrid import hybrid_property
 from backend.models.albums import Album
+from backend.models.clips import Clip
 
 
 class FavoriteTracks(Base):
@@ -119,6 +120,10 @@ class Track(Base):
     @hybrid_property
     def is_available(self):
         return self.is_opened & self.album_uploaded
+
+    @property
+    def clip(self):
+        return object_session(self).query(Clip).filter(Clip.track_id == self.id).first()
 
     @property
     def liked(self):

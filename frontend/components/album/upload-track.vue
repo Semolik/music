@@ -124,8 +124,8 @@ const nameError = computed(
         track.value.name.length < MIN_TRACK_NAME_LENGTH &&
         track.value.name.length <= MAX_TRACK_NAME_LENGTH
 );
-const featError = computed(
-    () => track.value.feat.length > MAX_TRACK_FEAT_LENGTH
+const featError = computed(() =>
+    track.value.feat ? track.value.feat.length > MAX_TRACK_FEAT_LENGTH : false
 );
 const buttonActive = computed(
     () =>

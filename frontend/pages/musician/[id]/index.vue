@@ -62,11 +62,14 @@
             >
                 <SliderSwiper class="slider" :loop="false" :autoplay="false">
                     <SwiperSlide
-                        v-for="clip in musician.popular.clips"
+                        v-for="(clip, index) in musician.popular.clips"
                         :key="clip.id"
                         class="slide"
                     >
-                        <ClipCard :clip="clip" :musician-info="musician" />
+                        <ClipCard
+                            v-model:clip="musician.popular.clips[index]"
+                            :musician-info="musician"
+                        />
                     </SwiperSlide>
                 </SliderSwiper>
             </selection>

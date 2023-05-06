@@ -63,6 +63,17 @@ class MusicianCrud(CRUDBase):
             .slice(start=(end - page_size), stop=end)\
             .all()
 
+    def search_popular_musician_tracks(self, musician_id: int, search: str, page: int = 1, page_size: int = settings.POPULAR_TRACKS_LIMIT_ALL) -> List[Track]:
+        end = page * page_size
+        return self.db.query(Track)\
+            .join(Album, Album.id == Track.album_id)\
+            .filter(Track.artist_id == musician_id, Track.is_available, Track.name.ilike(f'%{search}%'))\
+            .join(FavoriteTracks, FavoriteTracks.track_id == Track.id, isouter=True)\
+            .group_by(Track.id) \
+            .order_by(func.count().desc())\
+            .slice(start=(end - page_size), stop=end)\
+            .all()
+
     def get_popular_musician_albums(self, musician_id: int, page: int = 1, page_size: int = settings.ALBUM_PAGE_COUNT_ALL) -> List[Album]:
         end = page * page_size
         return self.db.query(Album)\

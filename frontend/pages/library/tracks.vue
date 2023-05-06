@@ -1,5 +1,5 @@
 <template>
-    <Tracks :on-next-page="loadMore" :page_size="FAVORITE_TRACKS_LIMIT" />
+    <Tracks :on-next-page="loadMore" :page-size="FAVORITE_TRACKS_LIMIT" />
 </template>
 <script setup>
 import { Service } from "@/client";

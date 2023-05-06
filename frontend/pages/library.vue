@@ -4,6 +4,7 @@
 <script setup>
 import { routesNames } from "@typed-router";
 import { useHeaderStore } from "~/stores/header";
+
 const headerStore = useHeaderStore();
 
 const route = useRoute();
@@ -37,14 +38,13 @@ const router = useRouter();
 watch(
     router.currentRoute,
     async (value) => {
+        headerStore.setTitle("Библиотека");
+        headerStore.links = links;
         if (value.name === "library") {
             router.push({ name: "library-playlists" });
             return;
         }
         headerStore.currentRouteName = route.name;
-
-        headerStore.setTitle("Библиотека");
-        headerStore.links = links;
     },
     { immediate: true }
 );

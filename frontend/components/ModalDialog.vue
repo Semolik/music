@@ -93,6 +93,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    borderRadius: {
+        type: Number,
+        default: 10,
+    },
 });
 const modalStateBus = useEventBus("modal-state");
 const emit = defineEmits(["update:active", "mounted", "close"]);
@@ -114,7 +118,9 @@ const height = computed(() => {
     }
     return `${props.maxHeight}px`;
 });
-
+const borderRadius = computed(() => {
+    return `${props.borderRadius}px`;
+});
 const gapString = computed(() => {
     return `${props.gap}px`;
 });
@@ -230,7 +236,7 @@ onBeforeUnmount(() => {
         max-width: v-bind(width);
         max-height: v-bind(height);
         width: 100%;
-        border-radius: 10px;
+        border-radius: v-bind(borderRadius);
         display: flex;
         flex-direction: column;
         padding: 10px;

@@ -28,14 +28,10 @@ def search_musician(text: str = Query(description="Поисковый запро
     search_crud = SearchCrud(Auth.db)
     db_musicians = search_crud.search_musicians_by_name(
         name=text, limit=settings.SEARCH_MUSICIAN_LIMIT)
-    db_musicians_objs = []
-    for musician in db_musicians:
-        musician_obj = SearchMusician.from_orm(musician)
-        if Auth.current_user_id:
-            musician_obj.liked = MusicianCrud(Auth.db).musician_is_liked(
-                musician_id=musician.id, user_id=Auth.current_user_id)
-        db_musicians_objs.append(musician_obj)
-    return db_musicians_objs
+    if Auth.current_user_id:
+        for musician in db_musicians:
+            musician.current_user_id = Auth.current_user_id
+    return db_musicians
 
 
 @router.get('/album', response_model=List[SearchAlbum])
@@ -44,14 +40,10 @@ def search_album(text: str = Query(description="Поисковый запрос"
     search_crud = SearchCrud(Auth.db)
     db_albums = search_crud.search_albums_by_name(
         name=text, limit=settings.SEARCH_ALBUM_LIMIT)
-    db_albums_objs = []
-    for album in db_albums:
-        album_obj = SearchAlbum.from_orm(album)
-        if Auth.current_user_id:
-            album_obj.liked = AlbumsCruds(Auth.db).album_is_liked(
-                album_id=album.id, user_id=Auth.current_user_id)
-        db_albums_objs.append(album_obj)
-    return db_albums_objs
+    if Auth.current_user_id:
+        for album in db_albums:
+            album.current_user_id = Auth.current_user_id
+    return db_albums
 
 
 @router.get('/track', response_model=List[SearchTrack])
@@ -60,14 +52,10 @@ def search_track(text: str = Query(description="Поисковый запрос"
     search_crud = SearchCrud(Auth.db)
     db_tracks = search_crud.search_tracks_by_name(
         name=text, limit=settings.SEARCH_TRACK_LIMIT)
-    db_tracks_objs = []
-    for track in db_tracks:
-        track_obj = SearchTrack.from_orm(track)
-        if Auth.current_user_id:
-            track_obj.liked = TracksCrud(Auth.db).track_is_liked(
-                track_id=track.id, user_id=Auth.current_user_id)
-        db_tracks_objs.append(track_obj)
-    return db_tracks_objs
+    if Auth.current_user_id:
+        for track in db_tracks:
+            track.current_user_id = Auth.current_user_id
+    return db_tracks
 
 
 @router.get('/clip', response_model=List[SearchClip])
@@ -85,14 +73,10 @@ def search_playlist(text: str = Query(description="Поисковый запро
     search_crud = SearchCrud(Auth.db)
     db_playlists = search_crud.search_playlists_by_name(
         name=text, limit=settings.SEARCH_PLAYLIST_LIMIT)
-    db_playlists_objs = []
-    for playlist in db_playlists:
-        playlist_obj = SearchPlaylist.from_orm(playlist)
-        if Auth.current_user_id:
-            playlist_obj.liked = PlaylistsCrud(Auth.db).playlist_is_liked(
-                playlist_id=playlist.id, user_id=Auth.current_user_id)
-        db_playlists_objs.append(playlist_obj)
-    return db_playlists_objs
+    if Auth.current_user_id:
+        for playlist in db_playlists:
+            playlist.current_user_id = Auth.current_user_id
+    return db_playlists
 
 
 @router.get('/genres', response_model=List[Genre])
@@ -101,11 +85,7 @@ def get_genres(text: str = Query(description="Поисковый запрос"),
     search_crud = SearchCrud(Auth.db)
     db_genres = search_crud.search_genres_by_name_sorted_by_likes(
         name=text, limit=settings.SEARCH_GENRE_LIMIT)
-    db_genres_objs = []
-    for genre in db_genres:
-        genre_obj = Genre.from_orm(genre)
-        if Auth.current_user_id is not None:
-            genre_obj.liked = bool(GenresCruds(Auth.db).get_liked_genre_model(
-                genre_id=genre.id, user_id=Auth.current_user_id))
-        db_genres_objs.append(genre_obj)
-    return db_genres_objs
+    if Auth.current_user_id:
+        for genre in db_genres:
+            genre.current_user_id = Auth.current_user_id
+    return db_genres
