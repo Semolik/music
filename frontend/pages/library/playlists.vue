@@ -80,6 +80,7 @@ const getPlaylists = async () => {
     const owned_only = filters["Создатель"].active === "Мои" ? true : false;
     const private_ = filters["Тип"].active === "Приватные" ? true : false;
     const new_playlists = await Service.getMyPlaylistsApiV1PlaylistsGet(
+        page.value,
         order_by,
         order,
         owned_only,
@@ -93,7 +94,7 @@ const getPlaylists = async () => {
 watch(
     filters,
     async (value) => {
-        page.value = 0;
+        page.value = 1;
         playlists.value = [];
         if (value["Тип"].active === "Приватные") {
             value["Создатель"].disabled = true;

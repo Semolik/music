@@ -82,5 +82,8 @@ const addTrack = () => {
 .buttons {
     display: flex;
     gap: 10px;
+    @include lg(true) {
+        flex-direction: column;
+    }
 }
 </style>
