@@ -1,9 +1,11 @@
 import uuid
 from backend.db.base_class import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, func
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, and_, func
 from sqlalchemy.orm import relationship, backref, object_session
 from backend.core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
+
+from backend.models.playlists import Playlist, FavoritePlaylist
 
 
 class FavoriteMusicians(Base):
@@ -78,6 +80,17 @@ class User(Base):
     @property
     def is_admin(self):
         return self.type == settings.UserTypeEnum.superuser
+
+    @property
+    def last_playlists(self):
+        return (
+            object_session(self)
+            .query(Playlist)
+            .filter(and_(Playlist.user_id == self.id, Playlist.private == False))
+            .order_by(Playlist.created_at.desc())
+            .limit(20)
+            .all()
+        )
 
 
 class PublicProfile(Base):

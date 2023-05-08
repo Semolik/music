@@ -4,13 +4,16 @@ from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
 from backend.crud.crud_playlists import PlaylistsCrud
 from backend.helpers.auth_helper import Authenticate
 from backend.helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
-from backend.schemas.playlists import PlaylistBase, PlaylistInfo, PlaylistCreate, PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
+from backend.schemas.playlists import PlaylistInfo,  PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
+from backend.schemas.playlists_base import PlaylistBase, PlaylistCreate
 from backend.core.config import settings
 router = APIRouter(prefix='/playlists', tags=['Плейлисты'])
 
 
 @router.get('', response_model=List[PlaylistInfoWithoutTracks])
 def get_my_playlists(
+    page: int = Query(
+        default=1, description='Номер страницы', ge=1),
     order_by: order_playlist_by = Query(
         default=order_playlist_by.created_at, description='Порядок сортировки'),
     order_orientation: settings.Order = Query(
@@ -32,7 +35,8 @@ def get_my_playlists(
         order_by=order_by,
         order_orientation=order_orientation,
         owned_only=owned_only,
-        private=private
+        private=True if private else None,
+        page=page
     )
     for playlist in playlists:
         playlist.current_user_id = Auth.current_user_id

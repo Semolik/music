@@ -29,7 +29,7 @@
             </template>
             <AppInput
                 v-model="login"
-                placeholder="Имя пользователя"
+                placeholder="Никнейм"
                 :show-word-limit="showLoginLimit"
                 :maxLength="MAX_LOGIN_LENGTH"
                 :minLength="MIN_LOGIN_LENGTH"

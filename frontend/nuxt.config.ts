@@ -197,6 +197,7 @@ export default defineNuxtConfig({
             POPULAR_MUSICIANS_LIMIT_ALL: Number(
                 process.env.POPULAR_MUSICIANS_LIMIT_ALL
             ),
+            USER_PLAYLISTS_LIMIT: Number(process.env.USER_PLAYLISTS_LIMIT),
         },
     },
 });

@@ -11,7 +11,8 @@ from backend.crud.crud_playlists import PlaylistsCrud
 from fastapi import Depends, APIRouter, HTTPException, Path, Query, status, UploadFile, File
 from typing import List
 from backend.core.config import settings
-router = APIRouter(tags=['Профили пользователей'], prefix='/users')
+router = APIRouter(
+    tags=['Профили пользователей'], prefix='/users')
 
 
 @router.get('/stats', response_model=UsersStats)
@@ -99,6 +100,22 @@ def get_user_info(Auth: Authenticate = Depends(Authenticate())):
     return Auth.current_user
 
 
+@router.get('/{user_id}', response_model=UserInfo)
+def get_user_info_by_id(
+    user_id: int = Path(..., description='ID пользователя'),
+    Auth: Authenticate = Depends(Authenticate(required=False)),
+):
+    '''Получение данных пользователя по ID'''
+    user_cruds = UserCruds(Auth.db)
+    db_user = user_cruds.get_user_by_id(user_id=user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Пользователь не найден',
+        )
+    return db_user
+
+
 @router.put('/me/public', responses={status.HTTP_401_UNAUTHORIZED: {"model": HTTP_401_UNAUTHORIZED}}, response_model=PublicProfileUsernames)
 def update_user_public_profile_data(
     PublicProfileData: PublicProfileModifiable,
@@ -152,6 +169,8 @@ def get_user_public_profile_info(
 @router.get('/{user_id}/playlists', response_model=List[PlaylistInfoWithoutTracks])
 def get_user_playlists(
     Auth: Authenticate = Depends(Authenticate(required=False)),
+    page: int = Query(
+        default=1, description='Номер страницы', ge=1),
     user_id: int = Path(
         ..., description='ID пользователя', ge=1),
     order_by: order_playlist_by = Query(
@@ -170,10 +189,13 @@ def get_user_playlists(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Пользователь не найден'
         )
-    playlists = PlaylistsCrud(Authenticate.db).get_playlists_by_user_id(
-        user_id=Authenticate.current_user_id,
+    playlists = PlaylistsCrud(Auth.db).get_playlists_by_user_id(
+        user_id=Auth.current_user_id,
         owner_id=user_id,
         order_by=order_by,
-        order_orientation=order_orientation
+        order_orientation=order_orientation,
+        page=page,
+        owned_only=True,
+        private=False,
     )
     return playlists

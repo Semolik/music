@@ -5,6 +5,7 @@ from backend.models.albums import Album
 from backend.models.playlists import Playlist, PlaylistTrack, FavoritePlaylist
 from backend.models.tracks import Track
 from sqlalchemy import or_
+from backend.core.config import env_config
 
 
 class PlaylistsCrud(CRUDBase):
@@ -23,7 +24,7 @@ class PlaylistsCrud(CRUDBase):
     def is_playlist_liked(self, user_id: int, playlist_id: UUID) -> bool:
         return self.db.query(FavoritePlaylist).filter(FavoritePlaylist.user_id == user_id, FavoritePlaylist.playlist_id == playlist_id).first() is not None
 
-    def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str, owned_only: bool, private: bool) -> List[Playlist]:
+    def get_playlists_by_user_id(self, owner_id: int, user_id: int, order_by: str, order_orientation: str, owned_only: bool, private: bool, page: int, page_size=int(env_config.get('USER_PLAYLISTS_LIMIT'))) -> List[Playlist]:
         query = self.db.query(Playlist).outerjoin(
             FavoritePlaylist, FavoritePlaylist.playlist_id == Playlist.id)
         if owned_only:
@@ -34,6 +35,8 @@ class PlaylistsCrud(CRUDBase):
         if private:
             query = query.filter(Playlist.private == True,
                                  Playlist.user_id == owner_id)
+        elif private is False:
+            query = query.filter(Playlist.private == False)
         query = query.group_by(Playlist.id)
         if order_by == 'created_at':
             order_column = Playlist.created_at
@@ -48,8 +51,8 @@ class PlaylistsCrud(CRUDBase):
 
         if owner_id != user_id:
             query = query.filter(Playlist.private == False)
-
-        return query.all()
+        end = page * page_size
+        return query.slice(end-page_size, page_size).all()
 
     def create_playlist(self, name: str, description: str, user_id: int, private: bool, tracks_ids: List[UUID]):
         playlist = self.create(

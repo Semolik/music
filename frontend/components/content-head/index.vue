@@ -23,7 +23,7 @@
                         <div class="dot" v-if="index !== info.length - 1"></div>
                     </template>
                 </div>
-                <div class="actions-buttons">
+                <div class="actions-buttons" v-if="!hideAllButtons">
                     <div
                         class="play action-button"
                         @click="$emit('play')"
@@ -91,6 +91,7 @@ const {
     likesCount,
     isMusician,
     hidePlayButton,
+    hideAllButtons,
 } = defineProps({
     name: {
         type: String,
@@ -145,6 +146,11 @@ const {
         default: false,
     },
     hidePlayButton: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    hideAllButtons: {
         type: Boolean,
         required: false,
         default: false,

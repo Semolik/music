@@ -22,6 +22,9 @@
                 is-link
             />
         </CardsContainer>
+        <AppButton v-if="loadMoreButton" active @click="getPlaylists">
+            Загрузить еще
+        </AppButton>
         <NotFound
             :text="
                 filtersIsActived
@@ -36,7 +39,8 @@
 import { Service } from "@/client";
 const filtersIsActived = ref(false);
 const createPlaylistModalOpened = ref(false);
-
+const { USER_PLAYLISTS_LIMIT } = useRuntimeConfig().public;
+const loadMoreButton = ref(false);
 var filters = reactive({
     "Сортировать по": {
         values: ["Названию", "Дате добавления"],
@@ -62,9 +66,10 @@ var filters = reactive({
 });
 const fething = ref(false);
 const playlists = ref([]);
-
+const page = ref(0);
 const getPlaylists = async () => {
     if (fething.value) return;
+    page.value++;
     fething.value = true;
     const order_by =
         filters["Сортировать по"].active === "Названию" ? "name" : "created_at";
@@ -74,18 +79,22 @@ const getPlaylists = async () => {
             : "desc";
     const owned_only = filters["Создатель"].active === "Мои" ? true : false;
     const private_ = filters["Тип"].active === "Приватные" ? true : false;
-    playlists.value = await Service.getMyPlaylistsApiV1PlaylistsGet(
+    const new_playlists = await Service.getMyPlaylistsApiV1PlaylistsGet(
         order_by,
         order,
         owned_only,
         private_
     );
+    playlists.value = [...playlists.value, ...new_playlists];
+    loadMoreButton.value = new_playlists.length === USER_PLAYLISTS_LIMIT;
     fething.value = false;
 };
 
 watch(
     filters,
     async (value) => {
+        page.value = 0;
+        playlists.value = [];
         if (value["Тип"].active === "Приватные") {
             value["Создатель"].disabled = true;
             value["Создатель"].active = "Мои";

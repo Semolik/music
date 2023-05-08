@@ -7,6 +7,7 @@ from backend.models.roles import ChangeRoleRequestStatus
 from backend.schemas.file import File, ImageLink
 from backend.helpers.forms import form_body
 from backend.schemas.links import TelegramUsername, VKUsernameToUrl, YoutubeChannelID, VKUsername, TelegramUsernameToUrl, YoutubeChannelIDToUrl
+from backend.schemas.playlists_base import PlaylistInfoBase
 
 
 class UserUsername(BaseModel):
@@ -82,7 +83,7 @@ class UserInfo(AllUserTypes, UserBase, UserUsername):
         default=None,
         description='Ccылка на аватарку пользователя',
     )
-
+    last_playlists: List[PlaylistInfoBase]
     class Config:
         orm_mode = True
 
