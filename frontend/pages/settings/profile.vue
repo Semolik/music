@@ -93,12 +93,11 @@ import { Service } from "~~/client";
 import { IconsNames } from "~~/configs/icons";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
-import { useToast } from "vue-toastification";
 useHead({ title: "Профиль" });
 definePageMeta({
     middleware: ["auth"],
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const {
     MAX_FIRSTNAME_LENGTH,
@@ -160,7 +159,7 @@ const saveProfile = async () => {
                 username: username.value,
             });
         } catch (error) {
-            toast.error(HandleOpenApiError(error).message);
+            $toast.error(HandleOpenApiError(error).message);
         }
     }
 };

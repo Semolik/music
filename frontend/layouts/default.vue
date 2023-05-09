@@ -40,6 +40,7 @@
         }
         .app-content {
             flex-grow: 1;
+            // overflow: scroll;
 
             &.enable-padding {
                 padding: 20px;

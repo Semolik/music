@@ -57,7 +57,6 @@
 <script setup>
 import { useAuthStore } from "~~/stores/auth";
 import { HandleOpenApiError } from "~~/composables/errors";
-import { useToast } from "vue-toastification";
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
 const authStore = useAuthStore();
@@ -68,7 +67,7 @@ const { register } = defineProps({
         default: false,
     },
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const login = ref("");
 const password = ref("");
 const firstName = ref("");
@@ -179,7 +178,7 @@ const loginHandler = async () => {
           )
         : await authStore.loginRequest(login.value, password.value);
     if (error) {
-        toast.error(HandleOpenApiError(error).message);
+        $toast.error(HandleOpenApiError(error).message);
         return;
     }
     const router = useRouter();

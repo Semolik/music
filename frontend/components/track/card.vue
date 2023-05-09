@@ -215,9 +215,8 @@ import { Service } from "@/client";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
-import { useToast } from "vue-toastification";
 const playlistsStore = usePlaylistsStore();
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
 const emit = defineEmits([
@@ -343,7 +342,7 @@ const removeTrackFromPlaylist = async () => {
         });
         emit("playlist-remove-track", track.id);
     } catch (e) {
-        toast.error("Не удалось удалить трек из плейлиста");
+        $toast.error("Не удалось удалить трек из плейлиста");
     }
 };
 watch(menuOpened, (value) => {
@@ -376,7 +375,7 @@ const addTrackToPlaylist = async (playlistId) => {
             trackId: track.id,
         });
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 
     addToPlaylistModalOpened.value = false;

@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "build": "nuxt build",
+        "build": "npm run generate-client && nuxt build --port=4000 --dotenv ../.env",
         "dev": "npm run generate-client && nuxt dev --port=4000 --dotenv ../.env",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@formkit/auto-animate": "^1.0.0-beta.6",
+        "@liripeng/vue-audio-player": "^1.5.1",
         "@nuxt/devtools": "^0.2.5",
         "@nuxt/types": "^2.16.0",
         "@nuxtjs/google-fonts": "^3.0.0-1",

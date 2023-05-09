@@ -69,7 +69,6 @@
 </template>
 <script setup>
 import { Service } from "~~/client";
-import { useToast } from "vue-toastification";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "@typed-router";
@@ -78,7 +77,7 @@ definePageMeta({
 });
 const authStore = useAuthStore();
 const { isAdmin } = storeToRefs(authStore);
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const { MAX_CHANGE_ROLE_FILES_SIZE_MB } = runtimeConfig.public;
 const message = ref("");
@@ -102,7 +101,7 @@ const handleFileChange = (e) => {
         .map((file) => file.size)
         .reduce((acc, size) => acc + size, 0);
     if (filesSize > MAX_CHANGE_ROLE_FILES_SIZE_MB * 1024 * 1024) {
-        toast.error(
+        $toast.error(
             `Максимальный размер файлов ${MAX_CHANGE_ROLE_FILES_SIZE_MB} МБ`
         );
         return;
@@ -111,7 +110,7 @@ const handleFileChange = (e) => {
 };
 const send = async () => {
     if (message.value.length === 0) {
-        toast.error("Сообщение не может быть пустым");
+        $toast.error("Сообщение не может быть пустым");
         return;
     }
     try {
@@ -121,7 +120,7 @@ const send = async () => {
                 files: files.value,
             });
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 const deleteRequest = async () => {
@@ -131,7 +130,7 @@ const deleteRequest = async () => {
         );
         currentRequest.value = null;
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 </script>

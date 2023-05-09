@@ -13,9 +13,7 @@
 <script setup>
 import { IconsNames } from "~~/configs/icons";
 import { Clipboard } from "v-clipboard";
-
-import { useToast } from "vue-toastification";
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const { value } = defineProps({
     value: {
         type: String,
@@ -32,7 +30,7 @@ const copyText = () => {
     try {
         Clipboard.copy(value);
     } catch (error) {
-        toast.error("Не удалось скопировать текст");
+        $toast.error("Не удалось скопировать текст");
     }
     setTimeout(() => {
         coping.value = false;

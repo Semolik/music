@@ -20,8 +20,7 @@
 </template>
 <script setup>
 import { IconsNames } from "@/configs/icons";
-import { useToast } from "vue-toastification";
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const { fileSize, fileTypes, url } = defineProps({
     fileSize: {
         type: Number,
@@ -43,11 +42,11 @@ const handleSelect = (e) => {
         return;
     }
     if (fileTypes.length && !fileTypes.includes(event_file.type)) {
-        toast.error("Неверный тип файла");
+        $toast.error("Неверный тип файла");
         return;
     }
     if (fileSize && event_file.size > fileSize * 1024 * 1024) {
-        toast.error(`Размер файла превышает ${fileSize} MB`);
+        $toast.error(`Размер файла превышает ${fileSize} MB`);
         return;
     }
     file.value = event_file;

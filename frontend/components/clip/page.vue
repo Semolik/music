@@ -102,7 +102,6 @@
 </template>
 <script setup>
 import { Service } from "~/client";
-import { useToast } from "vue-toastification";
 import { IconsNames } from "~/configs/icons";
 import { routesNames } from "~/.nuxt/typed-router";
 import { useAuthStore } from "~/stores/auth";
@@ -117,7 +116,7 @@ const { id } = defineProps({
     },
 });
 const { MAX_CLIP_NAME_LENGTH, YOUTUBE_VIDEO } = useRuntimeConfig().public;
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const clip = id ? ref(await Service.getClipByIdApiV1ClipsClipIdGet(id)) : {};
 const title = computed(() =>
     id ? "Редактирование клипа " + clip.value.name : "Создание клипа"
@@ -180,7 +179,7 @@ const buttonActive = computed(() => {
     );
 });
 const show_click_image_error = () => {
-    toast.error(
+    $toast.error(
         'Чтобы изменить изображение, выберите "Файл" в поле "Источник изображения"'
     );
 };
@@ -211,7 +210,7 @@ const save = async () => {
     if (!buttonActive.value) return;
     const new_video_id = get_id_from_youtube_url(url.value);
     if (!new_video_id) {
-        toast.error("Неверная ссылка на видео");
+        $toast.error("Неверная ссылка на видео");
         return;
     }
     if (updating.value) return;

@@ -55,7 +55,6 @@
 <script setup>
 import { IconsNames } from "~/configs/icons";
 import { Service } from "~/client";
-import { useToast } from "vue-toastification";
 const startGenres = await Service.getGenresApiV1GenresGet(1);
 const { MAX_SELECT_GENRES_COUNT } = useRuntimeConfig().public;
 const search = ref("");
@@ -69,13 +68,13 @@ const modelValue = computed({
     get: () => props.modelValue,
     set: (value) => emit("update:modelValue", value),
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const selectedGenresIds = computed(() => modelValue.value.map((g) => g.id));
 const maxSelected = computed(
     () => modelValue.value.length >= MAX_SELECT_GENRES_COUNT
 );
 const showMaxGenresMessage = () => {
-    toast.error(
+    $toast.error(
         `Вы не можете выбрать больше ${MAX_SELECT_GENRES_COUNT} жанров`
     );
 };

@@ -83,11 +83,14 @@ class UserInfo(AllUserTypes, UserBase, UserUsername):
         default=None,
         description='Ccылка на аватарку пользователя',
     )
-    last_playlists: List[PlaylistInfoBase]
+
     class Config:
         orm_mode = True
 
-
+class UserInfoWithPlaylists(UserInfo):
+    last_playlists: List[PlaylistInfoBase]
+    class Config:
+        orm_mode = True
 @form_body
 class UpdateUserRoleRequest(BaseModel):
     message: str = Query(..., description='Сообщение пользователя')

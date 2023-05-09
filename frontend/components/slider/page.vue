@@ -82,8 +82,7 @@ import { Service } from "~~/client";
 import { IconsNames } from "~~/configs/icons";
 import { routesNames } from "@typed-router";
 import moment from "moment";
-import { useToast } from "vue-toastification";
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const { id } = defineProps({
     id: {
         type: String,
@@ -162,7 +161,7 @@ const createSlide = async () => {
             params: { id: response.id },
         });
     } catch (error) {
-        toast.error(HandleOpenApiError(error).message);
+        $toast.error(HandleOpenApiError(error).message);
     }
 };
 
@@ -181,7 +180,7 @@ const updateSlide = async () => {
         pictureBlob.value = null;
         dateRange.value = [dateStart.value, dateEnd.value];
     } catch (error) {
-        toast.error(HandleOpenApiError(error).message);
+        $toast.error(HandleOpenApiError(error).message);
     }
 };
 const deleteSlide = async () => {
@@ -189,7 +188,7 @@ const deleteSlide = async () => {
         await Service.deleteSlideApiV1SliderSlideIdDelete(id);
         router.push({ name: routesNames.adminCabinet.cabinetSlider });
     } catch (error) {
-        toast.error(HandleOpenApiError(error).message);
+        $toast.error(HandleOpenApiError(error).message);
     }
 };
 </script>

@@ -73,7 +73,7 @@
                     resize="none"
                     @max-length="
                         (e) =>
-                            toast.error(
+                            $toast.error(
                                 `Максимальная длина описания - ${MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH} символов`
                             )
                     "
@@ -119,13 +119,11 @@
 <script setup>
 import { Service } from "~~/client";
 import { IconsNames } from "~~/configs/icons";
-
-import { useToast } from "vue-toastification";
 useHead({ title: "Профиль" });
 definePageMeta({
     middleware: ["auth"],
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 
 const {
     MAX_PUBLIC_PROFILE_DESCRIPTION_LENGTH,
@@ -206,7 +204,7 @@ const saveProfile = async () => {
                 links[key] = links[key];
             }
         } catch (error) {
-            toast.error(HandleOpenApiError(error).message);
+            $toast.error(HandleOpenApiError(error).message);
         }
     }
 };
@@ -218,7 +216,7 @@ const deleteUserAvatar = async () => {
         await Service.updateUserPublicAvatarApiV1UsersMePublicAvatarPut();
         publicProfileData.picture = null;
     } catch (error) {
-        toast.error(HandleOpenApiError(error).message);
+        $toast.error(HandleOpenApiError(error).message);
     }
     showDeleteAvatarModal.value = false;
 };

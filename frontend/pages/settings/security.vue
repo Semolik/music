@@ -28,12 +28,11 @@
 </template>
 <script setup>
 import { Service } from "@/client";
-import { useToast } from "vue-toastification";
 definePageMeta({
     middleware: ["auth"],
 });
 useHead({ title: "Настройки безопасности" });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } = runtimeConfig.public;
 
@@ -53,9 +52,9 @@ const changePassword = async () => {
             password: oldPassword.value,
             new_password: newPassword.value,
         });
-        toast.success("Пароль успешно изменен");
+        $toast.success("Пароль успешно изменен");
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     } finally {
         oldPassword.value = "";
         newPassword.value = "";

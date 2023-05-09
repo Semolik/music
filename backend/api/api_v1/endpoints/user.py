@@ -3,7 +3,7 @@ from backend.crud.crud_user import UserCruds
 from backend.helpers.files import valid_content_length
 from backend.schemas.error import HTTP_401_UNAUTHORIZED
 from backend.schemas.statistics import UsersStats
-from backend.schemas.user import PublicProfile, PublicProfileModifiable, PublicProfileUsernames, UserInfo, UserBase
+from backend.schemas.user import PublicProfile, PublicProfileModifiable, PublicProfileUsernames, UserInfo, UserBase, UserInfoWithPlaylists
 from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
 from backend.helpers.images import save_image
 from backend.helpers.auth_helper import Authenticate
@@ -100,7 +100,7 @@ def get_user_info(Auth: Authenticate = Depends(Authenticate())):
     return Auth.current_user
 
 
-@router.get('/{user_id}', response_model=UserInfo)
+@router.get('/{user_id}', response_model=UserInfoWithPlaylists)
 def get_user_info_by_id(
     user_id: int = Path(..., description='ID пользователя'),
     Auth: Authenticate = Depends(Authenticate(required=False)),

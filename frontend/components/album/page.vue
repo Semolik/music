@@ -97,7 +97,6 @@
 </template>
 <script setup>
 import { Service } from "~/client";
-import { useToast } from "vue-toastification";
 import { IconsNames } from "~/configs/icons";
 import { routesNames } from "~/.nuxt/typed-router";
 import moment from "moment";
@@ -108,7 +107,7 @@ const { id } = defineProps({
         default: null,
     },
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const { MAX_ALBUM_NAME_LENGTH } = useRuntimeConfig().public;
 
 const album = id
@@ -168,7 +167,7 @@ const albumIsOpened = computed(
 );
 const goToAlbum = (album) => {
     if (!albumIsOpened.value) {
-        toast.error("Альбом еще не открыт");
+        $toast.error("Альбом еще не открыт");
         return;
     }
     router.push({
@@ -191,7 +190,7 @@ const createAlbum = async () => {
         });
         goToEditTracks(new_album);
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 const updateAlbum = async () => {
@@ -214,7 +213,7 @@ const updateAlbum = async () => {
         genres.value = updated_album.genres;
         pictureBlob.value = null;
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 const deleteAlbum = async () => {
@@ -224,7 +223,7 @@ const deleteAlbum = async () => {
             name: routesNames.musicianCabinet.cabinetAlbums,
         });
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 </script>

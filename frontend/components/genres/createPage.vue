@@ -93,7 +93,6 @@
 import { Service } from "@/client";
 import { routesNames } from "@typed-router";
 import { IconsNames } from "~~/configs/icons";
-import { useToast } from "vue-toastification";
 
 const { id } = defineProps({
     id: {
@@ -101,7 +100,7 @@ const { id } = defineProps({
         default: null,
     },
 });
-const toast = useToast();
+const { $toast } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const { MAX_GENRE_NAME_LENGTH } = runtimeConfig.public;
 const router = useRouter();
@@ -122,7 +121,7 @@ const deleteGenre = async () => {
         await Service.deleteGenreApiV1GenresGenreIdDelete(id);
         router.push({ name: routesNames.adminCabinet.cabinetGenres });
     } catch (e) {
-        toast.error("Не удалось удалить жанр");
+        $toast.error("Не удалось удалить жанр");
     }
 };
 const form = ref(null);
@@ -153,7 +152,7 @@ const updateGenre = async () => {
         picture.value = genreData.picture;
         pictureBlob.value = null;
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 const createGenre = async () => {
@@ -169,7 +168,7 @@ const createGenre = async () => {
             params: { id: genreData.id },
         });
     } catch (e) {
-        toast.error(HandleOpenApiError(e).message);
+        $toast.error(HandleOpenApiError(e).message);
     }
 };
 </script>
