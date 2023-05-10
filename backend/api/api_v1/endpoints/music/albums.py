@@ -1,5 +1,5 @@
 from typing import List, Union
-from fastapi import Depends, APIRouter,  UploadFile, File, status, HTTPException, Query
+from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException, Query
 from backend.core.config import settings, env_config
 from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
@@ -41,7 +41,7 @@ def create_album(
 
 @router.put('/{album_id}/close-uploading', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, status_code=status.HTTP_204_NO_CONTENT)
 def close_album_uploading(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Закрытие альбома для загрузки треков'''
@@ -64,7 +64,7 @@ def close_album_uploading(
     settings.MAX_IMAGE_FILE_SIZE_MB))])
 def update_album(
     albumData: UpdateAlbumJson,
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     albumPicture: UploadFile = File(
         default=False, description='Картинка альбома'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
@@ -93,7 +93,7 @@ def update_album(
 def update_album_tracks_order(
     tracks_ids: List[int] = Query(...,
                                   description='ID треков в новом порядке'),
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Обновление порядка треков в альбоме'''
@@ -147,7 +147,7 @@ def search_my_albums(
 
 @router.put('/{album_id}/like', responses={**NOT_FOUND_ALBUM}, response_model=LikesInfo)
 def album_like(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайнуть альбом'''
@@ -201,7 +201,7 @@ def get_last_albums(
 
 @router.get('/{album_id}', responses={**NOT_FOUND_ALBUM}, response_model=Union[AlbumWithTracks, AlbumWithTracksUploaded])
 def get_album_by_id(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение альбома по id'''
@@ -224,7 +224,7 @@ def get_album_by_id(
 
 @router.get('/{album_id}/info', responses={**NOT_FOUND_ALBUM}, response_model=AlbumInfoUploaded)
 def get_album_info_by_id(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Получение информации об альбоме по id'''
@@ -243,7 +243,7 @@ def get_album_info_by_id(
 @router.post('/{album_id}/track', responses={**UNAUTHORIZED_401, **NOT_FOUND_USER}, response_model=TrackAfterUpload, status_code=status.HTTP_201_CREATED, dependencies=[Depends(valid_content_length(
     settings.MAX_TRACK_FILE_SIZE_MB))])
 def upload_track(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     trackData: UploadTrackForm = Depends(UploadTrackForm),
     trackPicture: UploadFile = File(..., description="Изображение трека"),
     track: UploadFile = File(..., description="Файл трека",
@@ -279,9 +279,9 @@ def upload_track(
     return db_track
 
 
-@ router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{album_id}', responses={**NOT_FOUND_ALBUM}, status_code=status.HTTP_204_NO_CONTENT)
 def delete_album_by_id(
-    album_id: int = Query(..., description='ID альбома'),
+    album_id: int = Path(..., description='ID альбома'),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Удаление альбома по id'''

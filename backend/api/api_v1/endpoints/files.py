@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, HTTPException, status, Depends, Path
 from fastapi.responses import FileResponse
 from backend.crud.crud_file import FileCruds
 from backend.core.config import settings
@@ -12,7 +12,8 @@ router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 
 @router.get('/images/{image_id}', response_class=FileResponse)
 def get_image(
-    image_id: uuid_pkg.UUID = Query(..., description="ID изображения"),
+    image_id: uuid_pkg.UUID = Path(...,
+                                   description="ID изображения"),
     db: Session = Depends(get_db)
 ):
     """Получение изображения по его id"""
@@ -27,7 +28,7 @@ def get_image(
 
 
 @router.get('/other/{file_id}', response_class=FileResponse)
-def get_file(file_id: uuid_pkg.UUID = Query(..., description="ID файла"), db: Session = Depends(get_db)):
+def get_file(file_id: uuid_pkg.UUID = Path(..., description="ID файла"), db: Session = Depends(get_db)):
     """Получение файла по его id"""
     db_file = FileCruds(db).get_file_by_id(file_id=file_id)
     if not db_file:

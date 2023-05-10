@@ -2,14 +2,16 @@ from pydantic import AnyHttpUrl, BaseSettings, BaseModel
 from typing import List, Literal, Optional
 from dotenv import dotenv_values
 import enum
-env_config = {**dotenv_values('.env'), **dotenv_values(".env.local")}
+import os
+env_config = {**dotenv_values('.env'), **
+              dotenv_values(".env.local"), **os.environ}
 
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SERVER_LINK: str = 'http://localhost:8000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        'http://localhost:4000', 'http://localhost:3000', 'http://192.168.50.106:4000']
+        env_config.get('BASE_URL') or 'http://localhost:4000']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
     TEST_DATABASE_URI: Optional[str] = DATABASE_URI + '_test'
     FIRST_SUPERUSER: str = "admin"

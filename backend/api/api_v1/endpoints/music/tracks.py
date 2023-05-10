@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List
-from fastapi import Depends, APIRouter, File, UploadFile,  status, HTTPException, Query
+from fastapi import Depends, APIRouter, File, Path, UploadFile,  status, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
 from backend.crud.crud_albums import AlbumsCruds
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 @router.put('/{track_id}/like',  response_model=bool)
 def like_track(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Лайк трека'''
@@ -91,7 +91,7 @@ def get_popular_tracks_period(
 
 @router.get('/{track_id}',  response_model=Track)
 def get_track(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     '''Получение трека'''
@@ -111,7 +111,7 @@ def get_track(
 
 @router.put('/{track_id}', response_model=Track)
 def update_track_by_id(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     trackData: UploadTrackForm = Depends(UploadTrackForm),
     trackPicture: UploadFile = File(None, description="Изображение трека"),
     track: UploadFile = File(None, description="Файл трека"),
@@ -142,7 +142,7 @@ def update_track_by_id(
 
 @router.delete('/{track_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_track(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
 ):
     '''Удаление трека'''
@@ -163,7 +163,7 @@ def delete_track(
 
 
 @router.get('/{track_id}/playlists/my',  response_model=List[PlaylistInfoWithoutTracks])
-def get_track_playlists(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate())):
+def get_track_playlists(track_id: uuid_pkg.UUID = Path(..., description="ID трека"), Auth: Authenticate = Depends(Authenticate())):
     '''Получение ваших плейлистов, в которых есть трек'''
     tracks_crud = TracksCrud(db=Auth.db)
     track = tracks_crud.get_track(track_id=track_id)
@@ -180,7 +180,7 @@ def get_track_playlists(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Au
 
 
 @router.get('/{track_id}/stats',  response_model=TrackStats)
-def get_track_statistics(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(Authenticate(is_admin=True, is_musician=True))):
+def get_track_statistics(track_id: uuid_pkg.UUID= Path(..., description="ID трека"), Auth: Authenticate = Depends(Authenticate(is_admin=True, is_musician=True))):
     '''Получение статистики по треку'''
     tracks_crud = TracksCrud(db=Auth.db)
     track = tracks_crud.get_track(track_id=track_id)
@@ -203,7 +203,7 @@ def get_track_statistics(track_id: uuid_pkg.UUID, Auth: Authenticate = Depends(A
 
 @router.post('/{track_id}/listening',  status_code=status.HTTP_204_NO_CONTENT)
 def start_listening_track(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Начало прослушивания трека'''
@@ -223,7 +223,7 @@ def start_listening_track(
 
 @router.put('/{track_id}/listening',  status_code=status.HTTP_204_NO_CONTENT)
 def set_listened_track(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate()),
 ):
     '''Установка прослушанного трека'''
@@ -252,7 +252,7 @@ def set_listened_track(
 
 @router.get('/{track_id}/file', response_class=FileResponse)
 def get_track_file(
-    track_id: uuid_pkg.UUID = Query(..., description="ID трека"),
+    track_id: uuid_pkg.UUID = Path(..., description="ID трека"),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
     """Получение трека по его id"""

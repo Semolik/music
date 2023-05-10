@@ -154,7 +154,7 @@ def get_musician_albums(
 
 @router.get('/{profile_id}/popular', response_model=List[Track])
 def get_musician_popular_tracks(
-    profile_id: int = Query(..., description='ID музыканта'),
+    profile_id: int = Path(..., description='ID музыканта'),
     page: int = Query(1, description='Страница'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):
@@ -175,7 +175,7 @@ def get_musician_popular_tracks(
 
 @router.get('/{profile_id}/popular/search', response_model=List[Track])
 def search_musician_popular_tracks(
-    profile_id: int = Query(..., description='ID музыканта'),
+    profile_id: int = Path(..., description='ID музыканта'),
     search: str = Query(..., description='Поисковый запрос'),
     Auth: Authenticate = Depends(Authenticate(required=False)),
 ):

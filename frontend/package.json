@@ -8,6 +8,11 @@
         "postinstall": "nuxt prepare",
         "generate-client": "openapi --input http://localhost:8000/openapi.json --output ./client --client axios"
     },
+    "config": {
+        "nuxt": {
+            "port": 4080
+        }
+    },
     "devDependencies": {
         "@element-plus/nuxt": "^1.0.3",
         "@nuxtjs/tailwindcss": "^6.4.1",
