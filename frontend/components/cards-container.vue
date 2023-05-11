@@ -24,7 +24,7 @@
     &.one-line {
         grid-template-rows: 1fr;
         grid-auto-rows: 0;
-        gap: 0px;
+        row-gap: 0px;
         column-gap: 10px;
         overflow-y: hidden;
     }

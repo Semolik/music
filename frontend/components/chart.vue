@@ -18,7 +18,6 @@
 <script setup>
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
-const viewport = useViewport();
 const end = new Date();
 const start = new Date(end.getFullYear(), end.getMonth() - 1, end.getDate());
 const tracks = ref(

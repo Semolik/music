@@ -94,7 +94,7 @@ const getPlaylists = async () => {
 watch(
     filters,
     async (value) => {
-        page.value = 1;
+        page.value = 0;
         playlists.value = [];
         if (value["Тип"].active === "Приватные") {
             value["Создатель"].disabled = true;
