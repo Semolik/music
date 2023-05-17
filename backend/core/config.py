@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SERVER_LINK: str = 'http://localhost:8000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
-        env_config.get('BASE_URL') or 'http://localhost:4000']
+        env_config.get('BASE_URL') or 'http://localhost:4000', 'http://tsoa-voloshin.ru']
     DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
     TEST_DATABASE_URI: Optional[str] = DATABASE_URI + '_test'
     FIRST_SUPERUSER: str = "admin"
