@@ -11,6 +11,7 @@
                 @update:track="tracks[index] = $event"
                 class="track-card"
                 min
+                :onCardClick="() => playTrack(track)"
             />
         </TracksContainer>
     </Selection>
@@ -18,6 +19,8 @@
 <script setup>
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
 const end = new Date();
 const start = new Date(end.getFullYear(), end.getMonth() - 1, end.getDate());
 const tracks = ref(
@@ -28,4 +31,8 @@ const tracks = ref(
         1
     )
 );
+const playTrack = (track) => {
+    playerStore.setTracks(tracks.value, track);
+    playerStore.playCurrentTrack();
+};
 </script>

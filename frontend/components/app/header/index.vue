@@ -1,10 +1,7 @@
 <template>
     <header :class="{ 'header-bar-active': headerBarActive }">
         <AppHeaderSearch v-model:searchActive="searchIsActive" />
-        <div
-            class="header-bar"
-            v-if="headerBarActive && headerStore.isActive()"
-        >
+        <div class="header-bar" v-if="headerStore.isActive()">
             <div class="navigate-buttons">
                 <div
                     :class="[
@@ -55,7 +52,6 @@ const { links, title, currentRouteName } = storeToRefs(headerStore);
 const openSearchBus = useEventBus("openSearch");
 const viewport = useViewport();
 const router = useRouter();
-
 const headerBarActive = ref(false);
 watch(
     [viewport.breakpoint, router.currentRoute],
@@ -78,9 +74,9 @@ onBeforeUnmount(() => {
 watch(router.currentRoute, (value) => {
     searchIsActive.value = false;
     headerStore.currentRouteName = value.name;
-
-    // if (links.value.includes(value.name)) return;
-    // headerStore.reset();
+    if (links.value.map((link) => link.name).includes(value.name)) return;
+    headerStore.reset();
+    console.log(title.value);
 });
 
 onMounted(() => {

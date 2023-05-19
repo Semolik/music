@@ -1,15 +1,13 @@
 <template>
+    {{ playerStore.listUrls }}
     <div class="player">
-        <AudioPlayer ref="player" :audio-list="playerStore.listUrls" />
+        <AudioPlayer ref="player" :audio-list="listUrls" />
     </div>
 </template>
 <script setup>
-const player = ref(null);
 import AudioPlayer from "@liripeng/vue-audio-player";
 import { usePlayerStore } from "@/stores/player";
-
+import { storeToRefs } from "pinia";
 const playerStore = usePlayerStore();
+const { listUrls, player } = storeToRefs(playerStore);
 </script>
-<style lang="scss" scoped>
-
-</style>

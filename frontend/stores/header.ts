@@ -25,6 +25,7 @@ export const useHeaderStore = defineStore({
             this.title = "";
         },
         setTitle(title: string) {
+            console.log("setTitle", title);
             this.title = title;
             useHead({
                 title: title,

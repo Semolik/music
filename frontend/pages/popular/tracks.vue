@@ -25,7 +25,6 @@ watch(
     () => route.name,
     async (value) => {
         if (!Object.values(routesNames.popularTracks).includes(value)) return;
-        headerStore.reset();
         headerStore.currentRouteName = value;
         switch (value) {
             case "popular-tracks-week":

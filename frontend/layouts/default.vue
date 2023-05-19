@@ -38,9 +38,9 @@
         @include lg(true) {
             padding-bottom: 70px;
         }
+
         .app-content {
             flex-grow: 1;
-            // overflow: scroll;
 
             &.enable-padding {
                 padding: 20px;

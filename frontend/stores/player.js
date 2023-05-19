@@ -14,6 +14,10 @@ export const usePlayerStore = defineStore({
                 (track) => track.id === currentTrack.id
             );
         },
+        playCurrentTrack() {
+            this.player.currentPlayIndex = this.current_track_index || 0;
+            this.player.play();
+        },
     },
     getters: {
         listUrls() {

@@ -38,13 +38,14 @@ const router = useRouter();
 watch(
     router.currentRoute,
     async (value) => {
-        headerStore.setTitle("Библиотека");
-        headerStore.links = links;
         if (value.name === "library") {
             router.push({ name: "library-playlists" });
+            headerStore.links = links;
             return;
         }
-        headerStore.currentRouteName = route.name;
+        if (!Object.values(routesNames.library).includes(value.name)) return;
+        headerStore.setTitle("Библиотека");
+        headerStore.links = links;
     },
     { immediate: true }
 );

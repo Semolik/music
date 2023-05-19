@@ -11,7 +11,6 @@
         is-musician
         hide-delete-button
         :likes-count="musician.likes_count"
-        play-button-text="Перемешать"
     >
         <div class="musician-page-content">
             <selection
