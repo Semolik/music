@@ -4,4 +4,4 @@ from backend.core.config import settings
 
 def get_track_url_by_id(track_id: UUID):
     return ''.join(
-        [settings.SERVER_LINK, settings.API_V1_STR, '/tracks/', str(track_id), '/file'])
+        [settings.API_V1_STR, '/tracks/', str(track_id), '/file'])
