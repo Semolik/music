@@ -1,6 +1,10 @@
 <template>
-    {{ playerStore.listUrls }}
-    <div class="player">
+    <div
+        class="player"
+        :style="{
+            display: 'none',
+        }"
+    >
         <AudioPlayer ref="player" :audio-list="listUrls" />
     </div>
 </template>

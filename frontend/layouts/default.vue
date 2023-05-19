@@ -12,6 +12,7 @@
                 >
                     <slot />
                 </div>
+                <AppPlayer />
             </div>
             <AppBottomBar v-if="$viewport.isLessThan('lg')" />
         </div>
@@ -41,6 +42,7 @@
 
         .app-content {
             flex-grow: 1;
+            overflow-y: scroll;
 
             &.enable-padding {
                 padding: 20px;
