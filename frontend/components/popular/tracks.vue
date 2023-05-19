@@ -7,6 +7,7 @@
                 :track="track"
                 @update:track="tracks[index] = $event"
                 is-link
+                :on-card-click="() => playTrack(track)"
             />
         </div>
         <AppButton v-if="showMoreButton" @click="getTracks">
@@ -16,12 +17,15 @@
 </template>
 <script setup>
 import { Service } from "~/client";
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
 const { period } = defineProps({
     period: {
         type: String,
         required: true,
     },
 });
+
 const { POPULAR_TRACKS_LIMIT } = useRuntimeConfig().public;
 const page = ref(0);
 const tracks = ref([]);
@@ -43,6 +47,10 @@ const period_start = computed(() => {
             );
     }
 });
+const playTrack = (track) => {
+    playerStore.setTracks(tracks.value, track);
+    playerStore.toggleCurrentTrack();
+};
 const period_end = computed(() => new Date());
 const getTracks = async () => {
     page.value++;

@@ -5,7 +5,9 @@
             :icon="icon"
             :borderRadius="borderRadius"
             min
-        />
+        >
+            <slot name="card-picture" />
+        </CardPicture>
         <div class="card-min-content">
             <slot name="content" />
         </div>

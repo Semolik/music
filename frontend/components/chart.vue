@@ -33,6 +33,6 @@ const tracks = ref(
 );
 const playTrack = (track) => {
     playerStore.setTracks(tracks.value, track);
-    playerStore.playCurrentTrack();
+    playerStore.toggleCurrentTrack();
 };
 </script>

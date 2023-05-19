@@ -6,6 +6,7 @@ export const IconsNames = {
     likeIcon: "material-symbols:favorite",
     dislikeIcon: "ion:heart-dislike",
     playIcon: "material-symbols:play-arrow",
+    pauseIcon: "material-symbols:pause",
     dotsIcon: "material-symbols:more-horiz",
     homeIcon: "material-symbols:home-rounded",
     historyIcon: "material-symbols:history-rounded",

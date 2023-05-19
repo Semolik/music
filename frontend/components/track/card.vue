@@ -6,6 +6,14 @@
         :class="['track-card', { min: min }]"
         @click="handleCardClick"
     >
+        <template #card-picture v-if="nowPlaying">
+            <client-only>
+                <div class="loading-container" v-auto-animate>
+                    <Icon :name="IconsNames.pauseIcon" v-if="paused" />
+                    <div class="dot" v-else></div>
+                </div>
+            </client-only>
+        </template>
         <template #content>
             <div :class="['info-container', { min: min }]">
                 <div class="info">
@@ -19,7 +27,7 @@
                     v-if="!min && albumName"
                     :to="albumLink"
                 >
-                    {{ albumName }}
+                    {{ albumName }} {{ paused }}
                 </nuxt-link>
                 <nuxt-link
                     class="info-item musican-name"
@@ -210,12 +218,15 @@
 import moment from "moment";
 import { IconsNames } from "@/configs/icons";
 import { usePlaylistsStore } from "@/stores/playlists";
+import { usePlayerStore } from "~/stores/player";
 import { onClickOutside } from "@vueuse/core";
 import { Service } from "@/client";
 import { useAuthStore } from "~~/stores/auth";
 import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
 const playlistsStore = usePlaylistsStore();
+const playerStore = usePlayerStore();
+const { paused } = storeToRefs(playerStore);
 const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
@@ -282,6 +293,7 @@ const albumLink = computed(() => {
         params: { id: album_id },
     };
 });
+const nowPlaying = computed(() => playerStore.currentTrack?.id === track.id);
 const clipModalOpeneded = ref(false);
 const albumName = computed(() => albumInfo?.name || track?.album?.name || null);
 const musicianLink = computed(() => {
@@ -388,6 +400,40 @@ const duration = computed(() =>
 );
 </script>
 <style lang="scss" scoped>
+.loading-container {
+    @include flex-center;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    svg {
+        color: $accent;
+    }
+
+    @keyframes bounce {
+        0% {
+            scale: 1;
+        }
+        50% {
+            scale: 1.5;
+        }
+        100% {
+            scale: 1;
+        }
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: $accent;
+        margin: 0 5px;
+        animation: bounce 0.7s infinite;
+    }
+}
 .playlist-modal-content {
     display: flex;
     flex-direction: column;
