@@ -1,4 +1,3 @@
-<!-- eslint-disable no-use-before-define -->
 <template>
     <card-min
         :picture="track.picture"
@@ -61,14 +60,21 @@
                         v-if="!(hideDotsMenu || createTrackMode)"
                     >
                         <Icon :name="IconsNames.dotsIcon" />
-               
+
                         <div class="menu" v-if="menuOpened">
                             <TrackCardMenuContent
                                 :track="track"
-                                v-model:addToPlaylistModalOpened="addToPlaylistModalOpened"
+                                :addToPlaylistModalOpened="
+                                    addToPlaylistModalOpened
+                                "
+                                @update:addToPlaylistModalOpened="
+                                    addToPlaylistModalOpened = $event
+                                "
                                 v-model:clipModalOpeneded="clipModalOpeneded"
                                 v-model:menuOpened="menuOpened"
-                                @playlist-remove-track="emit('playlist-remove-track', $event)"
+                                @playlist-remove-track="
+                                    emit('playlist-remove-track', $event)
+                                "
                                 @update:track="emit('update:track', $event)"
                             />
                         </div>
@@ -79,10 +85,8 @@
     </card-min>
 </template>
 <script setup>
-import { unref as _unref } from "vue";
 import moment from "moment";
 import { IconsNames } from "@/configs/icons";
-
 import { usePlayerStore } from "~/stores/player";
 import { onClickOutside } from "@vueuse/core";
 import { Service } from "@/client";

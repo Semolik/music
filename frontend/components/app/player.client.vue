@@ -76,8 +76,11 @@
                             <TrackCardMenuContent
                                 :track="currentTrack"
                                 @update:track="playerStore.updateTrack($event)"
-                                v-model:addToPlaylistModalOpened="
+                                :addToPlaylistModalOpened="
                                     addToPlaylistModalOpened
+                                "
+                                @update:addToPlaylistModalOpened="
+                                    addToPlaylistModalOpened = $event
                                 "
                                 v-model:menuOpened="menuOpened"
                                 v-model:clipModalOpeneded="clipModalOpeneded"
