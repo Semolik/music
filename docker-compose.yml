@@ -31,4 +31,4 @@ services:
       - DB_PORT=5432
       - DB_NAME=semolik-music
     ports:
-      - '8003:8000'
+      - '8001:8000'
