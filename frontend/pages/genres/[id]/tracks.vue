@@ -3,9 +3,11 @@
 </template>
 <script setup>
 import { Service } from "~/client";
+
 const { POPULAR_TRACKS_LIMIT_ALL } = useRuntimeConfig().public;
 const route = useRoute();
 const { id } = route.params;
+
 const genre = await Service.getGenreInfoApiV1GenresGenreIdInfoGet(id);
 const loadMore = async (page) => {
     return await Service.getPopularTracksByGenreIdApiV1GenresGenreIdTracksGet(

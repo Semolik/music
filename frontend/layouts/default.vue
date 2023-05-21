@@ -2,7 +2,12 @@
     <NuxtErrorBoundary @error="handleError">
         <div class="default-layout">
             <AppAside v-if="$viewport.isGreaterOrEquals('lg')" />
-            <div class="content-container">
+            <div
+                :class="[
+                    'content-container',
+                    { 'player-active': currentTrack },
+                ]"
+            >
                 <AppHeader />
                 <div
                     :class="[
@@ -35,9 +40,17 @@
         display: flex;
         flex-direction: column;
         overflow-x: hidden;
+        position: relative;
 
         @include lg(true) {
             padding-bottom: 70px;
+
+            &.player-active {
+                padding-bottom: 200px;
+            }
+        }
+        &.player-active {
+            padding-bottom: 125px;
         }
 
         .app-content {
@@ -55,6 +68,9 @@
 }
 </style>
 <script setup>
+import { usePlayerStore } from "~/stores/player";
+import { storeToRefs } from "pinia";
+const { currentTrack } = storeToRefs(usePlayerStore());
 const router = useRouter();
 const disableDefaultLayoutPadding = computed(
     () => router.currentRoute.value.meta.disableDefaultLayoutPadding

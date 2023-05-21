@@ -5,6 +5,7 @@
             :icon="icon"
             :borderRadius="borderRadius"
             min
+            @click="emit('picture-click', $event)"
         >
             <slot name="card-picture" />
         </CardPicture>
@@ -15,6 +16,7 @@
     </div>
 </template>
 <script setup>
+const emit = defineEmits(["picture-click"]);
 const { text, picture, icon, borderRadius } = defineProps({
     picture: {
         type: [String, null],
@@ -42,6 +44,7 @@ const { text, picture, icon, borderRadius } = defineProps({
     background-color: $quaternary-bg;
     border-radius: 10px;
     color: $secondary-text;
+    cursor: pointer;
     @include lg {
         &:hover {
             background-color: $quinary-bg;

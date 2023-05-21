@@ -27,6 +27,7 @@ const { homeIcon, menuIcon, searchIcon } = IconsNames;
     display: flex;
     padding: 5px;
     z-index: 1000;
+    height: 70px;
     a {
         @include flex-center;
         flex-grow: 1;

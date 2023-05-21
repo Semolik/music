@@ -23,7 +23,7 @@
                 >
                     <Icon :name="likeIcon" />
                 </div>
-                <div class="play button" @click.stop="">
+                <div class="play button" @click.stop="playMusician">
                     <Icon :name="playIcon" />
                 </div>
                 <div class="more button" @click.stop="ShareModalOpened = true">
@@ -48,6 +48,9 @@ import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
 import { IconsNames } from "@/configs/icons";
 import { routesNames } from "@typed-router";
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
+
 const authStore = useAuthStore();
 const { logined } = storeToRefs(authStore);
 const ShareModalOpened = ref(false);
@@ -76,8 +79,22 @@ const onClick = () => {
         });
     }
 };
+const playMusician = async () => {
+    try {
+        const tracks =
+            await Service.getMusicianPopularTracksApiV1MusicianProfileIdPopularGet(
+                musician.id
+            );
+        if (tracks.length === 0) {
+            return;
+        }
+        playerStore.setTracks(tracks, tracks[0]);
+        playerStore.toggleCurrentTrack();
+    } catch (e) {
+        console.log(e);
+    }
+};
 const emit = defineEmits(["update:musician"]);
-
 const props = reactive({
     picture: musician.picture,
     icon: IconsNames.userIcon,
@@ -116,13 +133,13 @@ const onFavorite = async () => {
             border-radius: 50%;
             @include flex-center;
             height: min-content;
-            padding: 5px;
+
             width: 35px;
             height: 35px;
             transition: background-color 0.2s ease-in-out;
             svg {
-                height: 100%;
-                width: 100%;
+                width: 15px;
+                height: 15px;
             }
             &.play {
                 background-color: $accent;
@@ -133,6 +150,8 @@ const onFavorite = async () => {
                 }
                 svg {
                     color: black;
+                    width: 25px;
+                    height: 25px;
                 }
             }
             &.favorite {

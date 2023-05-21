@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
     inset: 0;
     background-color: rgba($color: #000000, $alpha: 0.5);
     @include flex-center;
-    z-index: 99;
+    z-index: 2000;
     opacity: 0;
     color: $primary-text;
     flex-direction: column;

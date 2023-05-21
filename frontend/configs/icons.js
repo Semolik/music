@@ -7,6 +7,8 @@ export const IconsNames = {
     dislikeIcon: "ion:heart-dislike",
     playIcon: "material-symbols:play-arrow",
     pauseIcon: "material-symbols:pause",
+    prevIcon: "material-symbols:skip-previous-rounded",
+    nextIcon: "material-symbols:skip-next-rounded",
     dotsIcon: "material-symbols:more-horiz",
     homeIcon: "material-symbols:home-rounded",
     historyIcon: "material-symbols:history-rounded",

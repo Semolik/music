@@ -10,6 +10,8 @@
         @delete="openDeleteModal"
         :is-liked="playlist.liked"
         @like="toggleLikePlaylist"
+        :hide-play-button="!playButtonActive"
+        @play="playPlaylist"
     >
         <div
             :class="['description', { splitter: !playlist.picture }]"
@@ -24,6 +26,7 @@
                 v-model:track="playlist.tracks[index]"
                 :playlist-id="playlist.id"
                 @playlist-remove-track="playlist.tracks.splice(index, 1)"
+                :onCardClick="() => playTrack(track)"
             />
             <NotFound v-if="!playlist.tracks.length" text="Плейлист пуст" />
         </div>
@@ -100,8 +103,9 @@ import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "@typed-router";
 import { useEventBus } from "@vueuse/core";
-
+import { usePlayerStore } from "~/stores/player";
 const route = useRoute();
+const playerStore = usePlayerStore();
 
 const goToLoginBus = useEventBus("go-to-login");
 const { MAX_PLAYLIST_NAME_LENGTH, MAX_PLAYLIST_DESCRIPTION_LENGTH } =
@@ -117,7 +121,18 @@ const playlist = ref(
 useHead({
     title: "Плейлист " + playlist.value.name,
 });
+const playTrack = async (track) => {
+    playerStore.setTracks(playlist.value.tracks, track);
+    playerStore.toggleCurrentTrack();
+};
+const playButtonActive = computed(() => playlist.value.tracks.length > 0);
+const playPlaylist = async () => {
+    if (!playButtonActive.value) {
+        return;
+    }
 
+    playTrack(playlist.value.tracks[0]);
+};
 const authStore = useAuthStore();
 const { userData, logined } = storeToRefs(authStore);
 const isOwner = computed(

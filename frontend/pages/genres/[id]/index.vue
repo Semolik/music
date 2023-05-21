@@ -5,7 +5,8 @@
         type="Жанр"
         :is-liked="genre.liked"
         @like="like"
-        :hide-play-button="notFound"
+        :hide-play-button="notFound || !genre.popular_tracks.length"
+        @play="playGenre"
     >
         <div class="genre-page">
             <Selection
@@ -23,6 +24,7 @@
                         :key="track.id"
                         v-model:track="genre.popular_tracks[index]"
                         min
+                        :onCardClick="() => playTrack(track)"
                     />
                 </TracksContainer>
             </Selection>
@@ -85,6 +87,8 @@
 <script setup>
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
@@ -101,6 +105,14 @@ const notFound = computed(
         !genre.value.popular_musicians.length &&
         !genre.value.popular_tracks.length
 );
+const playTrack = (track) => {
+    playerStore.setTracks(genre.value.popular_tracks, track);
+    playerStore.toggleCurrentTrack();
+};
+const playGenre = () => {
+    if (!genre.value.popular_tracks.length) return;
+    playTrack(genre.value.popular_tracks[0]);
+};
 </script>
 <style lang="scss" scoped>
 .genre-page {

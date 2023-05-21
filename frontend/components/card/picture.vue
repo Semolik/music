@@ -31,6 +31,7 @@ const { picture, icon, borderRadius } = defineProps({
     overflow: hidden;
     @include flex-center;
     aspect-ratio: 1;
+
     &.min {
         height: 100%;
         background-color: $tertiary-bg;
@@ -47,7 +48,7 @@ const { picture, icon, borderRadius } = defineProps({
         height: 100%;
         object-fit: cover;
     }
-    svg {
+    & > svg {
         padding: 20%;
         height: 100%;
         width: 100%;
