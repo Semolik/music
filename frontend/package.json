@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "build": "npm run generate-client && nuxt build --port=4000 --dotenv ../.env",
+        "build": "cross-env NODE_ENV=production npm run generate-client && nuxt build --port=4000 --dotenv ../.env",
         "dev": "npm run generate-client && nuxt dev --port=4000 --dotenv ../.env",
         "generate": "nuxt generate",
         "preview": "nuxt preview",

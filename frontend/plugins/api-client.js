@@ -7,7 +7,9 @@ export default defineNuxtPlugin((nuxtApp) => {
             Cookie: `access_token_cookie=${cookie.value}; refresh_token_cookie=${refreshToken.value}`,
         };
     }
-    // OpenAPI.BASE = "http://music.semolik.ru/api";
-    OpenAPI.BASE = "http://localhost:8000";
+    OpenAPI.BASE =
+        process.env.NODE_ENV === "production"
+            ? "http://music.semolik.ru/api"
+            : "http://localhost:8000";
     OpenAPI.WITH_CREDENTIALS = true;
 });
