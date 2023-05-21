@@ -11,6 +11,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     OpenAPI.BASE =
         process.env.NODE_ENV === "development"
             ? "http://localhost:8000"
-            : "http://music.semolik.ru";
+            : "https://music.semolik.ru";
     OpenAPI.WITH_CREDENTIALS = true;
 });
