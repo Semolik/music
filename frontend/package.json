@@ -1,12 +1,13 @@
 {
     "private": true,
     "scripts": {
-        "build": "cross-env NODE_ENV=production npm run generate-client && nuxt build --port=4000 --dotenv ../.env",
-        "dev": "npm run generate-client && nuxt dev --port=4000 --dotenv ../.env",
+        "build": "cross-env NODE_ENV=production npm run generate-client-prod && nuxt build --port=4000 --dotenv ../.env",
+        "dev": "npm run generate-client-dev && nuxt dev --port=4000 --dotenv ../.env",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "generate-client": "openapi --input http://localhost:8000/openapi.json --output ./client --client axios"
+        "generate-client-prod": "openapi --input http://localhost:8001/openapi.json --output ./client --client axios",
+        "generate-client-dev": "openapi --input http://localhost:8000/openapi.json --output ./client --client axios"
     },
     "config": {
         "nuxt": {
