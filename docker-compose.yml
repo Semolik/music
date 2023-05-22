@@ -33,4 +33,4 @@ services:
     ports:
       - '8001:8000'
     volumes:
-      - /app/assets:/var/www/semolik.ru/music/assets
+      - ./assets:/var/www/semolik.ru/music/assets
