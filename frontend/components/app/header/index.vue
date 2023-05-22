@@ -76,7 +76,6 @@ watch(router.currentRoute, (value) => {
     headerStore.currentRouteName = value.name;
     if (links.value.map((link) => link.name).includes(value.name)) return;
     headerStore.reset();
-    console.log(title.value);
 });
 
 onMounted(() => {

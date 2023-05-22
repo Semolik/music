@@ -1,7 +1,7 @@
 <template>
     <client-only>
         <div class="loading-container" v-auto-animate>
-            <Icon :name="IconsNames.pauseIcon" v-if="paused" />
+            <Icon :name="IconsNames.playIcon" v-if="paused" />
             <div class="dot" v-else></div>
         </div>
     </client-only>

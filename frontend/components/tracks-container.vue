@@ -1,15 +1,15 @@
 <template>
     <ClientOnly v-if="animate">
-        <div v-auto-animate :class="['tracks', { grid }]">
+        <div v-auto-animate :class="['tracks', { grid }]" ref="tracksContainer">
             <slot />
         </div>
     </ClientOnly>
-    <div :class="['tracks', { grid }]" v-else>
+    <div :class="['tracks', { grid }]" v-else ref="tracksContainer">
         <slot />
     </div>
 </template>
 <script setup>
-const { grid, cut, cutCount } = defineProps({
+const { grid, cut, rows } = defineProps({
     grid: {
         type: Boolean,
         default: false,
@@ -22,6 +22,41 @@ const { grid, cut, cutCount } = defineProps({
         type: Boolean,
         default: false,
     },
+    rows: {
+        type: Number,
+        default: 2,
+    },
+});
+
+const tracksContainer = ref(null);
+const rowElementsCount = ref(1);
+onMounted(() => {
+    window.addEventListener("resize", () => {
+        if (!tracksContainer.value) return;
+        const containerWidth = tracksContainer.value.clientWidth;
+        const elementWidth = tracksContainer.value.children[0].clientWidth;
+        const elementsCount = Math.floor(containerWidth / elementWidth);
+        rowElementsCount.value = elementsCount > 6 ? elementsCount : 6;
+    });
+});
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", () => {});
+});
+
+const cutElementsCount = computed(() => {
+    if (!cut) return 0;
+    return rows * rowElementsCount.value;
+});
+watch(cutElementsCount, (value) => {
+    if (!tracksContainer.value) return;
+    const elements = tracksContainer.value.children;
+    for (let i = 0; i < elements.length; i++) {
+        if (i >= value) {
+            elements[i].style = "display: none";
+        } else {
+            elements[i].style = "";
+        }
+    }
 });
 </script>
 <style lang="scss" scoped>
@@ -41,10 +76,6 @@ const { grid, cut, cutCount } = defineProps({
 
         & > * {
             flex-grow: 1;
-        }
-
-        & > :nth-last-child(n + 7) {
-            display: none;
         }
     }
 }
