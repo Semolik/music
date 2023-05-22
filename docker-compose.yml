@@ -32,3 +32,5 @@ services:
       - DB_NAME=semolik-music
     ports:
       - '8001:8000'
+    volumes:
+      - ./assets:/var/www/semolik.ru/music/assets
