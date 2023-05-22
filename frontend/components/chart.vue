@@ -27,7 +27,7 @@ const tracks = ref(
     await Service.getPopularTracksPeriodApiV1TracksPopularPeriodGet(
         start.toISOString(),
         end.toISOString(),
-        9,
+        8,
         1
     )
 );
