@@ -3,7 +3,12 @@
         <TracksContainer>
             <div class="buttons">
                 <AppButton active @click="addTrack"> Добавить трек </AppButton>
-                <AppButton active @click="publishAlbumModalOpened = true">
+                <AppButton
+                    @[publishButtonActive&&`click`]="
+                        publishAlbumModalOpened = true
+                    "
+                    :active="publishButtonActive"
+                >
                     Опубликовать альбом
                 </AppButton>
                 <ModalDialog
@@ -31,6 +36,7 @@
             </div>
             <AlbumUploadTrack
                 :track="track"
+                :musician-info="musicianProfile"
                 v-for="(track, index) in tracks"
                 @position-up="positionUp(index)"
                 @position-down="positionDown(index)"
@@ -66,6 +72,9 @@ const publishAlbum = async () => {
         params: { id },
     });
 };
+const publishButtonActive = computed(() => {
+    return !!tracks.value.length;
+});
 const addTrack = () => {
     tracks.value.push({
         name: "",

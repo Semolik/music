@@ -80,7 +80,10 @@
                     />
                 </CardsContainer>
             </Selection>
-            <NotFound v-if="notFound" text="Тут пока ничего нет :(" />
+            <NotFound
+                v-if="notFound"
+                text="Контента с таким жанром не найдено"
+            />
         </div>
     </ContentHead>
 </template>

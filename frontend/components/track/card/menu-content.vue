@@ -42,10 +42,11 @@
         <Icon :name="IconsNames.albumIcon" />
         <span>Перейти к альбому</span>
     </nuxt-link>
+
     <nuxt-link
         :to="musicianLink"
         :class="['menu-item', { 'modal-mode': modalMode }]"
-        @click="menuOpened = false"
+        @click="menuOpenedLocal = false"
     >
         <Icon :name="IconsNames.userIcon" />
         <span>Перейти к исполнителю</span>
@@ -53,13 +54,14 @@
     <template v-if="track.clip">
         <div
             :class="['menu-item', { 'modal-mode': modalMode }]"
-            @click="clipModalOpeneded = true"
+            @click="clipModalOpenededLocal = true"
         >
             <Icon :name="IconsNames.clipIcon" />
             <span>Клип</span>
         </div>
         <ClipModal
-            v-model:modalOpened="clipModalOpenededLocal"
+            :modalOpened="clipModalOpeneded"
+            @update:modalOpened="clipModalOpenededLocal = $event"
             :clip="track.clip"
             @update:clip="
                 emit('update:track', {
@@ -217,6 +219,7 @@ const toggleLikeTrack = async () => {
 const clipModalOpenededLocal = computed({
     get: () => clipModalOpeneded,
     set: (value) => {
+        console.log(value);
         emit("update:clipModalOpeneded", value);
     },
 });

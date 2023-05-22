@@ -77,10 +77,11 @@ const props = reactive({
     right: 5px;
     background-color: $secondary-bg;
     border-radius: 5px;
+    padding: 5px;
 
     svg {
-        width: 30px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
         color: $secondary-text;
     }
 }

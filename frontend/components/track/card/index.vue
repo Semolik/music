@@ -7,7 +7,7 @@
         @picture-click="handleCardClick"
         @click.self="handleCardClick"
     >
-        <template #card-picture v-if="nowPlaying">
+        <template #card-picture v-if="nowPlaying && !createTrackMode">
             <TrackCardPlayingAnimation :paused="paused" />
         </template>
         <template #content>
@@ -67,6 +67,7 @@
                                 :addToPlaylistModalOpened="
                                     addToPlaylistModalOpened
                                 "
+                                :musican-info="musicanInfo"
                                 @update:addToPlaylistModalOpened="
                                     addToPlaylistModalOpened = $event
                                 "

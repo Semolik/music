@@ -5,7 +5,7 @@ from backend.models.files import Image
 from backend.models.tracks import Track, FavoriteTracks
 from backend.models.genres import Genre, LovedGenre
 from backend.models.user import PublicProfile, FavoriteMusicians
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from backend.core.config import settings
 from sqlalchemy import or_
 
@@ -92,6 +92,7 @@ class GenresCruds(CRUDBase):
         end = page * page_size
         return self.db.query(Track).join(Album, Album.id == Track.album_id)\
             .join(AlbumGenre, AlbumGenre.album_id == Album.id)\
+            .join(Genre, and_(Genre.id == AlbumGenre.genre_id, Genre.id == genre_id))\
             .outerjoin(FavoriteTracks, Track.id == FavoriteTracks.track_id)\
             .filter(AlbumGenre.genre_id == genre_id, Track.is_available)\
             .group_by(Track.id)\

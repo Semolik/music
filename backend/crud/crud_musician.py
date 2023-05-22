@@ -4,7 +4,7 @@ from backend.models.tracks import FavoriteTracks, Track, ListenTrackHistoryItem
 from backend.models.albums import Album, FavoriteAlbum
 from backend.models.user import FavoriteMusicians, PublicProfile
 from backend.core.config import env_config, settings
-from sqlalchemy import func
+from sqlalchemy import and_, func
 
 
 class MusicianCrud(CRUDBase):
@@ -55,9 +55,8 @@ class MusicianCrud(CRUDBase):
     def get_popular_musician_tracks(self, musician_id: int, page: int = 1, page_size: int = settings.POPULAR_TRACKS_LIMIT_ALL) -> List[Track]:
         end = page * page_size
         return self.db.query(Track)\
-            .join(Album, Album.id == Track.album_id)\
-            .filter(Track.artist_id == musician_id, Track.is_available)\
-            .join(FavoriteTracks, FavoriteTracks.track_id == Track.id, isouter=True)\
+            .join(Album, and_(Album.id == Track.album_id, Album.is_available, Album.musician_id == musician_id))\
+            .outerjoin(FavoriteTracks, FavoriteTracks.track_id == Track.id)\
             .group_by(Track.id) \
             .order_by(func.count().desc())\
             .slice(start=(end - page_size), stop=end)\
@@ -77,7 +76,7 @@ class MusicianCrud(CRUDBase):
     def get_popular_musician_albums(self, musician_id: int, page: int = 1, page_size: int = settings.ALBUM_PAGE_COUNT_ALL) -> List[Album]:
         end = page * page_size
         return self.db.query(Album)\
-            .filter(Album.musician_id == musician_id)\
+            .filter(Album.musician_id == musician_id, Album.is_available)\
             .join(FavoriteAlbum, FavoriteAlbum.album_id == Album.id, isouter=True)\
             .group_by(Album.id) \
             .order_by(func.count().desc())\

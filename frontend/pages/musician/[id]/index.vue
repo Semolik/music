@@ -11,6 +11,7 @@
         is-musician
         hide-delete-button
         :likes-count="musician.likes_count"
+        @play="playMusician"
     >
         <div class="musician-page-content">
             <selection
@@ -29,6 +30,7 @@
                         @update:track="musician.popular.tracks[index] = $event"
                         min
                         :musican-info="musician"
+                        :onCardClick="() => playTrack(track)"
                     />
                 </TracksContainer>
             </selection>
@@ -82,14 +84,28 @@ import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 import { routesNames } from "@typed-router";
 import { useEventBus } from "@vueuse/core";
-
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
 const goToLoginBus = useEventBus("go-to-login");
 const route = useRoute();
 const { id } = route.params;
 const musician = ref(
     await Service.getPublicProfileInfoApiV1MusicianProfileIdGet(id)
 );
-
+const tracksWithMusician = computed(() =>
+    musician.value.popular.tracks.map((track) => ({
+        ...track,
+        musician: musician.value,
+    }))
+);
+const playTrack = (track) => {
+    playerStore.setTracks(tracksWithMusician.value, track);
+    playerStore.toggleCurrentTrack();
+};
+const playMusician = () => {
+    if (!tracksWithMusician.value.length) return;
+    playTrack(tracksWithMusician.value[0]);
+};
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });

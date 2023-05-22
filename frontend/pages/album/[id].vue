@@ -11,6 +11,7 @@
         @like="toggleLikeAlbum"
         hide-delete-button
         :likes-count="album.likes_count"
+        @play="playAlbum"
     >
         <div class="tracks">
             <TrackCard
@@ -19,6 +20,7 @@
                 v-model:track="album.tracks[index]"
                 :album-info="album"
                 :musican-info="album.musician"
+                :onCardClick="() => playTrack(track)"
             />
         </div>
     </ContentHead>
@@ -30,14 +32,30 @@ import { useAuthStore } from "~/stores/auth";
 import { routesNames } from "@typed-router";
 import { storeToRefs } from "pinia";
 import { useEventBus } from "@vueuse/core";
+import { usePlayerStore } from "~/stores/player";
 const goToLoginBus = useEventBus("go-to-login");
+const playerStore = usePlayerStore();
 definePageMeta({
     disableDefaultLayoutPadding: true,
 });
+
 const route = useRoute();
 const { id } = route.params;
 const album = ref(await Service.getAlbumByIdApiV1AlbumsAlbumIdGet(id));
-
+const tracksWithMusician = computed(() =>
+    album.value.tracks.map((track) => ({
+        ...track,
+        musician: album.value.musician,
+    }))
+);
+const playTrack = (track) => {
+    playerStore.setTracks(tracksWithMusician.value, track);
+    playerStore.toggleCurrentTrack();
+};
+const playAlbum = () => {
+    if (!album.value.tracks.length) return;
+    playTrack(album.value.tracks[0]);
+};
 const authStore = useAuthStore();
 const { logined, musicianProfile } = storeToRefs(authStore);
 

@@ -8,6 +8,7 @@
                 @edit="toggleEdit"
                 class="track-card"
                 @delete="OpenDeleteTrackModal"
+                :musican-info="musicianInfo"
             />
             <ModalDialog
                 :active="deleteTrackModalOpened"
@@ -98,6 +99,10 @@ const props = defineProps({
     albumId: {
         type: Number,
         required: true,
+    },
+    musicianInfo: {
+        type: Object,
+        required: false,
     },
 });
 const deleteTrackModalOpened = ref(false);
