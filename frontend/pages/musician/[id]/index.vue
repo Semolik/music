@@ -12,6 +12,7 @@
         hide-delete-button
         :likes-count="musician.likes_count"
         @play="playMusician"
+        :hide-play-button="!musician.popular.tracks.length"
     >
         <div class="musician-page-content">
             <selection

@@ -9,7 +9,7 @@
     </div>
 </template>
 <script setup>
-const { grid, cut, rows } = defineProps({
+const { grid, cut } = defineProps({
     grid: {
         type: Boolean,
         default: false,
@@ -22,42 +22,42 @@ const { grid, cut, rows } = defineProps({
         type: Boolean,
         default: false,
     },
-    rows: {
-        type: Number,
-        default: 2,
-    },
 });
 
 const tracksContainer = ref(null);
 const rowElementsCount = ref(1);
-onMounted(() => {
-    window.addEventListener("resize", () => {
-        if (!tracksContainer.value) return;
-        const containerWidth = tracksContainer.value.clientWidth;
-        const elementWidth = tracksContainer.value.children[0].clientWidth;
-        const elementsCount = Math.floor(containerWidth / elementWidth);
-        rowElementsCount.value = elementsCount > 6 ? elementsCount : 6;
-    });
-});
-onBeforeUnmount(() => {
-    window.removeEventListener("resize", () => {});
-});
-
-const cutElementsCount = computed(() => {
-    if (!cut) return 0;
-    return rows * rowElementsCount.value;
-});
-watch(cutElementsCount, (value) => {
+const setRowElementsCount = () => {
     if (!tracksContainer.value) return;
-    const elements = tracksContainer.value.children;
-    for (let i = 0; i < elements.length; i++) {
-        if (i >= value) {
-            elements[i].style = "display: none";
-        } else {
-            elements[i].style = "";
-        }
-    }
-});
+    const containerWidth = tracksContainer.value.clientWidth;
+    const elementWidth = tracksContainer.value.children[0].clientWidth;
+    const elementsCount = Math.floor(containerWidth / elementWidth);
+    rowElementsCount.value = elementsCount;
+};
+if (cut) {
+    onMounted(() => {
+        watch(
+            rowElementsCount,
+            (value) => {
+                const elements = tracksContainer.value.children;
+
+                const cut_els = (value === 1 ? 6 : 3) * value;
+                for (let i = 0; i < elements.length; i++) {
+                    if (i >= cut_els) {
+                        elements[i].style.display = "none";
+                    }
+                }
+            },
+            { immediate: true }
+        );
+        setRowElementsCount();
+        window.addEventListener("resize", () => {
+            setRowElementsCount();
+        });
+    });
+    onBeforeUnmount(() => {
+        window.removeEventListener("resize", () => {});
+    });
+}
 </script>
 <style lang="scss" scoped>
 .tracks {

@@ -51,11 +51,14 @@
         }
         &.player-active {
             padding-bottom: 125px;
+            @include lg(true) {
+                padding-bottom: 195px;
+            }
         }
 
         .app-content {
             flex-grow: 1;
-            overflow-y: scroll;
+            overflow-y: auto;
 
             &.enable-padding {
                 padding: 20px;
