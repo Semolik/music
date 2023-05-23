@@ -67,6 +67,7 @@
                                 :addToPlaylistModalOpened="
                                     addToPlaylistModalOpened
                                 "
+                                :menu-buttons="menuButtons"
                                 :musican-info="musicanInfo"
                                 @update:addToPlaylistModalOpened="
                                     addToPlaylistModalOpened = $event

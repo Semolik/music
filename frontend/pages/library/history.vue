@@ -12,7 +12,7 @@
                 },
             ]"
         />
-        <NotFound v-if="!history_tracks.length" />
+        <NotFound v-if="!history_tracks.length && !fetching" />
         <AppButton @click="getNextPage" active v-if="showNextButton">
             Показать ещё
         </AppButton>
@@ -30,7 +30,9 @@ useHead({
 const history_tracks = ref([]);
 const showNextButton = ref(false);
 const page = ref(0);
+const fetching = ref(false);
 const getNextPage = async () => {
+    fetching.value = true;
     page.value++;
     const new_history_tracks =
         await Service.getHistoryTracksApiV1HistoryTracksGet(page.value);
@@ -38,6 +40,7 @@ const getNextPage = async () => {
     history_tracks.value = history_tracks.value.concat(new_history_tracks);
     showNextButton.value =
         new_history_tracks.length == HISTORY_ALL_TRACKS_LIMIT;
+    fetching.value = false;
 };
 getNextPage();
 const deleteTrackFromHistory = async (history_item_id) => {
