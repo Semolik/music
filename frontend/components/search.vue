@@ -6,6 +6,7 @@
         :suffix-icon="searching ? Loading : null"
         clearable
         id="search-input"
+        autofocus
     />
     <div class="results-categories" v-if="searchQuery">
         <div
@@ -26,12 +27,15 @@
                 <MusicianCard
                     v-if="item.type == 'musician'"
                     :musician="item.info"
+                    min
+                    is-link
                 />
                 <TrackCard
                     v-if="item.type == 'track'"
                     :track="item.info"
                     min
                     hide-dots-menu
+                    :on-card-click="() => playTrack(item.info)"
                 />
                 <PlaylistCard
                     v-if="item.type == 'playlist'"
@@ -64,16 +68,21 @@
             />
         </template>
     </div>
-    <div class="not-found" v-else-if="searchQuery">
-        по вашему запросу ничего не найдено
-    </div>
-    <div class="recomendations" v-else>рекомендации</div>
+    <NotFound
+        v-else
+        :text="searchQuery ? 'Ничего не найдено' : 'Введите запрос'"
+    />
 </template>
 <script setup>
 import { Service } from "@/client";
 import { Loading } from "@element-plus/icons-vue";
 import { useEventBus } from "@vueuse/core";
-
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
+const playTrack = (track) => {
+    playerStore.setTracks([track], track);
+    playerStore.toggleCurrentTrack();
+};
 const resetSearchBus = useEventBus("reset-search");
 const results = reactive({
     all: [],
