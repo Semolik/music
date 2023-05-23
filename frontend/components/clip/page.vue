@@ -258,16 +258,16 @@ watch(connectToTrackModalOpened, (new_value) => {
         searchTrackText.value = "";
     }
 });
-const popular_tracks =
-    await Service.getMusicianPopularTracksApiV1MusicianProfileIdPopularGet(
-        musicianProfile.value.id
-    );
+
 const search_tracks = ref([]);
 watch(
     searchTrackText,
     async (value) => {
         if (!value) {
-            search_tracks.value = popular_tracks;
+            search_tracks.value =
+                await Service.getMusicianPopularTracksApiV1MusicianProfileIdPopularGet(
+                    musicianProfile.value.id
+                );
             return;
         }
         search_tracks.value =
