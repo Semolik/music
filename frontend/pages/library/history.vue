@@ -47,9 +47,10 @@ const deleteTrackFromHistory = async (history_item_id) => {
     await Service.deleteTrackFromHistoryApiV1HistoryTracksHistoryItemIdDelete(
         history_item_id
     );
-    history_tracks.value = history_tracks.value.filter(
-        (history_track) => history_track.id != history_item_id
+    const index = history_tracks.value.findIndex(
+        (history_track) => history_track.id == history_item_id
     );
+    history_tracks.value.splice(index, 1);
 };
 </script>
 <style lang="scss" scoped>
