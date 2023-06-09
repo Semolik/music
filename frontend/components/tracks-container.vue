@@ -29,6 +29,7 @@ const rowElementsCount = ref(1);
 const setRowElementsCount = () => {
     if (!tracksContainer.value) return;
     const containerWidth = tracksContainer.value.clientWidth;
+    if (!tracksContainer.value.children[0]) return;
     const elementWidth = tracksContainer.value.children[0].clientWidth;
     const elementsCount = Math.floor(containerWidth / elementWidth);
     rowElementsCount.value = elementsCount;
