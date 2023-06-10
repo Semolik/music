@@ -98,9 +98,12 @@
 import { IconsNames } from "~/configs/icons";
 import AudioPlayer from "@liripeng/vue-audio-player";
 import { usePlayerStore } from "@/stores/player";
+import { useAuthStore } from "~/stores/auth";
 import { storeToRefs } from "pinia";
 import { Service } from "~/client";
 const playerStore = usePlayerStore();
+const authStore = useAuthStore();
+const { logined } = storeToRefs(authStore);
 const { listUrls, player, paused, isFirstTrack, currentTrack, isLastTrack } =
     storeToRefs(playerStore);
 const setting_pause = ref(false);
@@ -110,18 +113,26 @@ const setPause = (value) => {
     setting_pause.value = false;
 };
 const handleBeforePlay = async (next) => {
-    await Service.startListeningTrackApiV1TracksTrackIdListeningPost(
-        currentTrack.value.id
-    );
+    if (logined.value) {
+        try {
+            await Service.startListeningTrackApiV1TracksTrackIdListeningPost(
+                currentTrack.value.id
+            );
+        } catch (e) {
+            console.error(HandleOpenApiError(e).message);
+        }
+    }
     next();
 };
 const handleEnded = async () => {
-    try {
-        await Service.setListenedTrackApiV1TracksTrackIdListeningPut(
-            currentTrack.value.id
-        );
-    } catch (e) {
-        console.error(HandleOpenApiError(e).message);
+    if (logined.value) {
+        try {
+            await Service.setListenedTrackApiV1TracksTrackIdListeningPut(
+                currentTrack.value.id
+            );
+        } catch (e) {
+            console.error(HandleOpenApiError(e).message);
+        }
     }
     playerStore.nextTrack();
 };
