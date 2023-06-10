@@ -57,9 +57,9 @@ class TracksCrud(CRUDBase):
         if not last_listened:
             return False
         track: Track = last_listened.track
-        # Время, когда трек должен был начаться если прослушивание закончилось во время (time)
-        target_return_time = time - timedelta(seconds=int(track.duration))
-        return target_return_time > last_listened.listen_datetime if target_return_time - last_listened.listen_datetime < timedelta(minutes=3) else False
+        end_time = last_listened.listen_datetime + \
+            timedelta(seconds=int(track.duration) - 5)
+        return end_time <= time
 
     def add_track_to_history(self, track_id: int, user_id: int, time: datetime):
         last_listened = self.get_last_track_listen(

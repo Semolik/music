@@ -201,6 +201,7 @@ const menuOpened = ref(false);
                 color: $primary-text;
                 border-radius: 10px;
                 background-color: $quinary-bg;
+                cursor: pointer;
 
                 @include lg(true) {
                     &.next,
@@ -220,7 +221,7 @@ const menuOpened = ref(false);
                         background-color: $quaternary-bg;
                     }
                 }
-                cursor: pointer;
+
                 &:hover {
                     background-color: $senary-bg;
                 }
