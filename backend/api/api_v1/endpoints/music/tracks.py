@@ -238,9 +238,6 @@ def set_listened_track(
     if not last_track_listen:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Прослушивание трека не найдено")
-    if last_track_listen.listened:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Трек уже прослушан")
     is_listened = tracks_crud.track_is_listened(
         last_listened=last_track_listen, time=datetime.now())
     if not is_listened:

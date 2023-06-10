@@ -6,12 +6,13 @@
             theme-color="hwb(153 26% 28%)"
             @pause="setPause(true)"
             @play="setPause(false)"
-            @ended="playerStore.nextTrack"
+            @ended="handleEnded"
             :show-playback-rate="false"
             :show-play-button="false"
             :show-prev-button="false"
             :show-next-button="false"
             :show-volume-button="false"
+            :before-play="handleBeforePlay"
         />
         <div class="player-controls-info" v-if="currentTrack">
             <div class="controls">
@@ -98,6 +99,7 @@ import { IconsNames } from "~/configs/icons";
 import AudioPlayer from "@liripeng/vue-audio-player";
 import { usePlayerStore } from "@/stores/player";
 import { storeToRefs } from "pinia";
+import { Service } from "~/client";
 const playerStore = usePlayerStore();
 const { listUrls, player, paused, isFirstTrack, currentTrack, isLastTrack } =
     storeToRefs(playerStore);
@@ -106,6 +108,22 @@ const setPause = (value) => {
     setting_pause.value = true;
     paused.value = value;
     setting_pause.value = false;
+};
+const handleBeforePlay = async (next) => {
+    await Service.startListeningTrackApiV1TracksTrackIdListeningPost(
+        currentTrack.value.id
+    );
+    next();
+};
+const handleEnded = async () => {
+    try {
+        await Service.setListenedTrackApiV1TracksTrackIdListeningPut(
+            currentTrack.value.id
+        );
+    } catch (e) {
+        console.error(HandleOpenApiError(e).message);
+    }
+    playerStore.nextTrack();
 };
 const addToPlaylistModalOpened = ref(false);
 const clipModalOpeneded = ref(false);
