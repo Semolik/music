@@ -1,64 +1,68 @@
 <template>
-    <div class="login-form-container">
-        <div class="login-form shadow-2xl">
-            <div
-                :class="[
-                    'message',
-                    { active: messageIsShowed },
-                    { error: isErrorMessage },
-                ]"
-            >
-                {{ message }}
-            </div>
-            <div class="headline">
-                {{ register ? "Зарегистрироваться" : "Войти в свой аккаунт" }}
-            </div>
-            <template v-if="register">
-                <AppInput
-                    placeholder="Имя"
-                    show-word-limit
-                    :maxLength="MAX_FIRSTNAME_LENGTH"
-                    v-model="firstName"
-                />
-                <AppInput
-                    placeholder="Фамилия"
-                    show-word-limit
-                    :maxLength="MAX_LASTNAME_LENGTH"
-                    v-model="lastName"
-                />
-            </template>
+    <FormContainer
+        :headline="register ? 'Зарегистрироваться' : 'Войти в свой аккаунт'"
+        ref="formContainer"
+    >
+        <template v-if="register">
             <AppInput
-                v-model="login"
-                placeholder="Никнейм"
-                :show-word-limit="showLoginLimit"
-                :maxLength="MAX_LOGIN_LENGTH"
-                :minLength="MIN_LOGIN_LENGTH"
-                :formatter="validateLogin"
-                :error="loginError || usernameAlreadyExists"
+                placeholder="Имя"
+                show-word-limit
+                :maxLength="MAX_FIRSTNAME_LENGTH"
+                v-model="firstName"
             />
             <AppInput
-                v-model="password"
-                placeholder="Пароль"
-                type="password"
-                :maxLength="MAX_PASSWORD_LENGTH"
-                :minLength="MIN_PASSWORD_LENGTH"
-                :error="passwordError"
+                placeholder="Фамилия"
+                show-word-limit
+                :maxLength="MAX_LASTNAME_LENGTH"
+                v-model="lastName"
             />
-            <LoginFormPasswordStrength :password="password" v-if="register" />
-            <div class="login-button" @click="loginHandler">
-                {{ register ? "Зарегистрироваться" : "Войти" }}
-            </div>
-        </div>
-        <nuxt-link class="bottom-text" :to="register ? '/login' : '/sign-in'">
-            {{ register ? "Уже есть аккаунт?" : "Нет аккаунта?" }}
+        </template>
+        <AppInput
+            v-model="login"
+            placeholder="Никнейм"
+            :show-word-limit="showLoginLimit"
+            :maxLength="MAX_LOGIN_LENGTH"
+            :minLength="MIN_LOGIN_LENGTH"
+            :formatter="validateLogin"
+            :error="loginError || usernameAlreadyExists"
+        />
+        <AppInput
+            v-model="password"
+            placeholder="Пароль"
+            type="password"
+            :maxLength="MAX_PASSWORD_LENGTH"
+            :minLength="MIN_PASSWORD_LENGTH"
+            :error="passwordError"
+        />
+        <LoginFormPasswordStrength :password="password" v-if="register" />
+
+        <nuxt-link
+            v-if="!register"
+            class="bottom-text forgot-password"
+            :to="routesNames.resetPassword"
+        >
+            Забыли пароль?
         </nuxt-link>
-    </div>
+        <div class="login-button" @click="loginHandler">
+            {{ register ? "Зарегистрироваться" : "Войти" }}
+        </div>
+
+        <template #bottom>
+            <nuxt-link
+                class="bottom-text"
+                :to="register ? '/login' : '/sign-in'"
+            >
+                {{ register ? "Уже есть аккаунт?" : "Нет аккаунта?" }}
+            </nuxt-link>
+        </template>
+    </FormContainer>
 </template>
 <script setup>
 import { useAuthStore } from "~~/stores/auth";
 import { HandleOpenApiError } from "~~/composables/errors";
 import { routesNames } from "@typed-router";
 import { Service } from "~~/client";
+import FormContainer from "~/components/form-container.vue";
 const authStore = useAuthStore();
 const runtimeConfig = useRuntimeConfig();
 const { register } = defineProps({
@@ -67,6 +71,7 @@ const { register } = defineProps({
         default: false,
     },
 });
+const formContainer = ref(null);
 const { $toast } = useNuxtApp();
 const login = ref("");
 const password = ref("");
@@ -84,35 +89,8 @@ const {
 const showLoginLimit = computed(
     () => register || login.value.length === MAX_LOGIN_LENGTH
 );
-const message = ref("");
-const messageIsShowed = ref(false);
-const messageTimer = ref(null);
-const messageNestedTimer = ref(null);
-const isErrorMessage = ref(false);
 const loginError = ref(false);
 const passwordError = ref(false);
-
-const showMessage = (messageText, isError) => {
-    if (messageTimer.value) {
-        clearTimeout(messageTimer.value);
-        if (messageNestedTimer.value) {
-            clearTimeout(messageNestedTimer.value);
-        }
-    }
-    isErrorMessage.value = isError;
-    message.value = messageText;
-    messageIsShowed.value = true;
-    messageTimer.value = setTimeout(() => {
-        messageIsShowed.value = false;
-        messageNestedTimer.value = setTimeout(() => {
-            message.value = "";
-        }, 500);
-    }, 3000 * (isError ? 2 : 1));
-};
-const hideMessage = () => {
-    messageIsShowed.value = false;
-    message.value = "";
-};
 const usernameAlreadyExists = ref(false);
 watch(login, async (newUsername) => {
     if (!register || !newUsername) {
@@ -125,23 +103,27 @@ watch(login, async (newUsername) => {
             newUsername
         );
     if (usernameAlreadyExists.value) {
-        showMessage("Пользователь с таким именем уже существует");
+        formContainer.value?.showMessage(
+            "Пользователь с таким именем уже существует"
+        );
     } else {
-        hideMessage();
+        formContainer.value?.hideMessage();
     }
 });
 
 const loginHandler = async () => {
     if (login.value.length < MIN_LOGIN_LENGTH) {
         loginError.value = true;
-        showMessage(`Логин должен быть не менее ${MIN_LOGIN_LENGTH} символов`);
+        formContainer.value?.showMessage(
+            `Логин должен быть не менее ${MIN_LOGIN_LENGTH} символов`
+        );
         return;
     } else {
         loginError.value = false;
     }
     if (password.value.length < MIN_PASSWORD_LENGTH) {
         passwordError.value = true;
-        showMessage(
+        formContainer.value?.showMessage(
             `Пароль должен быть не менее ${MIN_PASSWORD_LENGTH} символов`
         );
         return;
@@ -149,12 +131,14 @@ const loginHandler = async () => {
         passwordError.value = false;
     }
     if (usernameAlreadyExists.value) {
-        showMessage("Пользователь с таким именем уже существует");
+        formContainer.value?.showMessage(
+            "Пользователь с таким именем уже существует"
+        );
         return;
     }
     if (password.value.length > MAX_PASSWORD_LENGTH) {
         passwordError.value = true;
-        showMessage(
+        formContainer.value?.showMessage(
             `Пароль должен быть не более ${MAX_PASSWORD_LENGTH} символов`
         );
         return;
@@ -163,7 +147,9 @@ const loginHandler = async () => {
     }
     if (login.value.length > MAX_LOGIN_LENGTH) {
         loginError.value = true;
-        showMessage(`Логин должен быть не более ${MAX_LOGIN_LENGTH} символов`);
+        formContainer.value?.showMessage(
+            `Логин должен быть не более ${MAX_LOGIN_LENGTH} символов`
+        );
         return;
     } else {
         loginError.value = false;
@@ -187,88 +173,44 @@ const loginHandler = async () => {
     });
 };
 const validateLogin = (value) => {
-    const regex = /[^a-zA-Z0-9_]/g;
-    if (regex.test(value)) {
-        showMessage(
-            "Логин может содержать только латинские буквы, цифры и нижнее подчеркивание"
-        );
+    const { login, error } = useLoginValidation(value);
+    if (error) {
+        formContainer.value?.showMessage(error);
     }
-    return value.replace(regex, "");
+    return login;
 };
 </script>
 <style scoped lang="scss">
-.login-form-container {
+.login-button {
     @include flex-center;
-    flex-direction: column;
-    gap: 20px;
-    height: 100%;
+    height: 40px;
 
-    .login-form {
-        color: $primary-text;
-        width: 100%;
-        max-width: 400px;
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        position: relative;
-        background-color: $primary-bg-2;
-        border-radius: 10px;
-        --app-input-border-radius: 5px;
-        @include md(true) {
-            padding: 20px;
-        }
-        .message {
-            position: absolute;
-            bottom: 110%;
-            left: 0;
-            width: 100%;
-            font-size: 14px;
-            text-align: center;
-            color: transparent;
+    border-radius: 5px;
 
-            &.active {
-                color: $secondary-text;
-                &.error {
-                    color: $accent-error;
-                }
-            }
-        }
-        .headline {
-            font-size: 20px;
-            font-weight: 500;
-            text-align: center;
-            color: $secondary-text;
-            margin-bottom: 10px;
-        }
-
-        .login-button {
-            @include flex-center;
-            height: 40px;
-
-            border-radius: 5px;
-
-            font-weight: 500;
-            cursor: pointer;
-            user-select: none;
-            background-color: $tertiary-bg;
-            &:hover {
-                background-color: $quaternary-bg;
-            }
-            color: $secondary-text;
-            cursor: pointer;
-            &:hover {
-                color: $primary-text;
-            }
-        }
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    background-color: $tertiary-bg;
+    &:hover {
+        background-color: $quaternary-bg;
     }
-    .bottom-text {
-        font-size: 14px;
-        color: $secondary-text;
-        cursor: pointer;
-        &:hover {
-            color: $primary-text;
-        }
+    color: $secondary-text;
+    cursor: pointer;
+    &:hover {
+        color: $primary-text;
+    }
+}
+
+.bottom-text {
+    font-size: 14px;
+    color: $secondary-text;
+    cursor: pointer;
+    &:hover {
+        color: $primary-text;
+    }
+
+    &.forgot-password {
+        line-height: 1;
     }
 }
 </style>

@@ -7,7 +7,7 @@ from backend.models.tracks import *
 from backend.models.clips import *
 from backend.models.playlists import *
 from backend.models.slider import *
-
+from backend.models.support import *
 
 from backend.core.config import settings
 

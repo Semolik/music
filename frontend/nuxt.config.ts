@@ -197,6 +197,10 @@ export default defineNuxtConfig({
                 process.env.POPULAR_MUSICIANS_LIMIT_ALL
             ),
             USER_PLAYLISTS_LIMIT: Number(process.env.USER_PLAYLISTS_LIMIT),
+            MAX_EMAIL_LENGTH: Number(process.env.MAX_EMAIL_LENGTH),
+            MAX_SUPPORT_MESSAGE_LENGTH: Number(
+                process.env.MAX_SUPPORT_MESSAGE_LENGTH
+            ),
         },
     },
 });

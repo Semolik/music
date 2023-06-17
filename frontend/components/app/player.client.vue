@@ -221,7 +221,6 @@ const menuOpened = ref(false);
                         background-color: $quaternary-bg;
                     }
                 }
-
                 &:hover {
                     background-color: $senary-bg;
                 }
