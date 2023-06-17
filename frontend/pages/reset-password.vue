@@ -180,10 +180,15 @@ const send = async () => {
             background-color: $tertiary-bg;
             padding: 10px;
             text-align: center;
+
+            &:not(.message) {
+                @include flex-center;
+            }
         }
         .value {
             background-color: $quaternary-bg;
             overflow-wrap: anywhere;
+
 
             &.message {
                 text-align: left;
