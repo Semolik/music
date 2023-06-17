@@ -1,10 +1,22 @@
 import uuid
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from backend.db.base_class import Base
 from backend.core.config import env_config
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+import enum
+
+
+class SupportMessageStatus(enum.Enum):
+    PENDING = 'pending'
+    RESOLVED = 'resolved'
+    REJECTED = 'rejected'
+
+
+class SupportMessageType(enum.Enum):
+    PASSWORD_RECOVERY = 'password_recovery'
+    SUPPORT = 'support'
 
 
 class SupportMessage(Base):
@@ -34,7 +46,14 @@ class SupportMessage(Base):
         ),
         nullable=False
     )
-    is_resolved = Column(Boolean, default=False)
+    status = Column(
+        Enum(SupportMessageStatus),
+        default=SupportMessageStatus.PENDING
+    )
+    type = Column(
+        Enum(SupportMessageType),
+        default=SupportMessageType.SUPPORT
+    )
     created_at = Column(DateTime, server_default=func.now())
 
     @property

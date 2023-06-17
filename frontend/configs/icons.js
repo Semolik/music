@@ -40,4 +40,5 @@ export const IconsNames = {
     clipIcon: "material-symbols:video-library",
     adminIcon: "material-symbols:admin-panel-settings",
     fileIcon: "material-symbols:file-present-rounded",
+    supportIcon: "material-symbols:contact-support",
 };

@@ -39,4 +39,12 @@ const loadMore = async () => {
     fetching.value = false;
 };
 loadMore();
+const resetPage = () => {
+    page.value = 0;
+    items.value = [];
+    loadMore();
+};
+defineExpose({
+    resetPage,
+});
 </script>

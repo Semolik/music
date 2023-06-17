@@ -201,6 +201,9 @@ export default defineNuxtConfig({
             MAX_SUPPORT_MESSAGE_LENGTH: Number(
                 process.env.MAX_SUPPORT_MESSAGE_LENGTH
             ),
+            SUPPORT_MESSAGES_PAGE_SIZE: Number(
+                process.env.SUPPORT_MESSAGES_PAGE_SIZE
+            ),
         },
     },
 });

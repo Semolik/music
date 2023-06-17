@@ -36,5 +36,12 @@ const linksAll = [
         },
         icon: IconsNames.imageIcon,
     },
+    {
+        text: "Запросы в поддержку",
+        to: {
+            name: routesNames.adminCabinet.cabinetSupport,
+        },
+        icon: IconsNames.supportIcon,
+    },
 ];
 </script>

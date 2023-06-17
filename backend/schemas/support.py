@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from fastapi import Query
 import uuid
 from backend.core.config import env_config
-
 from backend.schemas.user import UserInfo
+from backend.models.support import SupportMessageStatus, SupportMessageType
 
 
 class SupportMessageBase(BaseModel):
@@ -13,6 +13,10 @@ class SupportMessageBase(BaseModel):
                        max_length=int(env_config.get('MAX_EMAIL_LENGTH')))
     message: str = Query(..., description="Сообщение", max_length=int(
         env_config.get('MAX_SUPPORT_MESSAGE_LENGTH')))
+    type: SupportMessageType = Query(
+        default=SupportMessageType.SUPPORT,
+        description="Тип сообщения"
+    )
 
 
 class CreateSupportMessage(SupportMessageBase):
@@ -22,8 +26,11 @@ class CreateSupportMessage(SupportMessageBase):
 
 class SupportMessage(SupportMessageBase):
     id: uuid.UUID = Query(..., description="ID сообщения")
-    is_resolved: bool = Query(...,
-                              description="Решено ли сообщение")
+    status: SupportMessageStatus = Query(
+        ...,
+        description="Статус сообщения"
+    )
+
     created_at: datetime = Query(...,
                                  description="Дата создания сообщения")
 

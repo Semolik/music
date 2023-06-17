@@ -1,10 +1,11 @@
 from uuid import UUID
 from backend.helpers.auth_helper import Authenticate
-from fastapi import Depends, APIRouter, HTTPException, Path, status
+from fastapi import Depends, APIRouter, HTTPException, Path, Query, status
 from backend.core.config import settings
-from backend.schemas.support import SupportMessage, CreateSupportMessage, SupportMessageLogin
+from backend.schemas.support import CreateSupportMessage, SupportMessageLogin, SupportMessageFull
 from backend.crud.crud_support import SupportCrud
 from backend.crud.crud_user import UserCruds
+from backend.models.support import SupportMessageType
 router = APIRouter(tags=['Поддержка'], prefix='/support')
 
 
@@ -28,7 +29,8 @@ def create_support_message(
     return SupportCrud(auth.db).create_support_message(
         user_id=db_user.id,
         email=support_message.email,
-        message=support_message.message
+        message=support_message.message,
+        type=support_message.type
     )
 
 
@@ -49,3 +51,12 @@ def get_support_message(
             detail="Нельзя получать сообщения от чужого имени"
         )
     return db_support_message
+
+
+@router.get('/messages', response_model=list[SupportMessageLogin])
+def get_support_messages(
+    type: SupportMessageType = None,
+    page: int = Query(1, description="Номер страницы", gt=0),
+    auth: Authenticate = Depends(Authenticate(is_admin=True)),
+):
+    return SupportCrud(auth.db).get_messages(type=type, page=page)
