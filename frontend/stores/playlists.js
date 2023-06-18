@@ -56,5 +56,8 @@ export const usePlaylistsStore = defineStore({
                 return playlist;
             });
         },
+        addPlaylistToCache(playlist) {
+            this.playlists_cache.push(playlist);
+        },
     },
 });

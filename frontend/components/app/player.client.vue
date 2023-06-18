@@ -83,6 +83,7 @@
                                 @update:addToPlaylistModalOpened="
                                     addToPlaylistModalOpened = $event
                                 "
+                                v-model:shareModalOpened="shareModalOpened"
                                 v-model:menuOpened="menuOpened"
                                 v-model:clipModalOpeneded="clipModalOpeneded"
                                 modal-mode
@@ -112,6 +113,7 @@ const setPause = (value) => {
     paused.value = value;
     setting_pause.value = false;
 };
+const shareModalOpened = ref(false);
 const handleBeforePlay = async (next) => {
     if (logined.value) {
         try {

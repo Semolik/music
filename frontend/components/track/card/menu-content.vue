@@ -102,7 +102,12 @@
                 </AppButton>
                 <PlaylistCreateModalContent
                     v-if="createMode"
-                    @creared="closeAddToPlaylistModal"
+                    @creared="
+                        (playlist) => {
+                            playlistsStore.addPlaylistToCache(playlist);
+                            addTrackToPlaylist(playlist.id);
+                        }
+                    "
                 />
                 <template v-else>
                     <div class="playlists">

@@ -47,6 +47,10 @@ const items = computed(() => [
         left: true,
     },
     {
+        title: "Указанная почта",
+        value: support_request.value.email,
+    },
+    {
         title: "Статус",
         value: getStatusName(support_request.value.status),
     },
