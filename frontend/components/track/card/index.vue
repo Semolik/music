@@ -74,6 +74,7 @@
                                 "
                                 v-model:clipModalOpeneded="clipModalOpeneded"
                                 v-model:menuOpened="menuOpened"
+                                v-model:shareModalOpened="shareModalOpened"
                                 @playlist-remove-track="
                                     emit('playlist-remove-track', $event)
                                 "
@@ -180,7 +181,7 @@ const toggleLikeTrack = async () => {
 
 const addToPlaylistModalOpened = ref(false);
 const menuOpened = ref(false);
-
+const shareModalOpened = ref(false);
 const dotsButton = ref(null);
 const handleCardClick = (event) => {
     if (event.target === dotsButton.value) return;
@@ -194,6 +195,7 @@ onMounted(() => {
     onClickOutside(dotsButton, (event) => {
         if (clipModalOpeneded.value) return;
         if (addToPlaylistModalOpened.value) return;
+        if (shareModalOpened.value) return;
         menuOpened.value = false;
     });
 });

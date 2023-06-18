@@ -43,6 +43,7 @@ const onNextPage = async (page) => {
     display: flex;
     flex-direction: column;
     gap: 5px;
+
     .support-messages-list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

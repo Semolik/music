@@ -8,6 +8,7 @@
         <template #content>
             <ShareSocial :link="trackLink" />
             <AppButtonCopy :value="trackLink" />
+            {{ trackLink }}
         </template>
     </ShareModal>
 </template>
@@ -26,6 +27,7 @@ const { active, track } = defineProps({
 const trackLink = ref("");
 onMounted(() => {
     trackLink.value = window.location.origin + "/track/" + track.id;
+    console.log(trackLink.value);
 });
 const emit = defineEmits(["update:active"]);
 </script>

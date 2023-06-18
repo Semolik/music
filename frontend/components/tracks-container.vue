@@ -65,7 +65,7 @@ if (cut) {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: 100%;
+    height: min-content;
     &.grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

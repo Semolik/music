@@ -21,6 +21,7 @@ const { paused } = defineProps({
     top: 0;
     left: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
     z-index: 1;
     svg {
         color: $accent;

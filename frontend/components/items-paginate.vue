@@ -2,12 +2,16 @@
     <CardsContainer v-bind="$attrs" v-if="!isTracks">
         <slot :items="items" />
         <NotFound v-if="!items.length && !fetching" />
-        <AppButton v-if="loadMoreButton">Загрузить еще</AppButton>
+        <AppButton v-if="loadMoreButton" @click="loadMore" active>
+            Загрузить еще
+        </AppButton>
     </CardsContainer>
     <TracksContainer v-else v-bind="$attrs">
         <slot :items="items" />
         <NotFound v-if="!items.length && !fetching" />
-        <AppButton v-if="loadMoreButton">Загрузить еще</AppButton>
+        <AppButton v-if="loadMoreButton" @click="loadMore" active>
+            Загрузить еще
+        </AppButton>
     </TracksContainer>
 </template>
 <script setup>

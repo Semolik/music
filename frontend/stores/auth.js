@@ -43,7 +43,6 @@ export const useAuthStore = defineStore({
             try {
                 await Service.logoutApiV1AuthLogoutDelete();
             } catch (error) {}
-
             this.logout();
         },
         async loginRequest(username, password) {

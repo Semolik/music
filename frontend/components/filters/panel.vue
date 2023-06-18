@@ -4,7 +4,7 @@
         <div
             v-for="(name, key) in items"
             :class="['filter', { active: active === key }, key]"
-            @click="onChangeFilter(key)"
+            @click="emit('update:active', key)"
         >
             {{ name }}
         </div>
@@ -22,9 +22,6 @@ const { items, active } = defineProps({
     },
 });
 const emit = defineEmits(["update:active"]);
-const onChangeFilter = (key) => {
-    emit("update:active", key);
-};
 </script>
 <style scoped lang="scss">
 .filters-panel {

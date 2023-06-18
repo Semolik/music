@@ -11,6 +11,7 @@
                     onClick: () => deleteTrackFromHistory(history_item.id),
                 },
             ]"
+            :onCardClick="() => playTrack(history_item.track)"
         />
         <NotFound v-if="!history_tracks.length && !fetching" />
         <AppButton @click="getNextPage" active v-if="showNextButton">
@@ -23,10 +24,13 @@
 import { IconsNames } from "~/configs/icons";
 import { Service } from "~/client";
 import NotFound from "~/components/not-found.vue";
+import { usePlayerStore } from "~/stores/player";
+const playerStore = usePlayerStore();
 const { HISTORY_ALL_TRACKS_LIMIT } = useRuntimeConfig().public;
 useHead({
     title: "История",
 });
+
 const history_tracks = ref([]);
 const showNextButton = ref(false);
 const page = ref(0);
@@ -41,6 +45,11 @@ const getNextPage = async () => {
     showNextButton.value =
         new_history_tracks.length == HISTORY_ALL_TRACKS_LIMIT;
     fetching.value = false;
+};
+const tracks = computed(() => history_tracks.value.map((item) => item.track));
+const playTrack = (track) => {
+    playerStore.setTracks(tracks.value, { ...track });
+    playerStore.toggleCurrentTrack();
 };
 getNextPage();
 const deleteTrackFromHistory = async (history_item_id) => {

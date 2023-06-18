@@ -42,9 +42,8 @@ const statuses = {
     [ChangeRoleRequestStatus.REJECTED]: "Отклонен",
 };
 const status = ref(ChangeRoleRequestStatus.IN_PROGRESS);
-const showStatus = computed(() => status.value === null);
+const showStatus = computed(() => status.value === "all");
 const getRequests = async (page, filter) => {
-    console.log(filter);
     return await Service.getAllChangeRoleRequestsApiV1RolesChangeAllGet(
         page,
         filter === null ? undefined : filter

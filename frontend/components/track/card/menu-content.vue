@@ -75,7 +75,7 @@
         :class="['menu-item', { 'modal-mode': modalMode }]"
         @click="
             () => {
-                shareModalOpened = true;
+                emit('update:shareModalOpened', true);
             }
         "
     >
@@ -135,7 +135,7 @@
     </ModalDialog>
     <ShareTrackModal
         :active="shareModalOpened"
-        @update:active="shareModalOpened = $event"
+        @update:active="emit('update:shareModalOpened', $event)"
         :track="track"
     />
 </template>
@@ -162,6 +162,7 @@ const {
     albumInfo,
     clipModalOpeneded,
     modalMode,
+    shareModalOpened,
 } = defineProps({
     track: {
         type: Object,
@@ -203,10 +204,14 @@ const {
         type: Boolean,
         default: false,
     },
+    shareModalOpened: {
+        type: Boolean,
+        default: false,
+    },
 });
 const musicianLink = computed(() => useMusicianLink(musicanInfo, track));
 const albumLink = computed(() => useAlbumLink(albumInfo, track));
-const shareModalOpened = ref(false);
+
 const goToLoginBus = useEventBus("go-to-login");
 const toggleLikeTrack = async () => {
     if (!logined.value) {
@@ -229,7 +234,9 @@ const emit = defineEmits([
     "update:track",
     "playlist-remove-track",
     "update:clipModalOpeneded",
+    "update:shareModalOpened",
 ]);
+
 const route = useRoute();
 watch(route, () => {
     addToPlaylistModalOpenedLocal.value = false;

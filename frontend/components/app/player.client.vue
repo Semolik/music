@@ -210,8 +210,13 @@ const menuOpened = ref(false);
                         display: none;
                     }
                 }
-                &.like.active {
-                    color: $accent-red;
+                &.like {
+                    @include sm(true) {
+                        display: none;
+                    }
+                    &.active {
+                        color: $accent-red;
+                    }
                 }
                 &.disabled {
                     background-color: $quaternary-bg;
@@ -261,9 +266,14 @@ const menuOpened = ref(false);
                 text-overflow: ellipsis;
                 .musician-name {
                     color: $secondary-text;
+                    @include clip-text(1);
+
                     &:hover {
                         color: $accent;
                     }
+                }
+                .track-nanme {
+                    @include clip-text(1);
                 }
             }
         }

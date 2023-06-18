@@ -1,16 +1,20 @@
 <template>
-    <div class="share-social">
-        <div class="share-item tg">
-            <a :href="`https://t.me/share/url?url=${link}`" target="_blank">
-                <Icon :name="IconsNames.telegramIcon" />
-            </a>
-        </div>
-        <div class="share-item vk">
-            <a :href="`https://vk.com/share.php?url=${link}`" target="_blank">
-                <Icon :name="IconsNames.vkIcon" />
-            </a>
-        </div>
-    </div>
+    <a class="share-social">
+        <a
+            :href="`https://t.me/share/url?url=${link}`"
+            target="_blank"
+            class="share-item tg"
+        >
+            <Icon :name="IconsNames.telegramIcon" />
+        </a>
+        <a
+            :href="`https://vk.com/share.php?url=${link}`"
+            target="_blank"
+            class="share-item vk"
+        >
+            <Icon :name="IconsNames.vkIcon" />
+        </a>
+    </a>
 </template>
 <script setup>
 import { IconsNames } from "~~/configs/icons";
@@ -31,11 +35,22 @@ const { link } = defineProps({
         border-radius: 10px;
         @include flex-center;
         cursor: pointer;
+        $tg-color: #0088cc;
+        $vk-color: #4a76a8;
+
         &.tg {
-            background-color: #0088cc;
+            background-color: $tg-color;
+
+            &:hover {
+                background-color: darken($tg-color, 10%);
+            }
         }
         &.vk {
-            background-color: #0077ff;
+            background-color: $vk-color;
+
+            &:hover {
+                background-color: darken($vk-color, 10%);
+            }
         }
         svg {
             width: 50px;

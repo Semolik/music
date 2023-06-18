@@ -178,6 +178,10 @@ const send = async () => {
         &.resolved {
             background-color: $accent;
         }
+
+        &.rejected {
+            background-color: $accent-error;
+        }
     }
     .mail-message {
         color: $secondary-text;

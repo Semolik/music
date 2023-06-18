@@ -5,7 +5,7 @@ from backend.models.files import Image
 from sqlalchemy.sql import or_
 from backend.crud.crud_file import FileCruds
 from backend.core.config import settings, env_config
-from backend.models.support import SupportMessage, SupportMessageType
+from backend.models.support import SupportMessage, SupportMessageStatus, SupportMessageType
 
 
 class SupportCrud(CRUDBase):
@@ -29,3 +29,7 @@ class SupportCrud(CRUDBase):
         if type:
             query = query.filter(SupportMessage.type == type)
         return query.order_by(SupportMessage.created_at.desc()).slice(start, end).all()
+
+    def update_support_message(self, db_message: SupportMessage, status: SupportMessageStatus) -> SupportMessage:
+        db_message.status = status
+        return self.update(db_message)

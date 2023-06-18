@@ -5,7 +5,7 @@ from backend.core.config import settings
 from backend.schemas.support import CreateSupportMessage, SupportMessageLogin, SupportMessageFull
 from backend.crud.crud_support import SupportCrud
 from backend.crud.crud_user import UserCruds
-from backend.models.support import SupportMessageType
+from backend.models.support import SupportMessageType, SupportMessageStatus
 router = APIRouter(tags=['Поддержка'], prefix='/support')
 
 
@@ -60,3 +60,22 @@ def get_support_messages(
     auth: Authenticate = Depends(Authenticate(is_admin=True)),
 ):
     return SupportCrud(auth.db).get_messages(type=type, page=page)
+
+
+@router.put('/messages/{message_id}', response_model=SupportMessageLogin)
+def update_support_message(
+    message_id: UUID = Path(..., description="ID сообщения"),
+    message_status: SupportMessageStatus = Query(
+        ..., description="Статус сообщения"),
+    auth: Authenticate = Depends(Authenticate(is_admin=True))
+):
+    db_support_message = SupportCrud(auth.db).get_message_by_id(message_id)
+    if not db_support_message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Сообщение не найдено"
+        )
+    return SupportCrud(auth.db).update_support_message(
+        db_message=db_support_message,
+        status=message_status
+    )

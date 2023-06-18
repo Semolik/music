@@ -1,8 +1,14 @@
 <template>
-    <nuxt-link class="item">
+    <nuxt-link
+        class="item"
+        :to="{
+            name: routesNames.adminCabinet.cabinetSupportId,
+            params: { id: item.id },
+        }"
+    >
         <div class="line">
             <div class="login">
-                {{ item.user.username }}
+                {{ item.login }}
             </div>
             <div class="date">
                 {{ date }}
@@ -15,6 +21,7 @@
 </template>
 <script setup>
 import moment from "moment";
+import { routesNames } from "@typed-router";
 const { item } = defineProps({
     item: Object,
 });
@@ -40,6 +47,10 @@ const date = moment(item.created_at).format("DD.MM.YYYY HH:mm");
 
     &:hover {
         background-color: $quinary-bg;
+
+        .message {
+            background-color: $senary-bg;
+        }
     }
     .login {
         overflow: hidden;
@@ -48,10 +59,11 @@ const date = moment(item.created_at).format("DD.MM.YYYY HH:mm");
 
     .message {
         overflow-wrap: anywhere;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 1;
-        overflow: hidden;
+        @include clip-text(2);
+        background-color: $quinary-bg;
+        padding: 10px;
+        flex-grow: 1;
+        border-radius: 5px;
     }
 }
 </style>
