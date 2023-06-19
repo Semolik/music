@@ -68,7 +68,7 @@
                         :loading="uploading"
                         @click="props.track.id ? updateTrack() : createTrack()"
                     >
-                        {{ props.track.id ? "Загрузить" : "Обновить" }}
+                        {{ props.track.id ? "Обновить" : "Загрузить" }}
                     </AppButton>
                 </div>
             </div>
