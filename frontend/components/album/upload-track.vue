@@ -76,7 +76,7 @@
                 @file="track_file = $event"
                 ref="fileUploader"
                 :file-size="MAX_TRACK_FILE_SIZE_MB"
-                :file-types="['audio/mpeg', 'audio/mp3']"
+                :file-types="['audio/mpeg', 'audio/mp3', 'audio/flac']"
             />
         </div>
     </div>
