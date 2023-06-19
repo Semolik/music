@@ -66,9 +66,9 @@
                         class="upload"
                         :active="buttonActive"
                         :loading="uploading"
-                        @click="track.new ? createTrack() : updateTrack()"
+                        @click="!track.id ? createTrack() : updateTrack()"
                     >
-                        {{ track.new ? "Загрузить" : "Обновить" }}
+                        {{ track.id ? "Загрузить" : "Обновить" }}
                     </AppButton>
                 </div>
             </div>
@@ -110,43 +110,45 @@ const deleteTrackModalOpened = ref(false);
 const uploading = ref(false);
 const track_file = ref(null);
 const blobPicture = ref(null);
-const track = ref(Object.assign({}, props.track));
+const track = reactive({
+    ...props.track,
+});
 
 const OpenDeleteTrackModal = () => {
-    if (track.value.new) {
+    if (!track.id) {
         emit("delete");
         return;
     }
     deleteTrackModalOpened.value = true;
 };
 const handleSelectSuccess = (file) => {
-    track.value.picture = URL.createObjectURL(file);
+    track.picture = URL.createObjectURL(file);
     blobPicture.value = file;
 };
 const fileUploader = ref(null);
 const nameError = computed(
     () =>
-        track.value.name.length < MIN_TRACK_NAME_LENGTH &&
-        track.value.name.length <= MAX_TRACK_NAME_LENGTH
+        track.name.length < MIN_TRACK_NAME_LENGTH &&
+        track.name.length <= MAX_TRACK_NAME_LENGTH
 );
 const featError = computed(() =>
-    track.value.feat ? track.value.feat.length > MAX_TRACK_FEAT_LENGTH : false
+    track.feat ? track.feat.length > MAX_TRACK_FEAT_LENGTH : false
 );
 const buttonActive = computed(
     () =>
         !nameError.value &&
         !featError.value &&
-        (track.value?.new
+        (!track?.id
             ? !!track_file.value && !!blobPicture.value
-            : track.value.name !== props.track.name ||
-              track.value.feat !== props.track.feat ||
+            : track.name !== props.track.name ||
+              track.feat !== props.track.feat ||
               !!track_file.value ||
               !!blobPicture.value)
 );
 
-const editOpened = ref(!!props.track.new);
+const editOpened = ref(!props.track.id);
 const toggleEdit = () => {
-    if (track.value.new || (editOpened.value && buttonActive.value)) return;
+    if (!track.id || (editOpened.value && buttonActive.value)) return;
     editOpened.value = !editOpened.value;
 };
 
@@ -154,17 +156,17 @@ const createTrack = async () => {
     if (!buttonActive.value) return;
     if (uploading.value) return;
     uploading.value = true;
-    track.value = await Service.uploadTrackApiV1AlbumsAlbumIdTrackPost(
+    const new_track = await Service.uploadTrackApiV1AlbumsAlbumIdTrackPost(
         props.albumId,
         {
             trackPicture: blobPicture.value,
             track: track_file.value,
-            name: track.value.name,
-            feat: track.value.feat,
+            name: track.name,
+            feat: track.feat,
         }
     );
     uploading.value = false;
-    emit("update", track.value);
+    emit("update", new_track);
     blobPicture.value = null;
     track_file.value = null;
 };
@@ -173,17 +175,17 @@ const updateTrack = async () => {
     if (!buttonActive.value) return;
     if (uploading.value) return;
     uploading.value = true;
-    track.value = await Service.updateTrackByIdApiV1TracksTrackIdPut(
-        track.value.id,
+    const updated_track = await Service.updateTrackByIdApiV1TracksTrackIdPut(
+        track.id,
         {
             trackPicture: blobPicture.value,
             track: track_file.value,
-            name: track.value.name,
-            feat: track.value.feat,
+            name: track.name,
+            feat: track.feat,
         }
     );
     uploading.value = false;
-    emit("update", track.value);
+    emit("update", updated_track);
     blobPicture.value = null;
     track_file.value = null;
 };
@@ -191,7 +193,7 @@ const updateTrack = async () => {
 const deleteTrack = async () => {
     if (uploading.value) return;
     uploading.value = true;
-    await Service.deleteTrackApiV1TracksTrackIdDelete(track.value.id);
+    await Service.deleteTrackApiV1TracksTrackIdDelete(track.id);
     uploading.value = false;
     emit("delete");
 };
