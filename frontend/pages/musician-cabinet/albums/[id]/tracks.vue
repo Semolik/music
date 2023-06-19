@@ -81,8 +81,7 @@ const addTrack = () => {
         duration: 0,
         file: null,
         feat: "",
-        new: true,
-        picture: null,
+        picture: album.value.picture,
         musician: musicianProfile.value,
     });
 };

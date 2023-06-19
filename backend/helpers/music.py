@@ -25,7 +25,7 @@ from backend.schemas.music import Track as TrackSchema
 from backend.models.albums import Album
 
 
-def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Image, user_id: int, track: UploadTrackForm):
+def save_track(db: Session, album_id: int, upload_file: UploadFile, picture_id: UUID, user_id: int, track: UploadTrackForm):
     buf = io.BytesIO()
     shutil.copyfileobj(upload_file.file, buf)
     buf.seek(0)
@@ -33,7 +33,6 @@ def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Ima
         segment = AudioSegment.from_file(buf)
         artist_public_profile = UserCruds(
             db).get_public_profile(user_id=user_id)
-        db_picture = picture
         db_track = CRUDBase(db).create(
             Track(
                 artist_id=artist_public_profile.id,
@@ -41,7 +40,7 @@ def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Ima
                 feat=track.feat,
                 duration=round(segment.duration_seconds),
                 album_id=album_id,
-                picture=db_picture,
+                picture_id=picture_id
             )
         )
         ext = settings.SONGS_EXTENTION
@@ -49,7 +48,8 @@ def save_track(db: Session, album_id: int, upload_file: UploadFile, picture: Ima
                        format=ext.replace('.', ''))
         return db_track
     except:
-        raise HTTPException(status_code=422, detail="поврежденный файл")
+        raise HTTPException(
+            status_code=422, detail="поврежденный файл")
 
 
 def update_track(db: Session, track: Track, track_form: TrackSchema, picture: Image, upload_file: UploadFile):
@@ -64,7 +64,8 @@ def update_track(db: Session, track: Track, track_form: TrackSchema, picture: Im
                            format=ext.replace('.', ''))
             track.duration = round(segment.duration_seconds)
         except:
-            raise HTTPException(status_code=422, detail="поврежденный файл")
+            raise HTTPException(
+                status_code=422, detail="поврежденный файл")
     if picture:
         track.picture = FileCruds(db).replace_old_picture(
             model=track.picture, new_picture=picture)

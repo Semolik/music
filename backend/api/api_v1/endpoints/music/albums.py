@@ -245,7 +245,7 @@ def get_album_info_by_id(
 def upload_track(
     album_id: int = Path(..., description='ID альбома'),
     trackData: UploadTrackForm = Depends(UploadTrackForm),
-    trackPicture: UploadFile = File(..., description="Изображение трека"),
+    trackPicture: UploadFile = File(None, description="Изображение трека"),
     track: UploadFile = File(..., description="Файл трека",
                              media_type='audio/mpeg'),
     Auth: Authenticate = Depends(Authenticate(is_musician=True)),
@@ -267,14 +267,14 @@ def upload_track(
         db=Auth.db,
         upload_file=trackPicture,
         user_id=Auth.current_user_id,
-    )
+    ).id if trackPicture else None
     db_track = save_track(
         album_id=album_id,
         db=Auth.db,
         upload_file=track,
         user_id=Auth.current_user_id,
         track=trackData,
-        picture=db_image
+        picture_id=db_image
     )
     return db_track
 

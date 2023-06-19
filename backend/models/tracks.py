@@ -11,6 +11,7 @@ from backend.core.config import settings
 from sqlalchemy.ext.hybrid import hybrid_property
 from backend.models.albums import Album
 from backend.models.clips import Clip
+from backend.models.files import Image
 
 
 class FavoriteTracks(Base):
@@ -93,13 +94,13 @@ class Track(Base):
     track_position = Column(Integer)
     picture_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("images.id")
+        ForeignKey("images.id", ondelete="CASCADE")
     )
-    picture = relationship(
-        "Image",
-        foreign_keys=[picture_id],
-        cascade="all,delete",
-    )
+
+    @property
+    def picture(self):
+        picture_id = self.picture_id or self.album.picture_id
+        return object_session(self).query(Image).filter_by(id=picture_id).first()
 
     @hybrid_property
     def is_opened(self):

@@ -139,7 +139,7 @@ const buttonActive = computed(
         !nameError.value &&
         !featError.value &&
         (!track?.id
-            ? !!track_file.value && !!blobPicture.value
+            ? !!track_file.value
             : track.name !== props.track.name ||
               track.feat !== props.track.feat ||
               !!track_file.value ||
