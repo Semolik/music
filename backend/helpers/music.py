@@ -66,9 +66,13 @@ def update_track(db: Session, track: Track, track_form: TrackSchema, picture: Im
         except:
             raise HTTPException(
                 status_code=422, detail="поврежденный файл")
+
     if picture:
-        track.picture = FileCruds(db).replace_old_picture(
-            model=track.picture, new_picture=picture)
+        if track.picture_id:
+            FileCruds(db).delete(track.picture)
+            track.picture_id = picture.id
+        else:
+            track.picture_id = picture.id
     track.name = track_form.name
     track.feat = track_form.feat
     db.commit()

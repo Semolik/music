@@ -94,7 +94,7 @@ class Track(Base):
     track_position = Column(Integer)
     picture_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("images.id", ondelete="CASCADE")
+        ForeignKey("images.id", ondelete="SET NULL")
     )
 
     @property

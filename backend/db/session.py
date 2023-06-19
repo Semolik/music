@@ -18,6 +18,9 @@ engine = create_engine(
     settings.DATABASE_URI,
 )
 
+if not database_exists(engine.url):
+    create_database(engine.url)
+
 Base.metadata.create_all(engine)
 
 

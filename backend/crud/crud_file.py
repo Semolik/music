@@ -5,7 +5,7 @@ from backend.models.files import Image, File
 
 class FileCruds(CRUDBase):
 
-    def replace_old_picture(self, model, new_picture) -> Image:
+    def replace_old_picture(self, model, new_picture):
         picture: Image = model.picture
         model.picture = new_picture
         self.update(model)

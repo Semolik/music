@@ -7,6 +7,7 @@ from backend.crud.crud_albums import AlbumsCruds
 from backend.crud.crud_user import UserCruds
 from backend.crud.crud_tracks import TracksCrud
 from backend.helpers.auth_helper import Authenticate
+from backend.helpers.images import save_image
 from backend.helpers.music import update_track
 from backend.models.albums import Album
 from backend.schemas.music import Track, UploadTrackForm
@@ -130,11 +131,16 @@ def update_track_by_id(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Нельзя изменить трек, из уже загруженного альбома")
+    db_image = save_image(
+        db=Auth.db,
+        upload_file=trackPicture,
+        user_id=Auth.current_user_id,
+    ) if trackPicture else None
     db_track = update_track(
         db=Auth.db,
         track=db_track,
         track_form=trackData,
-        picture=trackPicture,
+        picture=db_image,
         upload_file=track
     )
     return db_track

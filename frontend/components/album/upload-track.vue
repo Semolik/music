@@ -66,9 +66,9 @@
                         class="upload"
                         :active="buttonActive"
                         :loading="uploading"
-                        @click="!track.id ? createTrack() : updateTrack()"
+                        @click="props.track.id ? updateTrack() : createTrack()"
                     >
-                        {{ track.id ? "Загрузить" : "Обновить" }}
+                        {{ props.track.id ? "Загрузить" : "Обновить" }}
                     </AppButton>
                 </div>
             </div>
@@ -105,6 +105,7 @@ const props = defineProps({
         required: false,
     },
 });
+
 const deleteTrackModalOpened = ref(false);
 
 const uploading = ref(false);
@@ -112,10 +113,11 @@ const track_file = ref(null);
 const blobPicture = ref(null);
 const track = reactive({
     ...props.track,
+    feat: props.track.feat || "",
 });
 
 const OpenDeleteTrackModal = () => {
-    if (!track.id) {
+    if (!props.track.id) {
         emit("delete");
         return;
     }
@@ -138,17 +140,17 @@ const buttonActive = computed(
     () =>
         !nameError.value &&
         !featError.value &&
-        (!track?.id
+        (!props.track?.id
             ? !!track_file.value
             : track.name !== props.track.name ||
-              track.feat !== props.track.feat ||
+              track.feat !== (props.track.feat || "") ||
               !!track_file.value ||
               !!blobPicture.value)
 );
 
 const editOpened = ref(!props.track.id);
 const toggleEdit = () => {
-    if (!track.id || (editOpened.value && buttonActive.value)) return;
+    if (!props.track.id || (editOpened.value && buttonActive.value)) return;
     editOpened.value = !editOpened.value;
 };
 
@@ -176,7 +178,7 @@ const updateTrack = async () => {
     if (uploading.value) return;
     uploading.value = true;
     const updated_track = await Service.updateTrackByIdApiV1TracksTrackIdPut(
-        track.id,
+        props.track.id,
         {
             trackPicture: blobPicture.value,
             track: track_file.value,
