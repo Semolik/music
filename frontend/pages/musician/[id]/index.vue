@@ -24,7 +24,7 @@
                 }"
                 v-if="musician.popular.tracks.length"
             >
-                <TracksContainer grid :animate="false">
+                <TracksContainer grid :animate="false" cut>
                     <TrackCard
                         v-for="(track, index) in musician.popular.tracks"
                         :track="track"

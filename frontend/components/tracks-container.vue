@@ -41,7 +41,7 @@ if (cut) {
             (value) => {
                 const elements = tracksContainer.value.children;
 
-                const cut_els = (value === 1 ? 6 : 3) * value;
+                const cut_els = (value === 1 ? 6 : 2) * value;
                 for (let i = 0; i < elements.length; i++) {
                     if (i >= cut_els) {
                         elements[i].style.display = "none";
