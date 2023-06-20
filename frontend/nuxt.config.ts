@@ -21,6 +21,7 @@ export default defineNuxtConfig({
                 lang: "ru",
                 class: "dark",
             },
+            link: [{ rel: "icon", type: "image/png", href: "/favicon.png" }],
         },
     },
     viewport: {
