@@ -67,6 +67,7 @@
                                 :addToPlaylistModalOpened="
                                     addToPlaylistModalOpened
                                 "
+                                :playlist-id="playlistId"
                                 :menu-buttons="menuButtons"
                                 :musican-info="musicanInfo"
                                 @update:addToPlaylistModalOpened="
