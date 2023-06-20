@@ -20,6 +20,14 @@
 
 ## [Альбом](/docs/album/README.md)
 
+## ER диаграмма базы данных
+
+<img src="frontend/public/er.png">
+
+## Структура сайта
+
+<img src="frontend/public/sitemap.png">
+
 <h1>Настройка</h1>
 
 <h3>Зависимости</h3>
