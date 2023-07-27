@@ -22,11 +22,11 @@
 
 ## ER диаграмма базы данных
 
-<img src="frontend/public/er.png">
+<img src="docs/er.png">
 
 ## Структура сайта
 
-<img src="frontend/public/sitemap.png">
+<img src="docs/db.svg">
 
 <h1>Настройка</h1>
 
