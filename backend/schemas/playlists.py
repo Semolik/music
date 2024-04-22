@@ -3,9 +3,9 @@ from enum import Enum
 from typing import List
 from uuid import UUID
 from pydantic import BaseModel
-from backend.schemas.music import Track
-from backend.schemas.playlists_base import PlaylistInfoBase
-from backend.schemas.user import UserInfo
+from schemas.music import Track
+from schemas.playlists_base import PlaylistInfoBase
+from schemas.user import UserInfo
 from fastapi import Query
 
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi import Query
 import uuid
 
-from backend.schemas.music import Genre, GenreWithoutLiked
+from schemas.music import Genre, GenreWithoutLiked
 
 
 class UsersStats(BaseModel):

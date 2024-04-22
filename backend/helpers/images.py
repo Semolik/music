@@ -1,11 +1,11 @@
-from backend.models.files import Image
-from backend.core.config import settings
+from models.files import Image
+from core.config import settings
 import io
 from PIL import Image as pillow
 import logging
 import shutil
 from fastapi import UploadFile, HTTPException
-from backend.crud.crud_file import FileCruds
+from crud.crud_file import FileCruds
 from pathlib import Path
 from sqlalchemy.orm import Session
 from uuid import UUID

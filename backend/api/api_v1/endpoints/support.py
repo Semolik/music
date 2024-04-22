@@ -1,11 +1,11 @@
 from uuid import UUID
-from backend.helpers.auth_helper import Authenticate
+from helpers.auth_helper import Authenticate
 from fastapi import Depends, APIRouter, HTTPException, Path, Query, status
-from backend.core.config import settings
-from backend.schemas.support import CreateSupportMessage, SupportMessageLogin, SupportMessageFull
-from backend.crud.crud_support import SupportCrud
-from backend.crud.crud_user import UserCruds
-from backend.models.support import SupportMessageType, SupportMessageStatus
+from core.config import settings
+from schemas.support import CreateSupportMessage, SupportMessageLogin, SupportMessageFull
+from crud.crud_support import SupportCrud
+from crud.crud_user import UserCruds
+from models.support import SupportMessageType, SupportMessageStatus
 router = APIRouter(tags=['Поддержка'], prefix='/support')
 
 

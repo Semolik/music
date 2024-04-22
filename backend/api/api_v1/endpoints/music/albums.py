@@ -1,17 +1,17 @@
 from typing import List, Union
 from fastapi import Depends, APIRouter, Path,  UploadFile, File, status, HTTPException, Query
-from backend.core.config import settings, env_config
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_user import UserCruds
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.files import valid_content_length
-from backend.helpers.music import album_is_available, save_track
-from backend.helpers.images import save_image
-from backend.helpers.music import validate_genres
-from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
-from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoUploaded, AlbumInfoWithoutMusician, AlbumWithTracks, AlbumWithTracksUploaded, CreateAlbumJson, TrackAfterUpload, UpdateAlbumJson, UploadTrackForm
-from backend.helpers.images import save_image
+from core.config import settings, env_config
+from crud.crud_albums import AlbumsCruds
+from crud.crud_user import UserCruds
+from helpers.auth_helper import Authenticate
+from helpers.files import valid_content_length
+from helpers.music import album_is_available, save_track
+from helpers.images import save_image
+from helpers.music import validate_genres
+from responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_ALBUM,  NOT_FOUND_USER, UNAUTHORIZED_401
+from schemas.base import LikesInfo
+from schemas.music import AlbumAfterUpload, AlbumInfo, AlbumInfoUploaded, AlbumInfoWithoutMusician, AlbumWithTracks, AlbumWithTracksUploaded, CreateAlbumJson, TrackAfterUpload, UpdateAlbumJson, UploadTrackForm
+from helpers.images import save_image
 router = APIRouter(prefix="/albums", tags=['Альбомы'])
 
 

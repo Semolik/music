@@ -1,11 +1,11 @@
 from uuid import UUID
-from backend.crud.crud_slider import SliderCrud
-from backend.helpers.files import valid_content_length
-from backend.schemas.slider import Slide, CreateSlide
-from backend.helpers.images import save_image
-from backend.helpers.auth_helper import Authenticate
+from crud.crud_slider import SliderCrud
+from helpers.files import valid_content_length
+from schemas.slider import Slide, CreateSlide
+from helpers.images import save_image
+from helpers.auth_helper import Authenticate
 from fastapi import Depends, APIRouter, HTTPException, Query, status, UploadFile, File
-from backend.core.config import settings
+from core.config import settings
 
 
 router = APIRouter(tags=['Слайдер'], prefix='/slider')

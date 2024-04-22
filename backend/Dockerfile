@@ -1,24 +1,10 @@
-ARG CACHEBUST=1 
-FROM tiangolo/uvicorn-gunicorn:python3.10
+# Stage 1: Building Python dependencies
+FROM tiangolo/uvicorn-gunicorn:python3.10-slim
+WORKDIR /backend
 
-# Install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg 
+COPY /backend/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Copy .env file
-COPY .env /app
+# Set the command to run your application
+CMD uvicorn main:app --host 0.0.0.0 --port 8000
 
-# Set the working directory to /app
-WORKDIR /app
-
-# Install necessary dependencies
-COPY backend/requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
-
-# Copy the app code to the /app directory
-COPY ./backend /app/backend
-COPY ./.env /app
-# Set the working directory in the container
-WORKDIR /app
-
-# When the container is run, start the API and the uvicorn server
-ENTRYPOINT ["uvicorn", "backend.main:app", "--host", "0.0.0.0"]

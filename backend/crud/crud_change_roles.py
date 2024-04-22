@@ -1,8 +1,8 @@
 from typing import List
-from backend.db.base import CRUDBase
-from backend.core.config import settings
-from backend.models.user import User
-from backend.models.roles import AnswerChangeRoleRequest, ChangeRoleRequest, ChangeRoleRequestStatus
+from db.base import CRUDBase
+from core.config import settings
+from models.user import User
+from models.roles import AnswerChangeRoleRequest, ChangeRoleRequest, ChangeRoleRequestStatus
 
 
 class ChangeRolesCruds(CRUDBase):

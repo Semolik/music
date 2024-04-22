@@ -1,17 +1,17 @@
 {
     "private": true,
     "scripts": {
-        "build": "npm run generate-client-prod && nuxt build --port=4000 --dotenv ../.env",
-        "dev": "npm run generate-client-dev && nuxt dev --port=4000 --dotenv ../.env",
+        "build": "nuxt build --port=4000 --dotenv ../.env",
+        "build-docker": "nuxt build --dotenv .env",
+        "dev": "nuxt dev --port=4000 --dotenv ../.env",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "generate-client-prod": "openapi --input http://localhost:8001/openapi.json --output ./client --client axios",
         "generate-client-dev": "openapi --input http://localhost:8000/openapi.json --output ./client --client axios"
     },
     "config": {
         "nuxt": {
-            "port": 4080
+            "port": 4000
         }
     },
     "devDependencies": {

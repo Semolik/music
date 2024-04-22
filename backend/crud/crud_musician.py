@@ -1,9 +1,9 @@
 from typing import List
-from backend.db.base import CRUDBase
-from backend.models.tracks import FavoriteTracks, Track, ListenTrackHistoryItem
-from backend.models.albums import Album, FavoriteAlbum
-from backend.models.user import FavoriteMusicians, PublicProfile
-from backend.core.config import env_config, settings
+from db.base import CRUDBase
+from models.tracks import FavoriteTracks, Track, ListenTrackHistoryItem
+from models.albums import Album, FavoriteAlbum
+from models.user import FavoriteMusicians, PublicProfile
+from core.config import env_config, settings
 from sqlalchemy import and_, func
 
 

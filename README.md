@@ -28,42 +28,56 @@
 
 <img src="docs/db.svg">
 
-<h1>Настройка</h1>
+<h1>Запуск проекта</h1>
 
-<h3>Зависимости</h3>
+<h3>Переменные окружения</h3>
 
-    - Python 3.10
-    - ffmpeg
-    - PostgreSQL
+Создайте файл `.env.local` в корневой папке с следующим содержимым
 
-<h3>Установка</h3>
+    POSTGRES_DB=*****
+    POSTGRES_PASSWORD=*****
+    POSTGRES_PASSWORD=*****
+    POSTGRES_PORT=5432
+    POSTGRES_HOST=db
 
-    cd backend
-    pip install -r reqirements.txt
+<h3>Запуск в режиме production</h3>
 
-    cd ..
+    docker-compose build
+    docker-compose up
 
-    cd frontend
-    npm i
+Сайт будет доступен по адресу `http://localhost:8080`
 
-<h3>Настройка</h3>
+При первом запуске в консоли напишет логин и пароль администратора
 
-Создайте файл .env.local в корневой папке с следующим содержимым
+<img src="docs/first_start.png">
 
-    DB_NAME=*****
-    DB_USER=*****
-    DB_PASSWORD=*****
-    DB_PORT=5432
-    DB_HOST=localhost
+<h1>Локальная разработка</h1>
 
-<h3>Запуск</h3>
+<h3>Переменные окружения</h3>
+
+Создайте файл `.env.dev.local` в корневой папке с следующим содержимым
+
+    POSTGRES_DB=*****
+    POSTGRES_PASSWORD=*****
+    POSTGRES_PASSWORD=*****
+    POSTGRES_PORT=*****
+    POSTGRES_HOST=db (для postgres в docker-compose)
+
+<h3>Запуск в режиме разработки</h3>
+
+Будет запущено только API
 
 <h4>backend</h4>
 
-    uvicorn backend.main:app --host localhost
+    docker-compose -f docker-compose.dev.yml up
+
+API будет доступно по адресу `http://localhost:8000`
 
 <h4>frontend</h4>
-
-Запускать только после запуска backend (делается запрос для генерации клиента API)
-
+    
     npm run dev
+
+После изменения конечных точек API сгенерируйте API-клиент (backend должен быть запущен в режиме разработки)
+
+    cd frontend
+    npm run generate-client-dev

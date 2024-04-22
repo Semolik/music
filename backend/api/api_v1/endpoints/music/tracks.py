@@ -3,18 +3,18 @@ from typing import List
 from fastapi import Depends, APIRouter, File, Path, UploadFile,  status, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_user import UserCruds
-from backend.crud.crud_tracks import TracksCrud
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.images import save_image
-from backend.helpers.music import update_track
-from backend.models.albums import Album
-from backend.schemas.music import Track, UploadTrackForm
+from crud.crud_albums import AlbumsCruds
+from crud.crud_user import UserCruds
+from crud.crud_tracks import TracksCrud
+from helpers.auth_helper import Authenticate
+from helpers.images import save_image
+from helpers.music import update_track
+from models.albums import Album
+from schemas.music import Track, UploadTrackForm
 import uuid as uuid_pkg
-from backend.core.config import settings
-from backend.schemas.playlists import PlaylistInfoWithoutTracks
-from backend.schemas.statistics import TrackStats
+from core.config import settings
+from schemas.playlists import PlaylistInfoWithoutTracks
+from schemas.statistics import TrackStats
 router = APIRouter(prefix="/tracks", tags=['Треки'])
 
 

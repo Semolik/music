@@ -1,12 +1,12 @@
 from typing import List
 from uuid import UUID
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
-from backend.schemas.playlists import PlaylistInfo,  PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
-from backend.schemas.playlists_base import PlaylistBase, PlaylistCreate
-from backend.core.config import settings
+from crud.crud_playlists import PlaylistsCrud
+from helpers.auth_helper import Authenticate
+from helpers.music import is_playlist_showed, validate_playlist_owner, validate_public_playlist, validate_tracks, validate_track
+from schemas.playlists import PlaylistInfo,  PlaylistInfoWithoutTracks, PlaylistTrack, order_playlist_by
+from schemas.playlists_base import PlaylistBase, PlaylistCreate
+from core.config import settings
 router = APIRouter(prefix='/playlists', tags=['Плейлисты'])
 
 

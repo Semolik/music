@@ -1,9 +1,9 @@
 from typing import Union
 from pydantic import BaseModel
 
-from backend.schemas.music import AlbumInfo, Track, MusicianClip
-from backend.schemas.playlists import PlaylistInfoWithoutTracks
-from backend.schemas.user import MusicianProfile
+from schemas.music import AlbumInfo, Track, MusicianClip
+from schemas.playlists import PlaylistInfoWithoutTracks
+from schemas.user import MusicianProfile
 
 
 class SearchMusician(MusicianProfile):

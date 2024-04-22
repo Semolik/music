@@ -1,16 +1,16 @@
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_musician import MusicianCrud
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.db.base import CRUDBase
-from backend.models.albums import Album,  ListenAlbumHistoryItem
-from backend.models.playlists import Playlist, ListenPlaylistHistoryItem
-from backend.models.tracks import Track, ListenTrackHistoryItem
-from backend.models.user import PublicProfile, ListenMusicianHistoryItem
-from backend.core.config import env_config
+from crud.crud_albums import AlbumsCruds
+from crud.crud_musician import MusicianCrud
+from crud.crud_playlists import PlaylistsCrud
+from db.base import CRUDBase
+from models.albums import Album,  ListenAlbumHistoryItem
+from models.playlists import Playlist, ListenPlaylistHistoryItem
+from models.tracks import Track, ListenTrackHistoryItem
+from models.user import PublicProfile, ListenMusicianHistoryItem
+from core.config import env_config
 from sqlalchemy import desc,  literal_column, Text, cast,  union_all
 import uuid
 
-from backend.schemas.history import HistoryItem
+from schemas.history import HistoryItem
 
 
 class HistoryCrud(CRUDBase):

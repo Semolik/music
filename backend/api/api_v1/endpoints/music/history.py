@@ -1,13 +1,13 @@
 from typing import List
 from uuid import UUID
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.music import is_playlist_showed
-from backend.schemas.history import HistoryAlbum, HistoryItem, HistoryMusician, HistoryPlaylist, HistoryTrack
-from backend.crud.crud_history import HistoryCrud
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_user import UserCruds
+from helpers.auth_helper import Authenticate
+from helpers.music import is_playlist_showed
+from schemas.history import HistoryAlbum, HistoryItem, HistoryMusician, HistoryPlaylist, HistoryTrack
+from crud.crud_history import HistoryCrud
+from crud.crud_playlists import PlaylistsCrud
+from crud.crud_albums import AlbumsCruds
+from crud.crud_user import UserCruds
 router = APIRouter(prefix="/history", tags=['История'])
 
 

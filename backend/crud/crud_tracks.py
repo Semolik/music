@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from typing import List
 from uuid import UUID
-from backend.db.base import CRUDBase
-from backend.core.config import settings, env_config
-from backend.models.albums import Album
-from backend.models.playlists import Playlist, PlaylistTrack
-from backend.models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
-from backend.schemas.statistics import TrackStats, StatsDay
+from db.base import CRUDBase
+from core.config import settings, env_config
+from models.albums import Album
+from models.playlists import Playlist, PlaylistTrack
+from models.tracks import FavoriteTracks, ListenTrackHistoryItem, Track
+from schemas.statistics import TrackStats, StatsDay
 from sqlalchemy import func
 
 

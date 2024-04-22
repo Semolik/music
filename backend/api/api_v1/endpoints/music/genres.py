@@ -1,15 +1,15 @@
 from typing import List
 from fastapi import Depends, APIRouter, Path, Query,  UploadFile, File, status, HTTPException
-from backend.crud.crud_genres import GenresCruds
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.files import valid_content_length
-from backend.helpers.images import save_image
-from backend.responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
-from backend.schemas.error import GENRE_IS_NOT_UNIQUE
-from backend.schemas.music import Genre, GenreBaseForm, GenreFullInfo, AlbumInfo, Track, MusicianInfo
-from backend.core.config import settings
-from backend.schemas.playlists import PlaylistInfo
-from backend.schemas.statistics import GenreStats
+from crud.crud_genres import GenresCruds
+from helpers.auth_helper import Authenticate
+from helpers.files import valid_content_length
+from helpers.images import save_image
+from responses import NOT_ENOUGH_RIGHTS, NOT_FOUND_GENRE
+from schemas.error import GENRE_IS_NOT_UNIQUE
+from schemas.music import Genre, GenreBaseForm, GenreFullInfo, AlbumInfo, Track, MusicianInfo
+from core.config import settings
+from schemas.playlists import PlaylistInfo
+from schemas.statistics import GenreStats
 
 router = APIRouter(prefix="/genres", tags=['Жанры'])
 

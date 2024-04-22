@@ -1,6 +1,6 @@
-from backend.helpers.images import set_picture
-from backend.models.clips import Clip
-from backend.core.config import settings
+from helpers.images import set_picture
+from models.clips import Clip
+from core.config import settings
 import requests
 
 

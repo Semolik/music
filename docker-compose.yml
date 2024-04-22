@@ -3,19 +3,15 @@ services:
   db:
     image: postgres:14.1-alpine
     restart: always
-    environment:
-      - POSTGRES_DB=semolik-music
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=abobus
-      - POSTGRES_PORT=5432
-      - POSTGRES_HOST=db
-    ports:
-      - '5432:5432'
+    env_file:
+      - .env.local
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d semolik-music" ]
+      test: pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
   api:
     restart: always
     depends_on:
@@ -24,13 +20,21 @@ services:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
-    environment:
-      - DB_USER=postgres
-      - DB_PASSWORD=abobus
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=semolik-music
-    ports:
-      - '8001:8000'
+    env_file:
+      - .env.local
+      - ./frontend/.env
     volumes:
+      - ./backend:/backend
       - ./assets:/app/assets
+  web:
+    build: frontend
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+      - web

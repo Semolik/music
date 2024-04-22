@@ -1,10 +1,10 @@
 from datetime import datetime
-from backend.db.base import CRUDBase
-from backend.models.slider import Slide
-from backend.models.files import Image
+from db.base import CRUDBase
+from models.slider import Slide
+from models.files import Image
 from sqlalchemy.sql import or_
-from backend.crud.crud_file import FileCruds
-from backend.core.config import settings
+from crud.crud_file import FileCruds
+from core.config import settings
 
 
 class SliderCrud(CRUDBase):

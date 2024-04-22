@@ -1,17 +1,17 @@
 from typing import List
 from fastapi import Depends, APIRouter, Path, UploadFile, File, status, HTTPException, Query
 from fastapi_jwt_auth import AuthJWT
-from backend.core.config import settings
-from backend.crud.crud_clips import ClipsCruds
-from backend.crud.crud_tracks import TracksCrud
-from backend.crud.crud_user import UserCruds
-from backend.helpers.auth_helper import Authenticate
-from backend.helpers.images import save_image
-from backend.helpers.clips import video_is_exists
-from backend.helpers.music import validate_track
-from backend.schemas.music import CreateMusicianClipForm, MusicianClip
-from backend.helpers.files import save_image_in_db_by_url, valid_content_length
-from backend.db.db import get_db
+from core.config import settings
+from crud.crud_clips import ClipsCruds
+from crud.crud_tracks import TracksCrud
+from crud.crud_user import UserCruds
+from helpers.auth_helper import Authenticate
+from helpers.images import save_image
+from helpers.clips import video_is_exists
+from helpers.music import validate_track
+from schemas.music import CreateMusicianClipForm, MusicianClip
+from helpers.files import save_image_in_db_by_url, valid_content_length
+from db.db import get_db
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/clips", tags=['Клипы'])

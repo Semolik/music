@@ -4,6 +4,4 @@ node_modules
 .nitro
 .cache
 .output
-.env
 dist
-/client

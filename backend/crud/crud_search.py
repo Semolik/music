@@ -1,22 +1,22 @@
 
 
 from uuid import UUID
-from backend.core.config import settings
-from backend.crud.crud_musician import MusicianCrud
-from backend.db.base import CRUDBase
-from backend.models.albums import Album, FavoriteAlbum
+from core.config import settings
+from crud.crud_musician import MusicianCrud
+from db.base import CRUDBase
+from models.albums import Album, FavoriteAlbum
 from sqlalchemy import Text, cast, func, union_all
-from backend.models.genres import Genre, LovedGenre
-from backend.models.playlists import Playlist
-from backend.models.user import PublicProfile, FavoriteMusicians
-from backend.models.tracks import Track, FavoriteTracks
-from backend.models.clips import Clip
+from models.genres import Genre, LovedGenre
+from models.playlists import Playlist
+from models.user import PublicProfile, FavoriteMusicians
+from models.tracks import Track, FavoriteTracks
+from models.clips import Clip
 from sqlalchemy import desc, func, literal_column
-from backend.crud.crud_tracks import TracksCrud
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_user import UserCruds
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.schemas.search import AllSearchItem, SearchAlbum, SearchMusician, SearchPlaylist, SearchTrack
+from crud.crud_tracks import TracksCrud
+from crud.crud_albums import AlbumsCruds
+from crud.crud_user import UserCruds
+from crud.crud_playlists import PlaylistsCrud
+from schemas.search import AllSearchItem, SearchAlbum, SearchMusician, SearchPlaylist, SearchTrack
 from sqlalchemy import or_
 
 

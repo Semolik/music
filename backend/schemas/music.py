@@ -3,13 +3,13 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel,  validator
 from fastapi import Query
-from backend.helpers.urls import get_track_url_by_id
-from backend.schemas.file import ImageLink
-from backend.schemas.links import YoutubeVideoIdToUrl
-from backend.schemas.user import PublicProfile
-from backend.helpers.forms import form_body
-from backend.core.config import env_config
-from backend.helpers.forms import ValidateJsonWithFormBody
+from helpers.urls import get_track_url_by_id
+from schemas.file import ImageLink
+from schemas.links import YoutubeVideoIdToUrl
+from schemas.user import PublicProfile
+from helpers.forms import form_body
+from core.config import env_config
+from helpers.forms import ValidateJsonWithFormBody
 
 
 class CreateAlbumBase(BaseModel):

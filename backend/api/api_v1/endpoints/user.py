@@ -1,16 +1,16 @@
-from backend.crud.crud_change_roles import ChangeRolesCruds
-from backend.crud.crud_user import UserCruds
-from backend.helpers.files import valid_content_length
-from backend.schemas.error import HTTP_401_UNAUTHORIZED
-from backend.schemas.statistics import UsersStats
-from backend.schemas.user import PublicProfile, PublicProfileModifiable, PublicProfileUsernames, UserInfo, UserBase, UserInfoWithPlaylists
-from backend.schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
-from backend.helpers.images import save_image
-from backend.helpers.auth_helper import Authenticate
-from backend.crud.crud_playlists import PlaylistsCrud
+from crud.crud_change_roles import ChangeRolesCruds
+from crud.crud_user import UserCruds
+from helpers.files import valid_content_length
+from schemas.error import HTTP_401_UNAUTHORIZED
+from schemas.statistics import UsersStats
+from schemas.user import PublicProfile, PublicProfileModifiable, PublicProfileUsernames, UserInfo, UserBase, UserInfoWithPlaylists
+from schemas.playlists import PlaylistInfoWithoutTracks, order_playlist_by
+from helpers.images import save_image
+from helpers.auth_helper import Authenticate
+from crud.crud_playlists import PlaylistsCrud
 from fastapi import Depends, APIRouter, HTTPException, Path, Query, status, UploadFile, File
 from typing import List
-from backend.core.config import settings
+from core.config import settings
 router = APIRouter(
     tags=['Профили пользователей'], prefix='/users')
 

@@ -1,11 +1,11 @@
 from typing import List
 from uuid import UUID
-from backend.db.base import CRUDBase
-from backend.models.albums import Album
-from backend.models.playlists import Playlist, PlaylistTrack, FavoritePlaylist
-from backend.models.tracks import Track
+from db.base import CRUDBase
+from models.albums import Album
+from models.playlists import Playlist, PlaylistTrack, FavoritePlaylist
+from models.tracks import Track
 from sqlalchemy import or_
-from backend.core.config import env_config
+from core.config import env_config
 
 
 class PlaylistsCrud(CRUDBase):

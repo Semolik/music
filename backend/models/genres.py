@@ -1,9 +1,9 @@
-from backend.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, backref,  object_session
-from backend.core.config import env_config
+from core.config import env_config
 from sqlalchemy.dialects.postgresql import UUID
-from backend.models.albums import AlbumGenre
+from models.albums import AlbumGenre
 
 
 class Genre(Base):

@@ -1,11 +1,11 @@
 import uuid
-from backend.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, and_, func
 from sqlalchemy.orm import relationship, backref, object_session
-from backend.core.config import env_config, settings
+from core.config import env_config, settings
 from sqlalchemy.dialects.postgresql import UUID
 
-from backend.models.playlists import Playlist, FavoritePlaylist
+from models.playlists import Playlist, FavoritePlaylist
 
 
 class FavoriteMusicians(Base):

@@ -1,13 +1,13 @@
-from backend.db.base import CRUDBase
-from backend.helpers.images import copy_image
-from backend.crud.crud_file import FileCruds
-from backend.models.files import Image
-from backend.schemas.user import UserAuth,  UserRegister
-from backend.models.user import PublicProfile, User
-from backend.models.user import PublicProfileLinks
+from db.base import CRUDBase
+from helpers.images import copy_image
+from crud.crud_file import FileCruds
+from models.files import Image
+from schemas.user import UserAuth,  UserRegister
+from models.user import PublicProfile, User
+from models.user import PublicProfileLinks
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
-from backend.core.config import settings
+from core.config import settings
 
 
 class UserCruds(CRUDBase):

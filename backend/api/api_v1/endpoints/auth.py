@@ -1,13 +1,13 @@
 from typing import Any
 from fastapi import HTTPException, Depends, APIRouter, status
 from fastapi_jwt_auth import AuthJWT
-from backend.db.db import get_db
+from db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.auth_helper import Authenticate
-from backend.schemas.user import ChangePassword, UserAuth, UserInfo
-from backend.crud.crud_user import UserCruds
-from backend.schemas.user import UserRegister
-from backend.core.config import settings
+from helpers.auth_helper import Authenticate
+from schemas.user import ChangePassword, UserAuth, UserInfo
+from crud.crud_user import UserCruds
+from schemas.user import UserRegister
+from core.config import settings
 router = APIRouter(tags=['Авторизация'], prefix='/auth')
 
 

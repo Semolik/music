@@ -1,12 +1,12 @@
 from typing import List
 from fastapi import Depends, APIRouter, status, UploadFile, HTTPException, Query
-from backend.core.config import settings
-from backend.helpers.files import save_file, valid_content_length
-from backend.models.roles import ChangeRoleRequestStatus
-from backend.schemas.user import RoleRequestAnswer, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo
-from backend.models.files import File
-from backend.crud.crud_change_roles import ChangeRolesCruds
-from backend.helpers.auth_helper import Authenticate
+from core.config import settings
+from helpers.files import save_file, valid_content_length
+from models.roles import ChangeRoleRequestStatus
+from schemas.user import RoleRequestAnswer, UpdateRoleRequestAnswer, UpdateUserRoleRequest, ChangeRoleRequestFullInfo
+from models.files import File
+from crud.crud_change_roles import ChangeRolesCruds
+from helpers.auth_helper import Authenticate
 router = APIRouter(tags=['Роли'], prefix='/roles/change')
 
 

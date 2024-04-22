@@ -1,28 +1,28 @@
 
 from typing import List
 from uuid import UUID
-from backend.crud.crud_file import FileCruds
-from backend.crud.crud_tracks import TracksCrud
-from backend.crud.crud_genres import GenresCruds
-from backend.crud.crud_albums import AlbumsCruds
+from crud.crud_file import FileCruds
+from crud.crud_tracks import TracksCrud
+from crud.crud_genres import GenresCruds
+from crud.crud_albums import AlbumsCruds
 from sqlalchemy.orm import Session
-from backend.helpers.images import set_picture
-from backend.helpers.urls import get_track_url_by_id
-from backend.models.files import Image
-from backend.models.playlists import Playlist
-from backend.models.tracks import Track
-from backend.schemas.music import UploadTrackForm, AlbumInfo as AlbumInfoSchema
-from backend.crud.crud_user import UserCruds
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.db.base import CRUDBase
+from helpers.images import set_picture
+from helpers.urls import get_track_url_by_id
+from models.files import Image
+from models.playlists import Playlist
+from models.tracks import Track
+from schemas.music import UploadTrackForm, AlbumInfo as AlbumInfoSchema
+from crud.crud_user import UserCruds
+from crud.crud_playlists import PlaylistsCrud
+from db.base import CRUDBase
 from pydub import AudioSegment
 from fastapi import UploadFile, HTTPException, status
 import shutil
-from backend.core.config import settings
+from core.config import settings
 import io
 from datetime import datetime
-from backend.schemas.music import Track as TrackSchema
-from backend.models.albums import Album
+from schemas.music import Track as TrackSchema
+from models.albums import Album
 
 
 def save_track(db: Session, album_id: int, upload_file: UploadFile, picture_id: UUID, user_id: int, track: UploadTrackForm):

@@ -1,5 +1,5 @@
 from sqlalchemy.sql import func
-from backend.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Column, Integer, String,  ForeignKey, Table, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship, backref
 import enum

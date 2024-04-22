@@ -1,6 +1,6 @@
 import json
 import re
-from backend.core.config import env_config, settings
+from core.config import env_config, settings
 
 
 class TelegramUsername(str):

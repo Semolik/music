@@ -1,17 +1,17 @@
-from backend.models.user import *
-from backend.models.roles import *
-from backend.models.files import *
-from backend.models.genres import *
-from backend.models.albums import *
-from backend.models.tracks import *
-from backend.models.clips import *
-from backend.models.playlists import *
-from backend.models.slider import *
-from backend.models.support import *
+from models.user import *
+from models.roles import *
+from models.files import *
+from models.genres import *
+from models.albums import *
+from models.tracks import *
+from models.clips import *
+from models.playlists import *
+from models.slider import *
+from models.support import *
 
-from backend.core.config import settings
+from core.config import settings
 
-from backend.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool

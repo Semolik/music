@@ -3,9 +3,9 @@ from uuid import UUID
 from pydantic import BaseModel, validator, Field
 from fastapi import Query
 
-from backend.core.config import settings
-from backend.helpers.images import image_id_to_url
-from backend.models.files import Image
+from core.config import settings
+from helpers.images import image_id_to_url
+from models.files import Image
 
 
 class File(BaseModel):

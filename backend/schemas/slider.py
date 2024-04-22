@@ -1,8 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
-from backend.schemas.file import ImageLink
-from backend.helpers.forms import ValidateJsonWithFormBody
+from schemas.file import ImageLink
+from helpers.forms import ValidateJsonWithFormBody
 
 
 class SlideBase(BaseModel):

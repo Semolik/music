@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-from backend.crud.crud_user import UserCruds
-from backend.db.db import get_db
-from backend.core.config import settings
+from crud.crud_user import UserCruds
+from db.db import get_db
+from core.config import settings
 
 
 class Authenticate:

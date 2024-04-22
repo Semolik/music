@@ -1,15 +1,15 @@
 from typing import List
 from fastapi import Depends, APIRouter, Path, status, HTTPException, Query
-from backend.crud.crud_clips import ClipsCruds
-from backend.helpers.auth_helper import Authenticate
-from backend.schemas.base import LikesInfo
-from backend.schemas.music import AlbumInfo, MusicianClip, MusicianContent, Track, MusicianFullInfo, MusicianInfo
-from backend.schemas.user import PublicProfile
-from backend.crud.crud_user import UserCruds
-from backend.crud.crud_musician import MusicianCrud
-from backend.db.db import get_db
+from crud.crud_clips import ClipsCruds
+from helpers.auth_helper import Authenticate
+from schemas.base import LikesInfo
+from schemas.music import AlbumInfo, MusicianClip, MusicianContent, Track, MusicianFullInfo, MusicianInfo
+from schemas.user import PublicProfile
+from crud.crud_user import UserCruds
+from crud.crud_musician import MusicianCrud
+from db.db import get_db
 from sqlalchemy.orm import Session
-from backend.core.config import settings, env_config
+from core.config import settings, env_config
 router = APIRouter(prefix='/musician', tags=['Музыканты'])
 
 

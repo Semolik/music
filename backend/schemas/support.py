@@ -3,9 +3,9 @@ from typing import List
 from pydantic import BaseModel
 from fastapi import Query
 import uuid
-from backend.core.config import env_config
-from backend.schemas.user import UserInfo
-from backend.models.support import SupportMessageStatus, SupportMessageType
+from core.config import env_config
+from schemas.user import UserInfo
+from models.support import SupportMessageStatus, SupportMessageType
 
 
 class SupportMessageBase(BaseModel):

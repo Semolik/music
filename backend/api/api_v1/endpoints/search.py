@@ -1,17 +1,17 @@
 from typing import List
 from fastapi import Depends, APIRouter,  Query
-from backend.crud.crud_genres import GenresCruds
-from backend.crud.crud_musician import MusicianCrud
-from backend.crud.crud_albums import AlbumsCruds
-from backend.crud.crud_playlists import PlaylistsCrud
-from backend.crud.crud_tracks import TracksCrud
-from backend.crud.crud_search import SearchCrud
-from backend.schemas.music import Genre
-from backend.schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchPlaylist, SearchTrack, SearchClip
-from backend.db.db import get_db
+from crud.crud_genres import GenresCruds
+from crud.crud_musician import MusicianCrud
+from crud.crud_albums import AlbumsCruds
+from crud.crud_playlists import PlaylistsCrud
+from crud.crud_tracks import TracksCrud
+from crud.crud_search import SearchCrud
+from schemas.music import Genre
+from schemas.search import AllSearchItem, SearchMusician, SearchAlbum, SearchPlaylist, SearchTrack, SearchClip
+from db.db import get_db
 from sqlalchemy.orm import Session
-from backend.helpers.auth_helper import Authenticate
-from backend.core.config import settings
+from helpers.auth_helper import Authenticate
+from core.config import settings
 
 router = APIRouter(tags=['Поиск'], prefix='/search')
 

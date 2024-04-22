@@ -1,10 +1,9 @@
-from pydantic import AnyHttpUrl, BaseSettings, BaseModel
+from pydantic import AnyHttpUrl, BaseModel,BaseSettings
 from typing import List, Literal, Optional
 from dotenv import dotenv_values
 import enum
 import os
-env_config = {**dotenv_values('.env'), **
-              dotenv_values(".env.local"), **os.environ}
+env_config = os.environ
 
 
 class Settings(BaseSettings):
@@ -12,7 +11,7 @@ class Settings(BaseSettings):
     SERVER_LINK: str = 'http://localhost:8000'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         env_config.get('BASE_URL') or 'http://localhost:4000', 'https://music.semolik.ru']
-    DATABASE_URI: Optional[str] = f"postgresql://{env_config['DB_USER']}:{env_config['DB_PASSWORD']}@{env_config['DB_HOST']}:{env_config['DB_PORT']}/{env_config['DB_NAME']}"
+    DATABASE_URI: Optional[str] = f"postgresql://{env_config['POSTGRES_USER']}:{env_config['POSTGRES_PASSWORD']}@{env_config['POSTGRES_HOST']}:{env_config['POSTGRES_PORT']}/{env_config['POSTGRES_DB']}"
     TEST_DATABASE_URI: Optional[str] = DATABASE_URI + '_test'
     FIRST_SUPERUSER: str = "admin"
     ASSETS_FOLDER: str = 'assets/'
@@ -24,7 +23,7 @@ class Settings(BaseSettings):
     UPLOADS_ROUTE: str = '/uploads'
     OTHER_FILES_ROUTE: str = '/other/'
     DATETIME_FORMAT: str = "%Y-%m-%d %H:%M"
-    SOCIAL_LINKS_FORMAT = {
+    SOCIAL_LINKS_FORMAT={
         'telegram': 'https://t.me/{0}',
         'vk': 'https://vk.com/{0}',
         'youtube': 'https://www.youtube.com/channel/{0}',

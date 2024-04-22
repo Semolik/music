@@ -4,12 +4,12 @@ from PIL import Image as pillow
 import logging
 import shutil
 from fastapi.encoders import jsonable_encoder
-from backend.helpers.images import save_image
-from backend.models.files import File
+from helpers.images import save_image
+from models.files import File
 from fastapi import Header, UploadFile
-from backend.schemas.file import File as FileSchema
-from backend.core.config import settings
-from backend.crud.crud_file import FileCruds
+from schemas.file import File as FileSchema
+from core.config import settings
+from crud.crud_file import FileCruds
 from sqlalchemy.orm import Session
 from pathlib import Path
 import requests

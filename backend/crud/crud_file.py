@@ -1,6 +1,6 @@
 
-from backend.db.base import CRUDBase
-from backend.models.files import Image, File
+from db.base import CRUDBase
+from models.files import Image, File
 
 
 class FileCruds(CRUDBase):

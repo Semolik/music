@@ -1,12 +1,12 @@
-from backend.db.base_class import Base
+from db.base_class import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from pathlib import Path
 import os
-from backend.core.config import settings
-from backend.models.user import User
+from core.config import settings
+from models.user import User
 
 
 class Image(Base):

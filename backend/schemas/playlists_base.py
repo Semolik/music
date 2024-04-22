@@ -4,8 +4,8 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from fastapi import Query
-from backend.core.config import env_config
-from backend.schemas.file import ImageLink
+from core.config import env_config
+from schemas.file import ImageLink
 
 
 class PlaylistBase(BaseModel):

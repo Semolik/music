@@ -1,3 +1,5 @@
+.env.dev.local
 .env.local
 /assets
 .vscode/settings.json
+/db-data

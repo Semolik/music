@@ -2,9 +2,9 @@ from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
 from typing import Union
-from backend.schemas.music import AlbumInfo, Track
-from backend.schemas.playlists import PlaylistInfoWithoutTracks
-from backend.schemas.user import MusicianProfile
+from schemas.music import AlbumInfo, Track
+from schemas.playlists import PlaylistInfoWithoutTracks
+from schemas.user import MusicianProfile
 
 
 class HistoryItem(BaseModel):

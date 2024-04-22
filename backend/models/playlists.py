@@ -1,8 +1,8 @@
 import uuid
 from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from backend.db.base_class import Base
-from backend.core.config import env_config
+from db.base_class import Base
+from core.config import env_config
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref, object_session

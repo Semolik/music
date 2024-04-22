@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 from fastapi import Query
-from backend.core.config import settings, env_config
-from backend.models.roles import ChangeRoleRequestStatus
-from backend.schemas.file import File, ImageLink
-from backend.helpers.forms import form_body
-from backend.schemas.links import TelegramUsername, VKUsernameToUrl, YoutubeChannelID, VKUsername, TelegramUsernameToUrl, YoutubeChannelIDToUrl
-from backend.schemas.playlists_base import PlaylistInfoBase
+from core.config import settings, env_config
+from models.roles import ChangeRoleRequestStatus
+from schemas.file import File, ImageLink
+from helpers.forms import form_body
+from schemas.links import TelegramUsername, VKUsernameToUrl, YoutubeChannelID, VKUsername, TelegramUsernameToUrl, YoutubeChannelIDToUrl
+from schemas.playlists_base import PlaylistInfoBase
 
 
 class UserUsername(BaseModel):

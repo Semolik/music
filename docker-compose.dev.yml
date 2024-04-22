@@ -1,0 +1,32 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    env_file:
+      - .env.local
+    healthcheck:
+      test: pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+  api:
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    env_file:
+      - .env.dev.local
+      - ./frontend/.env
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./backend:/backend
+      - ./assets:/app/assets

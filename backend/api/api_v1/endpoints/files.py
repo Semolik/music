@@ -1,12 +1,12 @@
 import os
 from fastapi import APIRouter, HTTPException, status, Depends, Path
 from fastapi.responses import FileResponse
-from backend.crud.crud_file import FileCruds
-from backend.core.config import settings
-from backend.db.db import get_db
+from crud.crud_file import FileCruds
+from core.config import settings
+from db.db import get_db
 from sqlalchemy.orm import Session
 import uuid as uuid_pkg
-from backend.helpers.images import image_id_to_path
+from helpers.images import image_id_to_path
 router = APIRouter(prefix=settings.UPLOADS_ROUTE, tags=['Файлы'])
 
 

@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import List
-from backend.core.config import settings, env_config
-from backend.crud.crud_file import FileCruds
-from backend.crud.crud_user import UserCruds
-from backend.db.base import CRUDBase
-from backend.models.files import Image
-from backend.models.genres import Genre
-from backend.models.albums import Album, FavoriteAlbum, AlbumGenre
-from backend.models.user import PublicProfile
+from core.config import settings, env_config
+from crud.crud_file import FileCruds
+from crud.crud_user import UserCruds
+from db.base import CRUDBase
+from models.files import Image
+from models.genres import Genre
+from models.albums import Album, FavoriteAlbum, AlbumGenre
+from models.user import PublicProfile
 from sqlalchemy import func
 
 

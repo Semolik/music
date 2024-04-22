@@ -1,12 +1,12 @@
-from backend.crud.crud_file import FileCruds
-from backend.db.base import CRUDBase
-from backend.models.albums import Album, AlbumGenre, FavoriteAlbum
-from backend.models.files import Image
-from backend.models.tracks import Track, FavoriteTracks
-from backend.models.genres import Genre, LovedGenre
-from backend.models.user import PublicProfile, FavoriteMusicians
+from crud.crud_file import FileCruds
+from db.base import CRUDBase
+from models.albums import Album, AlbumGenre, FavoriteAlbum
+from models.files import Image
+from models.tracks import Track, FavoriteTracks
+from models.genres import Genre, LovedGenre
+from models.user import PublicProfile, FavoriteMusicians
 from sqlalchemy import and_, func, select
-from backend.core.config import settings
+from core.config import settings
 from sqlalchemy import or_
 
 
